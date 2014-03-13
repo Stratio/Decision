@@ -1,25 +1,35 @@
 package com.stratio.bus
 
 import java.util.UUID
+import scala.concurrent.duration._
+import scala.concurrent._
+
 
 class StratioBus
   extends IStratioBus {
     import StratioBus._
 
   def create(tableName: String, tableValues: Map[String, BusDataTypes.DataType]) = {
-    //TODO David?????
+    //TODO David
     val groupId = UUID.randomUUID().toString
     //Create topic
     KafkaTopicUtils.createTopic("localhost:2181",tableName,1,1)
     //Create topic consumer
-    val createTableConsumer = new KafkaConsumer(tableName, groupId, "localhost:2181")
+    val createTableConsumer = new KafkaConsumer(tableName, groupId, "localhost:2181", false)
 
     //Send message to the create table producer topic
     createTableProducer.send(s"table $tableName created")
 
     //Waiting for the Ack...
-    println(s"Consumer for topic: $tableName is waiting for the response")
-    createTableConsumer.read(messageCreatedOk)
+    try {
+      println(s"Consumer for topic: $tableName is waiting for the response - max 10 seconds...")
+      Await.result(createTableConsumer.read(messageCreatedOk), 10 seconds)
+    } catch {
+      case e: TimeoutException => {
+        val producer = new KafkaProducer(tableName, "localhost:9092")
+        producer.send("ack")
+      }
+    }
 
     def messageCreatedOk(createdMessage: Array[Byte]) = {
       val messageContent = new String(createdMessage)

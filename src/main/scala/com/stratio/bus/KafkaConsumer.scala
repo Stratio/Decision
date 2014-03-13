@@ -5,6 +5,8 @@ import java.util.Properties
 import kafka.utils.Logging
 import scala.collection.JavaConversions._
 import kafka.consumer.{KafkaStream, Whitelist, Consumer, ConsumerConfig}
+import scala.concurrent.{ExecutionContext, Future}
+import ExecutionContext.Implicits.global
 
 class KafkaConsumer(
                      topic: String,
@@ -62,26 +64,24 @@ class KafkaConsumer(
 
   val filterSpec = new Whitelist(topic)
 
-  info("setup:start topic=%s for zk=%s and groupId=%s".format(topic,zookeeperConnect,groupId))
   val stream = connector.createMessageStreamsByFilter(filterSpec, 1, new DefaultDecoder(), new DefaultDecoder()).get(0)
-  info("setup:complete topic=%s for zk=%s and groupId=%s".format(topic,zookeeperConnect,groupId))
 
   def read(write: (Array[Byte])=>Unit) = {
-    println("reading on stream now")
-    for(messageAndTopic <- stream) {
-      try {
-        println("writing from stream")
-        write(messageAndTopic.message)
-        println("written to stream")
-      } catch {
-        case e: Throwable =>
-          if (true) { //this is objective even how to conditionalize on it
-            error("Error processing message, skipping this message: ", e)
-          } else {
-            throw e
-          }
+     Future {
+      for(messageAndTopic <- stream) {
+        try {
+          write(messageAndTopic.message)
+        } catch {
+          case e: Throwable =>
+            if (true) { //this is objective even how to conditionalize on it
+              error("Error processing message, skipping this message: ", e)
+            } else {
+              throw e
+            }
+        }
       }
-    }
+     }
+
   }
 
   def close() {
