@@ -24,7 +24,8 @@ test in assembly := {}
 
 libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.10" % "2.0" % "test" withSources() withJavadoc(),
-  "org.apache.kafka" % "kafka_2.10" % "0.8.0" exclude("com.sun.jdmk", "jmxtools") exclude("com.sun.jmx", "jmxri")
+  "org.apache.kafka" % "kafka_2.10" % "0.8.0" exclude("com.sun.jdmk", "jmxtools") exclude("com.sun.jmx", "jmxri"),
+  "com.typesafe" % "config" % "1.2.0"
 )
 
 initialCommands := "import com.stratio.bus._"
