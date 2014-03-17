@@ -27,7 +27,8 @@ case class Create(
       val createTableTimeOut = config.getString("create.table.ack.timeout.in.seconds").toInt
       val creationFullPath = getCreationZNodeFullPath(zNodeUniqueId, "create")
       Await.result(zookeeperConsumer.readZNode(creationFullPath), createTableTimeOut seconds)
-      println("ACK RECEIVED!!!!")
+      val response = zookeeperConsumer.getZNodeData(creationFullPath)
+      println("The response has been: "+response)
       //TODO define response (json, exceptions....)
     } catch {
       case e: TimeoutException => {
