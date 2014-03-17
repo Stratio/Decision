@@ -23,7 +23,6 @@ object KafkaTopicUtils {
     zkClient.setZkSerializer(zkSerializer)
     createOrUpdateTopic(zkClient, topic, numPartitions, replicationFactor)
     zkClient.close()
-
     true
   }
 
@@ -36,9 +35,7 @@ object KafkaTopicUtils {
     //TODO call the getNumPartitionsForTopic method to get the number of partitions
     //val numPartitions = getNumPartitionsForTopic(brokerList, 9092, topic)
     val partitionReplicaAssignment = AdminUtils.assignReplicasToBrokers(brokerList, numPartitions, replicationFactor,0,0)
-    System.out.println("Replica assignment list for " + topic + " is " + partitionReplicaAssignment.toString())
     AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(topic, partitionReplicaAssignment, zkClient, true)
-
     true
   }
 

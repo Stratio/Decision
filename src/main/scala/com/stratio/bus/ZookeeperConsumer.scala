@@ -5,8 +5,6 @@ import com.netflix.curator.framework.CuratorFramework
 import org.apache.zookeeper.data.Stat
 import ExecutionContext.Implicits.global
 import com.typesafe.config.ConfigFactory
-import org.apache.zookeeper.common.IOUtils
-import java.lang.String
 import scala.Predef.String
 
 case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {

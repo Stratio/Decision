@@ -6,6 +6,6 @@ trait IStratioBus {
 
   def insert(queryString: String)
 
-  def select
+  def select(queryString: String)
 
 }
