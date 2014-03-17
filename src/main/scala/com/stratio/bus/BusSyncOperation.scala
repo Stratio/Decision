@@ -11,6 +11,7 @@ case class BusSyncOperation(
   zookeeperConsumer: ZookeeperConsumer,
   operation: String) {
   val config = ConfigFactory.load()
+  val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
 
   def performSyncOperation(queryString: String) = {
     val zNodeUniqueId = UUID.randomUUID().toString
@@ -22,10 +23,8 @@ case class BusSyncOperation(
     val message = JsonUtils.appendElementsToJsonString(queryString, Map("zNodeId" -> creationUniqueId))
     tableProducer.send(message)
   }
-  
   private def waitForTheStreamingResponse(zNodeUniqueId: String) = {
     try {
-      val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
       val zNodeFullPath = getOperationZNodeFullPath(zNodeUniqueId, operation)
       Await.result(zookeeperConsumer.readZNode(zNodeFullPath), streamingAckTimeOut seconds)
       val response = zookeeperConsumer.getZNodeData(zNodeFullPath)
@@ -40,7 +39,7 @@ case class BusSyncOperation(
   }
 
   private def getOperationZNodeFullPath(uniqueId: String, operation: String) = {
-    val zookeeperPath = config.getString("zookeeper.listener.path")
+    val zookeeperPath = config.getString("zookeeper.listener.base.path")
     s"$zookeeperPath/$operation/$uniqueId"
   }
 }
