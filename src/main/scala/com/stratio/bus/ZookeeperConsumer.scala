@@ -9,12 +9,11 @@ import com.typesafe.config.ConfigFactory
 case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
   val config = ConfigFactory.load()
 
-  def readZNode(uniqueId: String, operation: String) = {
-    val zNodeName = getZNodeFullPath(uniqueId, operation)
+  def readZNode(fullPath: String) = {
     Future {
-      var zNode = checkZNode(zNodeName)
+      var zNode = checkZNode(fullPath)
       while(!zNodeHasBeenCreated(zNode)) {
-        zNode = checkZNode(zNodeName)
+        zNode = checkZNode(fullPath)
       }
     }
   }
@@ -22,10 +21,4 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
   private def checkZNode(zNodeName: String) = zooKeeperClient.checkExists().forPath(zNodeName)
 
   private def zNodeHasBeenCreated(zNode: Stat) = zNode != null
-
-  def getZNodeFullPath(uniqueId: String, operation: String) = {
-    val zookeeperPath = config.getString("zookeeper.listener.path")
-    s"$zookeeperPath/$operation/$uniqueId"
-  }
-
 }

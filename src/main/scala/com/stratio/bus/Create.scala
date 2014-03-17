@@ -12,19 +12,21 @@ case class Create(
   val config = ConfigFactory.load()
 
   def create(queryString: String) = {
-    val creationUniqueId = UUID.randomUUID().toString
-    createMessageInTheCreationTopic(queryString, creationUniqueId)
-    waitForTheStreamingResponse(creationUniqueId)
+    val zNodeUniqueId = UUID.randomUUID().toString
+    createMessageInTheCreationTopic(queryString, zNodeUniqueId)
+    waitForTheStreamingResponse(zNodeUniqueId)
   }
 
   def createMessageInTheCreationTopic(queryString: String, creationUniqueId: String) = {
-    val message = JsonUtils.appendElementsToJson(queryString, Map("zNodeId" -> creationUniqueId))
+    val message = JsonUtils.appendElementsToJsonString(queryString, Map("zNodeId" -> creationUniqueId))
     createTableProducer.send(message)
   }
-  def waitForTheStreamingResponse(creationUniqueId: String) = {
+  
+  def waitForTheStreamingResponse(zNodeUniqueId: String) = {
     try {
       val createTableTimeOut = config.getString("create.table.ack.timeout.in.seconds").toInt
-      Await.result(zookeeperConsumer.readZNode(creationUniqueId, "create"), createTableTimeOut seconds)
+      val creationFullPath = getCreationZNodeFullPath(zNodeUniqueId, "create")
+      Await.result(zookeeperConsumer.readZNode(creationFullPath), createTableTimeOut seconds)
       println("ACK RECEIVED!!!!")
       //TODO define response (json, exceptions....)
     } catch {
@@ -33,5 +35,11 @@ case class Create(
         //TODO insert error into error-topic ???
       }
     }
+  }
+
+  //TODO Extract????
+  def getCreationZNodeFullPath(uniqueId: String, operation: String) = {
+    val zookeeperPath = config.getString("zookeeper.listener.path")
+    s"$zookeeperPath/$operation/$uniqueId"
   }
 }

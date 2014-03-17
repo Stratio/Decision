@@ -15,7 +15,7 @@ class JsonUtilsTests
     Given("an input json")
     val inputJson = s"""{"command": "$command"}"""
     When("i append the uniqueid")
-    val jsonWithUniqueId = JsonUtils.appendElementsToJson(inputJson, Map("uniqueId" -> uniqueId))
+    val jsonWithUniqueId = JsonUtils.appendElementsToJsonString(inputJson, Map("uniqueId" -> uniqueId))
     Then("the json should contain the uniqueid")
     val expectedJson = s"""{"command": "$command", "uniqueId": "$uniqueId"}"""
     expectedJson should be (jsonWithUniqueId)
