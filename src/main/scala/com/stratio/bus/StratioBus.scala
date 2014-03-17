@@ -1,7 +1,5 @@
 package com.stratio.bus
 
-import scala.concurrent.duration._
-import scala.concurrent._
 import com.typesafe.config.ConfigFactory
 import com.netflix.curator.retry.ExponentialBackoffRetry
 import com.netflix.curator.framework.CuratorFrameworkFactory
@@ -11,34 +9,21 @@ class StratioBus
   extends IStratioBus {
   import StratioBus._
 
-  def create(tableName: String, queryString: String) = {
-    createMessageInTheCreationTopic(tableName)
-    waitForTheStreamingResponse(tableName)
-  }
+  def create(tableName: String, queryString: String) = stratioBusCreate.create(tableName, queryString)
 
-  def createMessageInTheCreationTopic(tableName: String) = createTableProducer.send(s"table $tableName created")
-
-  def waitForTheStreamingResponse(tableName: String) = {
-    try {
-      val createTableTimeOut = config.getString("create.table.ack.timeout.in.seconds").toInt
-      Await.result(zookeeperConsumer.readZNode(tableName), createTableTimeOut seconds)
-      println("ACK RECEIVED!!!!")
-    } catch {
-      case e: TimeoutException => {
-        println("TIME OUT")
-        //TODO insert error into error-topic ???
-      }
-    }
-  }
-
-  def insert = ???
+  def insert(queryString: String) = stratioBusInsert.insert(queryString)
 
   def select = ???
+
+  def alter = ???
+
+  def drop = ???
 }
 
 object StratioBus {
   val config = ConfigFactory.load()
   val createTopicName = config.getString("create.table.topic.name")
+  val insertTopicName = config.getString("insert.table.topic.name")
   val brokerServer = config.getString("broker.server")
   val brokerIp = config.getString("broker.ip")
   val kafkaBroker = s"$brokerServer:$brokerIp"
@@ -47,19 +32,25 @@ object StratioBus {
   val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
 
   lazy val createTableProducer = new KafkaProducer(createTopicName, kafkaBroker)
+  lazy val insertTableProducer = new KafkaProducer(insertTopicName, kafkaBroker)
+
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
-  val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
+  lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
   lazy val zookeeperConsumer = {
     zookeeperClient.start()
     ZookeeperConsumer(zookeeperClient)
   }
 
-  def initializeTopics(topicName: String) {
-    KafkaTopicUtils.createTopic(zookeeperCluster, topicName)
+  lazy val stratioBusCreate = new Create(createTableProducer, zookeeperConsumer)
+  lazy val stratioBusInsert = new Insert(insertTableProducer)
+
+  def initializeTopics() {
+    KafkaTopicUtils.createTopic(zookeeperCluster, createTopicName)
+    KafkaTopicUtils.createTopic(zookeeperCluster, insertTopicName)
   }
   
   def apply() = {
-    initializeTopics(createTopicName)
+    initializeTopics()
     new StratioBus()
   }
 }

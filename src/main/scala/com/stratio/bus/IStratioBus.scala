@@ -4,7 +4,7 @@ trait IStratioBus {
 
   def create(tableName: String, queryString: String)
 
-  def insert
+  def insert(queryString: String)
 
   def select
 

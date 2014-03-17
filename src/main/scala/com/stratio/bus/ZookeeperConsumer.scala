@@ -9,14 +9,14 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
 
   def readZNode(zNodeName: String) = {
     Future {
-      var zNodeExists = checkZNodeExists(zNodeName)
-      while(!zNodeHasBeenCreated(zNodeExists)) {
-        zNodeExists = checkZNodeExists(zNodeName)
+      var zNode = checkZNode(zNodeName)
+      while(!zNodeHasBeenCreated(zNode)) {
+        zNode = checkZNode(zNodeName)
       }
     }
   }
 
-  private def checkZNodeExists(zNodeName: String) = zooKeeperClient.checkExists().forPath(s"/$zNodeName")
+  private def checkZNode(zNodeName: String) = zooKeeperClient.checkExists().forPath(s"/$zNodeName")
 
   private def zNodeHasBeenCreated(zNode: Stat) = zNode != null
 
