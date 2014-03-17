@@ -24,7 +24,7 @@ class ConsumerProducerTests
       def exec(binaryObject: Array[Byte]) = {
         val message = new String(binaryObject)
         info("testMessage = " + testMessage + " and consumed message = " + message)
-        testMessage should be equals(message)
+        testMessage should be (message)
         consumer.close()
         testStatus = true
       }
@@ -32,7 +32,6 @@ class ConsumerProducerTests
       info("KafkaSpec is waiting some seconds")
       consumer.read(exec)
       info("KafkaSpec consumed")
-
       testStatus should be (true)
     }
 

@@ -23,7 +23,7 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
 
   private def zNodeHasBeenCreated(zNode: Stat) = zNode != null
 
-  private def getZNodeFullPath(uniqueId: String, operation: String) = {
+  def getZNodeFullPath(uniqueId: String, operation: String) = {
     val zookeeperPath = config.getString("zookeeper.listener.path")
     s"$zookeeperPath/$operation/$uniqueId"
   }
