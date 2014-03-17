@@ -87,7 +87,7 @@ case class KafkaProducer(topic: String,
     } catch {
       case e: Exception =>
         e.printStackTrace
-        System.exit(1)
+        //System.exit(1)
     }
   }
 }

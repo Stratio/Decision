@@ -11,7 +11,7 @@ class StratioBus
   extends IStratioBus {
   import StratioBus._
 
-  def create(tableName: String, tableValues: Map[String, BusDataTypes.DataType]) = {
+  def create(tableName: String, queryString: String) = {
     createMessageInTheCreationTopic(tableName)
     waitForTheStreamingResponse(tableName)
   }

@@ -2,7 +2,7 @@ package com.stratio.bus
 
 trait IStratioBus {
 
-  def create(tableName: String, tableValues: Map[String, BusDataTypes.DataType])
+  def create(tableName: String, queryString: String)
 
   def insert
 
