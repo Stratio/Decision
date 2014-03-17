@@ -19,48 +19,49 @@ class ZookeperConsumerTests
   zookeeperClient.start()
   val zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
   val operation = "theOperation"
+  val operationFullPath = s"/stratio/streaming/$operation"
 
   override def beforeAll() {
     createZookeeperFullPath()
   }
 
   describe("The zookeeper consumer") {
-    it("should create the full listener path") {
-      Given("a uniqueid and the operation")
-      val uniqueId = UUID.randomUUID().toString
-      When("i generate the path for a creation op")
-      val fullPath = zookeeperConsumer.getZNodeFullPath(uniqueId, operation)
-      Then("the path should be the full path")
-      val expectedFullPath = s"/stratio/streaming/$operation/$uniqueId"
-      expectedFullPath should be equals (fullPath)
-    }
-
-
     it("should not throw a TimeOutException when the znode has been created within the timeout") {
       Given("a uniqueId and an operation")
       val uniqueId = UUID.randomUUID().toString
-      val operation = "theOperation"
-      val fullPath = zookeeperConsumer.getZNodeFullPath(uniqueId, operation)
+      val fullPath = s"$operationFullPath/$uniqueId"
       When("I create the znode within the timeout")
       zookeeperClient.create().forPath(fullPath)
       And("I call the readZNode method")
-      Await.result(zookeeperConsumer.readZNode(uniqueId, operation), 1 seconds)
+      Await.result(zookeeperConsumer.readZNode(fullPath), 1 seconds)
       Then("the TimeOutException should not be thrown")
     }
-
 
     it("should throw a TimeOutException when the znode has not been created within the timeout") {
       Given("a uniqueId and an operation")
       val uniqueId = UUID.randomUUID().toString
-      val operation = "theOperation"
+      val fullPath = s"$operationFullPath/$uniqueId"
       When("I do not create the znode within the timeout")
       And("I call the readZNode method")
       Then("the TimeOutException should be thrown")
       intercept [TimeoutException] {
-        Await.result(zookeeperConsumer.readZNode(uniqueId, operation), 1 seconds)
+        Await.result(zookeeperConsumer.readZNode(fullPath), 1 seconds)
       }
     }
+
+    it("should pick up the value from the zNode") {
+      Given("a zNode with data")
+      val uniqueId = UUID.randomUUID().toString
+      val fullPath = s"$operationFullPath/$uniqueId"
+      zookeeperClient.create().forPath(fullPath, "someData".getBytes())
+      When("i fetch the value")
+      val data = zookeeperConsumer.getZNodeData(fullPath)
+      Then("i should get the data")
+      data.get should be ("someData")
+    }
+
   }
+
 
   def createZookeeperFullPath() {
     if (zookeeperClient.checkExists().forPath("/stratio")==null) {
