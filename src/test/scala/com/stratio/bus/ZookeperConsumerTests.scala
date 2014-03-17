@@ -3,8 +3,6 @@ package com.stratio.bus
 import org.scalatest.{GivenWhenThen, ShouldMatchers, FunSpec}
 import com.netflix.curator.framework.CuratorFrameworkFactory
 import com.netflix.curator.retry.ExponentialBackoffRetry
-import scala.concurrent._
-import scala.concurrent.duration._
 
 class ZookeperConsumerTests
   extends FunSpec

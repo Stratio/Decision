@@ -4,10 +4,13 @@ import scala.concurrent.{ExecutionContext, Future}
 import com.netflix.curator.framework.CuratorFramework
 import org.apache.zookeeper.data.Stat
 import ExecutionContext.Implicits.global
+import com.typesafe.config.ConfigFactory
 
 case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
+  val config = ConfigFactory.load()
 
-  def readZNode(zNodeName: String) = {
+  def readZNode(uniqueId: String, operation: String) = {
+    val zNodeName = getZNodeFullPath(uniqueId, operation)
     Future {
       var zNode = checkZNode(zNodeName)
       while(!zNodeHasBeenCreated(zNode)) {
@@ -16,8 +19,13 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
     }
   }
 
-  private def checkZNode(zNodeName: String) = zooKeeperClient.checkExists().forPath(s"/$zNodeName")
+  private def checkZNode(zNodeName: String) = zooKeeperClient.checkExists().forPath(zNodeName)
 
   private def zNodeHasBeenCreated(zNode: Stat) = zNode != null
+
+  private def getZNodeFullPath(uniqueId: String, operation: String) = {
+    val zookeeperPath = config.getString("zookeeper.listener.path")
+    s"$zookeeperPath/$operation/$uniqueId"
+  }
 
 }

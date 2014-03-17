@@ -9,7 +9,7 @@ class StratioBus
   extends IStratioBus {
   import StratioBus._
 
-  def create(tableName: String, queryString: String) = stratioBusCreate.create(tableName, queryString)
+  def create(queryString: String) = stratioBusCreate.create(queryString)
 
   def insert(queryString: String) = stratioBusInsert.insert(queryString)
 
