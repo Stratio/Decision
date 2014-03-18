@@ -57,7 +57,18 @@ class ZookeperConsumerTests
       When("i fetch the value")
       val data = zookeeperConsumer.getZNodeData(fullPath)
       Then("i should get the data")
+      data.isDefined should be (true)
       data.get should be ("someData")
+    }
+
+    it("should return None when the zNode does not exist") {
+      Given("a non existing zNode")
+      val uniqueId = UUID.randomUUID().toString
+      val fullPath = s"$operationFullPath/$uniqueId"
+      When("i fetch the value")
+      val data = zookeeperConsumer.getZNodeData(fullPath)
+      Then("i should get None")
+      data.isDefined should be (false)
     }
 
   }
