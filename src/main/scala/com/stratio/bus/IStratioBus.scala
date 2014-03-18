@@ -5,6 +5,8 @@ trait IStratioBus {
 
   def withZookeeperPort(port: String): IStratioBus
 
+  def withKafkaPort(port: String): IStratioBus
+
   def create(queryString: String)
 
   def insert(queryString: String)

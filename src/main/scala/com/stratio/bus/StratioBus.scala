@@ -23,6 +23,11 @@ class StratioBus
     this
   }
 
+  def withKafkaPort(port: String) = {
+    kafkaBroker = s"$brokerServer:$port"
+    this
+  }
+
   def initialize() = {
     initializeTopics()
     this
@@ -38,7 +43,7 @@ object StratioBus {
   val dropTopicName = config.getString("drop.table.topic.name")
   val brokerServer = config.getString("broker.server")
   val brokerPort = config.getString("broker.port")
-  val kafkaBroker = s"$brokerServer:$brokerPort"
+  var kafkaBroker = s"$brokerServer:$brokerPort"
   val zookeeperServer = config.getString("zookeeper.server")
   val zookeeperPort = config.getString("zookeeper.port")
   var zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
