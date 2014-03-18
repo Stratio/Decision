@@ -5,6 +5,10 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.duration._
 import java.util.UUID
 import com.stratio.bus.utils.JsonUtils
+import com.stratio.bus.StreamingAckValues._
+import com.stratio.bus.KafkaProducer
+import com.stratio.bus.ZookeeperConsumer
+import scala.Some
 
 case class BusSyncOperation(
   tableProducer: KafkaProducer,
@@ -28,7 +32,12 @@ case class BusSyncOperation(
       val zNodeFullPath = getOperationZNodeFullPath(zNodeUniqueId, operation)
       Await.result(zookeeperConsumer.readZNode(zNodeFullPath), streamingAckTimeOut seconds)
       val response = zookeeperConsumer.getZNodeData(zNodeFullPath)
-      println("The response has been: "+response)
+      println("The response has been: "+response.get)
+      response.get match {
+        case StreamingAckValues(AckOk) => println("ACK OK!!")
+        case StreamingAckValues(AckError) => println("ACK ERROR!!!")
+        case _ => println("I HAVE NO IDEA WHAT TO DO WITH THIS :(")
+      }
       //TODO define response (json, exceptions....)
     } catch {
       case e: TimeoutException => {
