@@ -27,6 +27,12 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
     }
   }
 
+  def removeZNode(fullPath: String) = {
+    val zNode = checkZNode(fullPath)
+    if (zNodeExists(zNode))
+      zooKeeperClient.delete.forPath(fullPath)
+  }
+
   private def checkZNode(zNodeName: String) = zooKeeperClient.checkExists().forPath(zNodeName)
 
   private def zNodeExists(zNode: Stat) = zNode != null

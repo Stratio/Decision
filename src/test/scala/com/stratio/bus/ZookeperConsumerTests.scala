@@ -71,17 +71,40 @@ class ZookeperConsumerTests
       data.isDefined should be (false)
     }
 
+    it("should remove a zNode") {
+      Given("an existing zNode")
+      val uniqueId = UUID.randomUUID().toString
+      val fullPath = s"$operationFullPath/$uniqueId"
+      zookeeperClient.create().forPath(fullPath, "someData".getBytes())
+      When("i remove the node")
+      zookeeperConsumer.removeZNode(fullPath)
+      Then("the node should be removed")
+      theNodeExists(fullPath) should be(false)
+    }
+
+    it("should not throw an Exception when removing a non existing node") {
+      Given("a non existing zNode")
+      val uniqueId = UUID.randomUUID().toString
+      val fullPath = s"$operationFullPath/$uniqueId"
+      When("i remove a non existing node")
+      zookeeperConsumer.removeZNode(fullPath)
+      Then("the consumer should not throw an exception")
+      //theNodeExists(fullPath) should be(false)
+    }
   }
 
+  private def theNodeExists(path: String): Boolean = {
+    zookeeperClient.checkExists().forPath(path)!=null
+  }
 
   def createZookeeperFullPath() {
-    if (zookeeperClient.checkExists().forPath("/stratio")==null) {
+    if (!theNodeExists("/stratio")) {
       zookeeperClient.create().forPath("/stratio")
     }
-    if (zookeeperClient.checkExists().forPath("/stratio/streaming")==null) {
+    if (!theNodeExists("/stratio/streaming")) {
       zookeeperClient.create().forPath("/stratio/streaming")
     }
-    if (zookeeperClient.checkExists().forPath(s"/stratio/streaming/$operation")==null) {
+    if (!theNodeExists(s"/stratio/streaming/$operation")) {
       zookeeperClient.create().forPath(s"/stratio/streaming/$operation")
     }
   }

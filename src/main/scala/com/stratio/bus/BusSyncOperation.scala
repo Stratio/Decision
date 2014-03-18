@@ -39,6 +39,7 @@ case class BusSyncOperation(
         case _ => println("I HAVE NO IDEA WHAT TO DO WITH THIS :(")
       }
       //TODO define response (json, exceptions....)
+      zookeeperConsumer.removeZNode(zNodeFullPath)
     } catch {
       case e: TimeoutException => {
         println("TIME OUT")
