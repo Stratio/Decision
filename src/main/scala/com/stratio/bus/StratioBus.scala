@@ -14,9 +14,9 @@ class StratioBus
 
   def select(queryString: String) = stratioBusSelect.performSyncOperation(queryString)
 
-  def alter = ???
+  def alter(queryString: String) = stratioBusAlter.performAsyncOperation(queryString)
 
-  def drop = ???
+  def drop(queryString: String) = stratioBusDrop.performSyncOperation(queryString)
 }
 
 object StratioBus {
@@ -24,6 +24,8 @@ object StratioBus {
   val createTopicName = config.getString("create.table.topic.name")
   val insertTopicName = config.getString("insert.table.topic.name")
   val selectTopicName = config.getString("select.table.topic.name")
+  val alterTopicName = config.getString("alter.table.topic.name")
+  val dropTopicName = config.getString("drop.table.topic.name")
   val brokerServer = config.getString("broker.server")
   val brokerIp = config.getString("broker.ip")
   val kafkaBroker = s"$brokerServer:$brokerIp"
@@ -34,6 +36,8 @@ object StratioBus {
   lazy val createTableProducer = new KafkaProducer(createTopicName, kafkaBroker)
   lazy val insertTableProducer = new KafkaProducer(insertTopicName, kafkaBroker)
   lazy val selectTableProducer = new KafkaProducer(selectTopicName, kafkaBroker)
+  lazy val alterTableProducer = new KafkaProducer(alterTopicName, kafkaBroker)
+  lazy val dropTableProducer = new KafkaProducer(dropTopicName, kafkaBroker)
 
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
@@ -45,11 +49,15 @@ object StratioBus {
   lazy val stratioBusCreate = new BusSyncOperation(createTableProducer, zookeeperConsumer, "create")
   lazy val stratioBusInsert = new BusAsyncOperation(insertTableProducer)
   lazy val stratioBusSelect = new BusSyncOperation(selectTableProducer, zookeeperConsumer, "select")
+  lazy val stratioBusAlter = new BusAsyncOperation(alterTableProducer)
+  lazy val stratioBusDrop = new BusSyncOperation(dropTableProducer, zookeeperConsumer, "drop")
 
   def initializeTopics() {
     KafkaTopicUtils.createTopic(zookeeperCluster, createTopicName)
     KafkaTopicUtils.createTopic(zookeeperCluster, insertTopicName)
     KafkaTopicUtils.createTopic(zookeeperCluster, selectTopicName)
+    KafkaTopicUtils.createTopic(zookeeperCluster, alterTopicName)
+    KafkaTopicUtils.createTopic(zookeeperCluster, dropTopicName)
   }
   
   def apply() = {
