@@ -1,7 +1,7 @@
 package com.stratio.bus
 
 object StratioBusFactory {
-  def initialize(): IStratioBus = {
-    StratioBus()
+  def create(): IStratioBus = {
+    new StratioBus()
   }
 }
