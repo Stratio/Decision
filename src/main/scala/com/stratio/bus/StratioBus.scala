@@ -18,16 +18,6 @@ class StratioBus
 
   def drop(queryString: String) = stratioBusDrop.performSyncOperation(queryString)
 
-  def withZookeeperPort(port: String) = {
-    zookeeperCluster = s"$zookeeperServer:$port"
-    this
-  }
-
-  def withKafkaPort(port: String) = {
-    kafkaBroker = s"$brokerServer:$port"
-    this
-  }
-
   def initialize() = {
     initializeTopics()
     this
@@ -43,10 +33,10 @@ object StratioBus {
   val dropTopicName = config.getString("drop.table.topic.name")
   val brokerServer = config.getString("broker.server")
   val brokerPort = config.getString("broker.port")
-  var kafkaBroker = s"$brokerServer:$brokerPort"
+  val kafkaBroker = s"$brokerServer:$brokerPort"
   val zookeeperServer = config.getString("zookeeper.server")
   val zookeeperPort = config.getString("zookeeper.port")
-  var zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
+  val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
 
   lazy val createTableProducer = new KafkaProducer(createTopicName, kafkaBroker)
   lazy val insertTableProducer = new KafkaProducer(insertTopicName, kafkaBroker)
