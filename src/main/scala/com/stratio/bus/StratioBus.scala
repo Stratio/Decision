@@ -26,11 +26,7 @@ class StratioBus
 
 object StratioBus {
   val config = ConfigFactory.load()
-  val createTopicName = config.getString("create.table.topic.name")
-  val insertTopicName = config.getString("insert.table.topic.name")
-  val selectTopicName = config.getString("select.table.topic.name")
-  val alterTopicName = config.getString("alter.table.topic.name")
-  val dropTopicName = config.getString("drop.table.topic.name")
+  val streamingTopicName = config.getString("streaming.topic.name")
   val brokerServer = config.getString("broker.server")
   val brokerPort = config.getString("broker.port")
   val kafkaBroker = s"$brokerServer:$brokerPort"
@@ -38,11 +34,7 @@ object StratioBus {
   val zookeeperPort = config.getString("zookeeper.port")
   val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
 
-  lazy val createTableProducer = new KafkaProducer(createTopicName, kafkaBroker)
-  lazy val insertTableProducer = new KafkaProducer(insertTopicName, kafkaBroker)
-  lazy val selectTableProducer = new KafkaProducer(selectTopicName, kafkaBroker)
-  lazy val alterTableProducer = new KafkaProducer(alterTopicName, kafkaBroker)
-  lazy val dropTableProducer = new KafkaProducer(dropTopicName, kafkaBroker)
+  lazy val kafkaProducer = new KafkaProducer(streamingTopicName, kafkaBroker)
 
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
@@ -51,17 +43,13 @@ object StratioBus {
     ZookeeperConsumer(zookeeperClient)
   }
 
-  lazy val stratioBusCreate = new BusSyncOperation(createTableProducer, zookeeperConsumer, "create")
-  lazy val stratioBusInsert = new BusAsyncOperation(insertTableProducer)
-  lazy val stratioBusSelect = new BusSyncOperation(selectTableProducer, zookeeperConsumer, "select")
-  lazy val stratioBusAlter = new BusAsyncOperation(alterTableProducer)
-  lazy val stratioBusDrop = new BusSyncOperation(dropTableProducer, zookeeperConsumer, "drop")
+  lazy val stratioBusCreate = new BusSyncOperation(kafkaProducer, zookeeperConsumer, "create")
+  lazy val stratioBusInsert = new BusAsyncOperation(kafkaProducer)
+  lazy val stratioBusSelect = new BusSyncOperation(kafkaProducer, zookeeperConsumer, "select")
+  lazy val stratioBusAlter = new BusAsyncOperation(kafkaProducer)
+  lazy val stratioBusDrop = new BusSyncOperation(kafkaProducer, zookeeperConsumer, "drop")
 
   def initializeTopics() {
-    KafkaTopicUtils.createTopic(zookeeperCluster, createTopicName)
-    KafkaTopicUtils.createTopic(zookeeperCluster, insertTopicName)
-    KafkaTopicUtils.createTopic(zookeeperCluster, selectTopicName)
-    KafkaTopicUtils.createTopic(zookeeperCluster, alterTopicName)
-    KafkaTopicUtils.createTopic(zookeeperCluster, dropTopicName)
+    KafkaTopicUtils.createTopic(zookeeperCluster, streamingTopicName)
   }
 }

@@ -6,9 +6,6 @@ import scala.concurrent.duration._
 import java.util.UUID
 import com.stratio.bus.utils.JsonUtils
 import com.stratio.bus.StreamingAckValues._
-import com.stratio.bus.KafkaProducer
-import com.stratio.bus.ZookeeperConsumer
-import scala.Some
 
 case class BusSyncOperation(
   tableProducer: KafkaProducer,
