@@ -30,4 +30,10 @@ How to start
   * To create the StratioBus distribution:
         sbt assembly
 
+Using the Bus
+=============
+
+  * To get an instance of StratioBus:
+
+    val stratioBus = StratioBusFactory.create().initialize()
  
