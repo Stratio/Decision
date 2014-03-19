@@ -1,4 +1,4 @@
-package com.stratio.streaming;
+package com.stratio.streaming.utils;
 
 import java.util.List;
 
