@@ -23,8 +23,6 @@ public class FilterMessagesByOperationFunction extends Function<Tuple2<String, S
 	@Override
 	public Boolean call(Tuple2<String, String> message) throws Exception {
 		
-		logger.info("Received request, type:" + message._1());
-				
 		if (message._1() != null && message._1().equalsIgnoreCase(allowedOperation)) {
 			return true;
 		}

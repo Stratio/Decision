@@ -30,15 +30,28 @@ import com.stratio.streaming.functions.ddl.DropStreamFunction;
 import com.stratio.streaming.functions.dml.InsertIntoStreamFunction;
 import com.stratio.streaming.functions.dml.ListStreamsFunction;
 import com.stratio.streaming.functions.dml.ListenStreamFunction;
+import com.stratio.streaming.functions.persistence.SaveRequestsToAuditLogFunction;
 import com.stratio.streaming.messages.BaseStreamingMessage;
 
+
+
+/**
+ * @author dmorales
+ * 
+ * =================
+ * Stratio Streaming
+ * =================
+ * 
+ * 1) Run a global Siddhi CEP engine
+ * 2) Listen to the Kafka topic in order to receive stream commands (CREATE, ADDQUERY, LIST, DROP, INSERT, LISTEN, ALTER)
+ * 3) Execute commands and send ACKs to Zookeeper
+ * 4) Send back the events if there are listeners 
+ *
+ */
 public class StreamingEngine {
 	
 	
 	private static Logger logger = LoggerFactory.getLogger(StreamingEngine.class);
-	
-	
-
 	private static SiddhiManager siddhiManager;
 
 
@@ -47,6 +60,10 @@ public class StreamingEngine {
 	}
 
 	/**
+	 * 
+	 * usage: --sparkMaster local --zookeeper-cluster fqdn:port --kafka-cluster fqdn:port
+	 * 
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -57,8 +74,10 @@ public class StreamingEngine {
         							.help(usage)                          
         							.parm("--spark-master", "local").req()
 //        							.parm("--sparkMaster", "node.stratio.com:9999" ).rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}$").req()
-        							.parm("--zookeeper-cluster", "node.stratio.com:9999").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()
-        							.parm("--kafka-cluster", "node.stratio.com:9999").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()     							
+        							.parm("--zookeeper-cluster", "node.stratio.com:2181").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()
+        							.parm("--kafka-cluster", "node.stratio.com:9092").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()
+        							.parm("--cassandra-cluster", "node.stratio.com:9160").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
+        							.parm("--auditEnabled", "false")
         							.build();  
        
         HashMap<String, String> R = new HashMap<String,String>();
@@ -76,16 +95,32 @@ public class StreamingEngine {
         launchStratioStreamingEngine(R.get("--spark-master").toString().replace("_", "[") + "]",        		
 										R.get("--zookeeper-cluster").toString(),
 										R.get("--kafka-cluster").toString(),
-										StratioStreamingConstants.BUS.TOPICS);
+										StratioStreamingConstants.BUS.TOPICS,
+										R.get("--cassandra-cluster").toString(),
+										Boolean.valueOf(R.get("--auditEnabled").toString()));
 
 	}
 	
 	
-	private static void launchStratioStreamingEngine(String sparkMaster, String zkCluster, String kafkaCluster, String topics) {
+	/**
+	 * 
+	 * - Launch the main process: spark context, kafkaInputDstream and siddhi CEP engine
+	 * - Filter the incoming messages (kafka) by key in order to separate the different commands
+	 * - Parse the request contained in the payload
+	 * - execute related command for each request
+	 *  
+	 * 
+	 * 
+	 * @param sparkMaster
+	 * @param zkCluster
+	 * @param kafkaCluster
+	 * @param topics
+	 */
+	private static void launchStratioStreamingEngine(String sparkMaster, String zkCluster, String kafkaCluster, String topics, String cassandraCluster, Boolean enableAuditing) {
 		
 
 		
-		// Create the context with a x seconds batch size
+//		Create the context with a x seconds batch size
 		JavaStreamingContext jssc = new JavaStreamingContext(sparkMaster, StreamingEngine.class.getName(), 
 																new Duration(StratioStreamingConstants.STREAMING.DURATION_MS), System.getenv("SPARK_HOME"), 
 																JavaStreamingContext.jarOfClass(StreamingEngine.class));
@@ -95,19 +130,20 @@ public class StreamingEngine {
 		String[] topic_list = topics.split(",");
 
 		
-		// building the topic map, by using the num of partitions of each topic
+//		building the topic map, by using the num of partitions of each topic
 		for (String topic : topic_list) {
 //			TODO use stratio bus API (int numberOfThreads = KafkaTopicUtils.getNumPartitionsForTopic(zkCluster, 9092, topic);)
 			topicMap.put(topic, 2);
 		}
 				
 		
+//		Start the Kafka stream  
 		JavaPairDStream<String, String> messages = KafkaUtils.createStream(jssc, zkCluster, StratioStreamingConstants.BUS.STREAMING_GROUP_ID, topicMap);
 		
 		
 		
 		
-
+//		Create a DStream for each command, so we can treat all related requests in the same way and also apply functions by command  
 		JavaDStream<BaseStreamingMessage> create_requests = messages.filter(new FilterMessagesByOperationFunction(StratioStreamingConstants.CEP_OPERATIONS.CREATE_OPERATION))
 																  	.map(new KeepPayloadFromMessageFunction());
 		
@@ -145,7 +181,20 @@ public class StreamingEngine {
 		
 		drop_requests.foreach(new DropStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster));
 		
-//		TODO remove listen requests when drop 
+//		TODO remove listeners requests when drop 
+//		TODO take insert requests and saveToCassandra if persistence is enabled
+		
+		
+		
+		if (enableAuditing) {
+			JavaDStream<BaseStreamingMessage> allRequests = create_requests.union(alter_requests).union(insert_requests).union(add_query_requests).union(listen_requests).union(list_requests).union(drop_requests);
+					
+//			persist the RDDs to cassandra using STRATIO DEEP
+			allRequests.foreachRDD(new SaveRequestsToAuditLogFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster));
+			
+		}
+		
+		
 		
 		
 		
@@ -184,6 +233,14 @@ public class StreamingEngine {
 	}
 	
 	
+	/**
+	 * 
+	 * - Instantiates the Siddhi CEP engine
+	 * - return the running CEP engine 
+	 * 
+	 * 
+	 * @return SiddhiManager
+	 */
 	private static SiddhiManager getSiddhiManager() {
 		
 		if (siddhiManager == null) {
