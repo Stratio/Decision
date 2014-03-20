@@ -1,8 +1,8 @@
 package com.stratio.bus
 
 import com.typesafe.config.ConfigFactory
-import com.netflix.curator.retry.ExponentialBackoffRetry
-import com.netflix.curator.framework.CuratorFrameworkFactory
+import org.apache.curator.retry.ExponentialBackoffRetry
+import org.apache.curator.framework.CuratorFrameworkFactory
 
 class StratioBus
   extends IStratioBus {

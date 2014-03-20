@@ -1,11 +1,11 @@
 package com.stratio.bus
 
 import scala.concurrent.{ExecutionContext, Future}
-import com.netflix.curator.framework.CuratorFramework
 import org.apache.zookeeper.data.Stat
 import ExecutionContext.Implicits.global
 import com.typesafe.config.ConfigFactory
 import scala.Predef.String
+import org.apache.curator.framework.CuratorFramework
 
 case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
   val config = ConfigFactory.load()
