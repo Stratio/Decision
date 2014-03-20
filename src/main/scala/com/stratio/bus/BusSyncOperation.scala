@@ -53,7 +53,6 @@ case class BusSyncOperation(
 
   private def manageStreamingResponse(response: Option[String], queryString: String) = {
     //TODO define response (json, exceptions....)
-    val okCode = ReplyCodes.OK
     response.get match {
       case replyCode if isAnOkResponse(replyCode) => log.info("Stratio Bus - Ack received for: "+queryString)
       case replyCode if isAnErrorResponse(replyCode) => createLogError(replyCode, queryString)
@@ -61,7 +60,7 @@ case class BusSyncOperation(
     }
   }
 
-  private def isAnOkResponse(replyCode: String) = replyCode == ReplyCodes.KO_GENERAL_ERROR
+  private def isAnOkResponse(replyCode: String) = replyCode == ReplyCodes.OK
 
   private def isAnErrorResponse(replyCode: String) = ackErrorList.contains(replyCode)
 
