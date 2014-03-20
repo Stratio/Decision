@@ -3,6 +3,7 @@ package com.stratio.bus
 import com.typesafe.config.ConfigFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.CuratorFrameworkFactory
+import com.stratio.streaming.commons.TopicNames
 
 class StratioBus
   extends IStratioBus {
@@ -26,7 +27,7 @@ class StratioBus
 
 object StratioBus {
   val config = ConfigFactory.load()
-  val streamingTopicName = config.getString("streaming.topic.name")
+  val streamingTopicName = TopicNames.STREAMING_REQUESTS_TOPIC
   val brokerServer = config.getString("broker.server")
   val brokerPort = config.getString("broker.port")
   val kafkaBroker = s"$brokerServer:$brokerPort"

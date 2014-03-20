@@ -1,7 +1,6 @@
 package com.stratio.bus
 
 import org.scalatest.{ShouldMatchers, FunSpec}
-import StreamingAckValues._
 
 class StreamAckValuesTests
   extends FunSpec
