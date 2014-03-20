@@ -22,7 +22,7 @@ case class BusSyncOperation(
 
   private def addMessageToKafkaTopic(queryString: String, creationUniqueId: String) = {
     val message = JsonUtils.appendElementsToJsonString(queryString, Map("zNodeId" -> creationUniqueId))
-    tableProducer.send(message)
+    tableProducer.send(message, operation)
   }
   private def waitForTheStreamingResponse(zNodeUniqueId: String) = {
     try {

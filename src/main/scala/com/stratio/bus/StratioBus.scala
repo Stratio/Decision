@@ -19,7 +19,7 @@ class StratioBus
   def drop(queryString: String) = stratioBusDrop.performSyncOperation(queryString)
 
   def initialize() = {
-    initializeTopics()
+    initializeTopic()
     this
   }
 }
@@ -44,12 +44,12 @@ object StratioBus {
   }
 
   lazy val stratioBusCreate = new BusSyncOperation(kafkaProducer, zookeeperConsumer, "create")
-  lazy val stratioBusInsert = new BusAsyncOperation(kafkaProducer)
+  lazy val stratioBusInsert = new BusAsyncOperation(kafkaProducer, "insert")
   lazy val stratioBusSelect = new BusSyncOperation(kafkaProducer, zookeeperConsumer, "select")
-  lazy val stratioBusAlter = new BusAsyncOperation(kafkaProducer)
+  lazy val stratioBusAlter = new BusAsyncOperation(kafkaProducer, "alter")
   lazy val stratioBusDrop = new BusSyncOperation(kafkaProducer, zookeeperConsumer, "drop")
 
-  def initializeTopics() {
+  def initializeTopic() {
     KafkaTopicUtils.createTopic(zookeeperCluster, streamingTopicName)
   }
 }
