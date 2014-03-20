@@ -1,0 +1,1 @@
+sudo sh /path_to_spark/spark-0.9.0-incubating/bin/run-mine com.stratio.streaming.StreamingEngine --spark-master local_2 --zookeeper-cluster node.stratio.com:2181 --kafka-cluster node.strao.com:9092
