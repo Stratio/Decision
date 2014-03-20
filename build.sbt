@@ -29,7 +29,8 @@ libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.10" % "2.0" % "test" withSources() withJavadoc(),
   "org.apache.kafka" % "kafka_2.10" % "0.8.0" exclude("com.sun.jdmk", "jmxtools") exclude("com.sun.jmx", "jmxri"),
   "com.typesafe" % "config" % "1.2.0",
-  "org.apache.curator" % "curator-framework" % "2.4.1"
+  "org.apache.curator" % "curator-framework" % "2.4.1",
+  "org.slf4j" % "slf4j-log4j12" % "1.7.5"
 )
 
 initialCommands := "import com.stratio.bus._"
