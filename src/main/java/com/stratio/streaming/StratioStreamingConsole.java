@@ -9,6 +9,7 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.CuratorEvent;
@@ -63,14 +64,15 @@ public class StratioStreamingConsole {
             
             line = line.toLowerCase();
             
-            if (line.startsWith("create") 
-            		|| line.startsWith("drop") 
-            		|| line.startsWith("select")
-            		|| line.startsWith("insert")
-            		|| line.startsWith("addquery")
-            		|| line.startsWith("listen")
-            		|| line.startsWith("alter")
-            		|| line.startsWith("list")) {
+            if (line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP)
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST)) {
             	
             	self.handleCommand(line);
             	continue;
@@ -185,7 +187,7 @@ public class StratioStreamingConsole {
 			
 			
 			System.out.println("==> Sending message to Stratio Streaming: " + new Gson().toJson(message));
-			KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(StratioStreamingConstants.BUS.TOPICS, request.split("#")[0].trim(), new Gson().toJson(message));
+			KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(StratioStreamingConstants.BUS.TOPICS, request.split("@")[0].trim(), new Gson().toJson(message));
 			producer.send(busMessage);
 			
 			
@@ -251,28 +253,42 @@ public class StratioStreamingConsole {
 		
 		private static BaseStreamingMessage getMessageFromCommand(String command, String sessionId) {
 			
-			String operation = command.split("#")[0].trim().replaceAll("\\s+","");
+			String operation = command.split("@")[0].trim().replaceAll("\\s+","");
+			
+			
+			if (!(operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST))) {
+				
+				throw new IllegalArgumentException("Unsupported command: " + command);
+			}
 		
 			
-			if ((operation.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.ALTER_OPERATION)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.CREATE_OPERATION)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.INSERT_OPERATION)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.ADD_QUERY_OPERATION))
-				&& 	command.split("#").length != 3) {
+			if ((operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY))
+				&& 	command.split("@").length != 3) {
 				
-				throw new IllegalArgumentException("Malformed request, missing or exceding parts");
+				throw new IllegalArgumentException("Malformed request, missing or exceding parts: " + command);
 			}
 			
-			if ((operation.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.DROP_OPERATION)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.LISTEN_OPERATION))
-				&& command.split("#").length != 2) {
+			if ((operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN))
+				&& command.split("@").length != 2) {
 				
-				throw new IllegalArgumentException("Malformed request, missing or exceding parts");
+				throw new IllegalArgumentException("Malformed request, missing or exceding parts: " + command);
 			}
 			
-			if (operation.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.LIST_OPERATION)
-					&& command.split("#").length != 1) {
-				throw new IllegalArgumentException("Malformed request, missing or exceding parts");
+			if (operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST)
+					&& command.split("@").length != 1) {
+				throw new IllegalArgumentException("Malformed request, missing or exceding parts: " + command);
 			}
 			
 			
@@ -282,18 +298,18 @@ public class StratioStreamingConsole {
 			
 			
 			
-			if (command.split("#").length != 1) {
-				stream  = command.split("#")[1].trim().replaceAll("\\s+","");
+			if (command.split("@").length != 1) {
+				stream  = command.split("@")[1].trim().replaceAll("\\s+","");
 			}
 			
-			if (command.split("#").length == 3) {
-				request = command.split("#")[2].trim().replace("(", "").replace(")", "");			
+			if (command.split("@").length == 3) {
+				request = StringUtils.removeEnd(StringUtils.removeStart(command.split("@")[2].trim(), "("), ")");
 			}
 			
 			
-			if (operation.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.ALTER_OPERATION)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.CREATE_OPERATION)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.INSERT_OPERATION)) {
+			if (operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE)
+					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)) {
 					
 				message.setColumns(decodeColumns(operation, request));
 			}
@@ -332,12 +348,12 @@ public class StratioStreamingConsole {
 				String firstPart = column.split("\\.")[0].trim().replaceAll("\\s+","");
 				String secondPart = column.split("\\.")[1].trim().replaceAll("\\s+","");
 				
-				if (command.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.CREATE_OPERATION) 
-						|| command.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.ALTER_OPERATION)) {
+				if (command.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE) 
+						|| command.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)) {
 					
 					decodedColumns.add(new ColumnNameTypeValue(firstPart, secondPart, null));
 				}
-				if (command.equalsIgnoreCase(StratioStreamingConstants.CEP_OPERATIONS.INSERT_OPERATION)) {
+				if (command.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)) {
 					decodedColumns.add(new ColumnNameTypeValue(firstPart, null, secondPart));
 				}
 				

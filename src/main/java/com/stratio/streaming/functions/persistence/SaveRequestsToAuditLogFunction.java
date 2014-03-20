@@ -33,23 +33,25 @@ public class SaveRequestsToAuditLogFunction extends StratioStreamingBaseFunction
 	@Override
 	public Void call(JavaRDD<BaseStreamingMessage> rdd) throws Exception {
 		
-				
-		final IDeepJobConfig<Cells> averageCassandraConfig = DeepJobConfigFactory.create().host("node.stratio.com").rpcPort(9160).keyspace("stratio_streaming").table("audit").initialize();
 		
-		JavaRDD<Cells> outRDD = rdd.map(new Function<BaseStreamingMessage, Cells>() {
-											@Override
-											public Cells call(BaseStreamingMessage request) {
-												
-//												com.stratio.deep.entity.Cell<String> timestampCell = com.stratio.deep.entity.Cell.create("timestamp", request.);
-//												com.stratio.deep.entity.Cell<UUID> sensorTimeUUIDCell = com.stratio.deep.entity.Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
-//												com.stratio.deep.entity.Cell<Double> sensorDataCell = com.stratio.deep.entity.Cell.create("value", tuple2._2());
-			
-												return null;//new Cells(sensorNameCell, sensorTimeUUIDCell, sensorDataCell);
-											}
-										});
-
+//		TODO when siddhi RDD is ready
 				
-		CassandraCellRDD.saveRDDToCassandra(outRDD, averageCassandraConfig);			
+//		final IDeepJobConfig<Cells> averageCassandraConfig = DeepJobConfigFactory.create().host("node.stratio.com").rpcPort(9160).keyspace("stratio_streaming").table("audit").initialize();
+//		
+//		JavaRDD<Cells> outRDD = rdd.map(new Function<BaseStreamingMessage, Cells>() {
+//											@Override
+//											public Cells call(BaseStreamingMessage request) {
+//												
+////												com.stratio.deep.entity.Cell<String> timestampCell = com.stratio.deep.entity.Cell.create("timestamp", request.);
+////												com.stratio.deep.entity.Cell<UUID> sensorTimeUUIDCell = com.stratio.deep.entity.Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
+////												com.stratio.deep.entity.Cell<Double> sensorDataCell = com.stratio.deep.entity.Cell.create("value", tuple2._2());
+//			
+//												return null;//new Cells(sensorNameCell, sensorTimeUUIDCell, sensorDataCell);
+//											}
+//										});
+//
+//				
+//		CassandraCellRDD.saveRDDToCassandra(outRDD, averageCassandraConfig);			
 
 		return null;
 	}

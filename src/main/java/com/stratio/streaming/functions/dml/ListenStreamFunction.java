@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 
-import com.stratio.streaming.callbacks.SiddhiToKafkaStreamCallback;
+import com.stratio.streaming.callbacks.StreamToBusCallback;
 import com.stratio.streaming.common.StratioStreamingConstants;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
 import com.stratio.streaming.messages.BaseStreamingMessage;
@@ -16,7 +16,7 @@ import com.stratio.streaming.messages.BaseStreamingMessage;
 public class ListenStreamFunction extends StratioStreamingBaseFunction {
 	
 	private static Logger logger = LoggerFactory.getLogger(ListenStreamFunction.class);
-	private ConcurrentHashMap<String, SiddhiToKafkaStreamCallback> existingStreams = new ConcurrentHashMap<String, SiddhiToKafkaStreamCallback>();
+	private ConcurrentHashMap<String, StreamToBusCallback> existingStreams = new ConcurrentHashMap<String, StreamToBusCallback>();
 
 	/**
 	 * 
@@ -44,11 +44,11 @@ public class ListenStreamFunction extends StratioStreamingBaseFunction {
 					
 					
 					try {
-						SiddhiToKafkaStreamCallback siddhiToKafkaStreamCallback = new SiddhiToKafkaStreamCallback(getSiddhiManager().getStreamDefinition(request.getStreamName()), getKafkaCluster());
+						StreamToBusCallback streamCallBack = new StreamToBusCallback(getSiddhiManager().getStreamDefinition(request.getStreamName()), getKafkaCluster());
 						
-						getSiddhiManager().addCallback(request.getStreamName(), siddhiToKafkaStreamCallback);
+						getSiddhiManager().addCallback(request.getStreamName(), streamCallBack);
 						
-						existingStreams.put(request.getStreamName(), siddhiToKafkaStreamCallback);
+						existingStreams.put(request.getStreamName(), streamCallBack);
 						
 						
 						logger.info("==> LISTEN: stream " + request.getStreamName() + " is now working OK");

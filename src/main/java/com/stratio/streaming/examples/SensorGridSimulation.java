@@ -40,7 +40,7 @@ public class SensorGridSimulation {
 	public static final String[] topics		= {"commonSensor", "commonSensor", "commonSensor", "commonSensor", "commonSensor", "commonSensor"};
 //	public static final String[] ids		= {"3", "4", "5", "6", "7", "8"};  //thingspeak
 	public static final String[] ids		= {"52516", "52519", "52520", "52521", "52522", "52523"};  //open.sen.se
-	public static final String   sensorDataStream = "sensorData";
+	public static final String   sensorDataStream = "sensorgrid";
 	public static final long     streamSessionId  = System.currentTimeMillis();	
 
 	public SensorGridSimulation() {
@@ -172,7 +172,7 @@ public class SensorGridSimulation {
 			 
 			 
 				
-			message.setOperation(StratioStreamingConstants.CEP_OPERATIONS.INSERT_OPERATION);
+			message.setOperation(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT);
 			message.setStreamName(sensorDataStream);
 			message.setTimestamp(System.currentTimeMillis());
 			message.setSession_id("" + streamSessionId);
@@ -191,7 +191,7 @@ public class SensorGridSimulation {
 				message.setRequest("dummy request");
 			
 				KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(StratioStreamingConstants.BUS.TOPICS, 
-																								StratioStreamingConstants.CEP_OPERATIONS.INSERT_OPERATION, 
+																								StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT, 
 																								gson.toJson(message));
 				producer.send(busMessage);
 				globalMessagesSent.getAndIncrement();
