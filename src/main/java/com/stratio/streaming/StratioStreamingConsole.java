@@ -64,15 +64,15 @@ public class StratioStreamingConsole {
             
             line = line.toLowerCase();
             
-            if (line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP)
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST)) {
+            if (line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN.toLowerCase()) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA.toLowerCase()) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR.toLowerCase()) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY.toLowerCase()) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER.toLowerCase()) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE.toLowerCase()) 
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP.toLowerCase())
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT.toLowerCase())
+            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST.toLowerCase())) {
             	
             	self.handleCommand(line);
             	continue;

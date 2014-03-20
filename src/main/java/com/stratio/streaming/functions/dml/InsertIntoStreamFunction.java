@@ -44,7 +44,7 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 					
 					logger.info("==> INSERT: stream " + request.getStreamName() + " has received a new event OK");
 					
-					ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.OK);
+//					ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.OK);
 					
 				} catch (AttributeNotExistException anee) {
 					ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST);

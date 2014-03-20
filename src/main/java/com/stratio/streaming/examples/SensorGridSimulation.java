@@ -112,7 +112,7 @@ public class SensorGridSimulation {
 		sensorExecutorService.shutdown();
 		throughputExecutorService.shutdownNow();
     	
-		 logger.info("====> TOTAL THREADS:" + sensors.length + "// TOTAL MESSAGES:" + (dataToGenerate * sensors.length) + "//Time:" + TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startMs) + "//Messages/second:" + ((dataToGenerate * sensors.length) / TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startMs)));
+		 logger.info("====> TOTAL THREADS:" + sensors.length + "// TOTAL MESSAGES:" + (dataToGenerate * sensors.length) + "//Time:" + TimeUnit.MILLISECONDS.toMillis(System.currentTimeMillis() - startMs) + "//Messages/second:" + ((dataToGenerate * sensors.length) / TimeUnit.MILLISECONDS.toMillis(System.currentTimeMillis() - startMs)));
     	
 	}
 	
@@ -246,7 +246,7 @@ public class SensorGridSimulation {
 					logger.debug("Ending throughput controller" + globalMessagesSent.get());
 					
 					data.clear();
-		        	long throughput = (globalMessagesSent.get() == 0) ? 0 : globalMessagesSent.get() / TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
+		        	long throughput = (globalMessagesSent.get() == 0) ? 0 : globalMessagesSent.get() / TimeUnit.MILLISECONDS.toMillis(System.currentTimeMillis() - startTime);
 					
 					
 					data.add(new Tuple2<String, Object>("52734", Double.valueOf(throughput)));
