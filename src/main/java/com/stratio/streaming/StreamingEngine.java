@@ -33,6 +33,7 @@ import com.stratio.streaming.functions.dml.ListenStreamFunction;
 import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
 import com.stratio.streaming.functions.requests.CollectRequestForStatsFunction;
 import com.stratio.streaming.messages.BaseStreamingMessage;
+import com.stratio.streaming.utils.ZKUtils;
 
 
 
@@ -66,8 +67,9 @@ public class StreamingEngine {
 	 * 
 	 * 
 	 * @param args
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		
 //		DECODING ARGUMENTS FROM COMMAND LINE
 		String usage = "usage: --sparkMaster local --zookeeper-cluster fqdn:port --kafka-cluster fqdn:port";
@@ -118,6 +120,7 @@ public class StreamingEngine {
 	 * @param zkCluster
 	 * @param kafkaCluster
 	 * @param topics
+	 * @throws Exception 
 	 */
 	private static void launchStratioStreamingEngine(String sparkMaster, 
 														String zkCluster, 
@@ -125,9 +128,10 @@ public class StreamingEngine {
 														String topics, 
 														String cassandraCluster, 
 														Boolean enableAuditing, 
-														Boolean enableStats) {
+														Boolean enableStats) throws Exception {
 		
 
+		ZKUtils.getZKUtils(zkCluster).createEphemeralZNode(StratioStreamingConstants.STREAMING.ZK_BASE_PATH + "/" + "engine", String.valueOf(System.currentTimeMillis()).getBytes());
 		
 //		Create the context with a x seconds batch size
 		JavaStreamingContext jssc = new JavaStreamingContext(sparkMaster, StreamingEngine.class.getName(), 

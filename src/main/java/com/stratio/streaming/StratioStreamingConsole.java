@@ -191,7 +191,7 @@ public class StratioStreamingConsole {
 			producer.send(busMessage);
 			
 			
-			client.checkExists().watched().forPath(StratioStreamingConstants.REPLY_CODES.ZK_BASE_PATH + "/" + message.getOperation() + "/" + message.getRequest_id());						
+			client.checkExists().watched().forPath(StratioStreamingConstants.STREAMING.ZK_BASE_PATH + "/" + message.getOperation() + "/" + message.getRequest_id());						
 			
 			
 		} catch (Exception e) {

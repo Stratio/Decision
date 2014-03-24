@@ -3,6 +3,8 @@ package com.stratio.streaming.utils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.ZooDefs.Ids;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +41,19 @@ public class ZKUtils {
 		return self;
 	}
 	
+	public void createEphemeralZNode(String path, byte[] data) throws Exception {
+		
+		if (client.checkExists().forPath(path) != null) {
+			client.delete().deletingChildrenIfNeeded().forPath(path);
+		}
+		
+		client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, data);
+	}
+	
 	
 	public void createZNode(BaseStreamingMessage request, Integer reply) throws Exception {
 		
-		String path = StratioStreamingConstants.REPLY_CODES.ZK_BASE_PATH 
+		String path = StratioStreamingConstants.STREAMING.ZK_BASE_PATH 
 													+ "/" + request.getOperation().toLowerCase()
 													+ "/" + request.getRequest_id();
 		

@@ -11,13 +11,14 @@ public interface StratioStreamingConstants {
 	
 	public interface STREAMING {
 		public static final int    DURATION_MS		= 2000;
+		public static final String  ZK_BASE_PATH				= "/stratio/streaming";
 	}
 
 	
 	
 	public interface REPLY_CODES {
 		
-		public static final String  ZK_BASE_PATH				= "/stratio/streaming";
+		
 		public static final Integer OK 							= 1;
 		public static final Integer KO_PARSER_ERROR				= 2;
 		public static final Integer KO_STREAM_ALREADY_EXISTS 	= 3;

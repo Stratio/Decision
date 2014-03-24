@@ -31,7 +31,7 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 	
 	private interface STATS_QUERIES {
 		static final String GLOBAL_STATS_BY_OPERATION = "from " + STATS_NAMES.BASE + 
-														" select operation, streamName, index, sum(count) as data group by operation output snapshot every 5 sec insert into " + 
+														" select operation, '" + STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, index, sum(count) as data group by operation output snapshot every 5 sec insert into " + 
 														STATS_NAMES.GLOBAL_STATS_BY_OPERATION + 
 														" for current-events";
 	}
@@ -83,7 +83,7 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 			getSiddhiManager().defineStream(STATS_STREAMS.BASE);
 			getSiddhiManager().addQuery(STATS_QUERIES.GLOBAL_STATS_BY_OPERATION);
 			
-			sendResetValuesForAllOperations();
+			sendResetValuesForAllOperations(getSiddhiManager().getInputHandler(STATS_NAMES.BASE));
 			
 		}
 		
@@ -92,19 +92,34 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 	}
 	
 	
-	private void sendResetValuesForAllOperations() throws Exception {
+	private void sendResetValuesForAllOperations(InputHandler baseRequestsStream) throws Exception {
 		
-		getSiddhiManager().getInputHandler(STATS_NAMES.BASE).send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN)));
-		getSiddhiManager().getInputHandler(STATS_NAMES.BASE).send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)));
-		getSiddhiManager().getInputHandler(STATS_NAMES.BASE).send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)));
+		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
+								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN)));
 		
+		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
+								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)));
 		
-		getSiddhiManager().getInputHandler(STATS_NAMES.BASE).send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY)));
-		getSiddhiManager().getInputHandler(STATS_NAMES.BASE).send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)));
-		getSiddhiManager().getInputHandler(STATS_NAMES.BASE).send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE)));
-		getSiddhiManager().getInputHandler(STATS_NAMES.BASE).send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP)));
-		getSiddhiManager().getInputHandler(STATS_NAMES.BASE).send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)));
-		getSiddhiManager().getInputHandler(STATS_NAMES.BASE).send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST)));
+		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
+								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)));
+				
+		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
+								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY)));
+		
+		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
+								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)));
+		
+		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
+								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE)));
+		
+		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
+								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP)));
+		
+		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
+								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)));
+		
+		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
+								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST)));
 		
 		
 	}
