@@ -6,13 +6,12 @@ import org.apache.spark.api.java.JavaRDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
 
 import com.stratio.streaming.common.StratioStreamingConstants;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
 import com.stratio.streaming.messages.BaseStreamingMessage;
-import com.stratio.streaming.messages.ColumnNameTypeValue;
+import com.stratio.streaming.utils.SiddhiUtils;
 
 public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 	
@@ -39,7 +38,9 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 			if (getSiddhiManager().getInputHandler(request.getStreamName()) != null) {
 				
 				try {
-					getSiddhiManager().getInputHandler(request.getStreamName()).send(getOrderedValues(request.getStreamName(), 
+					getSiddhiManager()
+						.getInputHandler(request.getStreamName())
+							.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(request.getStreamName()), 
 																											request.getColumns()));
 					
 					logger.info("==> INSERT: stream " + request.getStreamName() + " has received a new event OK");
@@ -67,19 +68,7 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 	}
 
 	
-	private Object[] getOrderedValues(String streamName, List<ColumnNameTypeValue> columns) {
-		
-		StreamDefinition streamMetaData = getSiddhiManager().getStreamDefinition(streamName);
-		Object[] orderedValues = new Object[streamMetaData.getAttributeList().size()];
-		
-		for (ColumnNameTypeValue column : columns) {
-			
-			orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = column.getValue();
-		}
 
-		return orderedValues;
-		
-	}
 	
 
 

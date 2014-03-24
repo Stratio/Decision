@@ -60,8 +60,8 @@ public class ListStreamsFunction extends StratioStreamingBaseFunction {
 				streams.add(new BaseStreamingMessage(streamMetaData.getId(), columns));
 			}
 			
-			KeyedMessage<String, String> message = new KeyedMessage<String, String>(StratioStreamingConstants.BUS.LIST_STREAMS_TOPIC, 			 //topic 
-																					StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST,     //key 
+			KeyedMessage<String, String> message = new KeyedMessage<String, String>(StratioStreamingConstants.BUS.LIST_STREAMS_TOPIC, 			 								//topic 
+																					StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST,     							//key 
 																					new Gson().toJson( new ListStreamsMessage(getSiddhiManager().getStreamDefinitions().size(), //value.count
 																																System.currentTimeMillis(), 					//value.time
 																																streams)));                                		//value.streams																				

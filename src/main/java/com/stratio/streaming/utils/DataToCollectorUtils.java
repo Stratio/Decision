@@ -8,20 +8,55 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 
+import com.google.common.collect.Lists;
+import com.stratio.streaming.messages.BaseStreamingMessage;
+import com.stratio.streaming.messages.ColumnNameTypeValue;
+
 import scala.Tuple2;
 
-public class DataToCollector {
+public class DataToCollectorUtils {
 
-	public DataToCollector() {
+	public DataToCollectorUtils() {
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+	
+	
+	
+	public static void sendData(List<BaseStreamingMessage> collected_events) {
+		
+		ColumnNameTypeValue indexColumn = new ColumnNameTypeValue("index", null, null);
+		ColumnNameTypeValue dataColumn = new ColumnNameTypeValue("data", null, null);
+		
+		List<Tuple2<String, Object>> data = Lists.newArrayList();
+		
+		try {
+		
+			for (BaseStreamingMessage event : collected_events) {
+				
+				int indexPosition = event.getColumns().indexOf(indexColumn);
+				int dataPosition  = event.getColumns().indexOf(dataColumn);
+				
+				if (indexPosition > 0 & dataPosition > 0) {
+//					TODO improve index formatting
+					data.add(new Tuple2<String, Object>(event.getColumns().get(indexPosition).getValue().toString().replace(".0", ""), 
+																event.getColumns().get(dataPosition).getValue()));
+				}
+				
+				
+				
+				
+			}
+			
+		
+			DataToCollectorUtils.sendDataToOpenSense(data);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 	
 	public static void sendDataToOpenSense(List<Tuple2<String, Object>> data) throws Exception {
@@ -42,8 +77,11 @@ public class DataToCollector {
 			if (data.get(i)._2() instanceof String)  {
 				postBody = postBody + "{\"feed_id\":" + data.get(i)._1() + ",\"value\":\"" + data.get(i)._2() + "\"}";
 			}
-			else {
+			if (data.get(i)._2() instanceof Double)  {
 				postBody = postBody + "{\"feed_id\":" + data.get(i)._1() + ",\"value\":" + (Math.round(((Double)data.get(i)._2()) * 100.0 ) / 100.0) + "}";
+			}
+			if (data.get(i)._2() instanceof Long)  {
+				postBody = postBody + "{\"feed_id\":" + data.get(i)._1() + ",\"value\":" + (Math.round(((Long)data.get(i)._2()) * 100.0 ) / 100.0) + "}";
 			}
 		
 		}

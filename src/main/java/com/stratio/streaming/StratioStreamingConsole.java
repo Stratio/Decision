@@ -94,8 +94,8 @@ public class StratioStreamingConsole {
 		String usage = "usage: --broker-list ip:port";
         ParseCmd cmd = new ParseCmd.Builder()
         							.help(usage)                          
-        							.parm("--broker-list", "255.25.25.255:9999" ).rex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}:[0-9]{1,4}$").req()
-        							.parm("--zookeeper",   "255.25.25.255:9999" ).rex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}:[0-9]{1,4}$").req()
+        							.parm("--broker-list", "node.stratio.com:9999" ).rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()
+        							.parm("--zookeeper",   "node.stratio.com:9999" ).rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()
         							.build();  
        
         HashMap<String, String> R = new HashMap<String,String>();

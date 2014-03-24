@@ -1,8 +1,14 @@
 package com.stratio.streaming.utils;
 
+import java.util.List;
+
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.Attribute.Type;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
+
+import com.stratio.streaming.messages.ColumnNameTypeValue;
 
 public class SiddhiUtils {
 	
@@ -38,6 +44,20 @@ public class SiddhiUtils {
 			default:
 				throw new SiddhiPraserException("Unsupported Column type");
 		}
+		
+	}
+	
+	public static Object[] getOrderedValues(StreamDefinition streamMetaData, List<ColumnNameTypeValue> columns) throws AttributeNotExistException {
+		
+		Object[] orderedValues = new Object[streamMetaData.getAttributeList().size()];
+		
+		for (ColumnNameTypeValue column : columns) {
+			
+//			if attribute does not exist, a AttributeNotExistException exception wil be thrown
+			orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = column.getValue();
+		}
+
+		return orderedValues;
 		
 	}
 

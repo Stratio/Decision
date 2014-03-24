@@ -1,4 +1,4 @@
-package com.stratio.streaming.functions.persistence;
+package com.stratio.streaming.functions.requests;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;

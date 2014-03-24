@@ -30,8 +30,8 @@ import com.stratio.streaming.functions.ddl.DropStreamFunction;
 import com.stratio.streaming.functions.dml.InsertIntoStreamFunction;
 import com.stratio.streaming.functions.dml.ListStreamsFunction;
 import com.stratio.streaming.functions.dml.ListenStreamFunction;
-import com.stratio.streaming.functions.persistence.SaveRequestsToAuditLogFunction;
-import com.stratio.streaming.functions.persistence.SaveRequestsToDataCollectorFunction;
+import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
+import com.stratio.streaming.functions.requests.CollectRequestForStatsFunction;
 import com.stratio.streaming.messages.BaseStreamingMessage;
 
 
@@ -79,6 +79,7 @@ public class StreamingEngine {
         							.parm("--kafka-cluster", "node.stratio.com:9092").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()
         							.parm("--cassandra-cluster", "node.stratio.com:9160").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
         							.parm("--auditEnabled", "false")
+        							.parm("--statsEnabled", "true")
         							.build();  
        
         HashMap<String, String> R = new HashMap<String,String>();
@@ -98,7 +99,8 @@ public class StreamingEngine {
 										R.get("--kafka-cluster").toString(),
 										StratioStreamingConstants.BUS.TOPICS,
 										R.get("--cassandra-cluster").toString(),
-										Boolean.valueOf(R.get("--auditEnabled").toString()));
+										Boolean.valueOf(R.get("--auditEnabled").toString()),
+										Boolean.valueOf(R.get("--statsEnabled").toString()));
 
 	}
 	
@@ -117,7 +119,13 @@ public class StreamingEngine {
 	 * @param kafkaCluster
 	 * @param topics
 	 */
-	private static void launchStratioStreamingEngine(String sparkMaster, String zkCluster, String kafkaCluster, String topics, String cassandraCluster, Boolean enableAuditing) {
+	private static void launchStratioStreamingEngine(String sparkMaster, 
+														String zkCluster, 
+														String kafkaCluster, 
+														String topics, 
+														String cassandraCluster, 
+														Boolean enableAuditing, 
+														Boolean enableStats) {
 		
 
 		
@@ -186,7 +194,7 @@ public class StreamingEngine {
 		
 //		saveToCassandra_requests.foreach(new save(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster));
 		
-		saveToDataCollector_requests.foreach(new SaveRequestsToDataCollectorFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+		saveToDataCollector_requests.foreach(new CollectRequestForStatsFunction(getSiddhiManager(), zkCluster, kafkaCluster));
 		
 		list_requests.foreach(new ListStreamsFunction(getSiddhiManager(), zkCluster, kafkaCluster));
 		
@@ -197,12 +205,26 @@ public class StreamingEngine {
 		
 		
 		
-		if (enableAuditing) {
-			JavaDStream<BaseStreamingMessage> allRequests = create_requests.union(alter_requests).union(insert_requests).union(add_query_requests).union(listen_requests).union(list_requests).union(drop_requests);
-					
-//			persist the RDDs to cassandra using STRATIO DEEP
-			allRequests.foreachRDD(new SaveRequestsToAuditLogFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster));
+		if (enableAuditing || enableStats) {
 			
+			JavaDStream<BaseStreamingMessage> allRequests = create_requests
+																.union(alter_requests)
+																.union(insert_requests)
+																.union(add_query_requests)
+																.union(listen_requests)
+																.union(list_requests)
+																.union(drop_requests);
+			
+			
+			if (enableAuditing) {
+//				persist the RDDs to cassandra using STRATIO DEEP
+				allRequests.foreachRDD(new SaveRequestsToAuditLogFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster));				
+			}
+			
+			if (enableStats) {
+			
+				allRequests.foreachRDD(new CollectRequestForStatsFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+			}			
 		}
 		
 		

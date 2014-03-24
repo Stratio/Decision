@@ -25,7 +25,7 @@ import com.google.gson.Gson;
 import com.stratio.streaming.common.StratioStreamingConstants;
 import com.stratio.streaming.messages.BaseStreamingMessage;
 import com.stratio.streaming.messages.ColumnNameTypeValue;
-import com.stratio.streaming.utils.DataToCollector;
+import com.stratio.streaming.utils.DataToCollectorUtils;
 
 public class SensorGridSimulation {
 
@@ -40,7 +40,7 @@ public class SensorGridSimulation {
 	public static final String[] topics		= {"commonSensor", "commonSensor", "commonSensor", "commonSensor", "commonSensor", "commonSensor"};
 //	public static final String[] ids		= {"3", "4", "5", "6", "7", "8"};  //thingspeak
 	public static final String[] ids		= {"52516", "52519", "52520", "52521", "52522", "52523"};  //open.sen.se
-	public static final String   sensorDataStream = "sensorgrid";
+	public static final String   sensorDataStream = "sensor_grid";
 	public static final long     streamSessionId  = System.currentTimeMillis();	
 
 	public SensorGridSimulation() {
@@ -66,7 +66,7 @@ public class SensorGridSimulation {
 		String usage = "usage: --broker-list ip:port --events n";
         ParseCmd cmd = new ParseCmd.Builder()
         							.help(usage)                          
-        							.parm("--broker-list", "255.25.25.255:9999" ).rex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}:[0-9]{1,4}$").req()    
+        							.parm("--broker-list", "node.stratio.com:9092" ).rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()    
         							.parm("--events", "1000" ).req()
         							.build();  
        
@@ -231,7 +231,7 @@ public class SensorGridSimulation {
 					
 					
 					data.add(new Tuple2<String, Object>("52734", Double.valueOf(throughput)));
-					DataToCollector.sendDataToOpenSense(data);
+					DataToCollectorUtils.sendDataToOpenSense(data);
 					
 					Thread.currentThread().sleep(7000);
 					
@@ -252,7 +252,7 @@ public class SensorGridSimulation {
 					data.add(new Tuple2<String, Object>("52734", Double.valueOf(throughput)));
 					
 					try {
-						DataToCollector.sendDataToOpenSense(data);
+						DataToCollectorUtils.sendDataToOpenSense(data);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -268,7 +268,7 @@ public class SensorGridSimulation {
 					data.add(new Tuple2<String, Object>("52734", Double.valueOf(0)));
 					
 					
-						DataToCollector.sendDataToOpenSense(data);
+						DataToCollectorUtils.sendDataToOpenSense(data);
 					
 				} catch (Exception e) {
 					e.printStackTrace();

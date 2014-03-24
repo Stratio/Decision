@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 import com.stratio.streaming.functions.FilterMessagesByOperationFunction;
 import com.stratio.streaming.messages.BaseStreamingMessage;
 import com.stratio.streaming.messages.ColumnNameTypeValue;
-import com.stratio.streaming.utils.DataToCollector;
+import com.stratio.streaming.utils.DataToCollectorUtils;
 
 public class StreamToBusCallback extends StreamCallback {
 
@@ -66,50 +66,14 @@ public class StreamToBusCallback extends StreamCallback {
 		}
 		
 		sendEventToBus(collected_events);
-		sendEventToDataCollector(collected_events);
+		DataToCollectorUtils.sendData(collected_events);
 		
 	}
 	
 	
 
 
-	private void sendEventToDataCollector(List<BaseStreamingMessage> collected_events) {
-		
-		ColumnNameTypeValue indexColumn = new ColumnNameTypeValue("index", null, null);
-		ColumnNameTypeValue dataColumn = new ColumnNameTypeValue("data", null, null);
-		
-		List<Tuple2<String, Object>> data = Lists.newArrayList();
-		
-		try {
-		
-			for (BaseStreamingMessage event : collected_events) {
-				
-				int indexPosition = event.getColumns().indexOf(indexColumn);
-				int dataPosition  = event.getColumns().indexOf(dataColumn);
-				
-				if (indexPosition > 0 & dataPosition > 0) {
-															
-					data.add(new Tuple2<String, Object>(event.getColumns().get(indexPosition).getValue().toString().replace(".0", ""), 
-																event.getColumns().get(dataPosition).getValue()));
-					
-					logger.info("sendEventToDataCollector:" + event.getColumns().get(indexPosition).getValue().toString());
-				}
-				
-				
-				
-				
-			}
-			
-		
-			DataToCollector.sendDataToOpenSense(data);
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-	}
+
 
 	private void sendEventToBus(List<BaseStreamingMessage> collected_events) {
 		
@@ -143,4 +107,4 @@ public class StreamToBusCallback extends StreamCallback {
 		this.producer.close();
 	}
 		
-	}
+}
