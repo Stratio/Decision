@@ -43,7 +43,7 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 							.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(request.getStreamName()), 
 																											request.getColumns()));
 					
-					logger.info("==> INSERT: stream " + request.getStreamName() + " has received a new event OK");
+//					logger.info("==> INSERT: stream " + request.getStreamName() + " has received a new event OK");
 					
 //					ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.OK);
 					
