@@ -7,11 +7,12 @@ import java.util.UUID
 import com.stratio.bus.utils.JsonUtils
 import org.slf4j.LoggerFactory
 import com.stratio.streaming.commons.{Paths, ReplyCodes}
+import com.google.gson.Gson
+import com.stratio.streaming.commons.messages.StratioStreamingMessage
 
 case class BusSyncOperation(
   tableProducer: KafkaProducer,
-  zookeeperConsumer: ZookeeperConsumer,
-  operation: String) {
+  zookeeperConsumer: ZookeeperConsumer) {
   val config = ConfigFactory.load()
   val log = LoggerFactory.getLogger(getClass)
   val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
@@ -26,36 +27,36 @@ case class BusSyncOperation(
     ReplyCodes.KO_COLUMN_DOES_NOT_EXISTS
   )
 
-  def performSyncOperation(queryString: String) = {
+  def performSyncOperation(message: StratioStreamingMessage) = {
     val zNodeUniqueId = UUID.randomUUID().toString
-    addMessageToKafkaTopic(queryString, zNodeUniqueId)
-    waitForTheStreamingResponse(zNodeUniqueId, queryString)
+    addMessageToKafkaTopic(message, zNodeUniqueId)
+    waitForTheStreamingResponse(zNodeUniqueId, message)
   }
 
-  private def addMessageToKafkaTopic(queryString: String, creationUniqueId: String) = {
-    val message = JsonUtils.appendElementsToJsonString(queryString, Map("zNodeId" -> creationUniqueId))
-    tableProducer.send(message, operation)
+  private def addMessageToKafkaTopic(message: StratioStreamingMessage, creationUniqueId: String) = {
+    val kafkaMessage = JsonUtils.appendElementsToJsonString(new Gson().toJson(message), Map("zNodeId" -> creationUniqueId))
+    tableProducer.send(kafkaMessage, message.getOperation)
   }
-  private def waitForTheStreamingResponse(zNodeUniqueId: String, queryString: String) = {
-    val zNodeFullPath = getOperationZNodeFullPath(zNodeUniqueId, operation)
+  private def waitForTheStreamingResponse(zNodeUniqueId: String, message: StratioStreamingMessage) = {
+    val zNodeFullPath = getOperationZNodeFullPath(zNodeUniqueId, message)
     try {
       Await.result(zookeeperConsumer.readZNode(zNodeFullPath), streamingAckTimeOut seconds)
       val response = zookeeperConsumer.getZNodeData(zNodeFullPath)
-      manageStreamingResponse(response, queryString)
+      manageStreamingResponse(response, message)
       zookeeperConsumer.removeZNode(zNodeFullPath)
     } catch {
       case e: TimeoutException => {
-        log.error("Stratio Bus - Ack from zookeeper timeout expired for: "+queryString)
+        log.error("Stratio Bus - Ack from zookeeper timeout expired for: "+message.getRequest)
         //TODO insert error into error-topic ???
       }
     }
   }
 
-  private def manageStreamingResponse(response: Option[String], queryString: String) = {
+  private def manageStreamingResponse(response: Option[String], message: StratioStreamingMessage) = {
     //TODO define response (json, exceptions....)
     response.get match {
-      case replyCode if isAnOkResponse(replyCode) => log.info("Stratio Bus - Ack received for: "+queryString)
-      case replyCode if isAnErrorResponse(replyCode) => createLogError(replyCode, queryString)
+      case replyCode if isAnOkResponse(replyCode) => log.info("Stratio Bus - Ack received for: "+message.getRequest)
+      case replyCode if isAnErrorResponse(replyCode) => createLogError(replyCode, message.getRequest)
       case _ => log.info("Stratio Bus - I have no idea what to do with this")
     }
   }
@@ -68,8 +69,9 @@ case class BusSyncOperation(
     log.error(s"Stratio Bus - [ACK_CODE,QUERY_STRING]: [$responseCode,$queryString]")
   }
 
-  private def getOperationZNodeFullPath(uniqueId: String, operation: String) = {
+  private def getOperationZNodeFullPath(uniqueId: String, message: StratioStreamingMessage) = {
     val zookeeperPath = Paths.ZK_BASE_PATH
+    val operation = message.getOperation
     s"$zookeeperPath/$operation/$uniqueId"
   }
 }

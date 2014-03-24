@@ -1,17 +1,11 @@
 package com.stratio.bus
 
+import com.stratio.streaming.commons.messages.StratioStreamingMessage
+
+
 trait IStratioBus {
   def initialize(): IStratioBus
 
-  def create(queryString: String)
-
-  def insert(queryString: String)
-
-  def select(queryString: String)
-
-  def alter(queryString: String)
-
-  def drop(queryString: String)
-
+  def send(message: StratioStreamingMessage)
 
 }

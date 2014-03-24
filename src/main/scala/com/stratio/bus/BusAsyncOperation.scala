@@ -1,10 +1,16 @@
 package com.stratio.bus
 
-case class BusAsyncOperation(tableProducer: KafkaProducer,
-                              operation: String) {
-  def performAsyncOperation(queryString: String) = {
-    addMessageToKafkaTopic(queryString)
+import com.google.gson.Gson
+import com.stratio.streaming.commons.messages.StratioStreamingMessage
+
+case class BusAsyncOperation(tableProducer: KafkaProducer) {
+  def performAsyncOperation(message: StratioStreamingMessage) = {
+    addMessageToKafkaTopic(message)
   }
 
-  def addMessageToKafkaTopic(queryString: String) = tableProducer.send(queryString, operation)
+  def addMessageToKafkaTopic(message: StratioStreamingMessage) = {
+    val kafkaMessage = new Gson().toJson(message)
+    val operation = message.getOperation
+    tableProducer.send(kafkaMessage, operation)
+  }
 }

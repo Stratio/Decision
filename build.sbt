@@ -33,7 +33,8 @@ libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.2.0",
   "org.apache.curator" % "curator-framework" % "2.4.1",
   "org.slf4j" % "slf4j-log4j12" % "1.7.5",
-  "com.stratio.streaming" % "StratioStreamingCommons" % "1.0-SNAPSHOT"
+  "com.stratio.streaming" % "StratioStreamingCommons" % "1.0-SNAPSHOT",
+  "com.google.code.gson" % "gson" % "2.2.4"
 )
 
 initialCommands := "import com.stratio.bus._"
