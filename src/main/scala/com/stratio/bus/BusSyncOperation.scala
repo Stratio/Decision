@@ -46,15 +46,14 @@ case class BusSyncOperation(
       zookeeperConsumer.removeZNode(zNodeFullPath)
     } catch {
       case e: TimeoutException => {
-        log.error("Stratio Bus - Ack from zookeeper timeout expired for: "+message.getRequest)
-        throw new StratioBusException("Ack from zookeeper timeout expired for: "+message.getRequest)
+        log.error("Stratio Bus - Ack timeout expired for: "+message.getRequest)
+        throw new StratioBusException("Ack timeout expired for: "+message.getRequest)
         //TODO insert error into error-topic ???
       }
     }
   }
 
   private def manageStreamingResponse(response: Option[String], message: StratioStreamingMessage) = {
-    //TODO define response (json, exceptions....)
     response.get match {
       case replyCode if isAnOkResponse(replyCode) => log.info("Stratio Bus - Ack received for: "+message.getRequest)
       case replyCode if isAnErrorResponse(replyCode) => {
@@ -62,7 +61,10 @@ case class BusSyncOperation(
         val errorMessage = ackErrorList.get(response.get).get
         throw new StratioBusException("Error response received from StratioStreaming: "+errorMessage)
       }
-      case _ => log.info("Stratio Bus - I have no idea what to do with this")
+      case _ => {
+        log.info("Stratio Bus - ACK unknown response code received")
+        throw new StratioBusException("Stratio Bus - ACK unknown response code received")
+      }
     }
   }
 

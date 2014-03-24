@@ -6,6 +6,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory
 import com.stratio.streaming.commons.TopicNames
 import com.stratio.streaming.commons.constants.CEPOperations._
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
+import com.stratio.bus.exception.StratioBusException
 
 class StratioBus
   extends IStratioBus {
@@ -13,18 +14,12 @@ class StratioBus
 
   def send(message: StratioStreamingMessage) = {
     message.getOperation.toUpperCase match {
-      case CREATE => stratioBusCreate.performSyncOperation(message)
-      case ADD_QUERY => stratioBusSelect.performAsyncOperation(message)
-      case DROP => stratioBusDrop.performSyncOperation(message)
-      case ALTER => stratioBusAlter.performSyncOperation(message)
-      case INSERT => stratioBusInsert.performAsyncOperation(message)
+      case CREATE | DROP | ALTER | INSERT | LISTEN => syncOperation.performSyncOperation(message)
+      case ADD_QUERY | LIST => asyncOperation.performAsyncOperation(message)
+      case _ => throw new StratioBusException("Stratio Bus - Unknown operation")
       //TODO IMPLEMENT METHODS
-      //case LIST => "LIST"
-      //case LISTEN => "LISTEN"
       //case SAVETO_DATACOLLECTOR => "SAVETO_DATACOLLECTOR"
       //case SAVETO_CASSANDRA => "SAVETO_CASSANDRA"
-      //TODO CREATE EXCEPTION
-      //case _ => throw new StratioBusException();
     }
   }
 
@@ -53,11 +48,8 @@ object StratioBus {
     ZookeeperConsumer(zookeeperClient)
   }
 
-  lazy val stratioBusCreate = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
-  lazy val stratioBusInsert = new BusAsyncOperation(kafkaProducer)
-  lazy val stratioBusSelect = new BusAsyncOperation(kafkaProducer)
-  lazy val stratioBusAlter = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
-  lazy val stratioBusDrop = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
+  lazy val syncOperation = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
+  lazy val asyncOperation = new BusAsyncOperation(kafkaProducer)
 
   def initializeTopic() {
     KafkaTopicUtils.createTopic(zookeeperCluster, streamingTopicName)
