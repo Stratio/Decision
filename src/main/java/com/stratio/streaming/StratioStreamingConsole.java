@@ -2,9 +2,16 @@ package com.stratio.streaming;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import jline.ConsoleReader;
+import kafka.consumer.ConsumerConfig;
+import kafka.consumer.ConsumerIterator;
+import kafka.consumer.KafkaStream;
+import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
@@ -18,13 +25,16 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import EDU.oswego.cs.dl.util.concurrent.Executor;
 import ca.zmatrix.cli.ParseCmd;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.stratio.streaming.common.StratioStreamingConstants;
 import com.stratio.streaming.messages.BaseStreamingMessage;
 import com.stratio.streaming.messages.ColumnNameTypeValue;
+import com.stratio.streaming.messages.ListStreamsMessage;
 
 public class StratioStreamingConsole {
 	
@@ -34,6 +44,7 @@ public class StratioStreamingConsole {
 	private String sessionId;
 	private Producer<String, String> producer;
 	private CuratorFramework  client;
+	private ExecutorService consumers;
 	
 
 
@@ -115,6 +126,9 @@ public class StratioStreamingConsole {
         this.sessionId = "" + System.currentTimeMillis();
         this.producer = new Producer<String, String>(createProducerConfig());
         
+        consumers = Executors.newFixedThreadPool(1);
+        consumers.execute(new StratioRepliesConsumer(R.get("--zookeeper").toString(), StratioStreamingConstants.BUS.LIST_STREAMS_TOPIC));
+        
         
         
 //		ZOOKEPER CONNECTION
@@ -157,6 +171,7 @@ public class StratioStreamingConsole {
 	}
 	
 	private void shutDown() {
+		consumers.shutdownNow();
 		producer.close();
 		client.close();
 		System.out.println("<<<<<<<<<< SHUTTING DOWN STRATIO BUS CONNECTION");
@@ -164,17 +179,7 @@ public class StratioStreamingConsole {
     
     
     
-	private ProducerConfig createProducerConfig() {
-		Properties properties = new Properties();
-		properties.put("serializer.class", "kafka.serializer.StringEncoder");
-		properties.put("metadata.broker.list", brokerList);
-//		properties.put("request.required.acks", "1");
-//		properties.put("compress", "true");
-//		properties.put("compression.codec", "gzip");
-//		properties.put("producer.type", "sync");
- 
-        return new ProducerConfig(properties);
-    }  
+
 	
 	
 	private void handleCommand(String request) {
@@ -241,6 +246,102 @@ public class StratioStreamingConsole {
 	}
 	
 	
+	private ProducerConfig createProducerConfig() {
+		Properties properties = new Properties();
+		properties.put("serializer.class", "kafka.serializer.StringEncoder");
+		properties.put("metadata.broker.list", brokerList);
+//		properties.put("request.required.acks", "1");
+//		properties.put("compress", "true");
+//		properties.put("compression.codec", "gzip");
+//		properties.put("producer.type", "sync");
+ 
+        return new ProducerConfig(properties);
+    }  
+	
+	
+	private class StratioRepliesConsumer implements Runnable {
+		
+		private String zkCluster;
+		private ConsumerConnector consumer;
+		private String topic;
+		
+		public StratioRepliesConsumer(String zkCluster, String topic) {
+			this.zkCluster = zkCluster;			
+			this.topic = topic;
+			//		start consumer
+			this.consumer = kafka.consumer.Consumer.createJavaConsumerConnector(createConsumerConfig(zkCluster));		
+		}		
+		
+		
+		private ConsumerConfig createConsumerConfig(String zkClusters) {
+	        Properties props = new Properties();
+	        props.put("zookeeper.connect", zkClusters);
+	        props.put("group.id", "314");
+	 
+	        return new ConsumerConfig(props);
+	    }
+		
+		private String printColumns(List<ColumnNameTypeValue> columns) {
+			String print = "(";
+			
+			for (ColumnNameTypeValue column : columns) {
+				print += column.getColumn() + "." + column.getType() + ",";
+			}
+			
+			if (print.length() > 1) {
+				print = print.substring(0, print.length() -1);
+			}
+						
+			return print += ")";
+			
+		}
+		
+
+		@Override
+		public void run() {
+			
+			try {
+			
+				while (!Thread.currentThread().isInterrupted()) {
+	
+					
+				
+					Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
+					topicCountMap.put(topic, new Integer(1));
+					Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = consumer.createMessageStreams(topicCountMap);
+					ConsumerIterator<byte[], byte[]> it = consumerMap.get(topic).get(0).iterator();
+					
+						        
+					while (it.hasNext()) {
+						ListStreamsMessage reply = new Gson().fromJson(new String(it.next().message()), ListStreamsMessage.class);
+						
+						System.out.println("");
+						System.out.println("*********** LIST STREAMS REPLY ************");
+						System.out.println("**** SIDDHI STREAMS: " + reply.getCount());
+						for (BaseStreamingMessage stream : reply.getStreams()) {
+							System.out.println("********" + stream.getStreamName() + printColumns(stream.getColumns()));
+						}
+						System.out.println("*******************************************");
+						System.out.println("");
+						
+					}
+				}
+			}
+			catch(Exception e) {
+				
+			}
+			finally {
+				System.out.println("<<<<<<<<<<<< Shutting down consumer for topic:" + topic);
+				consumer.shutdown();
+			}
+			
+		
+				
+		
+			
+		}
+		
+	}
 	
 	
 	
@@ -368,7 +469,7 @@ public class StratioStreamingConsole {
 	}
 	
 	
-	
+
 
 	
 	

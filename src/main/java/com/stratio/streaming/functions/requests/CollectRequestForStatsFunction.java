@@ -59,7 +59,7 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 			
 			List<ColumnNameTypeValue> selectedFields = Lists.newArrayList();
 			
-			selectedFields.add(new ColumnNameTypeValue("operation", null, request.getOperation()));
+			selectedFields.add(new ColumnNameTypeValue("operation", null, request.getOperation().toUpperCase()));
 			selectedFields.add(new ColumnNameTypeValue("streamName", null, request.getStreamName()));
 			selectedFields.add(new ColumnNameTypeValue("count", null, Integer.valueOf(1)));
 			selectedFields.add(new ColumnNameTypeValue("index", null, getIndexForOperation(request.getOperation())));
