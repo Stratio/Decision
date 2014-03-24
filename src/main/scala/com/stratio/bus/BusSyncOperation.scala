@@ -48,7 +48,6 @@ case class BusSyncOperation(
       case e: TimeoutException => {
         log.error("Stratio Bus - Ack timeout expired for: "+message.getRequest)
         throw new StratioBusException("Ack timeout expired for: "+message.getRequest)
-        //TODO insert error into error-topic ???
       }
     }
   }
