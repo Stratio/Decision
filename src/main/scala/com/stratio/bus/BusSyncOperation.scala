@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory
 import com.stratio.streaming.commons.{Paths, ReplyCodes}
 import com.google.gson.Gson
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
+import com.stratio.bus.exception.StratioBusException
 
 case class BusSyncOperation(
   tableProducer: KafkaProducer,
@@ -16,15 +17,14 @@ case class BusSyncOperation(
   val config = ConfigFactory.load()
   val log = LoggerFactory.getLogger(getClass)
   val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
-  val ackErrorList = List(
-    ReplyCodes.KO_GENERAL_ERROR,
-    ReplyCodes.KO_PARSER_ERROR,
-    ReplyCodes.KO_LISTENER_ALREADY_EXISTS,
-    ReplyCodes.KO_QUERY_ALREADY_EXISTS,
-    ReplyCodes.KO_STREAM_ALREADY_EXISTS,
-    ReplyCodes.KO_STREAM_DOES_NOT_EXIST,
-    ReplyCodes.KO_COLUMN_ALREADY_EXISTS,
-    ReplyCodes.KO_COLUMN_DOES_NOT_EXISTS
+  val ackErrorList = Map(ReplyCodes.KO_GENERAL_ERROR -> "Generic error",
+    ReplyCodes.KO_PARSER_ERROR -> "Parser error",
+    ReplyCodes.KO_LISTENER_ALREADY_EXISTS -> "Listener already exists",
+    ReplyCodes.KO_QUERY_ALREADY_EXISTS -> "Query already exists",
+    ReplyCodes.KO_STREAM_ALREADY_EXISTS -> "Stream already exists",
+    ReplyCodes.KO_STREAM_DOES_NOT_EXIST -> "Stream does not exist",
+    ReplyCodes.KO_COLUMN_ALREADY_EXISTS -> "Column already exists",
+    ReplyCodes.KO_COLUMN_DOES_NOT_EXISTS -> "Column does not exist"
   )
 
   def performSyncOperation(message: StratioStreamingMessage) = {
@@ -47,6 +47,7 @@ case class BusSyncOperation(
     } catch {
       case e: TimeoutException => {
         log.error("Stratio Bus - Ack from zookeeper timeout expired for: "+message.getRequest)
+        throw new StratioBusException("Ack from zookeeper timeout expired for: "+message.getRequest)
         //TODO insert error into error-topic ???
       }
     }
@@ -56,7 +57,11 @@ case class BusSyncOperation(
     //TODO define response (json, exceptions....)
     response.get match {
       case replyCode if isAnOkResponse(replyCode) => log.info("Stratio Bus - Ack received for: "+message.getRequest)
-      case replyCode if isAnErrorResponse(replyCode) => createLogError(replyCode, message.getRequest)
+      case replyCode if isAnErrorResponse(replyCode) => {
+        createLogError(replyCode, message.getRequest)
+        val errorMessage = ackErrorList.get(response.get).get
+        throw new StratioBusException("Error response received from StratioStreaming: "+errorMessage)
+      }
       case _ => log.info("Stratio Bus - I have no idea what to do with this")
     }
   }

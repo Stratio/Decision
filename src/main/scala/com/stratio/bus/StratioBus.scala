@@ -12,12 +12,11 @@ class StratioBus
   import StratioBus._
 
   def send(message: StratioStreamingMessage) = {
-    println("BUS OPERATION: "+message.getOperation)
     message.getOperation.toUpperCase match {
       case CREATE => stratioBusCreate.performSyncOperation(message)
-      case ADD_QUERY => stratioBusSelect.performSyncOperation(message)
+      case ADD_QUERY => stratioBusSelect.performAsyncOperation(message)
       case DROP => stratioBusDrop.performSyncOperation(message)
-      case ALTER => stratioBusAlter.performAsyncOperation(message)
+      case ALTER => stratioBusAlter.performSyncOperation(message)
       case INSERT => stratioBusInsert.performAsyncOperation(message)
       //TODO IMPLEMENT METHODS
       //case LIST => "LIST"
@@ -56,8 +55,8 @@ object StratioBus {
 
   lazy val stratioBusCreate = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
   lazy val stratioBusInsert = new BusAsyncOperation(kafkaProducer)
-  lazy val stratioBusSelect = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
-  lazy val stratioBusAlter = new BusAsyncOperation(kafkaProducer)
+  lazy val stratioBusSelect = new BusAsyncOperation(kafkaProducer)
+  lazy val stratioBusAlter = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
   lazy val stratioBusDrop = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
 
   def initializeTopic() {
