@@ -8,11 +8,11 @@ Architecture
 
 This component forwards the incoming requests to the StratioStreaming component via kafka topics.
 
-Upon receiving a message the component will produce a KeyedMessage to a kafka topic, the key will be the message operation (create, select, insert...). The Stratio streaming component will be listening to this topic and handle the message according to the message type. 
+Upon receiving a message the component will send a KeyedMessage to a kafka topic for which the key will be the message operation (create, select, insert...). The Stratio streaming component will be listening to this topic and handle the message accordingly to its type. 
 
-The comunication between the Bus and Stratio streaming is managed by acknowledges sending via zookeeper. There are two operation types:
+The comunication between the Bus and Stratio streaming components is managed by acknowledges sending via zookeeper. There are two operation types:
 
-   * Sync operations: Once the Bus sends a message to the kafka topic it will be waiting for the response reading a zookeeper zNode. If the Streaming component is able to handle the message it will write an OK response within the zookeeper zNode, if not a timeout expires and the Bus will throw an Exception.
+   * Sync operations: Once the Bus sends a message to the kafka topic it will be waiting for the response reading a zookeeper zNode. If the Streaming component is able to handle the message it will write a response within the zookeeper zNode, if not a timeout expires and the Bus will throw an Exception.
 
    * Async operations: The Bus sends a message to the kafka topic and it will not wait for the response.
 
