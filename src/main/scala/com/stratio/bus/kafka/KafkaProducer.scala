@@ -1,4 +1,4 @@
-package com.stratio.bus
+package com.stratio.bus.kafka
 
 import java.util.UUID
 import java.util.Properties

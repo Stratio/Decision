@@ -1,4 +1,4 @@
-package com.stratio.bus
+package com.stratio.bus.zookeeper
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.apache.zookeeper.data.Stat

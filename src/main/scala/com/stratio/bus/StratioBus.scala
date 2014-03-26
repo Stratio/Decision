@@ -7,6 +7,8 @@ import com.stratio.streaming.commons.TopicNames
 import com.stratio.streaming.commons.constants.CEPOperations._
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.bus.exception.StratioBusException
+import com.stratio.bus.zookeeper.ZookeeperConsumer
+import com.stratio.bus.kafka.{KafkaTopicUtils, KafkaProducer}
 
 class StratioBus
   extends IStratioBus {

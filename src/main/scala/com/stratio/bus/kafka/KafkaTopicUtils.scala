@@ -1,4 +1,4 @@
-package com.stratio.bus
+package com.stratio.bus.kafka
 
 import kafka.utils.{ZkUtils, ZKStringSerializer}
 import org.I0Itec.zkclient.ZkClient

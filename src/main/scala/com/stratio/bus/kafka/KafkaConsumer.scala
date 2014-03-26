@@ -1,4 +1,4 @@
-package com.stratio.bus
+package com.stratio.bus.kafka
 
 import kafka.serializer._
 import java.util.Properties
@@ -7,6 +7,8 @@ import scala.collection.JavaConversions._
 import kafka.consumer.{KafkaStream, Whitelist, Consumer, ConsumerConfig}
 import scala.concurrent.{ExecutionContext, Future}
 import ExecutionContext.Implicits.global
+import scala.Predef._
+import kafka.consumer.Whitelist
 
 class KafkaConsumer(
                      topic: String,

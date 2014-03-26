@@ -2,6 +2,7 @@ package com.stratio.bus
 
 import org.scalatest.{ShouldMatchers, FunSpec}
 import java.util.UUID
+import com.stratio.bus.kafka.{KafkaProducer, KafkaConsumer}
 
 
 class ConsumerProducerTests
