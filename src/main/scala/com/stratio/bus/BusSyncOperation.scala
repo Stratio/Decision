@@ -30,15 +30,15 @@ case class BusSyncOperation(
   def performSyncOperation(message: StratioStreamingMessage) = {
     val zNodeUniqueId = UUID.randomUUID().toString
     addMessageToKafkaTopic(message, zNodeUniqueId)
-    waitForTheStreamingResponse(zNodeUniqueId, message)
+    waitForTheStreamingResponse(message)
   }
 
   private def addMessageToKafkaTopic(message: StratioStreamingMessage, creationUniqueId: String) = {
-    val kafkaMessage = JsonUtils.appendElementsToJsonString(new Gson().toJson(message), Map("zNodeId" -> creationUniqueId))
+    val kafkaMessage = new Gson().toJson(message)
     tableProducer.send(kafkaMessage, message.getOperation)
   }
-  private def waitForTheStreamingResponse(zNodeUniqueId: String, message: StratioStreamingMessage) = {
-    val zNodeFullPath = getOperationZNodeFullPath(zNodeUniqueId, message)
+  private def waitForTheStreamingResponse(message: StratioStreamingMessage) = {
+    val zNodeFullPath = getOperationZNodeFullPath(message)
     try {
       Await.result(zookeeperConsumer.readZNode(zNodeFullPath), streamingAckTimeOut seconds)
       val response = zookeeperConsumer.getZNodeData(zNodeFullPath)
@@ -75,9 +75,12 @@ case class BusSyncOperation(
     log.error(s"Stratio Bus - [ACK_CODE,QUERY_STRING]: [$responseCode,$queryString]")
   }
 
-  private def getOperationZNodeFullPath(uniqueId: String, message: StratioStreamingMessage) = {
-    val zookeeperPath = Paths.ZK_BASE_PATH
-    val operation = message.getOperation
-    s"$zookeeperPath/$operation/$uniqueId"
+  private def getOperationZNodeFullPath(message: StratioStreamingMessage) = {
+    val zookeeperBasePath = Paths.ZK_BASE_PATH
+    val operation = message.getOperation.toLowerCase()
+    val uniqueId = message.getRequest_id
+    val zookeeperPath = s"$zookeeperBasePath/$operation/$uniqueId"
+    log.info(s"Stratio Bus - Waiting for zookeeper node response. Listen to the following path: $zookeeperPath")
+    zookeeperPath
   }
 }

@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 import kafka.common.Topic
 
 object KafkaTopicUtils {
-  def createTopic(zookeeperCluster: String,
+  def createTopicIfNotExists(zookeeperCluster: String,
                   topic: String,
                   replicationFactor: Int = 1,
                   numPartitions: Int = 1) = {
@@ -19,10 +19,12 @@ object KafkaTopicUtils {
 
       def deserialize(p1: Array[Byte]): AnyRef = ZKStringSerializer.deserialize(p1)
     }
-    val zkClient = new ZkClient(zookeeperCluster, 30000, 30000)
-    zkClient.setZkSerializer(zkSerializer)
-    createOrUpdateTopic(zkClient, topic, numPartitions, replicationFactor)
-    zkClient.close()
+
+      val zkClient = new ZkClient(zookeeperCluster, 30000, 30000)
+      zkClient.setZkSerializer(zkSerializer)
+      if (!AdminUtils.topicExists(zkClient, topic))
+        createOrUpdateTopic(zkClient, topic, numPartitions, replicationFactor)
+      zkClient.close()
     true
   }
 
@@ -32,10 +34,8 @@ object KafkaTopicUtils {
                           replicationFactor: Int) = {
     Topic.validate(topic)
     val brokerList = ZkUtils.getSortedBrokerList(zkClient)
-    //TODO call the getNumPartitionsForTopic method to get the number of partitions
-    //val numPartitions = getNumPartitionsForTopic(brokerList, 9092, topic)
     val partitionReplicaAssignment = AdminUtils.assignReplicasToBrokers(brokerList, numPartitions, replicationFactor,0,0)
-    AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(topic, partitionReplicaAssignment, zkClient, true)
+    AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(zkClient, topic, partitionReplicaAssignment)
     true
   }
 

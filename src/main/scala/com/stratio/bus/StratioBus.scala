@@ -39,7 +39,7 @@ object StratioBus {
   val zookeeperPort = config.getString("zookeeper.port")
   val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
 
-  lazy val kafkaProducer = new KafkaProducer(streamingTopicName, kafkaBroker)
+  lazy val kafkaProducer = new KafkaProducer("stratio_streaming_requests", kafkaBroker)
 
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
@@ -52,6 +52,6 @@ object StratioBus {
   lazy val asyncOperation = new BusAsyncOperation(kafkaProducer)
 
   def initializeTopic() {
-    KafkaTopicUtils.createTopic(zookeeperCluster, streamingTopicName)
+    KafkaTopicUtils.createTopicIfNotExists(zookeeperCluster, streamingTopicName)
   }
 }
