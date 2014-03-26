@@ -5,12 +5,12 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.duration._
 import java.util.UUID
 import org.slf4j.LoggerFactory
-import com.stratio.streaming.commons.{Paths, ReplyCodes}
 import com.google.gson.Gson
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.bus.exception.StratioBusException
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.bus.kafka.KafkaProducer
+import com.stratio.streaming.commons.constants.{ReplyCodes, Paths}
 
 case class BusSyncOperation(
   tableProducer: KafkaProducer,

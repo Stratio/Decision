@@ -12,28 +12,31 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
 
   def readZNode(fullPath: String) = {
     Future {
-      var zNode = checkZNode(fullPath)
-      while(!zNodeExists(zNode)) {
-        zNode = checkZNode(fullPath)
+      var nodeExists = zNodeExists(fullPath)
+      while(!nodeExists) {
+        nodeExists = zNodeExists(fullPath)
       }
     }
   }
 
   def getZNodeData(fullPath: String): Option[String] = {
-    val zNode = checkZNode(fullPath)
-    zNodeExists(zNode) match {
+    zNodeExists(fullPath) match {
       case true => Some(new String(zooKeeperClient.getData.forPath(fullPath)))
       case _ => None
     }
   }
 
   def removeZNode(fullPath: String) = {
-    val zNode = checkZNode(fullPath)
-    if (zNodeExists(zNode))
+    if (zNodeExists(fullPath))
       zooKeeperClient.delete.forPath(fullPath)
+  }
+
+  def zNodeExists(zNodeName: String) = {
+    val zNode = checkZNode(zNodeName)
+    zNode != null
   }
 
   private def checkZNode(zNodeName: String) = zooKeeperClient.checkExists().forPath(zNodeName)
 
-  private def zNodeExists(zNode: Stat) = zNode != null
+  //private def zNodeExists(zNode: Stat) = zNode != null
 }

@@ -3,12 +3,13 @@ package com.stratio.bus
 import com.typesafe.config.ConfigFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.CuratorFrameworkFactory
-import com.stratio.streaming.commons.TopicNames
 import com.stratio.streaming.commons.constants.CEPOperations._
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.bus.exception.StratioBusException
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.bus.kafka.{KafkaTopicUtils, KafkaProducer}
+import com.stratio.streaming.commons.constants.TopicNames
+import com.stratio.streaming.commons.constants.Paths._
 
 class StratioBus
   extends IStratioBus {
@@ -26,6 +27,7 @@ class StratioBus
   }
 
   def initialize() = {
+    checkEphemeralNode()
     initializeTopic()
     this
   }
@@ -52,6 +54,13 @@ object StratioBus {
 
   lazy val syncOperation = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
   lazy val asyncOperation = new BusAsyncOperation(kafkaProducer)
+
+  def checkEphemeralNode() {
+    val ephemeralNodePath = ZK_EPHEMERAL_NODE_PATH
+    if (!zookeeperConsumer.zNodeExists(ephemeralNodePath))
+      throw new IllegalStateException(" stratio streaming is not running.")
+
+  }
 
   def initializeTopic() {
     KafkaTopicUtils.createTopicIfNotExists(zookeeperCluster, streamingTopicName)
