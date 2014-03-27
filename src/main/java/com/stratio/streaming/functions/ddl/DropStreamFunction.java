@@ -46,7 +46,7 @@ public class DropStreamFunction extends StratioStreamingBaseFunction {
 //				}
 //				
 ////				then we removeStream in siddhi
-//				getSiddhiManager().removeStream(request.getStreamName());
+				getSiddhiManager().removeStream(request.getStreamName());
 //				
 ////				and finally we drop the streamStatus
 //				SiddhiUtils.removeStreamStatus(request.getStreamName(), getSiddhiManager());
