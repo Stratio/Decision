@@ -1,5 +1,8 @@
 package com.stratio.streaming.functions.requests;
 
+import java.util.UUID;
+
+import org.apache.cassandra.utils.UUIDGen;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.slf4j.Logger;
@@ -10,13 +13,14 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.rdd.CassandraCellRDD;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.messages.BaseStreamingMessage;
 
 public class SaveRequestsToAuditLogFunction extends StratioStreamingBaseFunction {
 	
 	private static Logger logger = LoggerFactory.getLogger(SaveRequestsToAuditLogFunction.class);
 	private String cassandraCluster;
+	private IDeepJobConfig<Cells> auditCassandraConfig;
 	
 
 	/**
@@ -26,32 +30,37 @@ public class SaveRequestsToAuditLogFunction extends StratioStreamingBaseFunction
 
 	public SaveRequestsToAuditLogFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster, String cassandraCluster) {
 		super(siddhiManager, zookeeperCluster, kafkaCluster);
-		this.cassandraCluster = cassandraCluster; 
+		this.cassandraCluster = cassandraCluster;
+		this.auditCassandraConfig = DeepJobConfigFactory.create().host("node.stratio.com").rpcPort(9160).keyspace("stratio_streaming").table("auditing_requests").createTableOnWrite(true).initialize();
 	}
 	
 
 	@Override
-	public Void call(JavaRDD<BaseStreamingMessage> rdd) throws Exception {
+	public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
 		
 		
 //		TODO when siddhi RDD is ready
-				
-//		final IDeepJobConfig<Cells> averageCassandraConfig = DeepJobConfigFactory.create().host("node.stratio.com").rpcPort(9160).keyspace("stratio_streaming").table("audit").initialize();
-//		
-//		JavaRDD<Cells> outRDD = rdd.map(new Function<BaseStreamingMessage, Cells>() {
-//											@Override
-//											public Cells call(BaseStreamingMessage request) {
-//												
-////												com.stratio.deep.entity.Cell<String> timestampCell = com.stratio.deep.entity.Cell.create("timestamp", request.);
-////												com.stratio.deep.entity.Cell<UUID> sensorTimeUUIDCell = com.stratio.deep.entity.Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
-////												com.stratio.deep.entity.Cell<Double> sensorDataCell = com.stratio.deep.entity.Cell.create("value", tuple2._2());
-//			
-//												return null;//new Cells(sensorNameCell, sensorTimeUUIDCell, sensorDataCell);
-//											}
-//										});
-//
-//				
-//		CassandraCellRDD.saveRDDToCassandra(outRDD, averageCassandraConfig);			
+		
+		if (rdd.count() > 0) {
+
+			JavaRDD<Cells> outRDD = rdd.map(new Function<StratioStreamingMessage, Cells>() {
+				@Override
+				public Cells call(StratioStreamingMessage request) {
+					
+					com.stratio.deep.entity.Cell<UUID>   requestTimeUUIDCell 		= com.stratio.deep.entity.Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
+					com.stratio.deep.entity.Cell<String> requestSessionIdCell 		= com.stratio.deep.entity.Cell.create("sessionId", request.getSession_id());
+					com.stratio.deep.entity.Cell<String> requestIdCell 				= com.stratio.deep.entity.Cell.create("requestId", request.getRequest_id());
+					com.stratio.deep.entity.Cell<String> requestStreamNameCell 		= com.stratio.deep.entity.Cell.create("streamName", request.getStreamName());
+					com.stratio.deep.entity.Cell<String> requestOperationNameCell 	= com.stratio.deep.entity.Cell.create("operation", request.getOperation());
+					com.stratio.deep.entity.Cell<String> requestDataCell 			= com.stratio.deep.entity.Cell.create("request", request.getRequest());
+	
+					return new Cells(requestTimeUUIDCell, requestSessionIdCell, requestIdCell, requestStreamNameCell, requestOperationNameCell, requestDataCell);
+				}
+			});
+	
+	
+			CassandraCellRDD.saveRDDToCassandra(outRDD, auditCassandraConfig);			
+		}
 
 		return null;
 	}

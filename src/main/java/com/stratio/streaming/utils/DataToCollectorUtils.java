@@ -8,11 +8,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 
-import com.google.common.collect.Lists;
-import com.stratio.streaming.messages.BaseStreamingMessage;
-import com.stratio.streaming.messages.ColumnNameTypeValue;
-
 import scala.Tuple2;
+
+import com.google.common.collect.Lists;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 
 public class DataToCollectorUtils {
 
@@ -23,7 +23,7 @@ public class DataToCollectorUtils {
 	
 	
 	
-	public static void sendData(List<BaseStreamingMessage> collected_events) {
+	public static void sendData(List<StratioStreamingMessage> collected_events) {
 		
 		ColumnNameTypeValue indexColumn = new ColumnNameTypeValue("index", null, null);
 		ColumnNameTypeValue dataColumn = new ColumnNameTypeValue("data", null, null);
@@ -32,7 +32,7 @@ public class DataToCollectorUtils {
 		
 		try {
 		
-			for (BaseStreamingMessage event : collected_events) {
+			for (StratioStreamingMessage event : collected_events) {
 				
 				int indexPosition = event.getColumns().indexOf(indexColumn);
 				int dataPosition  = event.getColumns().indexOf(dataColumn);

@@ -5,9 +5,9 @@ import org.apache.spark.api.java.function.Function;
 import scala.Tuple2;
 
 import com.google.gson.Gson;
-import com.stratio.streaming.messages.BaseStreamingMessage;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 
-public class KeepPayloadFromMessageFunction extends Function<Tuple2<String, String>, BaseStreamingMessage> {
+public class KeepPayloadFromMessageFunction extends Function<Tuple2<String, String>, StratioStreamingMessage> {
 
 	/**
 	 * 
@@ -19,17 +19,17 @@ public class KeepPayloadFromMessageFunction extends Function<Tuple2<String, Stri
 	}
 
 	@Override
-	public BaseStreamingMessage call(Tuple2<String, String> message) {
+	public StratioStreamingMessage call(Tuple2<String, String> message) {
 		
 		return buildRequestMessage(message._1(), message._2());
 	}
 
 	
-	private BaseStreamingMessage buildRequestMessage(String operation, String requestJson) {
+	private StratioStreamingMessage buildRequestMessage(String operation, String requestJson) {
 		
-		BaseStreamingMessage requestMessage = null;
+		StratioStreamingMessage requestMessage = null;
 		
-		requestMessage = getGson().fromJson(requestJson, BaseStreamingMessage.class);		
+		requestMessage = getGson().fromJson(requestJson, StratioStreamingMessage.class);		
 		requestMessage.setOperation(operation);
 		
 		

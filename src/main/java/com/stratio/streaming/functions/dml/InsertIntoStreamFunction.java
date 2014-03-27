@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
 
-import com.stratio.streaming.common.StratioStreamingConstants;
+import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.messages.BaseStreamingMessage;
 import com.stratio.streaming.utils.SiddhiUtils;
 
 public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
@@ -28,11 +28,11 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 	
 
 	@Override
-	public Void call(JavaRDD<BaseStreamingMessage> rdd) throws Exception {
+	public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
 		
-		List<BaseStreamingMessage> requests = rdd.collect();
+		List<StratioStreamingMessage> requests = rdd.collect();
 		
-		for (BaseStreamingMessage request : requests) {
+		for (StratioStreamingMessage request : requests) {
 			
 //			stream exists
 			if (getSiddhiManager().getInputHandler(request.getStreamName()) != null) {
@@ -48,17 +48,17 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 //					ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.OK);
 					
 				} catch (AttributeNotExistException anee) {
-					ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST);
+					ackStreamingOperation(request, REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST);
 				}
 				catch (InterruptedException e) {
-					ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.KO_GENERAL_ERROR);
+					ackStreamingOperation(request, REPLY_CODES.KO_GENERAL_ERROR);
 				}
 				
 				
 			}
 			else {
 				logger.info("==> INSERT: stream " + request.getStreamName() + " does not exist, no go to the insert KO");
-				ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.KO_STREAM_DOES_NOT_EXIST);
+				ackStreamingOperation(request, REPLY_CODES.KO_STREAM_DOES_NOT_EXIST);
 			}
 		}
 		

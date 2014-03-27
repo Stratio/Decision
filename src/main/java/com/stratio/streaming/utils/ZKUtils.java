@@ -4,12 +4,11 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.ZooDefs.Ids;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.stratio.streaming.common.StratioStreamingConstants;
-import com.stratio.streaming.messages.BaseStreamingMessage;
+import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 
 public class ZKUtils {
 	
@@ -51,11 +50,11 @@ public class ZKUtils {
 	}
 	
 	
-	public void createZNode(BaseStreamingMessage request, Integer reply) throws Exception {
+	public void createZNode(StratioStreamingMessage request, Integer reply) throws Exception {
 		
-		String path = StratioStreamingConstants.STREAMING.ZK_BASE_PATH 
-													+ "/" + request.getOperation().toLowerCase()
-													+ "/" + request.getRequest_id();
+		String path = STREAMING.ZK_BASE_PATH 
+							+ "/" + request.getOperation().toLowerCase()
+							+ "/" + request.getRequest_id();
 		
 		
 		if (client.checkExists().forPath(path) != null) {

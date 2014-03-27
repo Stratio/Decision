@@ -14,13 +14,11 @@ import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-import scala.Tuple2;
-
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.FilterMessagesByOperationFunction;
-import com.stratio.streaming.messages.BaseStreamingMessage;
-import com.stratio.streaming.messages.ColumnNameTypeValue;
 import com.stratio.streaming.utils.DataToCollectorUtils;
 
 public class StreamToBusCallback extends StreamCallback {
@@ -40,7 +38,7 @@ public class StreamToBusCallback extends StreamCallback {
 	@Override
 	public void receive(Event[] events) {
 		
-		List<BaseStreamingMessage> collected_events = Lists.newArrayList();
+		List<StratioStreamingMessage> collected_events = Lists.newArrayList();
 		
 		for (Event e : events) {
 			if (e instanceof InEvent) {
@@ -58,14 +56,14 @@ public class StreamToBusCallback extends StreamCallback {
 				}
 				
 				
-				collected_events.add(new BaseStreamingMessage(streamDefinition.getStreamId(), 			// value.streamName
+				collected_events.add(new StratioStreamingMessage(streamDefinition.getStreamId(), 	// value.streamName
 																			ie.getTimeStamp(), 	//value.timestamp
 																			columns)); 	 		// value.columns															
 									
 			}
 		}
 		
-		sendEventToBus(collected_events);
+		sendEventsToBus(collected_events);
 		DataToCollectorUtils.sendData(collected_events);
 		
 	}
@@ -75,11 +73,11 @@ public class StreamToBusCallback extends StreamCallback {
 
 
 
-	private void sendEventToBus(List<BaseStreamingMessage> collected_events) {
+	private void sendEventsToBus(List<StratioStreamingMessage> collected_events) {
 		
-		for (BaseStreamingMessage event : collected_events) {
+		for (StratioStreamingMessage event : collected_events) {
 			
-			KeyedMessage<String, String> message = new KeyedMessage<String, String>(streamDefinition.getId(), 				//topic 
+			KeyedMessage<String, String> message = new KeyedMessage<String, String>(streamDefinition.getId(), 					//topic 
 																						streamDefinition.getId() + "event", 	//key 
 																						new Gson().toJson(event)); 	 			// message
 

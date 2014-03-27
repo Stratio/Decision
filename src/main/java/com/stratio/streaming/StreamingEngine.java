@@ -20,19 +20,21 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import ca.zmatrix.cli.ParseCmd;
 
-import com.stratio.streaming.common.StratioStreamingConstants;
+import com.stratio.streaming.commons.constants.BUS;
+import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.FilterMessagesByOperationFunction;
 import com.stratio.streaming.functions.KeepPayloadFromMessageFunction;
+import com.stratio.streaming.functions.dal.ListenStreamFunction;
 import com.stratio.streaming.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.streaming.functions.ddl.AlterStreamFunction;
 import com.stratio.streaming.functions.ddl.CreateStreamFunction;
 import com.stratio.streaming.functions.ddl.DropStreamFunction;
 import com.stratio.streaming.functions.dml.InsertIntoStreamFunction;
 import com.stratio.streaming.functions.dml.ListStreamsFunction;
-import com.stratio.streaming.functions.dml.ListenStreamFunction;
-import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
 import com.stratio.streaming.functions.requests.CollectRequestForStatsFunction;
-import com.stratio.streaming.messages.BaseStreamingMessage;
+import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
 import com.stratio.streaming.utils.ZKUtils;
 
 
@@ -99,7 +101,7 @@ public class StreamingEngine {
         launchStratioStreamingEngine(R.get("--spark-master").toString().replace("_", "[") + "]",        		
 										R.get("--zookeeper-cluster").toString(),
 										R.get("--kafka-cluster").toString(),
-										StratioStreamingConstants.BUS.TOPICS,
+										BUS.TOPICS,
 										R.get("--cassandra-cluster").toString(),
 										Boolean.valueOf(R.get("--auditEnabled").toString()),
 										Boolean.valueOf(R.get("--statsEnabled").toString()));
@@ -131,11 +133,24 @@ public class StreamingEngine {
 														Boolean enableStats) throws Exception {
 		
 
-		ZKUtils.getZKUtils(zkCluster).createEphemeralZNode(StratioStreamingConstants.STREAMING.ZK_BASE_PATH + "/" + "engine", String.valueOf(System.currentTimeMillis()).getBytes());
+		ZKUtils.getZKUtils(zkCluster).createEphemeralZNode(STREAMING.ZK_BASE_PATH + "/" + "engine", String.valueOf(System.currentTimeMillis()).getBytes());
+		
+		KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
+		CreateStreamFunction createStreamFunction = new CreateStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
+		AlterStreamFunction alterStreamFunction = new AlterStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
+		InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
+		AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
+		ListenStreamFunction listenStreamFunction = new ListenStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
+		CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(getSiddhiManager(), zkCluster, kafkaCluster);
+		ListStreamsFunction listStreamsFunction = new ListStreamsFunction(getSiddhiManager(), zkCluster, kafkaCluster);
+		DropStreamFunction dropStreamFunction = new DropStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
+		SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster);
+	
+		
 		
 //		Create the context with a x seconds batch size
 		JavaStreamingContext jssc = new JavaStreamingContext(sparkMaster, StreamingEngine.class.getName(), 
-																new Duration(StratioStreamingConstants.STREAMING.DURATION_MS), System.getenv("SPARK_HOME"), 
+																new Duration(STREAMING.DURATION_MS), System.getenv("SPARK_HOME"), 
 																JavaStreamingContext.jarOfClass(StreamingEngine.class));
 		
 		
@@ -151,58 +166,60 @@ public class StreamingEngine {
 				
 		
 //		Start the Kafka stream  
-		JavaPairDStream<String, String> messages = KafkaUtils.createStream(jssc, zkCluster, StratioStreamingConstants.BUS.STREAMING_GROUP_ID, topicMap);
+		JavaPairDStream<String, String> messages = KafkaUtils.createStream(jssc, zkCluster, BUS.STREAMING_GROUP_ID, topicMap);
 		
 		
+//		as we are using messages several times, the best option is to cache it
+		messages.cache();
 		
 		
 //		Create a DStream for each command, so we can treat all related requests in the same way and also apply functions by command  
-		JavaDStream<BaseStreamingMessage> create_requests = messages.filter(new FilterMessagesByOperationFunction(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE))
-																  	.map(new KeepPayloadFromMessageFunction());
+		JavaDStream<StratioStreamingMessage> create_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.CREATE))
+																  	.map(keepPayloadFromMessageFunction);
 		
-		JavaDStream<BaseStreamingMessage> alter_requests = messages.filter(new FilterMessagesByOperationFunction(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER))
-			  														.map(new KeepPayloadFromMessageFunction());
+		JavaDStream<StratioStreamingMessage> alter_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.ALTER))
+			  														.map(keepPayloadFromMessageFunction);
 		
-		JavaDStream<BaseStreamingMessage> insert_requests = messages.filter(new FilterMessagesByOperationFunction(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT))
-																  	.map(new KeepPayloadFromMessageFunction());
+		JavaDStream<StratioStreamingMessage> insert_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.INSERT))
+																  	.map(keepPayloadFromMessageFunction);
 		
-		JavaDStream<BaseStreamingMessage> add_query_requests = messages.filter(new FilterMessagesByOperationFunction(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY))
-				  												  	.map(new KeepPayloadFromMessageFunction());
+		JavaDStream<StratioStreamingMessage> add_query_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.ADD_QUERY))
+				  												  	.map(keepPayloadFromMessageFunction);
 		
-		JavaDStream<BaseStreamingMessage> listen_requests = messages.filter(new FilterMessagesByOperationFunction(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN))
-				  													.map(new KeepPayloadFromMessageFunction());
+		JavaDStream<StratioStreamingMessage> listen_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.LISTEN))
+				  													.map(keepPayloadFromMessageFunction);
 		
-		JavaDStream<BaseStreamingMessage> saveToCassandra_requests = messages.filter(new FilterMessagesByOperationFunction(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA))
-																	.map(new KeepPayloadFromMessageFunction());
+		JavaDStream<StratioStreamingMessage> saveToCassandra_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA))
+																	.map(keepPayloadFromMessageFunction);
 		
-		JavaDStream<BaseStreamingMessage> saveToDataCollector_requests = messages.filter(new FilterMessagesByOperationFunction(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR))
-																	.map(new KeepPayloadFromMessageFunction());
+		JavaDStream<StratioStreamingMessage> saveToDataCollector_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR))
+																	.map(keepPayloadFromMessageFunction);
 		
-		JavaDStream<BaseStreamingMessage> list_requests = messages.filter(new FilterMessagesByOperationFunction(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST))
-																	.map(new KeepPayloadFromMessageFunction());
+		JavaDStream<StratioStreamingMessage> list_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.LIST))
+																	.map(keepPayloadFromMessageFunction);
 		
-		JavaDStream<BaseStreamingMessage> drop_requests = messages.filter(new FilterMessagesByOperationFunction(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP))
-				  													.map(new KeepPayloadFromMessageFunction());
+		JavaDStream<StratioStreamingMessage> drop_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.DROP))
+				  													.map(keepPayloadFromMessageFunction);
 		
 		
 		
-		create_requests.foreach(new CreateStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+		create_requests.foreachRDD(createStreamFunction);
 		
-		alter_requests.foreach(new AlterStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+		alter_requests.foreachRDD(alterStreamFunction);
 		
-		insert_requests.foreach(new InsertIntoStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+		insert_requests.foreachRDD(insertIntoStreamFunction);
 		
-		add_query_requests.foreach(new AddQueryToStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+		add_query_requests.foreachRDD(addQueryToStreamFunction);
 		
-		listen_requests.foreach(new ListenStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+		listen_requests.foreachRDD(listenStreamFunction);
 		
-//		saveToCassandra_requests.foreach(new save(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster));
+//		saveToCassandra_requests.foreachRDD(new SaveToCassandraStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster));
 		
-		saveToDataCollector_requests.foreach(new CollectRequestForStatsFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+		saveToDataCollector_requests.foreachRDD(collectRequestForStatsFunction);
 		
-		list_requests.foreach(new ListStreamsFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+		list_requests.foreachRDD(listStreamsFunction);
 		
-		drop_requests.foreach(new DropStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+		drop_requests.foreachRDD(dropStreamFunction);
 		
 //		TODO remove listeners requests when drop 
 //		TODO take insert requests and saveToCassandra if persistence is enabled
@@ -211,7 +228,7 @@ public class StreamingEngine {
 		
 		if (enableAuditing || enableStats) {
 			
-			JavaDStream<BaseStreamingMessage> allRequests = create_requests
+			JavaDStream<StratioStreamingMessage> allRequests = create_requests
 																.union(alter_requests)
 																.union(insert_requests)
 																.union(add_query_requests)
@@ -222,12 +239,13 @@ public class StreamingEngine {
 			
 			if (enableAuditing) {
 //				persist the RDDs to cassandra using STRATIO DEEP
-				allRequests.foreachRDD(new SaveRequestsToAuditLogFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster));				
+				allRequests.foreachRDD(saveRequestsToAuditLogFunction);				
 			}
 			
 			if (enableStats) {
-			
-				allRequests.foreachRDD(new CollectRequestForStatsFunction(getSiddhiManager(), zkCluster, kafkaCluster));
+				
+				allRequests.foreachRDD(collectRequestForStatsFunction);				
+				
 			}			
 		}
 		

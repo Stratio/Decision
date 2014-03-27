@@ -16,11 +16,12 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.stratio.streaming.common.StratioStreamingConstants;
+import com.stratio.streaming.commons.constants.BUS;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.messages.ListStreamsMessage;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.messages.BaseStreamingMessage;
-import com.stratio.streaming.messages.ColumnNameTypeValue;
-import com.stratio.streaming.messages.ListStreamsMessage;
 
 public class ListStreamsFunction extends StratioStreamingBaseFunction {
 	
@@ -41,13 +42,13 @@ public class ListStreamsFunction extends StratioStreamingBaseFunction {
 	
 
 	@Override
-	public Void call(JavaRDD<BaseStreamingMessage> rdd) throws Exception {
+	public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
 		
-		List<BaseStreamingMessage> requests = rdd.collect();
+		List<StratioStreamingMessage> requests = rdd.collect();
 		
-		for (BaseStreamingMessage request : requests) {
+		for (StratioStreamingMessage request : requests) {
 			
-			List<BaseStreamingMessage> streams = Lists.newArrayList();
+			List<StratioStreamingMessage> streams = Lists.newArrayList();
 			
 			for(StreamDefinition streamMetaData : getSiddhiManager().getStreamDefinitions()) {
 				
@@ -57,11 +58,11 @@ public class ListStreamsFunction extends StratioStreamingBaseFunction {
 					columns.add(new ColumnNameTypeValue(column.getName(), column.getType().toString(), null));
 				}
 				
-				streams.add(new BaseStreamingMessage(streamMetaData.getId(), columns));
+				streams.add(new StratioStreamingMessage(streamMetaData.getId(), columns));
 			}
 			
-			KeyedMessage<String, String> message = new KeyedMessage<String, String>(StratioStreamingConstants.BUS.LIST_STREAMS_TOPIC, 			 								//topic 
-																					StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST,     							//key 
+			KeyedMessage<String, String> message = new KeyedMessage<String, String>(BUS.LIST_STREAMS_TOPIC, 			 								//topic 
+																					STREAM_OPERATIONS.MANIPULATION.LIST,     							//key 
 																					new Gson().toJson( new ListStreamsMessage(getSiddhiManager().getStreamDefinitions().size(), //value.count
 																																System.currentTimeMillis(), 					//value.time
 																																streams)));                                		//value.streams																				

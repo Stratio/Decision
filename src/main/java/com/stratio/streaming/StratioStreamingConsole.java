@@ -7,6 +7,8 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.xml.soap.MessageFactory;
+
 import jline.ConsoleReader;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
@@ -25,16 +27,16 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import EDU.oswego.cs.dl.util.concurrent.Executor;
 import ca.zmatrix.cli.ParseCmd;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.stratio.streaming.common.StratioStreamingConstants;
-import com.stratio.streaming.messages.BaseStreamingMessage;
-import com.stratio.streaming.messages.ColumnNameTypeValue;
-import com.stratio.streaming.messages.ListStreamsMessage;
+import com.stratio.streaming.commons.constants.BUS;
+import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.messages.ListStreamsMessage;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 
 public class StratioStreamingConsole {
 	
@@ -75,15 +77,15 @@ public class StratioStreamingConsole {
             
             line = line.toLowerCase();
             
-            if (line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN.toLowerCase()) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA.toLowerCase()) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR.toLowerCase()) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY.toLowerCase()) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER.toLowerCase()) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE.toLowerCase()) 
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP.toLowerCase())
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT.toLowerCase())
-            		|| line.startsWith(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST.toLowerCase())) {
+            if (line.startsWith(STREAM_OPERATIONS.ACTION.LISTEN.toLowerCase()) 
+            		|| line.startsWith(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA.toLowerCase()) 
+            		|| line.startsWith(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR.toLowerCase()) 
+            		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.ADD_QUERY.toLowerCase()) 
+            		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.ALTER.toLowerCase()) 
+            		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.CREATE.toLowerCase()) 
+            		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.DROP.toLowerCase())
+            		|| line.startsWith(STREAM_OPERATIONS.MANIPULATION.INSERT.toLowerCase())
+            		|| line.startsWith(STREAM_OPERATIONS.MANIPULATION.LIST.toLowerCase())) {
             	
             	self.handleCommand(line);
             	continue;
@@ -127,7 +129,7 @@ public class StratioStreamingConsole {
         this.producer = new Producer<String, String>(createProducerConfig());
         
         consumers = Executors.newFixedThreadPool(1);
-        consumers.execute(new StratioRepliesConsumer(R.get("--zookeeper").toString(), StratioStreamingConstants.BUS.LIST_STREAMS_TOPIC));
+        consumers.execute(new StratioRepliesConsumer(R.get("--zookeeper").toString(), BUS.LIST_STREAMS_TOPIC));
         
         
         
@@ -186,17 +188,17 @@ public class StratioStreamingConsole {
 		
 		
 		try {
-			BaseStreamingMessage message = MessageFactory.getMessageFromCommand(request, sessionId);
+			StratioStreamingMessage message = MessageFactory.getMessageFromCommand(request, sessionId);
 			
 			
 			
 			
 			System.out.println("==> Sending message to Stratio Streaming: " + new Gson().toJson(message));
-			KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(StratioStreamingConstants.BUS.TOPICS, request.split("@")[0].trim(), new Gson().toJson(message));
+			KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(BUS.TOPICS, request.split("@")[0].trim(), new Gson().toJson(message));
 			producer.send(busMessage);
 			
 			
-			client.checkExists().watched().forPath(StratioStreamingConstants.STREAMING.ZK_BASE_PATH + "/" + message.getOperation() + "/" + message.getRequest_id());						
+			client.checkExists().watched().forPath(STREAMING.ZK_BASE_PATH + "/" + message.getOperation() + "/" + message.getRequest_id());						
 			
 			
 		} catch (Exception e) {
@@ -318,7 +320,7 @@ public class StratioStreamingConsole {
 						System.out.println("");
 						System.out.println("*********** LIST STREAMS REPLY ************");
 						System.out.println("**** SIDDHI STREAMS: " + reply.getCount());
-						for (BaseStreamingMessage stream : reply.getStreams()) {
+						for (StratioStreamingMessage stream : reply.getStreams()) {
 							System.out.println("********" + stream.getStreamName() + printColumns(stream.getColumns()));
 						}
 						System.out.println("*******************************************");
@@ -352,48 +354,48 @@ public class StratioStreamingConsole {
 		}
 		
 		
-		private static BaseStreamingMessage getMessageFromCommand(String command, String sessionId) {
+		private static StratioStreamingMessage getMessageFromCommand(String command, String sessionId) {
 			
 			String operation = command.split("@")[0].trim().replaceAll("\\s+","");
 			
 			
-			if (!(operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST))) {
+			if (!(operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ALTER)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.CREATE)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.INSERT)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ADD_QUERY)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.DROP)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.LISTEN)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.LIST))) {
 				
 				throw new IllegalArgumentException("Unsupported command: " + command);
 			}
 		
 			
-			if ((operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY))
+			if ((operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ALTER)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.CREATE)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.INSERT)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ADD_QUERY))
 				&& 	command.split("@").length != 3) {
 				
 				throw new IllegalArgumentException("Malformed request, missing or exceding parts: " + command);
 			}
 			
-			if ((operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN))
+			if ((operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.DROP)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.LISTEN))
 				&& command.split("@").length != 2) {
 				
 				throw new IllegalArgumentException("Malformed request, missing or exceding parts: " + command);
 			}
 			
-			if (operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST)
+			if (operation.equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.LIST)
 					&& command.split("@").length != 1) {
 				throw new IllegalArgumentException("Malformed request, missing or exceding parts: " + command);
 			}
 			
 			
-			BaseStreamingMessage message = new BaseStreamingMessage();
+			StratioStreamingMessage message = new StratioStreamingMessage();
 			String request = "";
 			String stream = "";
 			
@@ -408,9 +410,9 @@ public class StratioStreamingConsole {
 			}
 			
 			
-			if (operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE)
-					|| operation.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)) {
+			if (operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ALTER)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.CREATE)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.INSERT)) {
 					
 				message.setColumns(decodeColumns(operation, request));
 			}
@@ -449,12 +451,12 @@ public class StratioStreamingConsole {
 				String firstPart = column.split("\\.")[0].trim().replaceAll("\\s+","");
 				String secondPart = column.split("\\.")[1].trim().replaceAll("\\s+","");
 				
-				if (command.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE) 
-						|| command.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)) {
+				if (command.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.CREATE) 
+						|| command.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ALTER)) {
 					
 					decodedColumns.add(new ColumnNameTypeValue(firstPart, secondPart, null));
 				}
-				if (command.equalsIgnoreCase(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)) {
+				if (command.equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.INSERT)) {
 					decodedColumns.add(new ColumnNameTypeValue(firstPart, null, secondPart));
 				}
 				

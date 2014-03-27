@@ -20,11 +20,6 @@
   		<version>4.3.3</version>
   	</dependency>
   	<dependency>
-  		<groupId>com.stratio.deep</groupId>
-  		<artifactId>StratioDeepCommons</artifactId>
-  		<version>0.0.23</version>
-  	</dependency>
-  	<dependency>
   		<groupId>org.apache.spark</groupId>
   		<artifactId>spark-streaming_2.10</artifactId>
   		<version>0.9.0-incubating</version>
@@ -33,11 +28,6 @@
   		<groupId>org.apache.spark</groupId>
   		<artifactId>spark-core_2.10</artifactId>
   		<version>0.9.0-incubating</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.stratio.deep</groupId>
-  		<artifactId>StratioDeep</artifactId>
-  		<version>0.0.23</version>
   	</dependency>
   	<dependency>
   		<groupId>com.google.code.gson</groupId>
@@ -54,6 +44,31 @@
   		<artifactId>commons-lang3</artifactId>
   		<version>3.3</version>
   	</dependency>
+  	<dependency>
+  		<groupId>com.stratio.deep</groupId>
+  		<artifactId>StratioDeep</artifactId>
+  		<version>0.1.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.wso2.siddhi</groupId>
+  		<artifactId>siddhi-core</artifactId>
+  		<version>2.0.0-wso2v4</version>  		
+  	</dependency>
+  	<dependency>
+  		<groupId>org.wso2.siddhi</groupId>
+  		<artifactId>siddhi-api</artifactId>
+  		<version>2.0.0-wso2v4</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.wso2.siddhi</groupId>
+  		<artifactId>siddhi-query</artifactId>
+  		<version>2.0.0-wso2v4</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.stratio.streaming</groupId>
+  		<artifactId>StratioStreamingCommons</artifactId>
+  		<version>1.0-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
   <repositories>
         <repository>
@@ -68,5 +83,15 @@
             <id>spark-snapshots</id>
             <url>http://nexus.strat.io:8081/nexus/content/repositories/spark-snapshots</url>
         </repository>
-    </repositories>
+        <repository>
+			<id>wso2-nexus</id>
+			<name>WSO2 internal Repository</name>
+			<url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>ignore</checksumPolicy>
+			</releases>
+		</repository>
+    </repositories>  
 </project>

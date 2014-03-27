@@ -2,13 +2,17 @@ package com.stratio.streaming.utils;
 
 import java.util.List;
 
+import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.Attribute.Type;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
-import com.stratio.streaming.messages.ColumnNameTypeValue;
+import com.hazelcast.core.IMap;
+import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.streams.StreamStatus;
 
 public class SiddhiUtils {
 	
@@ -60,5 +64,52 @@ public class SiddhiUtils {
 		return orderedValues;
 		
 	}
+	
+
+	public static StreamStatus registerStreamStatus(String streamName, SiddhiManager siddhiManager) {
+		
+		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
+		StreamStatus streamStatus = new StreamStatus(streamName);
+		
+		streamStatusMap.put(streamName, streamStatus);
+		
+		return streamStatus;
+
+	}
+	
+	public static StreamStatus getStreamStatus(String streamName, SiddhiManager siddhiManager) {
+		
+		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
+		
+		if (streamStatusMap.get(streamName) != null) {
+			return (StreamStatus) streamStatusMap.get(streamName);
+		}
+		else {
+//			stream status does not exist, this is an special case
+//			the stream exists in siddhi becase a previous query has created it
+//			so we are going to register it as new
+			return registerStreamStatus(streamName, siddhiManager);
+		}
+		
+	}
+	
+	public static void updateStreamStatus(StreamStatus streamStatus, SiddhiManager siddhiManager) {
+		
+		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
+		
+		if (streamStatusMap.get(streamStatus.getStreamName()) != null) {
+			streamStatusMap.put(streamStatus.getStreamName(), streamStatus);
+		}
+		
+	}
+	
+	public static void removeStreamStatus(String streamName, SiddhiManager siddhiManager) {
+		
+		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
+		
+		streamStatusMap.remove(streamName);
+		
+	}
+	
 
 }

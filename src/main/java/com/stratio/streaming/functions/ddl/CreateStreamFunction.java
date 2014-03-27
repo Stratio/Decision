@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
-import com.stratio.streaming.common.StratioStreamingConstants;
+import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.messages.BaseStreamingMessage;
-import com.stratio.streaming.messages.ColumnNameTypeValue;
 
 public class CreateStreamFunction extends StratioStreamingBaseFunction {
 	
@@ -26,7 +26,7 @@ public class CreateStreamFunction extends StratioStreamingBaseFunction {
 		super(siddhiManager, zookeeperCluster, kafkaCluster);
 	}
 	
-	private String buildDefineStreamSiddhiQL(BaseStreamingMessage request) {
+	private String buildDefineStreamSiddhiQL(StratioStreamingMessage request) {
 		
 		String siddhiQL = "define stream " + request.getStreamName();
 		String columns = " ";
@@ -40,11 +40,11 @@ public class CreateStreamFunction extends StratioStreamingBaseFunction {
 	
 
 	@Override
-	public Void call(JavaRDD<BaseStreamingMessage> rdd) throws Exception {
+	public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
 		
-		List<BaseStreamingMessage> requests = rdd.collect();
+		List<StratioStreamingMessage> requests = rdd.collect();
 		
-		for (BaseStreamingMessage request : requests) {
+		for (StratioStreamingMessage request : requests) {
 //			Siddhi doesn't throw an exception if stream exists and you try to recreate it in the same way
 //			but if you try to redefine a stream, siddhi will throw a DifferentDefinitionAlreadyExistException
 //			so, we avoid this scenario but checking first if stream exists
@@ -52,19 +52,27 @@ public class CreateStreamFunction extends StratioStreamingBaseFunction {
 				
 				
 				try {
-					
-					logger.info("==========================> " + buildDefineStreamSiddhiQL(request));
+										
+//					create stream in siddhi
 					getSiddhiManager().defineStream(buildDefineStreamSiddhiQL(request));
+					
+//					register stream in shared memory
+//					SiddhiUtils.registerStreamStatus(request.getStreamName(), getSiddhiManager());
+					
+//					ack OK back to the bus
+					ackStreamingOperation(request, REPLY_CODES.OK);
+					
 					logger.info("==> CREATE: new stream " + request.getStreamName() + " OK");
-					ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.OK);
+					
+					
 				} catch (SiddhiPraserException spe) {
-					ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.KO_PARSER_ERROR);
+					ackStreamingOperation(request, REPLY_CODES.KO_PARSER_ERROR);
 				}
 				
 			}
 			else {
 				logger.info("==> CREATE: stream " + request.getStreamName() + " already exists KO");
-				ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.KO_STREAM_ALREADY_EXISTS);
+				ackStreamingOperation(request, REPLY_CODES.KO_STREAM_ALREADY_EXISTS);
 			}
 		}
 		

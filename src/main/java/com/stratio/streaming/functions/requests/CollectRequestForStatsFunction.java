@@ -9,14 +9,18 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 
 import com.google.common.collect.Lists;
-import com.stratio.streaming.common.StratioStreamingConstants;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.messages.BaseStreamingMessage;
-import com.stratio.streaming.messages.ColumnNameTypeValue;
 import com.stratio.streaming.utils.SiddhiUtils;
 
 public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7911766880059394316L;
 	private static Logger logger = LoggerFactory.getLogger(CollectRequestForStatsFunction.class);
 	
 	
@@ -30,7 +34,13 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 	}
 	
 	private interface STATS_QUERIES {
-		static final String GLOBAL_STATS_BY_OPERATION = "from " + STATS_NAMES.BASE + 
+		
+		static final String REQUEST_THROUGHPUT = "from " + STATS_NAMES.BASE + " #window.time( 1 sec ) " +
+												 " select 'TROUGHPUT' as operation, '" + STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, 54012 as index, count(*) as data output last every 5 sec" +
+												 " insert into " + STATS_NAMES.GLOBAL_STATS_BY_OPERATION + " for current-events";
+		
+		
+		static final String GLOBAL_STATS_BY_OPERATION = "from " + STATS_NAMES.BASE +
 														" select operation, '" + STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, index, sum(count) as data group by operation output snapshot every 5 sec insert into " + 
 														STATS_NAMES.GLOBAL_STATS_BY_OPERATION + 
 														" for current-events";
@@ -39,10 +49,7 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 	
 	
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7911766880059394316L;
+
 
 	public CollectRequestForStatsFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
 		super(siddhiManager, zookeeperCluster, kafkaCluster);
@@ -50,12 +57,11 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 	
 
 	@Override
-	public Void call(JavaRDD<BaseStreamingMessage> rdd) throws Exception {
-		
+	public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
 				
-		List<BaseStreamingMessage> requests = rdd.collect();
+		List<StratioStreamingMessage> requests = rdd.collect();
 		
-		for (BaseStreamingMessage request : requests) {
+		for (StratioStreamingMessage request : requests) {
 			
 			List<ColumnNameTypeValue> selectedFields = Lists.newArrayList();
 			
@@ -69,8 +75,6 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 			
 			getStatsBaseStream().send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), selectedFields));
 		}
-		
-		
 
 		return null;
 	}
@@ -80,8 +84,11 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 		
 		if (getSiddhiManager().getInputHandler(STATS_NAMES.BASE) == null) {
 			
+			logger.info("===========================> INITIALIZING STATISTICS");
+			
 			getSiddhiManager().defineStream(STATS_STREAMS.BASE);
 			getSiddhiManager().addQuery(STATS_QUERIES.GLOBAL_STATS_BY_OPERATION);
+//			getSiddhiManager().addQuery(STATS_QUERIES.REQUEST_THROUGHPUT);
 			
 			sendResetValuesForAllOperations(getSiddhiManager().getInputHandler(STATS_NAMES.BASE));
 			
@@ -94,32 +101,34 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 	
 	private void sendResetValuesForAllOperations(InputHandler baseRequestsStream) throws Exception {
 		
+		logger.info("===========================> SEND LISTEN");		
+
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
-								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN)));
+								resetValuesForOperation(STREAM_OPERATIONS.ACTION.LISTEN)));
 		
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
-								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)));
+								resetValuesForOperation(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)));
 		
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
-								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)));
+								resetValuesForOperation(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)));
 				
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
-								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY)));
+								resetValuesForOperation(STREAM_OPERATIONS.DEFINITION.ADD_QUERY)));
 		
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
-								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER)));
+								resetValuesForOperation(STREAM_OPERATIONS.DEFINITION.ALTER)));
 		
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
-								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE)));
+								resetValuesForOperation(STREAM_OPERATIONS.DEFINITION.CREATE)));
 		
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
-								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP)));
+								resetValuesForOperation(STREAM_OPERATIONS.DEFINITION.DROP)));
 		
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
-								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT)));
+								resetValuesForOperation(STREAM_OPERATIONS.MANIPULATION.INSERT)));
 		
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
-								resetValuesForOperation(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST)));
+								resetValuesForOperation(STREAM_OPERATIONS.MANIPULATION.LIST)));
 		
 		
 	}
@@ -140,25 +149,24 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 		
 		
 		switch (operation.toUpperCase()) {
-		case StratioStreamingConstants.STREAM_OPERATIONS.ACTION.LISTEN:			
+		case STREAM_OPERATIONS.ACTION.LISTEN:			
 			return Integer.valueOf(53828);
-		case StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA:			
+		case STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA:			
 			return Integer.valueOf(53829);
-		case StratioStreamingConstants.STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR:			
+		case STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR:			
 			return Integer.valueOf(53830);
-		case StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY:			
+		case STREAM_OPERATIONS.DEFINITION.ADD_QUERY:			
 			return Integer.valueOf(53831);
-		case StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.ALTER:			
+		case STREAM_OPERATIONS.DEFINITION.ALTER:			
 			return Integer.valueOf(53832);
-		case StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.CREATE:			
+		case STREAM_OPERATIONS.DEFINITION.CREATE:			
 			return Integer.valueOf(53833);
-		case StratioStreamingConstants.STREAM_OPERATIONS.DEFINITION.DROP:			
+		case STREAM_OPERATIONS.DEFINITION.DROP:			
 			return Integer.valueOf(53834);
-		case StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT:			
+		case STREAM_OPERATIONS.MANIPULATION.INSERT:			
 			return Integer.valueOf(53835);
-		case StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.LIST:			
+		case STREAM_OPERATIONS.MANIPULATION.LIST:			
 			return Integer.valueOf(53836);
-
 		default:
 			return Integer.valueOf(0);
 		}

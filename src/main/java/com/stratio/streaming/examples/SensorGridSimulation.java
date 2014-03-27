@@ -22,9 +22,10 @@ import ca.zmatrix.cli.ParseCmd;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.stratio.streaming.common.StratioStreamingConstants;
-import com.stratio.streaming.messages.BaseStreamingMessage;
-import com.stratio.streaming.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.constants.BUS;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.utils.DataToCollectorUtils;
 
 public class SensorGridSimulation {
@@ -168,11 +169,11 @@ public class SensorGridSimulation {
 			
 			logger.debug(name + index + " is ON... generating " + dataToGenerate + " measures");
 			 
-			BaseStreamingMessage message = new BaseStreamingMessage();
+			StratioStreamingMessage message = new StratioStreamingMessage();
 			 
 			 
 				
-			message.setOperation(StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT);
+			message.setOperation(STREAM_OPERATIONS.MANIPULATION.INSERT);
 			message.setStreamName(sensorDataStream);
 			message.setTimestamp(System.currentTimeMillis());
 			message.setSession_id("" + streamSessionId);
@@ -190,8 +191,8 @@ public class SensorGridSimulation {
 				message.setColumns(sensorData);
 				message.setRequest("dummy request");
 			
-				KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(StratioStreamingConstants.BUS.TOPICS, 
-																								StratioStreamingConstants.STREAM_OPERATIONS.MANIPULATION.INSERT, 
+				KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(BUS.TOPICS, 
+																								STREAM_OPERATIONS.MANIPULATION.INSERT, 
 																								gson.toJson(message));
 				producer.send(busMessage);
 				globalMessagesSent.getAndIncrement();
