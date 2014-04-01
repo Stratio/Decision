@@ -5,16 +5,16 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.duration._
 import java.util.UUID
 import org.slf4j.LoggerFactory
-import com.google.gson.Gson
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
-import com.stratio.bus.zookeeper.ZookeeperConsumer
-import com.stratio.bus.kafka.KafkaProducer
 import com.stratio.streaming.commons.constants.{ReplyCodes, Paths}
 import com.stratio.streaming.commons.exceptions.StratioEngineOperationException
+import com.stratio.bus.kafka.KafkaProducer
+import com.stratio.bus.zookeeper.ZookeeperConsumer
 
 case class BusSyncOperation(
-  tableProducer: KafkaProducer,
-  zookeeperConsumer: ZookeeperConsumer) {
+  kafkaProducer: KafkaProducer,
+  zookeeperConsumer: ZookeeperConsumer)
+  extends StreamingOperation {
   val config = ConfigFactory.load()
   val log = LoggerFactory.getLogger(getClass)
   val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
@@ -30,14 +30,10 @@ case class BusSyncOperation(
 
   def performSyncOperation(message: StratioStreamingMessage) = {
     val zNodeUniqueId = UUID.randomUUID().toString
-    addMessageToKafkaTopic(message, zNodeUniqueId)
+    addMessageToKafkaTopic(message, zNodeUniqueId, kafkaProducer)
     waitForTheStreamingResponse(message)
   }
 
-  private def addMessageToKafkaTopic(message: StratioStreamingMessage, creationUniqueId: String) = {
-    val kafkaMessage = new Gson().toJson(message)
-    tableProducer.send(kafkaMessage, message.getOperation)
-  }
   private def waitForTheStreamingResponse(message: StratioStreamingMessage) = {
     val zNodeFullPath = getOperationZNodeFullPath(message)
     try {
