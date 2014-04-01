@@ -7,10 +7,10 @@ import java.util.UUID
 import org.slf4j.LoggerFactory
 import com.google.gson.Gson
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
-import com.stratio.bus.exception.StratioBusException
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.bus.kafka.KafkaProducer
 import com.stratio.streaming.commons.constants.{ReplyCodes, Paths}
+import com.stratio.streaming.commons.exceptions.StratioEngineOperationException
 
 case class BusSyncOperation(
   tableProducer: KafkaProducer,
@@ -47,23 +47,23 @@ case class BusSyncOperation(
       zookeeperConsumer.removeZNode(zNodeFullPath)
     } catch {
       case e: TimeoutException => {
-        log.error("Stratio Bus - Ack timeout expired for: "+message.getRequest)
-        throw new StratioBusException("Ack timeout expired for: "+message.getRequest)
+        log.error("StratioAPI - Ack timeout expired for: "+message.getRequest)
+        throw new StratioEngineOperationException("Acknowledge timeout expired"+message.getRequest)
       }
     }
   }
 
   private def manageStreamingResponse(response: Option[String], message: StratioStreamingMessage) = {
     response.get match {
-      case replyCode if isAnOkResponse(replyCode) => log.info("Stratio Bus - Ack received for: "+message.getRequest)
+      case replyCode if isAnOkResponse(replyCode) => log.info("StratioEngine Ack received for: "+message.getRequest)
       case replyCode if isAnErrorResponse(replyCode) => {
         createLogError(replyCode, message.getRequest)
         val errorMessage = ackErrorList.get(response.get).get
-        throw new StratioBusException("Error response received from StratioStreaming: "+errorMessage)
+        throw new StratioEngineOperationException("StratioEngine error: "+errorMessage)
       }
       case _ => {
-        log.info("Stratio Bus - ACK unknown response code received")
-        throw new StratioBusException("Stratio Bus - ACK unknown response code received")
+        log.info("StratioEngine response code unknown")
+        throw new StratioEngineOperationException("StratioEngine Ack response code unknown")
       }
     }
   }
@@ -73,7 +73,7 @@ case class BusSyncOperation(
   private def isAnErrorResponse(replyCode: String) = ackErrorList.contains(replyCode)
 
   private def createLogError(responseCode: String, queryString: String) = {
-    log.error(s"Stratio Bus - [ACK_CODE,QUERY_STRING]: [$responseCode,$queryString]")
+    log.error(s"StratioAPI - [ACK_CODE,QUERY_STRING]: [$responseCode,$queryString]")
   }
 
   private def getOperationZNodeFullPath(message: StratioStreamingMessage) = {
@@ -81,7 +81,7 @@ case class BusSyncOperation(
     val operation = message.getOperation.toLowerCase()
     val uniqueId = message.getRequest_id
     val zookeeperPath = s"$zookeeperBasePath/$operation/$uniqueId"
-    log.info(s"Stratio Bus - Waiting for zookeeper node response. Listen to the following path: $zookeeperPath")
+    log.info(s"StratioAPI - Waiting for zookeeper node response. Listen to the following path: $zookeeperPath")
     zookeeperPath
   }
 }

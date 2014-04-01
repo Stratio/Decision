@@ -1,11 +1,11 @@
 package com.stratio.bus.zookeeper
 
 import scala.concurrent.{ExecutionContext, Future}
-import org.apache.zookeeper.data.Stat
 import ExecutionContext.Implicits.global
 import com.typesafe.config.ConfigFactory
-import scala.Predef.String
 import org.apache.curator.framework.CuratorFramework
+import scala.Predef._
+import scala.Some
 
 case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
   val config = ConfigFactory.load()
