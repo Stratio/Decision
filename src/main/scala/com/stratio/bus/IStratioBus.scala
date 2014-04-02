@@ -9,5 +9,5 @@ trait IStratioBus {
 
   def send(message: StratioStreamingMessage)
 
-  def getStreamingStatus(): List[StratioStream]
+  def getStreamsList(): List[StratioStream]
 }

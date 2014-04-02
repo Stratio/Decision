@@ -26,7 +26,7 @@ class StratioBus
       case INSERT | ADD_QUERY | LIST | SAVETO_CASSANDRA | SAVETO_DATACOLLECTOR =>
         asyncOperation.performAsyncOperation(message)
       case LIST  =>
-        statusOperation.getStreamingStatus()
+        getStreamsList()
       case _ => throw new StratioStreamingException("Unknown operation")
     }
   }
@@ -38,8 +38,8 @@ class StratioBus
     this
   }
 
-  def getStreamingStatus(): List[StratioStream] = {
-    statusOperation.getStreamingStatus()
+  def getStreamsList(): List[StratioStream] = {
+    statusOperation.getStreamsList()
   }
 }
 
@@ -66,7 +66,7 @@ object StratioBus {
 
   lazy val syncOperation = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
   lazy val asyncOperation = new BusAsyncOperation(kafkaProducer)
-  lazy val statusOperation = new StreamingStatusOperation(kafkaProducer, zookeeperCluster)
+  lazy val statusOperation = new StreamingListOperation(kafkaProducer, zookeeperConsumer)
 
   def checkEphemeralNode() {
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_PATH
