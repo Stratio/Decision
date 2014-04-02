@@ -28,8 +28,6 @@ case class KafkaProducer(topic: String,
   val producer = new Producer[AnyRef, AnyRef](new ProducerConfig(props))
 
   def send(message: String, key: String) = {
-    //val messageToBytes = message.getBytes("UTF8")
-    //val keyToBytes = message.getBytes("UTF8")
     try {
       log.info("Stratio Bus - Sending KeyedMessage[key, value]: ["+key+","+message+"]")
       producer.send(new KeyedMessage(topic, key, message))

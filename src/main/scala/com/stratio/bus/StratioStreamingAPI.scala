@@ -15,11 +15,12 @@ import com.stratio.streaming.commons.exceptions.{StratioEngineStatusException, S
 import com.stratio.streaming.commons.streams.StratioStream
 
 class StratioBus
-  extends IStratioBus {
+  extends IStratioStreamingAPI {
   import StratioBus._
 
   def send(message: StratioStreamingMessage) = {
     checkStreamingStatus()
+    checkSecurityConstraints(message)
     message.getOperation.toUpperCase match {
       case CEPOperations.CREATE | DROP | ALTER | LISTEN =>
         syncOperation.performSyncOperation(message)
@@ -83,8 +84,12 @@ object StratioBus {
     KafkaTopicUtils.createTopicIfNotExists(zookeeperCluster, streamingTopicName)
   }
 
+  def checkSecurityConstraints(message: StratioStreamingMessage) {
+
+  }
+
   def checkStreamingStatus() {
-     if (!streamingUpAndRunning) throw new StratioEngineStatusException("Stratio streaming is down")
+    if (!streamingUpAndRunning) throw new StratioEngineStatusException("Stratio streaming is down")
   }
 
   def addListener() = {

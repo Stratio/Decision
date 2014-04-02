@@ -4,8 +4,8 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.streaming.commons.streams.StratioStream
 
 
-trait IStratioBus {
-  def initialize(): IStratioBus
+trait IStratioStreamingAPI {
+  def initialize(): IStratioStreamingAPI
 
   def send(message: StratioStreamingMessage)
 
