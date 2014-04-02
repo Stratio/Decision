@@ -16,9 +16,6 @@ case class StreamingAPISyncOperation(
   kafkaProducer: KafkaProducer,
   zookeeperConsumer: ZookeeperConsumer)
   extends StreamingAPIOperation {
-  val config = ConfigFactory.load()
-  val log = LoggerFactory.getLogger(getClass)
-  val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
 
   def performSyncOperation(message: StratioStreamingMessage) = {
     val zNodeUniqueId = UUID.randomUUID().toString
