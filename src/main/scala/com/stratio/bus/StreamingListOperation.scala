@@ -1,8 +1,7 @@
 package com.stratio.bus
 
 import com.stratio.streaming.commons.streams.StratioStream
-import com.stratio.bus.kafka.KafkaConsumer
-import com.stratio.streaming.commons.constants.{ReplyCodes, Paths, BUS}
+import com.stratio.streaming.commons.constants.{ReplyCodes, Paths}
 import com.google.gson.Gson
 import com.stratio.streaming.commons.messages.{StratioStreamingMessage, ListStreamsMessage}
 import scala.collection.JavaConversions._
@@ -21,15 +20,6 @@ class StreamingListOperation(kafkaProducer: KafkaProducer,
   val log = LoggerFactory.getLogger(getClass)
   val config = ConfigFactory.load()
   val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
-  val ackErrorList = Map(ReplyCodes.KO_GENERAL_ERROR -> "Generic error",
-    ReplyCodes.KO_PARSER_ERROR -> "Parser error",
-    ReplyCodes.KO_LISTENER_ALREADY_EXISTS -> "Listener already exists",
-    ReplyCodes.KO_QUERY_ALREADY_EXISTS -> "Query already exists",
-    ReplyCodes.KO_STREAM_ALREADY_EXISTS -> "Stream already exists",
-    ReplyCodes.KO_STREAM_DOES_NOT_EXIST -> "Stream does not exist",
-    ReplyCodes.KO_COLUMN_ALREADY_EXISTS -> "Column already exists",
-    ReplyCodes.KO_COLUMN_DOES_NOT_EXISTS -> "Column does not exist"
-  )
 
   def getStreamsList(): List[StratioStream] = {
     val zNodeUniqueId = UUID.randomUUID().toString
@@ -39,14 +29,6 @@ class StreamingListOperation(kafkaProducer: KafkaProducer,
     parseTheStreamingResponse(jsonStreamingResponse)
   }
 
-  /*
-  def convertListStreamsMessageToStratioStream(binaryObject: Array[Byte]) = {
-    val message = new String(binaryObject)
-    val listStreamsMessage = new Gson().fromJson(message, classOf[ListStreamsMessage]).getStreams.toList
-    listOfStreams.drop(listOfStreams.size)
-    listStreamsMessage.foreach(stream => listOfStreams ::= new StratioStream(stream.getStreamName, stream.getColumns))
-  }*/
-  
   private def createListRequestMessage() = {
     val message = new StratioStreamingMessage()
     message.setOperation("list")
@@ -81,6 +63,12 @@ class StreamingListOperation(kafkaProducer: KafkaProducer,
   }
 
   private def parseTheStreamingResponse(jsonStreamingResponse: String): List[StratioStream] = {
-     List()
+    val listStreams = new Gson().fromJson(jsonStreamingResponse, classOf[ListStreamsMessage]).getStreams.toList
+    val stratioStreams = listStreams.map(
+      stream => new StratioStream(
+        stream.getStreamName,
+        stream.getColumns,
+        stream.getQueries))
+    stratioStreams
   }
 }
