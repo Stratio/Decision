@@ -32,7 +32,7 @@ public abstract class REPLY_CODES {
 			decodedReply = "KO: STREAM ALREADY EXISTS";
 			break;
 		case 4:
-			decodedReply = "KO: STREAM DOES NOT EXIST";
+			decodedReply = "KO: STREAM DOES NOT EXIST ";
 			break;
 		case 5:
 			decodedReply = "KO: QUERY ALREADY EXISTS";
