@@ -3,6 +3,10 @@ package com.stratio.streaming.commons.messages;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.swing.event.ListSelectionEvent;
+
+import com.google.common.collect.Lists;
+
 public class StratioStreamingMessage implements Serializable {
 
 	
@@ -18,15 +22,14 @@ public class StratioStreamingMessage implements Serializable {
 	private String request;	
 	private Long   timestamp;
 	private List<ColumnNameTypeValue> columns;
+	private List<StreamQuery> queries;
+	private Boolean userDefined;
 	
+
+
 	public StratioStreamingMessage() {
 		
 	}
-	
-	
-
-
-
 
 
 	/**
@@ -35,15 +38,11 @@ public class StratioStreamingMessage implements Serializable {
 	 * @param streamName
 	 * @param columns
 	 */
-	public StratioStreamingMessage(String streamName, List<ColumnNameTypeValue> columns) {
+	public StratioStreamingMessage(String streamName, List<ColumnNameTypeValue> columns, List<StreamQuery> queries) {
 		this.streamName = streamName;
 		this.columns = columns;
+		this.queries = queries;
 	}
-
-
-
-
-
 
 
 	/**
@@ -59,9 +58,20 @@ public class StratioStreamingMessage implements Serializable {
 		this.columns = columns;
 	}
 
-
-
-
+	
+	public void addColumn(ColumnNameTypeValue column) {
+		if (columns == null) {
+			columns = Lists.newArrayList();
+		}
+		this.columns.add(column);
+	}
+	
+	public void addQuery(StreamQuery query) {	
+		if (queries == null) {
+			queries = Lists.newArrayList();
+		}
+		this.queries.add(query);
+	}
 
 
 
@@ -78,6 +88,14 @@ public class StratioStreamingMessage implements Serializable {
 	}
 
 
+	public Boolean getUserDefined() {
+		return userDefined;
+	}
+
+
+	public void isUserDefined(Boolean userDefined) {
+		this.userDefined = userDefined;
+	}
 
 
 
@@ -142,6 +160,18 @@ public class StratioStreamingMessage implements Serializable {
 	public void setColumns(List<ColumnNameTypeValue> columns) {
 		this.columns = columns;
 	}
+
+
+	public List<StreamQuery> getQueries() {
+		return queries;
+	}
+
+
+	public void setQueries(List<StreamQuery> queries) {
+		this.queries = queries;
+	}
+	
+	
 	
 	
 }
