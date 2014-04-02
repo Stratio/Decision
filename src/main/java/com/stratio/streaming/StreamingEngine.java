@@ -277,11 +277,13 @@ public class StreamingEngine {
 				
 				logger.info("********************************************");						
 				logger.info("**       SIDDHI STREAMS                   **");
-				logger.info("** count:" + siddhiManager.getStreamDefinitions().size());											
+				logger.info("** countSiddhi:" + siddhiManager.getStreamDefinitions().size() + " // countHazelcast: " + getSiddhiManager().getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP).size());											
 				
 				for(StreamDefinition streamMetaData : getSiddhiManager().getStreamDefinitions()) {
 					
-					String streamDefition = streamMetaData.getStreamId() + " -" + SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isUserDefined() + "- ";
+					String streamDefition = streamMetaData.getStreamId() 
+												+ " - userDefined:" + SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isUserDefined() + "- "
+												+ " - listenEnable:" + SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isListen_enabled() + "- ";
 					
 					for (Attribute column : streamMetaData.getAttributeList()) {
 						streamDefition += " |" + column.getName() + "," + column.getType();

@@ -38,6 +38,17 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
 				
 				try {
+					
+					
+					logger.info("------------------------------");
+					logger.info("--- request: " + request.getStreamName() + "-" + request.getRequest_id());
+					
+					Object[] values = SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(request.getStreamName()), request.getColumns());
+					
+					for (Object value: values) {
+						logger.info("---->" + value.toString());
+					}
+					
 					getSiddhiManager()
 						.getInputHandler(request.getStreamName())
 							.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(request.getStreamName()), 

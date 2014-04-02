@@ -30,44 +30,62 @@ public class StreamToBusCallback extends StreamCallback implements MessageListen
 	private StreamDefinition streamDefinition;
 	private String kafkaCluster;
 	private Producer<String, String> producer;
+	private Boolean running;
 	
 	public StreamToBusCallback(StreamDefinition streamDefinition, String kafkaCluster) {
 		this.streamDefinition = streamDefinition;
 		this.kafkaCluster = kafkaCluster;
 		this.producer = new Producer<String, String>(createProducerConfig());
+		running = Boolean.TRUE;
 		logger.debug("Starting listener for stream " + streamDefinition.getStreamId());
 	}
 	
 	@Override
 	public void receive(Event[] events) {
 		
-		List<StratioStreamingMessage> collected_events = Lists.newArrayList();
+		if (running) {
+			
 		
-		for (Event e : events) {
-			if (e instanceof InEvent) {
-				InEvent ie = (InEvent) e;
+			List<StratioStreamingMessage> collected_events = Lists.newArrayList();
+			
+			for (Event e : events) {
 				
-				List<ColumnNameTypeValue> columns = Lists.newArrayList();
+				logger.info("event type: " + e.getClass() + " - " + e.getData(0) + e.getData(1));
 				
-				for (Attribute column : streamDefinition.getAttributeList()) {
+				
+				
+				if (e instanceof InEvent) {
+					InEvent ie = (InEvent) e;
 					
-					columns.add(new ColumnNameTypeValue(column.getName(),
-							 								column.getType().toString(),
-							 								ie.getData(streamDefinition.getAttributePosition(column.getName()))));
+					List<ColumnNameTypeValue> columns = Lists.newArrayList();
+					
+					for (Attribute column : streamDefinition.getAttributeList()) {
+						
+						logger.info("event data size: " +ie.getData().length + " // attribute: " + column.getName() + " // position: " + streamDefinition.getAttributePosition(column.getName()));
+						
+//						avoid retrieving a value out of the scope
+//						outputStream could have more fields defined than the output events (projection)
+						if (ie.getData().length >= streamDefinition.getAttributePosition(column.getName()) + 1) {
+						
+							columns.add(new ColumnNameTypeValue(column.getName(),
+								 								column.getType().toString(),
+								 								ie.getData(streamDefinition.getAttributePosition(column.getName()))));
+						}
+						
+						
+					}
 					
 					
+					collected_events.add(new StratioStreamingMessage(streamDefinition.getStreamId(), 	// value.streamName
+																				ie.getTimeStamp(), 	//value.timestamp
+																				columns)); 	 		// value.columns															
+										
 				}
-				
-				
-				collected_events.add(new StratioStreamingMessage(streamDefinition.getStreamId(), 	// value.streamName
-																			ie.getTimeStamp(), 	//value.timestamp
-																			columns)); 	 		// value.columns															
-									
 			}
+			
+			sendEventsToBus(collected_events);
+			DataToCollectorUtils.sendData(collected_events);
 		}
-		
-		sendEventsToBus(collected_events);
-		DataToCollectorUtils.sendData(collected_events);
 		
 	}
 	
@@ -102,14 +120,19 @@ public class StreamToBusCallback extends StreamCallback implements MessageListen
     }
 	
 	public void shutdownCallback() {
-		this.producer.close();
+		if (running) {
+			this.producer.close();
+		}
 	}
 
 	@Override
 	public void onMessage(Message<String> message) {
-		if (message.getMessageObject().equalsIgnoreCase(streamDefinition.getStreamId())) {
-			shutdownCallback();
-			logger.debug("Shutting down listener for stream " + streamDefinition.getStreamId());
+		if (running) {
+			if (message.getMessageObject().equalsIgnoreCase(streamDefinition.getStreamId())) {
+				shutdownCallback();
+				running = Boolean.FALSE;
+				logger.debug("Shutting down listener for stream " + streamDefinition.getStreamId());
+			}
 		}
 		
 	}
