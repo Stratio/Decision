@@ -14,9 +14,9 @@ import org.apache.curator.framework.api.CuratorEventType._
 import com.stratio.streaming.commons.exceptions.{StratioEngineStatusException, StratioStreamingException}
 import com.stratio.streaming.commons.streams.StratioStream
 
-class StratioBus
+class StratioStreamingAPI
   extends IStratioStreamingAPI {
-  import StratioBus._
+  import StratioStreamingAPI._
 
   def send(message: StratioStreamingMessage) = {
     checkStreamingStatus()
@@ -44,7 +44,7 @@ class StratioBus
   }
 }
 
-object StratioBus {
+object StratioStreamingAPI {
   val config = ConfigFactory.load()
   val streamingTopicName = TopicNames.STREAMING_REQUESTS_TOPIC
   val brokerServer = config.getString("broker.server")
