@@ -53,8 +53,4 @@ public class ListStreamsMessage {
 	public void setStreams(List<StratioStreamingMessage> streams) {
 		this.streams = streams;
 	}
-	
-	
-	
-
 }
