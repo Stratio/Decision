@@ -65,9 +65,9 @@ object StratioStreamingAPI {
     ZookeeperConsumer(zookeeperClient)
   }
 
-  lazy val syncOperation = new BusSyncOperation(kafkaProducer, zookeeperConsumer)
-  lazy val asyncOperation = new BusAsyncOperation(kafkaProducer)
-  lazy val statusOperation = new StreamingListOperation(kafkaProducer, zookeeperConsumer)
+  lazy val syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer)
+  lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaProducer)
+  lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer)
 
   def checkEphemeralNode() {
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_PATH

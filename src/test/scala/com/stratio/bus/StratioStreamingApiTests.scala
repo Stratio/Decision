@@ -27,7 +27,7 @@ class StratioStreamingApiTests
   describe("The Stratio Streaming API") {
     it("should throw a StratioEngineStatusException when the streaming engine is not running") {
       intercept [StratioEngineStatusException] {
-        StratioBusFactory.create().initialize()
+        StratioStreamingAPIFactory.create().initialize()
       }
     }
 
@@ -36,7 +36,7 @@ class StratioStreamingApiTests
       val internalStreamName = "stratio_whatever"
       val message = new StratioStreamingMessage()
       message.setStreamName(internalStreamName)
-      val streamingAPI = StratioBusFactory.create().initialize()
+      val streamingAPI = StratioStreamingAPIFactory.create().initialize()
       intercept [StratioAPISecurityException] {
         streamingAPI.send(message)
       }
@@ -49,7 +49,7 @@ class StratioStreamingApiTests
       val message = new StratioStreamingMessage()
       message.setStreamName(streamName)
       message.setOperation(operation)
-      val streamingAPI = StratioBusFactory.create().initialize()
+      val streamingAPI = StratioStreamingAPIFactory.create().initialize()
       intercept [StratioStreamingException] {
         streamingAPI.send(message)
       }

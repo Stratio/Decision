@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.bus.kafka.KafkaProducer
 
-case class BusAsyncOperation(tableProducer: KafkaProducer) {
+case class StreamingAPIAsyncOperation(tableProducer: KafkaProducer) {
   def performAsyncOperation(message: StratioStreamingMessage) = {
     addMessageToKafkaTopic(message)
   }

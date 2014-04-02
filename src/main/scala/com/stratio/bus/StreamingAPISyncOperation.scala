@@ -12,10 +12,10 @@ import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants.REPLY_CODES._
 import com.stratio.streaming.commons.constants.STREAMING._
 
-case class BusSyncOperation(
+case class StreamingAPISyncOperation(
   kafkaProducer: KafkaProducer,
   zookeeperConsumer: ZookeeperConsumer)
-  extends StreamingOperation {
+  extends StreamingAPIOperation {
   val config = ConfigFactory.load()
   val log = LoggerFactory.getLogger(getClass)
   val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
@@ -42,13 +42,21 @@ case class BusSyncOperation(
   }
 
   private def manageStreamingResponse(response: Option[String], message: StratioStreamingMessage) = {
-    val replyCode = response.get
+    val replyCode = getResponseCode(response.get)
     replyCode match {
-      case OK => log.info("StratioEngine Ack received for: "+message.getRequest)
+      case Some(OK) => log.info("StratioEngine Ack received for: "+message.getRequest)
       case _ => {
-        createLogError(replyCode, message.getRequest)
-        throw new StratioEngineOperationException("StratioEngine error: "+getReadableErrorFromCode(replyCode.toInt))
+        createLogError(response.get, message.getRequest)
+        throw new StratioEngineOperationException("StratioEngine error: "+getReadableErrorFromCode(replyCode.get))
       }
+    }
+  }
+
+  private def getResponseCode(response: String): Option[Integer] = {
+    try {
+      Some(new Integer(response))
+    } catch {
+      case ex: NumberFormatException => None
     }
   }
 

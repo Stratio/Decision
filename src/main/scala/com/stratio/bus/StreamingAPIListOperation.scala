@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.typesafe.config.ConfigFactory
 
-class StreamingListOperation(kafkaProducer: KafkaProducer,
+class StreamingAPIListOperation(kafkaProducer: KafkaProducer,
                              zookeeperConsumer: ZookeeperConsumer)
-  extends StreamingOperation {
+  extends StreamingAPIOperation {
   val log = LoggerFactory.getLogger(getClass)
   val config = ConfigFactory.load()
   val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt

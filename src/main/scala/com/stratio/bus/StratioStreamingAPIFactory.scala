@@ -1,6 +1,6 @@
 package com.stratio.bus
 
-object StratioBusFactory {
+object StratioStreamingAPIFactory {
   def create(): IStratioStreamingAPI = {
     new StratioStreamingAPI()
   }

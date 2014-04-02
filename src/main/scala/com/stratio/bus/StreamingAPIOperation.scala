@@ -4,7 +4,7 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.google.gson.Gson
 import com.stratio.bus.kafka.KafkaProducer
 
-class StreamingOperation {
+class StreamingAPIOperation {
   def addMessageToKafkaTopic(message: StratioStreamingMessage,
                                      creationUniqueId: String,
                                        tableProducer: KafkaProducer) = {
