@@ -2,9 +2,7 @@ package com.stratio.bus
 
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.google.gson.Gson
-import com.stratio.bus.kafka.KafkaProducer
 import com.stratio.streaming.commons.constants.STREAMING._
-import com.stratio.bus.kafka.KafkaProducer
 import scala.concurrent.duration._
 import scala.concurrent._
 import com.stratio.bus.kafka.KafkaProducer
