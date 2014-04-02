@@ -15,16 +15,16 @@ import com.stratio.streaming.functions.StratioStreamingBaseFunction;
 import com.stratio.streaming.streams.StreamStatus;
 import com.stratio.streaming.utils.SiddhiUtils;
 
-public class AddQueryToStreamFunction extends StratioStreamingBaseFunction {
+public class RemoveQueryToStreamFunction extends StratioStreamingBaseFunction {
 	
-	private static Logger logger = LoggerFactory.getLogger(AddQueryToStreamFunction.class);	
+	private static Logger logger = LoggerFactory.getLogger(RemoveQueryToStreamFunction.class);	
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7911766880059394316L;
 
-	public AddQueryToStreamFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
+	public RemoveQueryToStreamFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
 		super(siddhiManager, zookeeperCluster, kafkaCluster);
 	}
 	
@@ -39,35 +39,27 @@ public class AddQueryToStreamFunction extends StratioStreamingBaseFunction {
 //			stream exists in siddhi
 			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
 
-							
-//				Siddhi will add a query even when the same query is already present
-//				So it's better to maintain a reminder of which queries have been added
-//				and to prevent adding queries twice.
-				if (SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().isEmpty() ||
-						!SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().containsValue(request.getRequest())) {
+				logger.info("-----------> stream:" + request.getStreamName() + "//request:" +  request.getRequest() + "//isPresent" + SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().containsKey(request.getRequest()));			
+				
+//				check if query has been added before
+				if (SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().containsKey(request.getRequest())) {
 					
 					try {
 
-//						add query to siddhi
-						String queryId = getSiddhiManager().addQuery(request.getRequest());
+						String queryId = SiddhiUtils.removeQueryInStreamStatus(request.getRequest(), request.getStreamName(), getSiddhiManager());
 						
-//						register query in stream status						
-						SiddhiUtils.addQueryToStreamStatus(queryId, request.getRequest(), request.getStreamName(), getSiddhiManager());
+//						remove query in siddhi
+						getSiddhiManager().removeQuery(queryId);
 
 //						ack OK to the Bus
 						ackStreamingOperation(request, REPLY_CODES.OK);
 						
-					} 
-					catch (MalformedAttributeException  se ) {
-						ackStreamingOperation(request, REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST);
-					}
-					catch (SiddhiPraserException se) {
+					} catch (SiddhiPraserException | MalformedAttributeException  se ) {
 						ackStreamingOperation(request, REPLY_CODES.KO_PARSER_ERROR);
 					}
-					
 				}					
 				else {
-					ackStreamingOperation(request, REPLY_CODES.KO_QUERY_ALREADY_EXISTS);
+					ackStreamingOperation(request, REPLY_CODES.KO_QUERY_DOES_NOT_EXIST);
 				}
 
 			}

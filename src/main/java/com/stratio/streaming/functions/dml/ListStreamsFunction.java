@@ -1,11 +1,8 @@
 package com.stratio.streaming.functions.dml;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
-
-import kafka.javaapi.producer.Producer;
-import kafka.producer.KeyedMessage;
-import kafka.producer.ProducerConfig;
+import java.util.Map.Entry;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.slf4j.Logger;
@@ -15,19 +12,18 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.stratio.streaming.commons.constants.BUS;
-import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.ListStreamsMessage;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import com.stratio.streaming.commons.messages.StreamQuery;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
+import com.stratio.streaming.utils.SiddhiUtils;
+import com.stratio.streaming.utils.ZKUtils;
 
 public class ListStreamsFunction extends StratioStreamingBaseFunction {
 	
 	private static Logger logger = LoggerFactory.getLogger(ListStreamsFunction.class);
-	private String kafkaCluster;
-	private Producer<String, String> producer;
+	private String zookeeperCluster;
 
 	/**
 	 * 
@@ -36,8 +32,7 @@ public class ListStreamsFunction extends StratioStreamingBaseFunction {
 
 	public ListStreamsFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
 		super(siddhiManager, zookeeperCluster, kafkaCluster);
-		this.kafkaCluster = kafkaCluster;
-		this.producer = new Producer<String, String>(createProducerConfig());
+		this.zookeeperCluster = zookeeperCluster;
 	}
 	
 
@@ -58,15 +53,24 @@ public class ListStreamsFunction extends StratioStreamingBaseFunction {
 					columns.add(new ColumnNameTypeValue(column.getName(), column.getType().toString(), null));
 				}
 				
-				streams.add(new StratioStreamingMessage(streamMetaData.getId(), columns));
+				List<StreamQuery> queries = Lists.newArrayList();
+				
+				HashMap<String, String> attachedQueries = SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).getAddedQueries();
+				
+				for (Entry<String, String> entry : attachedQueries.entrySet()) {
+					queries.add(new StreamQuery(entry.getKey(), entry.getValue()));				    
+				}
+				
+				StratioStreamingMessage streamMessage = new StratioStreamingMessage(streamMetaData.getId(), columns, queries);
+				streamMessage.isUserDefined(SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isUserDefined());
+				
+				streams.add(streamMessage);
 			}
 			
-			KeyedMessage<String, String> message = new KeyedMessage<String, String>(BUS.LIST_STREAMS_TOPIC, 			 								//topic 
-																					STREAM_OPERATIONS.MANIPULATION.LIST,     							//key 
-																					new Gson().toJson( new ListStreamsMessage(getSiddhiManager().getStreamDefinitions().size(), //value.count
-																																System.currentTimeMillis(), 					//value.time
-																																streams)));                                		//value.streams																				
-			producer.send(message);
+			ZKUtils.getZKUtils(zookeeperCluster).createZNodeJsonReply(request, new ListStreamsMessage(getSiddhiManager().getStreamDefinitions().size(), //value.count
+																										System.currentTimeMillis(), 					//value.time
+																										streams));                                		//value.streams																				
+			
 			
 		}
 		
@@ -74,18 +78,5 @@ public class ListStreamsFunction extends StratioStreamingBaseFunction {
 		
 		return null;
 	}
-	
-	
-	private ProducerConfig createProducerConfig() {
-		Properties properties = new Properties();
-		properties.put("serializer.class", "kafka.serializer.StringEncoder");
-		properties.put("metadata.broker.list", kafkaCluster);
-//		properties.put("request.required.acks", "1");
-//		properties.put("compress", "true");
-//		properties.put("compression.codec", "gzip");
-//		properties.put("producer.type", "sync");
- 
-        return new ProducerConfig(properties);
-    }
 
 }

@@ -27,14 +27,17 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.FilterMessagesByOperationFunction;
 import com.stratio.streaming.functions.KeepPayloadFromMessageFunction;
 import com.stratio.streaming.functions.dal.ListenStreamFunction;
+import com.stratio.streaming.functions.dal.StopListenStreamFunction;
 import com.stratio.streaming.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.streaming.functions.ddl.AlterStreamFunction;
 import com.stratio.streaming.functions.ddl.CreateStreamFunction;
 import com.stratio.streaming.functions.ddl.DropStreamFunction;
+import com.stratio.streaming.functions.ddl.RemoveQueryToStreamFunction;
 import com.stratio.streaming.functions.dml.InsertIntoStreamFunction;
 import com.stratio.streaming.functions.dml.ListStreamsFunction;
 import com.stratio.streaming.functions.requests.CollectRequestForStatsFunction;
 import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
+import com.stratio.streaming.utils.SiddhiUtils;
 import com.stratio.streaming.utils.ZKUtils;
 
 
@@ -140,11 +143,13 @@ public class StreamingEngine {
 		AlterStreamFunction alterStreamFunction = new AlterStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
+		RemoveQueryToStreamFunction removeQueryToStreamFunction = new RemoveQueryToStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		ListenStreamFunction listenStreamFunction = new ListenStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		ListStreamsFunction listStreamsFunction = new ListStreamsFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		DropStreamFunction dropStreamFunction = new DropStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster);
+		StopListenStreamFunction stopListenStreamFunction = new StopListenStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 	
 		
 		
@@ -186,8 +191,14 @@ public class StreamingEngine {
 		JavaDStream<StratioStreamingMessage> add_query_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.ADD_QUERY))
 				  												  	.map(keepPayloadFromMessageFunction);
 		
+		JavaDStream<StratioStreamingMessage> remove_query_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY))
+				  													.map(keepPayloadFromMessageFunction);
+		
 		JavaDStream<StratioStreamingMessage> listen_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.LISTEN))
 				  													.map(keepPayloadFromMessageFunction);
+		
+		JavaDStream<StratioStreamingMessage> stop_listen_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_LISTEN))
+																	.map(keepPayloadFromMessageFunction);
 		
 		JavaDStream<StratioStreamingMessage> saveToCassandra_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA))
 																	.map(keepPayloadFromMessageFunction);
@@ -211,7 +222,11 @@ public class StreamingEngine {
 		
 		add_query_requests.foreachRDD(addQueryToStreamFunction);
 		
+		remove_query_requests.foreachRDD(removeQueryToStreamFunction);
+		
 		listen_requests.foreachRDD(listenStreamFunction);
+		
+		stop_listen_requests.foreachRDD(stopListenStreamFunction);
 		
 //		saveToCassandra_requests.foreachRDD(new SaveToCassandraStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster));
 		
@@ -221,7 +236,7 @@ public class StreamingEngine {
 		
 		drop_requests.foreachRDD(dropStreamFunction);
 		
-//		TODO remove listeners requests when drop 
+
 //		TODO take insert requests and saveToCassandra if persistence is enabled
 		
 		
@@ -233,6 +248,7 @@ public class StreamingEngine {
 																.union(insert_requests)
 																.union(add_query_requests)
 																.union(listen_requests)
+																.union(stop_listen_requests)
 																.union(list_requests)
 																.union(drop_requests);
 			
@@ -258,20 +274,29 @@ public class StreamingEngine {
 
 			@Override
 			public Void call(JavaRDD<Long> arg0) throws Exception {
+				
 				logger.info("********************************************");						
 				logger.info("**       SIDDHI STREAMS                   **");
-				logger.info("** count:" + siddhiManager.getStreamDefinitions().size());				
-				for(StreamDefinition streamMetaData : siddhiManager.getStreamDefinitions()) {
+				logger.info("** count:" + siddhiManager.getStreamDefinitions().size());											
+				
+				for(StreamDefinition streamMetaData : getSiddhiManager().getStreamDefinitions()) {
 					
-					String streamDefition = streamMetaData.getStreamId();
+					String streamDefition = streamMetaData.getStreamId() + " -" + SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isUserDefined() + "- ";
 					
 					for (Attribute column : streamMetaData.getAttributeList()) {
 						streamDefition += " |" + column.getName() + "," + column.getType();
 					}
 					
+					HashMap<String, String> attachedQueries = SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).getAddedQueries();
+					
+					streamDefition += " /// " + attachedQueries.size() + " attachedQueries";
+						
+					
 					logger.info("** stream: " + streamDefition);
-				}				
+				}
+				
 				logger.info("********************************************");
+				
 				
 				return null;
 			}
@@ -302,7 +327,7 @@ public class StreamingEngine {
 			SiddhiConfiguration conf = new SiddhiConfiguration();		
 			conf.setInstanceIdentifier("StratioStreamingCEP-Instance-"+ UUID.randomUUID().toString());
 			conf.setQueryPlanIdentifier("StratioStreamingCEP-Cluster");
-			conf.setDistributedProcessing(false);
+			conf.setDistributedProcessing(true);
 			
 			
 			// Create Siddhi Manager

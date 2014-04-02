@@ -2,18 +2,9 @@ package com.stratio.streaming;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.xml.soap.MessageFactory;
 
 import jline.ConsoleReader;
-import kafka.consumer.ConsumerConfig;
-import kafka.consumer.ConsumerIterator;
-import kafka.consumer.KafkaStream;
-import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
@@ -32,11 +23,13 @@ import ca.zmatrix.cli.ParseCmd;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.stratio.streaming.commons.constants.BUS;
+import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.ListStreamsMessage;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import com.stratio.streaming.commons.messages.StreamQuery;
 
 public class StratioStreamingConsole {
 	
@@ -46,7 +39,6 @@ public class StratioStreamingConsole {
 	private String sessionId;
 	private Producer<String, String> producer;
 	private CuratorFramework  client;
-	private ExecutorService consumers;
 	
 
 
@@ -77,10 +69,12 @@ public class StratioStreamingConsole {
             
             line = line.toLowerCase();
             
-            if (line.startsWith(STREAM_OPERATIONS.ACTION.LISTEN.toLowerCase()) 
+            if (line.startsWith(STREAM_OPERATIONS.ACTION.LISTEN.toLowerCase())
+            		|| line.startsWith(STREAM_OPERATIONS.ACTION.STOP_LISTEN.toLowerCase())
             		|| line.startsWith(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA.toLowerCase()) 
             		|| line.startsWith(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR.toLowerCase()) 
-            		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.ADD_QUERY.toLowerCase()) 
+            		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.ADD_QUERY.toLowerCase())
+            		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY.toLowerCase()) 
             		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.ALTER.toLowerCase()) 
             		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.CREATE.toLowerCase()) 
             		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.DROP.toLowerCase())
@@ -127,10 +121,7 @@ public class StratioStreamingConsole {
         this.brokerList = R.get("--broker-list").toString();
         this.sessionId = "" + System.currentTimeMillis();
         this.producer = new Producer<String, String>(createProducerConfig());
-        
-        consumers = Executors.newFixedThreadPool(1);
-        consumers.execute(new StratioRepliesConsumer(R.get("--zookeeper").toString(), BUS.LIST_STREAMS_TOPIC));
-        
+              
         
         
 //		ZOOKEPER CONNECTION
@@ -152,7 +143,16 @@ public class StratioStreamingConsole {
 				
 				switch (event.getType()) {
 				case WATCHED:
-					System.out.println("<<<<<<<<<< REPLY FROM STRATIO STREAMING FOR REQUEST ID: " + decodeReplyFromStratioStreaming(Integer.valueOf(new String(client.getData().forPath(event.getPath())))));
+					String originalReply = "";
+					try {
+						originalReply = new String(client.getData().forPath(event.getPath()));
+						Integer reply = Integer.valueOf(originalReply);
+						System.out.println("<<<<<<<<<< REPLY FROM STRATIO STREAMING FOR REQUEST ID: " + REPLY_CODES.getReadableErrorFromCode(reply));
+					}
+					catch(NumberFormatException nfe) {
+						printListStreams(originalReply);
+					}
+					
 					break;
 					
 				case CLOSING:
@@ -173,15 +173,49 @@ public class StratioStreamingConsole {
 	}
 	
 	private void shutDown() {
-		consumers.shutdownNow();
 		producer.close();
 		client.close();
 		System.out.println("<<<<<<<<<< SHUTTING DOWN STRATIO BUS CONNECTION");
 	}
     
     
+	private void printListStreams(String originalReply) {
+		ListStreamsMessage reply = new Gson().fromJson(originalReply, ListStreamsMessage.class);
+		
+		System.out.println("");
+		System.out.println(originalReply);
+		System.out.println("");
+		System.out.println("*********** LIST STREAMS REPLY ************");
+		System.out.println("**** SIDDHI STREAMS: " + reply.getCount());
+		for (StratioStreamingMessage stream : reply.getStreams()) {
+			System.out.println("********" + stream.getStreamName() + printColumnsAndQueries(stream.getColumns(), stream.getQueries()));
+		}
+		System.out.println("*******************************************");
+		System.out.println("");
+	}
     
-
+	private String printColumnsAndQueries(List<ColumnNameTypeValue> columns, List<StreamQuery> queries) {
+		String printColumns = "";
+		for (ColumnNameTypeValue column : columns) {
+			printColumns += column.getColumn() + "." + column.getType() + ",";
+		}
+		
+		if (printColumns.length() > 0) {
+			printColumns = printColumns.substring(0, printColumns.length() -1);
+		}
+		
+		String printQueries = "";
+		for (StreamQuery query : queries) {
+			printQueries += query.getQueryId() + "." + query.getQuery() + ",";
+		}
+		
+		if (printQueries.length() > 0) {
+			printQueries = printQueries.substring(0, printQueries.length() -1);
+		}
+					
+		return ", columns: [" + printColumns + "], queries: [" + printQueries + "]";
+		
+	}		
 	
 	
 	private void handleCommand(String request) {
@@ -207,47 +241,6 @@ public class StratioStreamingConsole {
 	}
 	
 	
-	private String decodeReplyFromStratioStreaming(Integer code) {
-		
-		String decodedReply = "";
-		
-		switch (code) {
-		case 1:
-			decodedReply = "OK";
-			break;
-		case 2:
-			decodedReply = "KO: PARSER ERROR";
-			break;
-		case 3:
-			decodedReply = "KO: STREAM ALREADY EXISTS";
-			break;
-		case 4:
-			decodedReply = "KO: STREAM DOES NOT EXIST";
-			break;
-		case 5:
-			decodedReply = "KO: QUERY ALREADY EXISTS";
-			break;
-		case 6:
-			decodedReply = "KO: LISTENER ALREADY EXISTS";
-			break;		
-		case 7:
-			decodedReply = "KO: GENERAL ERROR";
-			break;				
-		case 8:
-			decodedReply = "KO: COLUMN ALREADY EXISTS";
-			break;							
-		case 9:
-			decodedReply = "KO: COLUMN DOES NOT EXIST";
-			break;	
-		default:
-			break;
-		}
-		
-		
-		return decodedReply;
-	}
-	
-	
 	private ProducerConfig createProducerConfig() {
 		Properties properties = new Properties();
 		properties.put("serializer.class", "kafka.serializer.StringEncoder");
@@ -258,93 +251,7 @@ public class StratioStreamingConsole {
 //		properties.put("producer.type", "sync");
  
         return new ProducerConfig(properties);
-    }  
-	
-	
-	private class StratioRepliesConsumer implements Runnable {
-		
-		private String zkCluster;
-		private ConsumerConnector consumer;
-		private String topic;
-		
-		public StratioRepliesConsumer(String zkCluster, String topic) {
-			this.zkCluster = zkCluster;			
-			this.topic = topic;
-			//		start consumer
-			this.consumer = kafka.consumer.Consumer.createJavaConsumerConnector(createConsumerConfig(zkCluster));		
-		}		
-		
-		
-		private ConsumerConfig createConsumerConfig(String zkClusters) {
-	        Properties props = new Properties();
-	        props.put("zookeeper.connect", zkClusters);
-	        props.put("group.id", "314");
-	 
-	        return new ConsumerConfig(props);
-	    }
-		
-		private String printColumns(List<ColumnNameTypeValue> columns) {
-			String print = "(";
-			
-			for (ColumnNameTypeValue column : columns) {
-				print += column.getColumn() + "." + column.getType() + ",";
-			}
-			
-			if (print.length() > 1) {
-				print = print.substring(0, print.length() -1);
-			}
-						
-			return print += ")";
-			
-		}
-		
-
-		@Override
-		public void run() {
-			
-			try {
-			
-				while (!Thread.currentThread().isInterrupted()) {
-	
-					
-				
-					Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
-					topicCountMap.put(topic, new Integer(1));
-					Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = consumer.createMessageStreams(topicCountMap);
-					ConsumerIterator<byte[], byte[]> it = consumerMap.get(topic).get(0).iterator();
-					
-						        
-					while (it.hasNext()) {
-						ListStreamsMessage reply = new Gson().fromJson(new String(it.next().message()), ListStreamsMessage.class);
-						
-						System.out.println("");
-						System.out.println("*********** LIST STREAMS REPLY ************");
-						System.out.println("**** SIDDHI STREAMS: " + reply.getCount());
-						for (StratioStreamingMessage stream : reply.getStreams()) {
-							System.out.println("********" + stream.getStreamName() + printColumns(stream.getColumns()));
-						}
-						System.out.println("*******************************************");
-						System.out.println("");
-						
-					}
-				}
-			}
-			catch(Exception e) {
-				
-			}
-			finally {
-				System.out.println("<<<<<<<<<<<< Shutting down consumer for topic:" + topic);
-				consumer.shutdown();
-			}
-			
-		
-				
-		
-			
-		}
-		
-	}
-	
+    }	
 	
 	
 	private static class MessageFactory {
@@ -363,8 +270,10 @@ public class StratioStreamingConsole {
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.CREATE)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.INSERT)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ADD_QUERY)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.DROP)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.LISTEN)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.STOP_LISTEN)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.LIST))) {
 				
 				throw new IllegalArgumentException("Unsupported command: " + command);
@@ -374,7 +283,8 @@ public class StratioStreamingConsole {
 			if ((operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ALTER)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.CREATE)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.INSERT)
-					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ADD_QUERY))
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ADD_QUERY)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY))
 				&& 	command.split("@").length != 3) {
 				
 				throw new IllegalArgumentException("Malformed request, missing or exceding parts: " + command);
@@ -383,7 +293,8 @@ public class StratioStreamingConsole {
 			if ((operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.DROP)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)
-					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.LISTEN))
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.LISTEN)
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.STOP_LISTEN))
 				&& command.split("@").length != 2) {
 				
 				throw new IllegalArgumentException("Malformed request, missing or exceding parts: " + command);

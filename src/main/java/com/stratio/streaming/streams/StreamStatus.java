@@ -13,6 +13,7 @@ public class StreamStatus implements Serializable {
 	 */
 	private static final long serialVersionUID = -8455557383950387810L;
 	private String streamName;
+	private Boolean userDefined;
 	private Boolean listen_enabled;
 	private Boolean saveToCassandra_enabled;
 	private HashMap<String, String> addedQueries;
@@ -23,24 +24,37 @@ public class StreamStatus implements Serializable {
 	 * @param listen_enabled
 	 * @param saveToCassandra_enabled
 	 */
-	public StreamStatus(String streamName) {
+	public StreamStatus(String streamName, Boolean userDefined) {
 		super();
 		this.streamName = streamName;
+		this.userDefined = userDefined;
 		this.listen_enabled = false;
 		this.saveToCassandra_enabled = false;
 		this.addedQueries = new HashMap<String, String>();
 	}
 	
 	
+	public Boolean isUserDefined() {
+		return userDefined;
+	}
+
+
+	public void setUserDefined(Boolean userDefined) {
+		this.userDefined = userDefined;
+	}
+
+
+
 	public String getStreamName() {
 		return streamName;
 	}
 	public void setStreamName(String streamName) {
 		this.streamName = streamName;
 	}
-	public Boolean getListen_enabled() {
+	public Boolean isListen_enabled() {
 		return listen_enabled;
 	}
+		
 	public void setListen_enabled(Boolean listen_enabled) {
 		this.listen_enabled = listen_enabled;
 	}

@@ -82,12 +82,10 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 	
 	private InputHandler getStatsBaseStream() throws Exception {
 		
-		if (getSiddhiManager().getInputHandler(STATS_NAMES.BASE) == null) {
-			
-			logger.info("===========================> INITIALIZING STATISTICS");
+		if (getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE) == null) {
 			
 			getSiddhiManager().defineStream(STATS_STREAMS.BASE);
-			getSiddhiManager().addQuery(STATS_QUERIES.GLOBAL_STATS_BY_OPERATION);
+//			getSiddhiManager().addQuery(STATS_QUERIES.GLOBAL_STATS_BY_OPERATION);
 //			getSiddhiManager().addQuery(STATS_QUERIES.REQUEST_THROUGHPUT);
 			
 			sendResetValuesForAllOperations(getSiddhiManager().getInputHandler(STATS_NAMES.BASE));
@@ -100,8 +98,6 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 	
 	
 	private void sendResetValuesForAllOperations(InputHandler baseRequestsStream) throws Exception {
-		
-		logger.info("===========================> SEND LISTEN");		
 
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
 								resetValuesForOperation(STREAM_OPERATIONS.ACTION.LISTEN)));

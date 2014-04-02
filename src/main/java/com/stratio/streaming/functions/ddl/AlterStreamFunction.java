@@ -39,7 +39,7 @@ public class AlterStreamFunction extends StratioStreamingBaseFunction {
 		for (StratioStreamingMessage request : requests) {
 //			Siddhi doesn't throw an exception if stream does not exist and you try to remove it
 //			so there is no need to check if stream exists before dropping it.
-			if (getSiddhiManager().getInputHandler(request.getStreamName()) != null) {
+			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
 				
 				try {
 					
@@ -48,10 +48,6 @@ public class AlterStreamFunction extends StratioStreamingBaseFunction {
 															
 //					ack OK back to the bus
 					ackStreamingOperation(request, REPLY_CODES.OK);
-					
-					logger.info("==> ALTER: stream " + request.getStreamName() 
-							+ " was enlarged with " + addedColumns
-							+ " more new columns OK");
 					
 				} catch (SiddhiPraserException se) {
 					ackStreamingOperation(request, REPLY_CODES.KO_PARSER_ERROR);
@@ -62,7 +58,6 @@ public class AlterStreamFunction extends StratioStreamingBaseFunction {
 				}
 			}
 			else {
-				logger.info("==> ALTER: stream " + request.getStreamName() + " does not exist KO");
 				ackStreamingOperation(request, REPLY_CODES.KO_STREAM_DOES_NOT_EXIST);
 			}
 			
@@ -86,10 +81,8 @@ public class AlterStreamFunction extends StratioStreamingBaseFunction {
 				addedColumns++;
 				streamMetaData.attribute(columnNameTypeValue.getColumn(), SiddhiUtils.decodeSiddhiType(columnNameTypeValue.getType()));
 				
-				logger.info("==> ALTER: stream " + request.getStreamName() + " has now a new column: " + columnNameTypeValue.getColumn() + "|" + columnNameTypeValue.getType() + " OK");
 			}
 			else {
-				logger.info("==> ALTER: stream " + request.getStreamName() + " already has this column: " + columnNameTypeValue.getColumn() + "|" + columnNameTypeValue.getType() + " KO");
 				throw new AttributeAlreadyExistException(columnNameTypeValue.getColumn());
 			}
 		}

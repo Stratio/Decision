@@ -1,6 +1,7 @@
 package com.stratio.streaming.utils;
 
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -64,19 +65,19 @@ public class SiddhiUtils {
 		return orderedValues;
 		
 	}
-	
 
-	public static StreamStatus registerStreamStatus(String streamName, SiddhiManager siddhiManager) {
+	
+	public static StreamStatus createStreamStatus(String streamName, SiddhiManager siddhiManager) {
 		
 		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
-		StreamStatus streamStatus = new StreamStatus(streamName);
-		
+		StreamStatus streamStatus = new StreamStatus(streamName, Boolean.TRUE);
 		streamStatusMap.put(streamName, streamStatus);
-		
 		return streamStatus;
-
+		
 	}
-	
+
+
+
 	public static StreamStatus getStreamStatus(String streamName, SiddhiManager siddhiManager) {
 		
 		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
@@ -88,20 +89,43 @@ public class SiddhiUtils {
 //			stream status does not exist, this is an special case
 //			the stream exists in siddhi becase a previous query has created it
 //			so we are going to register it as new
-			return registerStreamStatus(streamName, siddhiManager);
+			StreamStatus streamStatus = new StreamStatus(streamName, Boolean.FALSE);
+			streamStatusMap.put(streamName, streamStatus);
+			return streamStatus;
 		}
 		
 	}
 	
-	public static void updateStreamStatus(StreamStatus streamStatus, SiddhiManager siddhiManager) {
+	public static void addQueryToStreamStatus(String queryId, String query, String streamName, SiddhiManager siddhiManager) {
 		
 		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
+		StreamStatus streamStatus = (StreamStatus) streamStatusMap.get(streamName);
+		streamStatus.getAddedQueries().put(queryId, query);				
+		streamStatusMap.put(streamStatus.getStreamName(), streamStatus);
 		
-		if (streamStatusMap.get(streamStatus.getStreamName()) != null) {
-			streamStatusMap.put(streamStatus.getStreamName(), streamStatus);
-		}
 		
 	}
+	
+	public static String removeQueryInStreamStatus(String queryId, String streamName, SiddhiManager siddhiManager) {
+		
+		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
+		StreamStatus streamStatus = (StreamStatus) streamStatusMap.get(streamName);		
+		streamStatus.getAddedQueries().remove(queryId);		
+		streamStatusMap.put(streamStatus.getStreamName(), streamStatus);		
+		return queryId;
+	}
+	
+	public static void changeListenerStreamStatus(Boolean enabled, String streamName, SiddhiManager siddhiManager) {
+		
+		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
+		StreamStatus streamStatus = (StreamStatus) streamStatusMap.get(streamName);
+		streamStatus.setListen_enabled(enabled);
+		streamStatusMap.put(streamStatus.getStreamName(), streamStatus);
+		
+		
+	}
+	
+	
 	
 	public static void removeStreamStatus(String streamName, SiddhiManager siddhiManager) {
 		

@@ -35,7 +35,7 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 		for (StratioStreamingMessage request : requests) {
 			
 //			stream exists
-			if (getSiddhiManager().getInputHandler(request.getStreamName()) != null) {
+			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
 				
 				try {
 					getSiddhiManager()
@@ -43,7 +43,6 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 							.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(request.getStreamName()), 
 																											request.getColumns()));
 					
-//					logger.info("==> INSERT: stream " + request.getStreamName() + " has received a new event OK");
 					
 //					ackStreamingOperation(request, StratioStreamingConstants.REPLY_CODES.OK);
 					
@@ -57,7 +56,6 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 				
 			}
 			else {
-				logger.info("==> INSERT: stream " + request.getStreamName() + " does not exist, no go to the insert KO");
 				ackStreamingOperation(request, REPLY_CODES.KO_STREAM_DOES_NOT_EXIST);
 			}
 		}
