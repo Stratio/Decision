@@ -8,10 +8,10 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.bus.kafka.{KafkaConsumer, KafkaTopicUtils, KafkaProducer}
 import com.stratio.streaming.commons.constants.{BUS, CEPOperations, TopicNames}
-import com.stratio.streaming.commons.constants.Paths._
 import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
 import org.apache.curator.framework.api.CuratorEventType._
-import com.stratio.streaming.commons.exceptions.{StratioEngineStatusException, StratioStreamingException}
+import com.stratio.streaming.commons.constants.STREAMING._
+import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineStatusException, StratioStreamingException}
 import com.stratio.streaming.commons.streams.StratioStream
 
 class StratioStreamingAPI
@@ -73,6 +73,8 @@ object StratioStreamingAPI {
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_PATH
     if (!zookeeperConsumer.zNodeExists(ephemeralNodePath))
       throw new StratioEngineStatusException("Stratio streaming is down")
+    else
+      streamingUpAndRunning = true
   }
 
   def startEphemeralNodeWatch() {
@@ -85,7 +87,8 @@ object StratioStreamingAPI {
   }
 
   def checkSecurityConstraints(message: StratioStreamingMessage) {
-
+     if (message.getStreamName.startsWith("stratio_"))
+       throw new StratioAPISecurityException("StratioStreamingAPI - the stream is not user defined")
   }
 
   def checkStreamingStatus() {
