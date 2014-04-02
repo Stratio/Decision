@@ -1,18 +1,19 @@
 package com.stratio.streaming.commons.constants;
 
 public abstract class REPLY_CODES {
-	public static final Integer OK 								= 1;
-	public static final Integer KO_PARSER_ERROR					= 2;
-	public static final Integer KO_STREAM_ALREADY_EXISTS 		= 3;
-	public static final Integer KO_STREAM_DOES_NOT_EXIST 		= 4;
-	public static final Integer KO_QUERY_ALREADY_EXISTS 		= 5;
-	public static final Integer KO_LISTENER_ALREADY_EXISTS 		= 6;		
-	public static final Integer KO_GENERAL_ERROR				= 7;
-	public static final Integer KO_COLUMN_ALREADY_EXISTS 		= 8;
-	public static final Integer KO_COLUMN_DOES_NOT_EXIST 		= 9;
-	public static final Integer KO_LISTENER_DOES_NOT_EXIST		= 10;
-	public static final Integer KO_QUERY_DOES_NOT_EXIST 		= 11;
-	public static final Integer KO_STREAM_IS_NOT_USER_DEFINED 	= 12;
+	public static final Integer OK 													= 1;
+	public static final Integer KO_PARSER_ERROR										= 2;
+	public static final Integer KO_STREAM_ALREADY_EXISTS 							= 3;
+	public static final Integer KO_STREAM_DOES_NOT_EXIST 							= 4;
+	public static final Integer KO_QUERY_ALREADY_EXISTS 							= 5;
+	public static final Integer KO_LISTENER_ALREADY_EXISTS 							= 6;		
+	public static final Integer KO_GENERAL_ERROR									= 7;
+	public static final Integer KO_COLUMN_ALREADY_EXISTS 							= 8;
+	public static final Integer KO_COLUMN_DOES_NOT_EXIST 							= 9;
+	public static final Integer KO_LISTENER_DOES_NOT_EXIST							= 10;
+	public static final Integer KO_QUERY_DOES_NOT_EXIST 							= 11;
+	public static final Integer KO_STREAM_IS_NOT_USER_DEFINED 						= 12;
+	public static final Integer KO_OUTPUTSTREAM_EXISTS_AND_DEFINITION_IS_DIFFERENT 	= 13;
 
 	
 	
@@ -57,8 +58,12 @@ public abstract class REPLY_CODES {
 			break;		
 		case 12:
 			decodedReply = "KO: STREAM IS NOT USER_DEFINED";
-			break;			
+			break;					
+		case 13:
+			decodedReply = "KO: OUTPUT STREAM ALREADY EXISTS AND ITS DEFINITION IS DIFFERENT";
+			break;
 		default:
+			decodedReply = "UNKOWN ERROR";
 			break;
 		}
 		
