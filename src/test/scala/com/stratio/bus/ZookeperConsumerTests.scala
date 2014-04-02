@@ -1,12 +1,12 @@
 package com.stratio.bus
 
 import org.scalatest.{BeforeAndAfterAll, GivenWhenThen, ShouldMatchers, FunSpec}
-import com.netflix.curator.framework.CuratorFrameworkFactory
-import com.netflix.curator.retry.ExponentialBackoffRetry
 import scala.concurrent._
 import scala.concurrent.duration._
 import java.util.UUID
 import com.stratio.bus.zookeeper.ZookeeperConsumer
+import org.apache.curator.retry.ExponentialBackoffRetry
+import org.apache.curator.framework.CuratorFrameworkFactory
 
 class ZookeperConsumerTests
   extends FunSpec
