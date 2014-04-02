@@ -7,6 +7,7 @@ import scala.collection.JavaConversions._
 import java.util.UUID
 import com.stratio.bus.kafka.KafkaProducer
 import com.stratio.bus.zookeeper.ZookeeperConsumer
+import com.stratio.bus.utils.StreamsParser
 
 class StreamingAPIListOperation(kafkaProducer: KafkaProducer,
                              zookeeperConsumer: ZookeeperConsumer)
@@ -17,7 +18,9 @@ class StreamingAPIListOperation(kafkaProducer: KafkaProducer,
     val message = createListRequestMessage()
     addMessageToKafkaTopic(message, zNodeUniqueId, kafkaProducer)
     val jsonStreamingResponse = waitForTheStreamingResponse(zookeeperConsumer, message)
-    parseTheStreamingResponse(jsonStreamingResponse)
+    println(jsonStreamingResponse)
+    val parsedList = StreamsParser.parse(jsonStreamingResponse)
+    parsedList
   }
 
   private def createListRequestMessage() = {
@@ -27,15 +30,5 @@ class StreamingAPIListOperation(kafkaProducer: KafkaProducer,
     message.setRequest_id(""+System.currentTimeMillis())
     message.setTimestamp(new java.lang.Long(System.currentTimeMillis))
     message
-  }
-
-  private def parseTheStreamingResponse(jsonStreamingResponse: String): List[StratioStream] = {
-    val listStreams = new Gson().fromJson(jsonStreamingResponse, classOf[ListStreamsMessage]).getStreams.toList
-    val stratioStreams = listStreams.map(
-      stream => new StratioStream(
-        stream.getStreamName,
-        stream.getColumns,
-        stream.getQueries))
-    stratioStreams
   }
 }

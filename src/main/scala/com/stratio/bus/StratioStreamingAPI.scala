@@ -3,16 +3,19 @@ package com.stratio.bus
 import com.typesafe.config.ConfigFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
-import com.stratio.streaming.commons.constants.CEPOperations._
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.bus.kafka.{KafkaConsumer, KafkaTopicUtils, KafkaProducer}
-import com.stratio.streaming.commons.constants.{BUS, CEPOperations, TopicNames}
+import com.stratio.streaming.commons.constants.BUS._
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION._
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION._
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.MANIPULATION._
 import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
 import org.apache.curator.framework.api.CuratorEventType._
 import com.stratio.streaming.commons.constants.STREAMING._
 import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineStatusException, StratioStreamingException}
 import com.stratio.streaming.commons.streams.StratioStream
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
@@ -22,7 +25,7 @@ class StratioStreamingAPI
     checkStreamingStatus()
     checkSecurityConstraints(message)
     message.getOperation.toUpperCase match {
-      case CEPOperations.CREATE | DROP | ALTER | LISTEN =>
+      case DEFINITION.CREATE | DROP | ALTER | LISTEN =>
         syncOperation.performSyncOperation(message)
       case INSERT | ADD_QUERY | LIST | SAVETO_CASSANDRA | SAVETO_DATACOLLECTOR =>
         asyncOperation.performAsyncOperation(message)
@@ -46,7 +49,7 @@ class StratioStreamingAPI
 
 object StratioStreamingAPI {
   val config = ConfigFactory.load()
-  val streamingTopicName = TopicNames.STREAMING_REQUESTS_TOPIC
+  val streamingTopicName = TOPICS
   val brokerServer = config.getString("broker.server")
   val brokerPort = config.getString("broker.port")
   val kafkaBroker = s"$brokerServer:$brokerPort"
@@ -55,8 +58,8 @@ object StratioStreamingAPI {
   val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
   var streamingUpAndRunning = false
 
-  lazy val kafkaProducer = new KafkaProducer(BUS.TOPICS, kafkaBroker)
-  lazy val kafkaConsumer = new KafkaConsumer(BUS.LIST_STREAMS_TOPIC, zookeeperCluster)
+  lazy val kafkaProducer = new KafkaProducer(TOPICS, kafkaBroker)
+  lazy val kafkaConsumer = new KafkaConsumer(LIST_STREAMS_TOPIC, zookeeperCluster)
 
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
