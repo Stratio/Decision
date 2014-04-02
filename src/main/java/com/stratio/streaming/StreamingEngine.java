@@ -148,7 +148,7 @@ public class StreamingEngine {
 		CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		ListStreamsFunction listStreamsFunction = new ListStreamsFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		DropStreamFunction dropStreamFunction = new DropStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
-		SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster);
+		SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster, enableAuditing);
 		StopListenStreamFunction stopListenStreamFunction = new StopListenStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 	
 		
@@ -289,7 +289,13 @@ public class StreamingEngine {
 					
 					HashMap<String, String> attachedQueries = SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).getAddedQueries();
 					
-					streamDefition += " /// " + attachedQueries.size() + " attachedQueries";
+					streamDefition += " /// " + attachedQueries.size() + " attachedQueries: (";
+					
+					for (String queryId : attachedQueries.keySet()) {
+						streamDefition += queryId + "/";
+					}
+					
+					
 						
 					
 					logger.info("** stream: " + streamDefition);
@@ -332,7 +338,7 @@ public class StreamingEngine {
 			
 			// Create Siddhi Manager
 			siddhiManager = new SiddhiManager(conf);
-			
+
 			
 //			DEBUG STREAMS
 //			siddhiManager.addCallback("testStream", new StreamCallback() {

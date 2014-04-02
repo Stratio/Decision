@@ -78,7 +78,7 @@ public class SiddhiUtils {
 
 
 
-	public static StreamStatus getStreamStatus(String streamName, SiddhiManager siddhiManager) {
+	public static StreamStatus getStreamStatus(String streamName, SiddhiManager siddhiManager) {	
 		
 		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
 		

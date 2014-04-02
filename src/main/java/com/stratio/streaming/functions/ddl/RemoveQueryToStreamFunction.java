@@ -39,7 +39,6 @@ public class RemoveQueryToStreamFunction extends StratioStreamingBaseFunction {
 //			stream exists in siddhi
 			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
 
-				logger.info("-----------> stream:" + request.getStreamName() + "//request:" +  request.getRequest() + "//isPresent" + SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().containsKey(request.getRequest()));			
 				
 //				check if query has been added before
 				if (SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().containsKey(request.getRequest())) {
@@ -54,7 +53,8 @@ public class RemoveQueryToStreamFunction extends StratioStreamingBaseFunction {
 //						ack OK to the Bus
 						ackStreamingOperation(request, REPLY_CODES.OK);
 						
-					} catch (SiddhiPraserException | MalformedAttributeException  se ) {
+					} 
+					catch (SiddhiPraserException | MalformedAttributeException  se ) {
 						ackStreamingOperation(request, REPLY_CODES.KO_PARSER_ERROR);
 					}
 				}					

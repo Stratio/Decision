@@ -1,5 +1,6 @@
 package com.stratio.streaming.functions.ddl;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.spark.api.java.JavaRDD;
@@ -45,13 +46,21 @@ public class DropStreamFunction extends StratioStreamingBaseFunction {
 				if (SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).isUserDefined()) {
 				
 //					stop all listeners
-					listenTopic.publish(request.getStreamName());				
-	
-//					and finally we drop the streamStatus
-					SiddhiUtils.removeStreamStatus(request.getStreamName(), getSiddhiManager());
+					listenTopic.publish(request.getStreamName());		
+					
+//					remove all queries
+					HashMap<String, String> attachedQueries = SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries();
+					
+					for (String queryId : attachedQueries.keySet()) {
+						getSiddhiManager().removeQuery(queryId);
+					}
 					
 //					then we removeStream in siddhi
 					getSiddhiManager().removeStream(request.getStreamName());
+	
+//					drop the streamStatus
+					SiddhiUtils.removeStreamStatus(request.getStreamName(), getSiddhiManager());
+					
 								
 //					ack OK back to the bus
 					ackStreamingOperation(request, REPLY_CODES.OK);

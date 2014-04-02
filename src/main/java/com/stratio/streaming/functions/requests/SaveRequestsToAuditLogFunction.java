@@ -28,10 +28,12 @@ public class SaveRequestsToAuditLogFunction extends StratioStreamingBaseFunction
 	 */
 	private static final long serialVersionUID = 7911766880059394316L;
 
-	public SaveRequestsToAuditLogFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster, String cassandraCluster) {
+	public SaveRequestsToAuditLogFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster, String cassandraCluster, Boolean auditEnabled) {
 		super(siddhiManager, zookeeperCluster, kafkaCluster);
 		this.cassandraCluster = cassandraCluster;
-		this.auditCassandraConfig = DeepJobConfigFactory.create().host("node.stratio.com").rpcPort(9160).keyspace("stratio_streaming").table("auditing_requests").createTableOnWrite(true).initialize();
+		if (auditEnabled) {
+			this.auditCassandraConfig = DeepJobConfigFactory.create().host("node.stratio.com").rpcPort(9160).keyspace("stratio_streaming").table("auditing_requests").createTableOnWrite(true).initialize();
+		}
 	}
 	
 

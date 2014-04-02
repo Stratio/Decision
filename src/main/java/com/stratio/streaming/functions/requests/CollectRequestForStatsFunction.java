@@ -36,12 +36,12 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 	private interface STATS_QUERIES {
 		
 		static final String REQUEST_THROUGHPUT = "from " + STATS_NAMES.BASE + " #window.time( 1 sec ) " +
-												 " select 'TROUGHPUT' as operation, '" + STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, 54012 as index, count(*) as data output last every 5 sec" +
+												 " select 'TROUGHPUT' as operation, '" + STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, 54012 as index, count(*) as data" +
 												 " insert into " + STATS_NAMES.GLOBAL_STATS_BY_OPERATION + " for current-events";
 		
 		
 		static final String GLOBAL_STATS_BY_OPERATION = "from " + STATS_NAMES.BASE +
-														" select operation, '" + STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, index, sum(count) as data group by operation output snapshot every 5 sec insert into " + 
+														" select operation, '" + STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, index, sum(count) as data group by operation insert into " + 
 														STATS_NAMES.GLOBAL_STATS_BY_OPERATION + 
 														" for current-events";
 	}
@@ -85,8 +85,8 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 		if (getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE) == null) {
 			
 			getSiddhiManager().defineStream(STATS_STREAMS.BASE);
-//			getSiddhiManager().addQuery(STATS_QUERIES.GLOBAL_STATS_BY_OPERATION);
-//			getSiddhiManager().addQuery(STATS_QUERIES.REQUEST_THROUGHPUT);
+			getSiddhiManager().addQuery(STATS_QUERIES.GLOBAL_STATS_BY_OPERATION);
+			getSiddhiManager().addQuery(STATS_QUERIES.REQUEST_THROUGHPUT);
 			
 			sendResetValuesForAllOperations(getSiddhiManager().getInputHandler(STATS_NAMES.BASE));
 			
