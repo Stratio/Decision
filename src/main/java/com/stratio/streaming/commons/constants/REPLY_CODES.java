@@ -14,6 +14,7 @@ public abstract class REPLY_CODES {
 	public static final Integer KO_QUERY_DOES_NOT_EXIST 							= 11;
 	public static final Integer KO_STREAM_IS_NOT_USER_DEFINED 						= 12;
 	public static final Integer KO_OUTPUTSTREAM_EXISTS_AND_DEFINITION_IS_DIFFERENT 	= 13;
+	public static final Integer KO_SAVE2CASSANDRA_STREAM_ALREADY_ENABLED		 	= 14;
 
 	
 	
@@ -62,6 +63,9 @@ public abstract class REPLY_CODES {
 		case 13:
 			decodedReply = "KO: OUTPUT STREAM ALREADY EXISTS AND ITS DEFINITION IS DIFFERENT";
 			break;
+		case 14:
+			decodedReply = "KO: SAVE2CASSANDRA IN THIS STREAM IS ALREADY_ENABLED";
+			break;			
 		default:
 			decodedReply = "UNKOWN ERROR";
 			break;
