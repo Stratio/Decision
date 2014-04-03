@@ -3,7 +3,7 @@ package com.stratio.bus
 import com.typesafe.config.ConfigFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
-import com.stratio.streaming.commons.messages.StratioStreamingMessage
+import com.stratio.streaming.commons.messages.{ColumnNameTypeValue, StratioStreamingMessage}
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.bus.kafka.{KafkaConsumer, KafkaTopicUtils, KafkaProducer}
 import com.stratio.streaming.commons.constants.BUS._
@@ -16,18 +16,30 @@ import com.stratio.streaming.commons.constants.STREAMING._
 import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineStatusException, StratioStreamingException}
 import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
+import java.util.List
+import com.stratio.bus.messaging.{ColumnNameType, CreateMessageBuilder}
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
   import StratioStreamingAPI._
 
+  def createStream(streamName: String, columns: List[ColumnNameType]) = {
+    val creationStreamMessage = CreateMessageBuilder(sessionId).build(streamName, columns)
+    syncOperation.performSyncOperation(creationStreamMessage)
+  }
+
   def send(message: StratioStreamingMessage) = {
     checkStreamingStatus()
     checkSecurityConstraints(message)
+
+    //TODO NEW OPERATIONS
+    //java.lang.String STOP_LISTEN = "STOP_LISTEN"
+    //java.lang.String REMOVE_QUERY = "REMOVE_QUERY"
+
     message.getOperation.toUpperCase match {
       case DEFINITION.CREATE | DROP | ALTER | LISTEN =>
         syncOperation.performSyncOperation(message)
-      case INSERT | ADD_QUERY | LIST | SAVETO_CASSANDRA | SAVETO_DATACOLLECTOR =>
+      case INSERT | ADD_QUERY | LIST | SAVETO_CASSANDRA  =>
         asyncOperation.performAsyncOperation(message)
       case LIST  =>
         getStreamsList()
@@ -50,6 +62,7 @@ class StratioStreamingAPI
 object StratioStreamingAPI {
   val config = ConfigFactory.load()
   val streamingTopicName = TOPICS
+  val sessionId = "" + System.currentTimeMillis()
   val brokerServer = config.getString("broker.server")
   val brokerPort = config.getString("broker.port")
   val kafkaBroker = s"$brokerServer:$brokerPort"
@@ -60,6 +73,7 @@ object StratioStreamingAPI {
 
   lazy val kafkaProducer = new KafkaProducer(TOPICS, kafkaBroker)
   lazy val kafkaConsumer = new KafkaConsumer(LIST_STREAMS_TOPIC, zookeeperCluster)
+ 
 
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)

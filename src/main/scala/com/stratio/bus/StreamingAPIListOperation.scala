@@ -1,13 +1,13 @@
 package com.stratio.bus
 
 import com.stratio.streaming.commons.streams.StratioStream
-import com.google.gson.Gson
-import com.stratio.streaming.commons.messages.{StratioStreamingMessage, ListStreamsMessage}
+import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import scala.collection.JavaConversions._
 import java.util.UUID
 import com.stratio.bus.kafka.KafkaProducer
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.bus.utils.StreamsParser
+import java.util.List
 
 class StreamingAPIListOperation(kafkaProducer: KafkaProducer,
                              zookeeperConsumer: ZookeeperConsumer)
