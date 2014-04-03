@@ -24,42 +24,74 @@ import com.stratio.bus.StreamingAPISyncOperation
 import com.stratio.bus.StreamingAPIAsyncOperation
 import com.stratio.bus.kafka.KafkaProducer
 import com.stratio.bus.zookeeper.ZookeeperConsumer
+import com.stratio.bus.messaging.MessageBuilder._
+import com.stratio.bus.messaging.CreateAndAlterMessageBuilder
+import com.stratio.bus.messaging.InsertMessageBuilder
+import com.stratio.bus.StreamingAPISyncOperation
+import com.stratio.bus.StreamingAPIAsyncOperation
+import com.stratio.bus.kafka.KafkaProducer
+import com.stratio.bus.messaging.AddQueryMessageBuilder
+import com.stratio.bus.zookeeper.ZookeeperConsumer
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
   import StratioStreamingAPI._
 
   def createStream(streamName: String, columns: List[ColumnNameType]) = {
+    checkStreamingStatus()
     val operation = DEFINITION.CREATE.toLowerCase
     val creationStreamMessage = CreateAndAlterMessageBuilder(sessionId, operation).build(streamName, columns)
+    checkSecurityConstraints(creationStreamMessage)
     syncOperation.performSyncOperation(creationStreamMessage)
   }
 
   def alterStream(streamName: String, columns: List[ColumnNameType]) = {
+    checkStreamingStatus()
     val operation = ALTER.toLowerCase
     val alterStreamMessage = CreateAndAlterMessageBuilder(sessionId, operation).build(streamName, columns)
+    checkSecurityConstraints(alterStreamMessage)
     syncOperation.performSyncOperation(alterStreamMessage)
   }
 
   def insertData(streamName: String, data: List[ColumnNameValue]) = {
+    checkStreamingStatus()
     val insertStreamMessage = InsertMessageBuilder(sessionId).build(streamName, data)
+    checkSecurityConstraints(insertStreamMessage)
     asyncOperation.performAsyncOperation(insertStreamMessage)
   }
 
   def addQuery(streamName: String, query: String) = {
+    checkStreamingStatus()
     val addQueryStreamMessage = AddQueryMessageBuilder(sessionId).build(streamName, query)
+    checkSecurityConstraints(addQueryStreamMessage)
     asyncOperation.performAsyncOperation(addQueryStreamMessage)
   }
 
+
+  //TODO REFACTOR BUILDERS!!!!!!!!!!!!
   def dropStream(streamName: String) = {
-    val addQueryStreamMessage = DropMessageBuilder(sessionId).build(streamName)
-    asyncOperation.performAsyncOperation(addQueryStreamMessage)
+    checkStreamingStatus()
+    val operation = DROP.toLowerCase
+    val dropStreamMessage = builder.withOperation(operation)
+      .withStreamName(streamName)
+      .withSessionId(sessionId)
+      .build()
+    checkSecurityConstraints(dropStreamMessage)
+    syncOperation.performSyncOperation(dropStreamMessage)
+  }
+
+  def listenStream(streamName: String) = {
+    checkStreamingStatus()
+    val operation = LISTEN.toLowerCase
+    val listenStreamMessage = builder.withOperation(operation)
+      .withStreamName(streamName)
+      .withSessionId(sessionId)
+      .build()
+    checkSecurityConstraints(listenStreamMessage)
+    syncOperation.performSyncOperation(listenStreamMessage)
   }
 
   def send(message: StratioStreamingMessage) = {
-    checkStreamingStatus()
-    checkSecurityConstraints(message)
-
     //TODO NEW OPERATIONS
     //java.lang.String STOP_LISTEN = "STOP_LISTEN"
     //java.lang.String REMOVE_QUERY = "REMOVE_QUERY"

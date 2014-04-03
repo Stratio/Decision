@@ -18,6 +18,8 @@ trait IStratioStreamingAPI {
 
   def dropStream(streamName: String)
 
+  def listenStream(streamName: String)
+
   def send(message: StratioStreamingMessage)
 
   def getStreamsList(): List[StratioStream]
