@@ -10,19 +10,23 @@ public class StratioStream implements Serializable {
     private String streamName;
     private List<ColumnNameTypeValue> columns;
     private List<StreamQuery> queries;
-    private Boolean userDefined;
+    private boolean userDefined;
 
-    public StratioStream(String streamName, List<ColumnNameTypeValue> columns, List<StreamQuery> queries) {
+    public StratioStream(String streamName,
+                         List<ColumnNameTypeValue> columns,
+                         List<StreamQuery> queries,
+                         boolean userDefined) {
         this.streamName = streamName;
         this.columns = columns;
         this.queries = queries;
+        this.userDefined = userDefined;
     }
 
-    public Boolean getUserDefined() {
+    public boolean getUserDefined() {
         return userDefined;
     }
 
-    public void setUserDefined(Boolean userDefined) {
+    public void setUserDefined(boolean userDefined) {
         this.userDefined = userDefined;
     }
 
