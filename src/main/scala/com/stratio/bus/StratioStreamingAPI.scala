@@ -3,7 +3,7 @@ package com.stratio.bus
 import com.typesafe.config.ConfigFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
-import com.stratio.streaming.commons.messages.{ColumnNameTypeValue, StratioStreamingMessage}
+import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.bus.kafka.{KafkaConsumer, KafkaTopicUtils, KafkaProducer}
 import com.stratio.streaming.commons.constants.BUS._
@@ -17,15 +17,22 @@ import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, St
 import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import java.util.List
-import com.stratio.bus.messaging.{ColumnNameType, CreateMessageBuilder}
+import com.stratio.bus.messaging.{ColumnNameType, CreateAndAlterMessageBuilder}
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
   import StratioStreamingAPI._
 
   def createStream(streamName: String, columns: List[ColumnNameType]) = {
-    val creationStreamMessage = CreateMessageBuilder(sessionId).build(streamName, columns)
+    val operation = DEFINITION.CREATE.toLowerCase
+    val creationStreamMessage = CreateAndAlterMessageBuilder(sessionId, operation).build(streamName, columns)
     syncOperation.performSyncOperation(creationStreamMessage)
+  }
+
+  def alterStream(streamName: String, columns: List[ColumnNameType]) = {
+    val operation = ALTER.toLowerCase
+    val alterStreamMessage = CreateAndAlterMessageBuilder(sessionId, operation).build(streamName, columns)
+    syncOperation.performSyncOperation(alterStreamMessage)
   }
 
   def send(message: StratioStreamingMessage) = {

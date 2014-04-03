@@ -10,6 +10,8 @@ trait IStratioStreamingAPI {
 
   def createStream(streamName: String, columns: List[ColumnNameType])
 
+  def alterStream(streamName: String, columns: List[ColumnNameType])
+
   def send(message: StratioStreamingMessage)
 
   def getStreamsList(): List[StratioStream]

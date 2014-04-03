@@ -6,9 +6,7 @@ import com.stratio.streaming.commons.constants.STREAM_OPERATIONS
 import scala.collection.JavaConversions._
 
 
-case class CreateMessageBuilder(sessionId: String) {
-  val operation = STREAM_OPERATIONS.DEFINITION.CREATE.toLowerCase
-
+case class CreateAndAlterMessageBuilder(sessionId: String, operation: String) {
   def build(streamName: String, columns: List[ColumnNameType]) = {
     val createStreamMessage = new StratioStreamingMessage
     val columnNameTypeValueList = columns.toList.map(element => new ColumnNameTypeValue(element.columnName, element.columnType.getValue, null))
