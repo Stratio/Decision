@@ -17,7 +17,13 @@ import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, St
 import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import java.util.List
-import com.stratio.bus.messaging.{InsertMessageBuilder, ColumnNameValue, ColumnNameType, CreateAndAlterMessageBuilder}
+import com.stratio.bus.messaging._
+import com.stratio.bus.messaging.CreateAndAlterMessageBuilder
+import com.stratio.bus.messaging.InsertMessageBuilder
+import com.stratio.bus.StreamingAPISyncOperation
+import com.stratio.bus.StreamingAPIAsyncOperation
+import com.stratio.bus.kafka.KafkaProducer
+import com.stratio.bus.zookeeper.ZookeeperConsumer
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
@@ -38,6 +44,11 @@ class StratioStreamingAPI
   def insertData(streamName: String, data: List[ColumnNameValue]) = {
     val insertStreamMessage = InsertMessageBuilder(sessionId).build(streamName, data)
     asyncOperation.performAsyncOperation(insertStreamMessage)
+  }
+
+  def addQuery(streamName: String, query: String) = {
+    val addQueryStreamMessage = AddQueryMessageBuilder(sessionId).build(streamName, query)
+    asyncOperation.performAsyncOperation(addQueryStreamMessage)
   }
 
   def send(message: StratioStreamingMessage) = {

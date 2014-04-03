@@ -14,6 +14,8 @@ trait IStratioStreamingAPI {
 
   def insertData(streamName: String, data: List[ColumnNameValue])
 
+  def addQuery(streamName: String, query: String)
+
   def send(message: StratioStreamingMessage)
 
   def getStreamsList(): List[StratioStream]
