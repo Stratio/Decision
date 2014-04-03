@@ -91,6 +91,14 @@ class StratioStreamingAPI
     syncOperation.performSyncOperation(listenStreamMessage)
   }
 
+  def listStreams(): List[StratioStream] = {
+    val operation = LIST.toLowerCase
+    val listStreamMessage = builder.withOperation(operation)
+      .withSessionId(sessionId)
+      .build()
+    statusOperation.getListStreams(listStreamMessage)
+  }
+
   def send(message: StratioStreamingMessage) = {
     //TODO NEW OPERATIONS
     //java.lang.String STOP_LISTEN = "STOP_LISTEN"
@@ -102,7 +110,7 @@ class StratioStreamingAPI
       case INSERT | ADD_QUERY | LIST | SAVETO_CASSANDRA  =>
         asyncOperation.performAsyncOperation(message)
       case LIST  =>
-        getStreamsList()
+        listStreams()
       case _ => throw new StratioStreamingException("Unknown operation")
     }
   }
@@ -112,10 +120,6 @@ class StratioStreamingAPI
     startEphemeralNodeWatch()
     initializeTopic()
     this
-  }
-
-  def getStreamsList(): List[StratioStream] = {
-    statusOperation.getStreamsList()
   }
 }
 

@@ -22,5 +22,5 @@ trait IStratioStreamingAPI {
 
   def send(message: StratioStreamingMessage)
 
-  def getStreamsList(): List[StratioStream]
+  def listStreams(): List[StratioStream]
 }

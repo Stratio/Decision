@@ -13,22 +13,11 @@ class StreamingAPIListOperation(kafkaProducer: KafkaProducer,
                              zookeeperConsumer: ZookeeperConsumer)
   extends StreamingAPIOperation {
 
-  def getStreamsList(): List[StratioStream] = {
+  def getListStreams(message: StratioStreamingMessage): List[StratioStream] = {
     val zNodeUniqueId = UUID.randomUUID().toString
-    val message = createListRequestMessage()
     addMessageToKafkaTopic(message, zNodeUniqueId, kafkaProducer)
     val jsonStreamingResponse = waitForTheStreamingResponse(zookeeperConsumer, message)
-    println(jsonStreamingResponse)
     val parsedList = StreamsParser.parse(jsonStreamingResponse)
     parsedList
-  }
-
-  private def createListRequestMessage() = {
-    val message = new StratioStreamingMessage()
-    message.setOperation("list")
-    message.setSession_id(""+System.currentTimeMillis())
-    message.setRequest_id(""+System.currentTimeMillis())
-    message.setTimestamp(new java.lang.Long(System.currentTimeMillis))
-    message
   }
 }
