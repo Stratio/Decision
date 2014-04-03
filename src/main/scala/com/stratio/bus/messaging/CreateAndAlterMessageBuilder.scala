@@ -8,14 +8,7 @@ import scala.collection.JavaConversions._
 
 case class CreateAndAlterMessageBuilder(sessionId: String, operation: String) {
   def build(streamName: String, columns: List[ColumnNameType]) = {
-    val createStreamMessage = new StratioStreamingMessage
     val columnNameTypeValueList = columns.toList.map(element => new ColumnNameTypeValue(element.columnName, element.columnType.getValue, null))
-    createStreamMessage.setColumns(columnNameTypeValueList)
-    createStreamMessage.setOperation(operation)
-    createStreamMessage.setStreamName(streamName)
-    createStreamMessage.setRequest_id("" + System.currentTimeMillis)
-    createStreamMessage.setSession_id(sessionId)
-    createStreamMessage.setTimestamp(new java.lang.Long(System.currentTimeMillis))
-    createStreamMessage
+    MessageBuilder.buildMessage(columnNameTypeValueList, operation, streamName, sessionId)
   }
 }

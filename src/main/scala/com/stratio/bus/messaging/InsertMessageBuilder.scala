@@ -11,13 +11,6 @@ case class InsertMessageBuilder(sessionId: String) {
 
   def build(streamName: String, data: List[ColumnNameValue]) = {
     val columnNameTypeValueList = data.toList.map(element => new ColumnNameTypeValue(element.columnName, null, element.columnValue))
-    val createStreamMessage = new StratioStreamingMessage
-    createStreamMessage.setColumns(columnNameTypeValueList)
-    createStreamMessage.setOperation(operation)
-    createStreamMessage.setStreamName(streamName)
-    createStreamMessage.setRequest_id("" + System.currentTimeMillis)
-    createStreamMessage.setSession_id(sessionId)
-    createStreamMessage.setTimestamp(new java.lang.Long(System.currentTimeMillis))
-    createStreamMessage
+    MessageBuilder.buildMessage(columnNameTypeValueList, operation, streamName, sessionId)
   }
 }
