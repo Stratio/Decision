@@ -17,7 +17,7 @@ import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, St
 import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import java.util.List
-import com.stratio.bus.messaging.{ColumnNameType, CreateAndAlterMessageBuilder}
+import com.stratio.bus.messaging.{InsertMessageBuilder, ColumnNameValue, ColumnNameType, CreateAndAlterMessageBuilder}
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
@@ -33,6 +33,11 @@ class StratioStreamingAPI
     val operation = ALTER.toLowerCase
     val alterStreamMessage = CreateAndAlterMessageBuilder(sessionId, operation).build(streamName, columns)
     syncOperation.performSyncOperation(alterStreamMessage)
+  }
+
+  def insertData(streamName: String, data: List[ColumnNameValue]) = {
+    val insertStreamMessage = InsertMessageBuilder(sessionId).build(streamName, data)
+    asyncOperation.performAsyncOperation(insertStreamMessage)
   }
 
   def send(message: StratioStreamingMessage) = {

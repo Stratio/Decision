@@ -1,3 +1,3 @@
 package com.stratio.bus.messaging
 
-class ColumnNameValue(var columnName: String, var columnValue: String)
+class ColumnNameValue(var columnName: String, var columnValue: Object)
