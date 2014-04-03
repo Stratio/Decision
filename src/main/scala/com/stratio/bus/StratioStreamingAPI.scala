@@ -51,6 +51,11 @@ class StratioStreamingAPI
     asyncOperation.performAsyncOperation(addQueryStreamMessage)
   }
 
+  def dropStream(streamName: String) = {
+    val addQueryStreamMessage = DropMessageBuilder(sessionId).build(streamName)
+    asyncOperation.performAsyncOperation(addQueryStreamMessage)
+  }
+
   def send(message: StratioStreamingMessage) = {
     checkStreamingStatus()
     checkSecurityConstraints(message)
