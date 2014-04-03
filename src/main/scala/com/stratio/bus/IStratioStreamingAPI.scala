@@ -16,11 +16,13 @@ trait IStratioStreamingAPI {
 
   def addQuery(streamName: String, query: String)
 
+  def removeQuery(streamName: String, queryId: String)
+
   def dropStream(streamName: String)
 
   def listenStream(streamName: String)
 
-  def send(message: StratioStreamingMessage)
-
   def listStreams(): List[StratioStream]
+
+  //def saveToCassandra(streamName: String)
 }

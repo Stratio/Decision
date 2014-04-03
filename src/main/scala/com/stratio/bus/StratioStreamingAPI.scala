@@ -18,14 +18,14 @@ import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import java.util.List
 import com.stratio.bus.messaging._
-import com.stratio.bus.messaging.CreateAndAlterMessageBuilder
+import com.stratio.bus.messaging.MessageBuilderWithColumns
 import com.stratio.bus.messaging.InsertMessageBuilder
 import com.stratio.bus.StreamingAPISyncOperation
 import com.stratio.bus.StreamingAPIAsyncOperation
 import com.stratio.bus.kafka.KafkaProducer
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.bus.messaging.MessageBuilder._
-import com.stratio.bus.messaging.CreateAndAlterMessageBuilder
+import com.stratio.bus.messaging.MessageBuilderWithColumns
 import com.stratio.bus.messaging.InsertMessageBuilder
 import com.stratio.bus.StreamingAPISyncOperation
 import com.stratio.bus.StreamingAPIAsyncOperation
@@ -40,7 +40,7 @@ class StratioStreamingAPI
   def createStream(streamName: String, columns: List[ColumnNameType]) = {
     checkStreamingStatus()
     val operation = DEFINITION.CREATE.toLowerCase
-    val creationStreamMessage = CreateAndAlterMessageBuilder(sessionId, operation).build(streamName, columns)
+    val creationStreamMessage = MessageBuilderWithColumns(sessionId, operation).build(streamName, columns)
     checkSecurityConstraints(creationStreamMessage)
     syncOperation.performSyncOperation(creationStreamMessage)
   }
@@ -48,7 +48,7 @@ class StratioStreamingAPI
   def alterStream(streamName: String, columns: List[ColumnNameType]) = {
     checkStreamingStatus()
     val operation = ALTER.toLowerCase
-    val alterStreamMessage = CreateAndAlterMessageBuilder(sessionId, operation).build(streamName, columns)
+    val alterStreamMessage = MessageBuilderWithColumns(sessionId, operation).build(streamName, columns)
     checkSecurityConstraints(alterStreamMessage)
     syncOperation.performSyncOperation(alterStreamMessage)
   }
@@ -64,7 +64,20 @@ class StratioStreamingAPI
     checkStreamingStatus()
     val addQueryStreamMessage = AddQueryMessageBuilder(sessionId).build(streamName, query)
     checkSecurityConstraints(addQueryStreamMessage)
-    asyncOperation.performAsyncOperation(addQueryStreamMessage)
+    syncOperation.performSyncOperation(addQueryStreamMessage)
+  }
+
+  def removeQuery(streamName: String, queryId: String) = {
+    //TODO IGUAL QUE ADDQUERY!!!!!!!!!!
+    checkStreamingStatus()
+    val operation = REMOVE_QUERY.toLowerCase
+    val removeQueryMessage = builder.withOperation(operation)
+        .withStreamName(streamName)
+        .withSessionId(sessionId)
+        .withRequest(queryId)
+        .build()
+    checkSecurityConstraints(removeQueryMessage)
+    syncOperation.performSyncOperation(removeQueryMessage)
   }
 
 
@@ -105,9 +118,7 @@ class StratioStreamingAPI
     //java.lang.String REMOVE_QUERY = "REMOVE_QUERY"
 
     message.getOperation.toUpperCase match {
-      case DEFINITION.CREATE | DROP | ALTER | LISTEN =>
-        syncOperation.performSyncOperation(message)
-      case INSERT | ADD_QUERY | LIST | SAVETO_CASSANDRA  =>
+      case SAVETO_CASSANDRA  =>
         asyncOperation.performAsyncOperation(message)
       case LIST  =>
         listStreams()
