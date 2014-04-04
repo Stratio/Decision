@@ -104,26 +104,23 @@ class StratioStreamingAPI
     syncOperation.performSyncOperation(listenStreamMessage)
   }
 
+  def stopListenStream(streamName: String) = {
+    checkStreamingStatus()
+    val operation = STOP_LISTEN.toLowerCase
+    val listenStreamMessage = builder.withOperation(operation)
+      .withStreamName(streamName)
+      .withSessionId(sessionId)
+      .build()
+    checkSecurityConstraints(listenStreamMessage)
+    syncOperation.performSyncOperation(listenStreamMessage)
+  }
+
   def listStreams(): List[StratioStream] = {
     val operation = LIST.toLowerCase
     val listStreamMessage = builder.withOperation(operation)
       .withSessionId(sessionId)
       .build()
     statusOperation.getListStreams(listStreamMessage)
-  }
-
-  def send(message: StratioStreamingMessage) = {
-    //TODO NEW OPERATIONS
-    //java.lang.String STOP_LISTEN = "STOP_LISTEN"
-    //java.lang.String REMOVE_QUERY = "REMOVE_QUERY"
-
-    message.getOperation.toUpperCase match {
-      case SAVETO_CASSANDRA  =>
-        asyncOperation.performAsyncOperation(message)
-      case LIST  =>
-        listStreams()
-      case _ => throw new StratioStreamingException("Unknown operation")
-    }
   }
 
   def initialize() = {

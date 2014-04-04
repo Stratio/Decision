@@ -1,6 +1,5 @@
 package com.stratio.bus
 
-import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.streaming.commons.streams.StratioStream
 import java.util.List
 import com.stratio.bus.messaging.{ColumnNameValue, ColumnNameType}
@@ -21,6 +20,8 @@ trait IStratioStreamingAPI {
   def dropStream(streamName: String)
 
   def listenStream(streamName: String)
+
+  def stopListenStream(streamName: String)
 
   def listStreams(): List[StratioStream]
 
