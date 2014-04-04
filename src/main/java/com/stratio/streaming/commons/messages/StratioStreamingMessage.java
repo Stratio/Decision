@@ -31,6 +31,39 @@ public class StratioStreamingMessage implements Serializable {
 		
 	}
 
+    /**
+     * Used in the API MessageBuilder
+     *
+     * @param operation
+     * @param streamName
+     * @param sessionId
+     * @param requestId
+     * @param request
+     * @param timeStamp
+     * @param columns
+     * @param queries
+     * @param userDefined
+     */
+    public StratioStreamingMessage(String operation,
+                                   String streamName,
+                                   String sessionId,
+                                   String requestId,
+                                   String request,
+                                   Long timeStamp,
+                                   List<ColumnNameTypeValue> columns,
+                                   List<StreamQuery> queries,
+                                   Boolean userDefined) {
+        this.operation = operation;
+        this.streamName = streamName;
+        this.session_id = sessionId;
+        this.request_id = requestId;
+        this.request = request;
+        this.timestamp = timeStamp;
+        this.columns = columns;
+        this.queries = queries;
+        this.userDefined = userDefined;
+    }
+
 
 	/**
 	 * Used in List Operation
