@@ -12,24 +12,24 @@ import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
 
 class StreamingAPIOperation {
-  val config = ConfigFactory.load()
-  val log = LoggerFactory.getLogger(getClass)
-  val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
+  protected val config = ConfigFactory.load()
+  protected val log = LoggerFactory.getLogger(getClass)
+  protected val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
 
-  def addMessageToKafkaTopic(message: StratioStreamingMessage,
+  protected def addMessageToKafkaTopic(message: StratioStreamingMessage,
                                      creationUniqueId: String,
                                        tableProducer: KafkaProducer) = {
     val kafkaMessage = new Gson().toJson(message)
     tableProducer.send(kafkaMessage, message.getOperation)
   }
 
-  def getOperationZNodeFullPath(operation: String, uniqueId: String) = {
+  protected def getOperationZNodeFullPath(operation: String, uniqueId: String) = {
     val zookeeperBasePath = ZK_BASE_PATH
     val zookeeperPath = s"$zookeeperBasePath/$operation/$uniqueId"
     zookeeperPath
   }
 
-  def waitForTheStreamingResponse(zookeeperConsumer: ZookeeperConsumer,
+  protected def waitForTheStreamingResponse(zookeeperConsumer: ZookeeperConsumer,
                                   message: StratioStreamingMessage) = {
     val zNodeFullPath = getOperationZNodeFullPath(
       message.getOperation.toLowerCase,

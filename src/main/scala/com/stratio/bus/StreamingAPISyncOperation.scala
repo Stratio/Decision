@@ -12,6 +12,12 @@ case class StreamingAPISyncOperation(
   zookeeperConsumer: ZookeeperConsumer)
   extends StreamingAPIOperation {
 
+  /**
+   * Sends the message to the StratioStreamingEngine and waits
+   * for the Acknowledge to be written in zookeeper.
+   *
+   * @param message
+   */
   def performSyncOperation(message: StratioStreamingMessage) = {
     val zNodeUniqueId = UUID.randomUUID().toString
     addMessageToKafkaTopic(message, zNodeUniqueId, kafkaProducer)

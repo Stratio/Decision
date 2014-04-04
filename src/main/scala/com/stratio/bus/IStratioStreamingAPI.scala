@@ -7,7 +7,7 @@ import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, St
 
 trait IStratioStreamingAPI {
   /**
-   * Gets a StratioStreamingAPI instance.
+   * Initializes the StratioStreamingAPI instance.
    * @return
    */
   def initialize(): IStratioStreamingAPI
