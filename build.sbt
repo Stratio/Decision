@@ -1,16 +1,16 @@
 import AssemblyKeys._
 
-name := "bus"
+name := "stratio-streaming-api"
 
 organization := "com.stratio"
 
-version := "0.0.1"
+version := "0.0.1-SNAPSHOT"
 
 scalaVersion := "2.10.3"
 
 seq(assemblySettings: _*)
 
-jarName in assembly := "stratio-bus.jar"
+jarName in assembly := "stratio-streaming-api-1.0.0-SNAPSHOT.jar"
 
 mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
   {

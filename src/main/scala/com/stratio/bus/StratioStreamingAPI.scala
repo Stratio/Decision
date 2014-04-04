@@ -13,7 +13,7 @@ import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.MANIPULATION._
 import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
 import org.apache.curator.framework.api.CuratorEventType._
 import com.stratio.streaming.commons.constants.STREAMING._
-import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineStatusException, StratioStreamingException}
+import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioAPISecurityException, StratioEngineStatusException, StratioStreamingException}
 import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import java.util.List
