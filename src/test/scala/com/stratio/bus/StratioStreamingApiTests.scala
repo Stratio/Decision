@@ -26,13 +26,19 @@ class StratioStreamingApiTests
   val internalTestStreamName = "stratio_"
 
 
-  override def beforeAll() {
+  /*override def beforeAll() {
     if (!zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH))
-    zookeeperClient.create().forPath(ZK_EPHEMERAL_NODE_PATH)
-  }
+      zookeeperClient.create().forPath(ZK_EPHEMERAL_NODE_PATH)
+  }*/
   
   override def beforeEach() {
+    if (!zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH))
+      zookeeperClient.create().forPath(ZK_EPHEMERAL_NODE_PATH)
     cleanStratioStreamingEngine()
+  }
+
+  def removeEphemeralNode() {
+    zookeeperConsumer.removeZNode(ZK_EPHEMERAL_NODE_PATH)
   }
   
   def cleanStratioStreamingEngine() {
@@ -41,15 +47,6 @@ class StratioStreamingApiTests
 
   def userDefinedStreams() = {
     streamingAPI.listStreams().filterNot(stream => stream.getStreamName.startsWith("stratio_"))
-  }
-
-  describe("The Stratio Streaming API") {
-    ignore("should throw a StratioEngineStatusException when the streaming engine is not running") {
-      zookeeperConsumer.removeZNode(ZK_EPHEMERAL_NODE_PATH)
-      intercept [StratioEngineStatusException] {
-        StratioStreamingAPIFactory.create().initialize()
-      }
-    }
   }
 
   describe("The create operation") {
@@ -89,8 +86,49 @@ class StratioStreamingApiTests
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      removeEphemeralNode()
+      //Add some delay to wait for the event to be triggered
+      Thread.sleep(1000)
+      intercept [StratioEngineStatusException] {
+        streamingAPI.createStream(testStreamName, columnList)
+      }
+    }
+  }
+
+  describe("The drop operation") {
+    it("should remove an existing stream") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      try {
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.dropStream(testStreamName)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+      userDefinedStreams.size should be(0)
+    }
+
+    it("should throw a StratioEngineOperationException when removing a stream that does not exist") {
+      val nonExistingStream = "nonExistingStream"
+      intercept [StratioEngineOperationException] {
+        streamingAPI.dropStream(nonExistingStream)
+      }
+    }
+
+    it("should throw a StratioAPISecurityException when removing a stream with the stratio_ prefix") {
       intercept [StratioAPISecurityException] {
-        streamingAPI.createStream(internalTestStreamName, columnList)
+        streamingAPI.dropStream(internalTestStreamName)
+      }
+    }
+
+    it("should throw a StratioEngineStatusException when streaming engine is not running") {
+      removeEphemeralNode()
+      //Add some delay to wait for the event to be triggered
+      Thread.sleep(1000)
+      intercept [StratioEngineStatusException] {
+        streamingAPI.dropStream(testStreamName)
       }
     }
   }

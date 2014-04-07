@@ -8,7 +8,7 @@ import com.stratio.bus.zookeeper.ZookeeperConsumer
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.CuratorFrameworkFactory
 
-class ZookeperConsumerTests
+class ZookeeperConsumerTests
   extends FunSpec
   with ShouldMatchers
   with GivenWhenThen
