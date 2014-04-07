@@ -4,6 +4,7 @@ import com.stratio.streaming.commons.streams.StratioStream
 import java.util.List
 import com.stratio.bus.messaging.{ColumnNameValue, ColumnNameType}
 import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineStatusException, StratioEngineOperationException}
+import com.stratio.bus.dto.StratioQueryStream
 
 trait IStratioStreamingAPI {
   /**
@@ -87,6 +88,13 @@ trait IStratioStreamingAPI {
   @throws(classOf[StratioAPISecurityException])
   @throws(classOf[StratioEngineOperationException])
   def stopListenStream(streamName: String)
+
+  /**
+   * Gets a list of the queries from a given stream.
+   * @param stream
+   * @return a list with the queries from the given stream
+   */
+  def queriesFromStream(stream: String): List[StratioQueryStream]
 
   /**
    * Gets a list of all the stream that currently exists.

@@ -4,8 +4,7 @@ import com.typesafe.config.ConfigFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
-import com.stratio.bus.zookeeper.ZookeeperConsumer
-import com.stratio.bus.kafka.{KafkaConsumer, KafkaTopicUtils, KafkaProducer}
+import com.stratio.bus.kafka.{KafkaConsumer, KafkaTopicUtils}
 import com.stratio.streaming.commons.constants.BUS._
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION._
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION._
@@ -13,23 +12,26 @@ import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.MANIPULATION._
 import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
 import org.apache.curator.framework.api.CuratorEventType._
 import com.stratio.streaming.commons.constants.STREAMING._
-import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioAPISecurityException, StratioEngineStatusException, StratioStreamingException}
+import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioAPISecurityException, StratioEngineStatusException}
 import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import java.util.List
 import com.stratio.bus.messaging._
-import com.stratio.bus.messaging.MessageBuilderWithColumns
-import com.stratio.bus.messaging.InsertMessageBuilder
-import com.stratio.bus.StreamingAPISyncOperation
-import com.stratio.bus.StreamingAPIAsyncOperation
-import com.stratio.bus.kafka.KafkaProducer
-import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.bus.messaging.MessageBuilder._
 import com.stratio.bus.messaging.MessageBuilderWithColumns
 import com.stratio.bus.messaging.InsertMessageBuilder
+import com.stratio.bus.kafka.KafkaProducer
+import com.stratio.bus.messaging.AddQueryMessageBuilder
+import com.stratio.bus.zookeeper.ZookeeperConsumer
+import com.stratio.bus.dto.StratioQueryStream
+import scala.collection.JavaConversions._
+import com.stratio.streaming.commons.constants.REPLY_CODES._
+import com.stratio.bus.messaging.InsertMessageBuilder
+import com.stratio.bus.messaging.MessageBuilderWithColumns
 import com.stratio.bus.StreamingAPISyncOperation
 import com.stratio.bus.StreamingAPIAsyncOperation
 import com.stratio.bus.kafka.KafkaProducer
+import com.stratio.bus.dto.StratioQueryStream
 import com.stratio.bus.messaging.AddQueryMessageBuilder
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 
@@ -113,6 +115,16 @@ class StratioStreamingAPI
       .build()
     checkSecurityConstraints(listenStreamMessage)
     syncOperation.performSyncOperation(listenStreamMessage)
+  }
+
+  def queriesFromStream(stream: String): List[StratioQueryStream] = {
+    checkStreamingStatus()
+    val stratioStreams = listStreams().toList
+    val stratioStream = stratioStreams.find(element => element.getStreamName.equals(stream))
+    stratioStream match {
+      case None => throw new StratioEngineOperationException("StratioEngine error: STREAM DOES NOT EXIST")
+      case Some(element) => element.getQueries.map(query => new StratioQueryStream(query.getQuery, query.getQueryId))
+    }
   }
 
   def listStreams(): List[StratioStream] = {

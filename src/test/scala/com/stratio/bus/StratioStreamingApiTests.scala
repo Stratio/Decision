@@ -1,13 +1,14 @@
 package com.stratio.bus
 
 import org.scalatest._
-import com.stratio.streaming.commons.messages.StratioStreamingMessage
-import com.stratio.streaming.commons.exceptions.{StratioStreamingException, StratioEngineStatusException, StratioAPISecurityException}
+import com.stratio.streaming.commons.exceptions.{StratioEngineStatusException, StratioAPISecurityException}
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.CuratorFrameworkFactory
-import com.stratio.bus.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants.STREAMING._
 import com.stratio.bus.zookeeper.ZookeeperConsumer
+import com.stratio.bus.messaging.ColumnNameType
+import com.stratio.streaming.commons.constants.ColumnType
+import scala.collection.JavaConversions._
 
 class StratioStreamingApiTests
   extends FunSpec
@@ -34,24 +35,12 @@ class StratioStreamingApiTests
     it("should throw a SecurityException when the user tries to perform an operation in an internal stream") {
       createEngineEphemeralNode()
       val internalStreamName = "stratio_whatever"
-      val message = new StratioStreamingMessage()
-      message.setStreamName(internalStreamName)
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
       val streamingAPI = StratioStreamingAPIFactory.create().initialize()
       intercept [StratioAPISecurityException] {
-        streamingAPI.send(message)
-      }
-    }
-
-    it("should throw a StratioStreamingException when the API receives an unknown operation") {
-      createEngineEphemeralNode()
-      val streamName = "whatever"
-      val operation = "unknownOperation"
-      val message = new StratioStreamingMessage()
-      message.setStreamName(streamName)
-      message.setOperation(operation)
-      val streamingAPI = StratioStreamingAPIFactory.create().initialize()
-      intercept [StratioStreamingException] {
-        streamingAPI.send(message)
+        streamingAPI.createStream(internalStreamName, columnList)
       }
     }
 
