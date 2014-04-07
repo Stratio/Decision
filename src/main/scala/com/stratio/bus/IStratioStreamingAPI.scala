@@ -5,6 +5,7 @@ import java.util.List
 import com.stratio.bus.messaging.{ColumnNameValue, ColumnNameType}
 import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineStatusException, StratioEngineOperationException}
 import com.stratio.bus.dto.StratioQueryStream
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue
 
 trait IStratioStreamingAPI {
   /**
@@ -88,6 +89,13 @@ trait IStratioStreamingAPI {
   @throws(classOf[StratioAPISecurityException])
   @throws(classOf[StratioEngineOperationException])
   def stopListenStream(streamName: String)
+
+  /**
+   * Gets a list of the columns from a given stream.
+   * @param stream
+   * @return a list with the columns from the given stream
+   */
+  def columnsFromStream(stream: String): List[ColumnNameTypeValue]
 
   /**
    * Gets a list of the queries from a given stream.

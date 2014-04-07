@@ -37,30 +37,19 @@ class StratioStreamingApiTests
     cleanStratioStreamingEngine()
   }
 
-  def removeEphemeralNode() {
-    zookeeperConsumer.removeZNode(ZK_EPHEMERAL_NODE_PATH)
-  }
-  
-  def cleanStratioStreamingEngine() {
-    userDefinedStreams.foreach(stream => streamingAPI.dropStream(stream.getStreamName))
-  }
-
-  def userDefinedStreams() = {
-    streamingAPI.listStreams().filterNot(stream => stream.getStreamName.startsWith("stratio_"))
-  }
-
   describe("The create operation") {
     it("should create a new stream when the stream does not exist") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
       try {
         streamingAPI.createStream(testStreamName, columnList)
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
-      userDefinedStreams.size should be(1)
+
+      theNumberOfUserDefinedStreams should be(1)
+      theNumberOfColumnsOfStream(testStreamName) should be(2)
     }
 
     it("should throw a StratioEngineOperationException when creating a stream that already exists") {
@@ -107,7 +96,7 @@ class StratioStreamingApiTests
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
-      userDefinedStreams.size should be(0)
+      theNumberOfUserDefinedStreams should be(0)
     }
 
     it("should throw a StratioEngineOperationException when removing a stream that does not exist") {
@@ -132,4 +121,25 @@ class StratioStreamingApiTests
       }
     }
   }
+
+  def removeEphemeralNode() {
+    zookeeperConsumer.removeZNode(ZK_EPHEMERAL_NODE_PATH)
+  }
+
+  def cleanStratioStreamingEngine() {
+    userDefinedStreams.foreach(stream => streamingAPI.dropStream(stream.getStreamName))
+  }
+
+  def userDefinedStreams() = {
+    streamingAPI.listStreams().filterNot(stream => stream.getStreamName.startsWith("stratio_"))
+  }
+
+  def theNumberOfUserDefinedStreams() = {
+    userDefinedStreams.size
+  }
+
+  def theNumberOfColumnsOfStream(streamName: String) = {
+    streamingAPI.columnsFromStream(streamName).size
+  }
+
 }

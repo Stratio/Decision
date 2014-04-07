@@ -3,7 +3,7 @@ package com.stratio.bus
 import com.typesafe.config.ConfigFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
-import com.stratio.streaming.commons.messages.StratioStreamingMessage
+import com.stratio.streaming.commons.messages.{ColumnNameTypeValue, StratioStreamingMessage}
 import com.stratio.bus.kafka.{KafkaConsumer, KafkaTopicUtils}
 import com.stratio.streaming.commons.constants.BUS._
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION._
@@ -115,6 +115,16 @@ class StratioStreamingAPI
     stratioStream match {
       case None => throw new StratioEngineOperationException("StratioEngine error: STREAM DOES NOT EXIST")
       case Some(element) => element.getQueries.map(query => new StratioQueryStream(query.getQuery, query.getQueryId))
+    }
+  }
+
+  def columnsFromStream(stream: String): List[ColumnNameTypeValue] = {
+    checkStreamingStatus()
+    val stratioStreams = listStreams().toList
+    val stratioStream = stratioStreams.find(element => element.getStreamName.equals(stream))
+    stratioStream match {
+      case None => throw new StratioEngineOperationException("StratioEngine error: STREAM DOES NOT EXIST")
+      case Some(element) => element.getColumns
     }
   }
 
