@@ -1,7 +1,7 @@
 package com.stratio.bus
 
 import org.scalatest._
-import com.stratio.streaming.commons.exceptions.{StratioEngineStatusException, StratioAPISecurityException}
+import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioStreamingException, StratioEngineStatusException, StratioAPISecurityException}
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.CuratorFrameworkFactory
 import com.stratio.streaming.commons.constants.STREAMING._
@@ -13,6 +13,7 @@ import scala.collection.JavaConversions._
 class StratioStreamingApiTests
   extends FunSpec
   with ShouldMatchers
+  with BeforeAndAfterAll 
   with BeforeAndAfterEach {
 
   val zookeeperCluster = "localhost:2181"
@@ -20,32 +21,58 @@ class StratioStreamingApiTests
   val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
   zookeeperClient.start()
   val zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
+  lazy val streamingAPI = StratioStreamingAPIFactory.create().initialize()
 
+
+  override def beforeAll() {
+    if (!zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH))
+    zookeeperClient.create().forPath(ZK_EPHEMERAL_NODE_PATH)
+  }
+  
   override def beforeEach() {
-    zookeeperConsumer.removeZNode(ZK_EPHEMERAL_NODE_PATH)
+    cleanStratioStreamingEngine()
+  }
+  
+  def cleanStratioStreamingEngine() {
+    userDefinedStreams.foreach(stream => streamingAPI.dropStream(stream.getStreamName))
+  }
+
+  def userDefinedStreams() = {
+    streamingAPI.listStreams().filterNot(stream => stream.getStreamName.startsWith("stratio_"))
   }
 
   describe("The Stratio Streaming API") {
-    it("should throw a StratioEngineStatusException when the streaming engine is not running") {
+    ignore("should throw a StratioEngineStatusException when the streaming engine is not running") {
+      zookeeperConsumer.removeZNode(ZK_EPHEMERAL_NODE_PATH)
       intercept [StratioEngineStatusException] {
         StratioStreamingAPIFactory.create().initialize()
       }
     }
 
     it("should throw a SecurityException when the user tries to perform an operation in an internal stream") {
-      createEngineEphemeralNode()
       val internalStreamName = "stratio_whatever"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val streamingAPI = StratioStreamingAPIFactory.create().initialize()
+
       intercept [StratioAPISecurityException] {
         streamingAPI.createStream(internalStreamName, columnList)
       }
     }
+  }
 
-    def createEngineEphemeralNode() {
-      zookeeperClient.create().forPath(ZK_EPHEMERAL_NODE_PATH)
+  describe("The create operation") {
+    it("should create a new stream when the stream does not exist") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val streamName = "testStream"
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      try {
+        streamingAPI.createStream(streamName, columnList)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+      userDefinedStreams.size should be(1)
     }
   }
 }
