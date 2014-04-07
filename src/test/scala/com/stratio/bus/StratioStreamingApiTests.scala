@@ -22,6 +22,8 @@ class StratioStreamingApiTests
   zookeeperClient.start()
   val zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
   lazy val streamingAPI = StratioStreamingAPIFactory.create().initialize()
+  val testStreamName = "unitTestsStream"
+  val internalTestStreamName = "stratio_"
 
 
   override def beforeAll() {
@@ -48,31 +50,48 @@ class StratioStreamingApiTests
         StratioStreamingAPIFactory.create().initialize()
       }
     }
-
-    it("should throw a SecurityException when the user tries to perform an operation in an internal stream") {
-      val internalStreamName = "stratio_whatever"
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-
-      intercept [StratioAPISecurityException] {
-        streamingAPI.createStream(internalStreamName, columnList)
-      }
-    }
   }
 
   describe("The create operation") {
     it("should create a new stream when the stream does not exist") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val streamName = "testStream"
+      
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
       try {
-        streamingAPI.createStream(streamName, columnList)
+        streamingAPI.createStream(testStreamName, columnList)
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
       userDefinedStreams.size should be(1)
+    }
+
+    it("should throw a StratioEngineOperationException when creating a stream that already exists") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      intercept [StratioEngineOperationException] {
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.createStream(testStreamName, columnList)
+      }
+    }
+
+    it("should throw a StratioAPISecurityException when creating a stream with the stratio_ prefix") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      intercept [StratioAPISecurityException] {
+        streamingAPI.createStream(internalTestStreamName, columnList)
+      }
+    }
+
+    it("should throw a StratioEngineStatusException when streaming engine is not running") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      intercept [StratioAPISecurityException] {
+        streamingAPI.createStream(internalTestStreamName, columnList)
+      }
     }
   }
 }
