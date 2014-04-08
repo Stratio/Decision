@@ -1,13 +1,12 @@
 package com.stratio.bus.kafka
 
-import kafka.serializer._
+import kafka.serializer.DefaultDecoder
 import java.util.Properties
 import kafka.utils.Logging
 import scala.collection.JavaConversions._
 import kafka.consumer.{KafkaStream, Consumer, ConsumerConfig, Whitelist}
-import scala.concurrent.{ExecutionContext, Future}
-import ExecutionContext.Implicits.global
 import scala.Predef._
+import com.stratio.streaming.commons.messages.StratioStreamingMessage
 
 class KafkaConsumer(topic: String,
                      zookeeperConnect: String,
@@ -25,9 +24,9 @@ class KafkaConsumer(topic: String,
 
   val filterSpec = new Whitelist(topic)
 
-  val stream = connector.createMessageStreamsByFilter(filterSpec, 1, new DefaultDecoder(), new DefaultDecoder()).get(0)
+  val stream = connector.createMessageStreamsByFilter(filterSpec, 1, new DefaultDecoder(), new JsonGenericDecoder).get(0)
 
-  def read(write: (Array[Byte])=>Unit) = {
+  /*def read(write: (Array[Byte])=>Unit) = {
      Future {
       for(messageAndTopic <- stream) {
         try {
@@ -43,7 +42,7 @@ class KafkaConsumer(topic: String,
       }
      }
 
-  }
+  }*/
 
   def close() {
     connector.shutdown()

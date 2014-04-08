@@ -13,7 +13,6 @@ import scala.collection.JavaConversions._
 class StratioStreamingApiTests
   extends FunSpec
   with ShouldMatchers
-  with BeforeAndAfterAll 
   with BeforeAndAfterEach {
 
   val zookeeperCluster = "localhost:2181"
@@ -26,11 +25,6 @@ class StratioStreamingApiTests
   val internalTestStreamName = "stratio_"
 
 
-  /*override def beforeAll() {
-    if (!zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH))
-      zookeeperClient.create().forPath(ZK_EPHEMERAL_NODE_PATH)
-  }*/
-  
   override def beforeEach() {
     if (!zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH))
       zookeeperClient.create().forPath(ZK_EPHEMERAL_NODE_PATH)

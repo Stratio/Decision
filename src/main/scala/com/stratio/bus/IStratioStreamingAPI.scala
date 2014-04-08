@@ -1,11 +1,12 @@
 package com.stratio.bus
 
+import _root_.kafka.consumer.KafkaStream
 import com.stratio.streaming.commons.streams.StratioStream
 import java.util.List
 import com.stratio.bus.messaging.{ColumnNameValue, ColumnNameType}
 import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineStatusException, StratioEngineOperationException}
 import com.stratio.bus.dto.StratioQueryStream
-import com.stratio.streaming.commons.messages.ColumnNameTypeValue
+import com.stratio.streaming.commons.messages.{StratioStreamingMessage, ColumnNameTypeValue}
 
 trait IStratioStreamingAPI {
   /**
@@ -79,7 +80,7 @@ trait IStratioStreamingAPI {
   @throws(classOf[StratioEngineStatusException])
   @throws(classOf[StratioAPISecurityException])
   @throws(classOf[StratioEngineOperationException])
-  def listenStream(streamName: String)
+  def listenStream(streamName: String): KafkaStream[Array[Byte], StratioStreamingMessage]
 
   /**
    * Stops listening to a stream.

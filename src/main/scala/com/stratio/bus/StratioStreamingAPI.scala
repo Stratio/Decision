@@ -1,5 +1,6 @@
 package com.stratio.bus
 
+import _root_.kafka.consumer.KafkaStream
 import com.typesafe.config.ConfigFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
@@ -95,6 +96,8 @@ class StratioStreamingAPI
       .build()
     checkSecurityConstraints(listenStreamMessage)
     syncOperation.performSyncOperation(listenStreamMessage)
+    val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster)
+    kafkaConsumer.stream
   }
 
   def stopListenStream(streamName: String) = {
@@ -157,7 +160,7 @@ object StratioStreamingAPI {
   var streamingUpAndRunning = false
 
   lazy val kafkaProducer = new KafkaProducer(TOPICS, kafkaBroker)
-  lazy val kafkaConsumer = new KafkaConsumer(LIST_STREAMS_TOPIC, zookeeperCluster)
+  //lazy val kafkaConsumer = new KafkaConsumer(LIST_STREAMS_TOPIC, zookeeperCluster)
  
 
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
