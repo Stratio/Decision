@@ -6,9 +6,9 @@ import com.google.gson.reflect.TypeToken
 import java.util
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
 
-class JsonGenericDecoder extends Decoder[StratioStreamingMessage] {
-    def fromBytes(bytes: Array[Byte]): StratioStreamingMessage = {
-      //val typeOfT = new TypeToken[util.Collection[StratioStreamingMessage]](){}.getType()
-      new Gson().fromJson(new String(bytes), classOf[StratioStreamingMessage])
+class JsonGenericDecoder[T] extends Decoder[T] {
+    def fromBytes(bytes: Array[Byte]): T = {
+      val typeOfT = new TypeToken[StratioStreamingMessage](){}.getType()
+      new Gson().fromJson(new String(bytes), typeOfT)
     }
 }

@@ -80,7 +80,7 @@ trait IStratioStreamingAPI {
   @throws(classOf[StratioEngineStatusException])
   @throws(classOf[StratioAPISecurityException])
   @throws(classOf[StratioEngineOperationException])
-  def listenStream(streamName: String): KafkaStream[Array[Byte], StratioStreamingMessage]
+  def listenStream[T](streamName: String): KafkaStream[Array[Byte], T]
 
   /**
    * Stops listening to a stream.
