@@ -1,6 +1,6 @@
 package com.stratio.bus.kafka
 
-import kafka.serializer.DefaultDecoder
+import kafka.serializer.{StringDecoder, DefaultDecoder}
 import java.util.Properties
 import kafka.utils.Logging
 import scala.collection.JavaConversions._
@@ -26,7 +26,7 @@ class KafkaConsumer(topic: String,
   val filterSpec = new Whitelist(topic)
 
 
-  val stream = connector.createMessageStreamsByFilter(filterSpec, 1, new DefaultDecoder(), new JsonGenericDecoder()).get(0)
+  val stream = connector.createMessageStreamsByFilter(filterSpec, 1, new StringDecoder(), new JsonGenericDecoder()).get(0)
 
   /*def read(write: (Array[Byte])=>Unit) = {
      Future {
