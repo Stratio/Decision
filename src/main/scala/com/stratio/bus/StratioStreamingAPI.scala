@@ -24,7 +24,7 @@ import com.stratio.bus.messaging.InsertMessageBuilder
 import com.stratio.bus.messaging.MessageBuilderWithColumns
 import com.stratio.bus.kafka.KafkaProducer
 import com.stratio.bus.dto.StratioQueryStream
-import com.stratio.bus.messaging.AddQueryMessageBuilder
+import com.stratio.bus.messaging.QueryMessageBuilder
 import com.stratio.bus.zookeeper.ZookeeperConsumer
 
 class StratioStreamingAPI
@@ -56,33 +56,24 @@ class StratioStreamingAPI
 
   def addQuery(streamName: String, query: String) = {
     checkStreamingStatus()
-    val addQueryStreamMessage = AddQueryMessageBuilder(sessionId).build(streamName, query)
+    val operation = ADD_QUERY.toLowerCase
+    val addQueryStreamMessage = QueryMessageBuilder(sessionId).build(streamName, query, operation)
     checkSecurityConstraints(addQueryStreamMessage)
     syncOperation.performSyncOperation(addQueryStreamMessage)
   }
 
   def removeQuery(streamName: String, queryId: String) = {
-    //TODO IGUAL QUE ADDQUERY!!!!!!!!!!
     checkStreamingStatus()
     val operation = REMOVE_QUERY.toLowerCase
-    val removeQueryMessage = builder.withOperation(operation)
-        .withStreamName(streamName)
-        .withSessionId(sessionId)
-        .withRequest(queryId)
-        .build()
+    val removeQueryMessage = QueryMessageBuilder(sessionId).build(streamName, queryId, operation)
     checkSecurityConstraints(removeQueryMessage)
     syncOperation.performSyncOperation(removeQueryMessage)
   }
 
-
-  //TODO REFACTOR BUILDERS!!!!!!!!!!!!
   def dropStream(streamName: String) = {
     checkStreamingStatus()
     val operation = DROP.toLowerCase
-    val dropStreamMessage = builder.withOperation(operation)
-      .withStreamName(streamName)
-      .withSessionId(sessionId)
-      .build()
+    val dropStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     checkSecurityConstraints(dropStreamMessage)
     syncOperation.performSyncOperation(dropStreamMessage)
   }
@@ -90,10 +81,7 @@ class StratioStreamingAPI
   def listenStream(streamName: String) = {
     checkStreamingStatus()
     val operation = LISTEN.toLowerCase
-    val listenStreamMessage = builder.withOperation(operation)
-      .withStreamName(streamName)
-      .withSessionId(sessionId)
-      .build()
+    val listenStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     checkSecurityConstraints(listenStreamMessage)
     syncOperation.performSyncOperation(listenStreamMessage)
     val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster)
@@ -104,10 +92,7 @@ class StratioStreamingAPI
   def stopListenStream(streamName: String) = {
     checkStreamingStatus()
     val operation = STOP_LISTEN.toLowerCase
-    val stopListenStreamMessage = builder.withOperation(operation)
-      .withStreamName(streamName)
-      .withSessionId(sessionId)
-      .build()
+    val stopListenStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     checkSecurityConstraints(stopListenStreamMessage)
     shutdownKafkaConsumerAndRemoveStreamingListener(streamName)
     syncOperation.performSyncOperation(stopListenStreamMessage)
