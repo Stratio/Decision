@@ -87,7 +87,7 @@ class StratioStreamingAPI
     syncOperation.performSyncOperation(dropStreamMessage)
   }
 
-  def listenStream[T](streamName: String) = {
+  def listenStream(streamName: String) = {
     checkStreamingStatus()
     val operation = LISTEN.toLowerCase
     val listenStreamMessage = builder.withOperation(operation)
@@ -96,7 +96,7 @@ class StratioStreamingAPI
       .build()
     checkSecurityConstraints(listenStreamMessage)
     syncOperation.performSyncOperation(listenStreamMessage)
-    val kafkaConsumer = new KafkaConsumer[T](streamName, zookeeperCluster)
+    val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster)
     kafkaConsumer.stream
   }
 

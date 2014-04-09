@@ -7,8 +7,9 @@ import scala.collection.JavaConversions._
 import kafka.consumer.{KafkaStream, Consumer, ConsumerConfig, Whitelist}
 import scala.Predef._
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
+import scala.reflect.ClassTag
 
-class KafkaConsumer[T](topic: String,
+class KafkaConsumer(topic: String,
                      zookeeperConnect: String,
                      groupId: String = "1111",
                      readFromStartOfStream: Boolean = true
@@ -24,7 +25,8 @@ class KafkaConsumer[T](topic: String,
 
   val filterSpec = new Whitelist(topic)
 
-  val stream = connector.createMessageStreamsByFilter(filterSpec, 1, new DefaultDecoder(), new JsonGenericDecoder[T]).get(0)
+
+  val stream = connector.createMessageStreamsByFilter(filterSpec, 1, new DefaultDecoder(), new JsonGenericDecoder()).get(0)
 
   /*def read(write: (Array[Byte])=>Unit) = {
      Future {
