@@ -97,18 +97,29 @@ class StratioStreamingAPI
     checkSecurityConstraints(listenStreamMessage)
     syncOperation.performSyncOperation(listenStreamMessage)
     val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster)
+    streamingListeners.put(streamName, kafkaConsumer)
     kafkaConsumer.stream
   }
 
   def stopListenStream(streamName: String) = {
     checkStreamingStatus()
     val operation = STOP_LISTEN.toLowerCase
-    val listenStreamMessage = builder.withOperation(operation)
+    val stopListenStreamMessage = builder.withOperation(operation)
       .withStreamName(streamName)
       .withSessionId(sessionId)
       .build()
-    checkSecurityConstraints(listenStreamMessage)
-    syncOperation.performSyncOperation(listenStreamMessage)
+    checkSecurityConstraints(stopListenStreamMessage)
+    shutdownKafkaConsumerAndRemoveStreamingListener(streamName)
+    syncOperation.performSyncOperation(stopListenStreamMessage)
+  }
+
+
+  def shutdownKafkaConsumerAndRemoveStreamingListener(streamName: String) {
+    val kafkaConsumer = streamingListeners.get(streamName)
+    kafkaConsumer match {
+      case Some(consumer) => consumer.close()
+    }
+    streamingListeners.remove(streamName)
   }
 
   def queriesFromStream(stream: String): List[StratioQueryStream] = {
@@ -158,6 +169,7 @@ object StratioStreamingAPI {
   val zookeeperPort = config.getString("zookeeper.port")
   val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
   var streamingUpAndRunning = false
+  val streamingListeners = scala.collection.mutable.Map[String, KafkaConsumer]()
 
   lazy val kafkaProducer = new KafkaProducer(TOPICS, kafkaBroker)
   //lazy val kafkaConsumer = new KafkaConsumer(LIST_STREAMS_TOPIC, zookeeperCluster)
