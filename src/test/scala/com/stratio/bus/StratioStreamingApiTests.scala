@@ -6,9 +6,12 @@ import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.CuratorFrameworkFactory
 import com.stratio.streaming.commons.constants.STREAMING._
 import com.stratio.bus.zookeeper.ZookeeperConsumer
-import com.stratio.bus.messaging.ColumnNameType
+import com.stratio.bus.messaging.{ColumnNameValue, ColumnNameType}
 import com.stratio.streaming.commons.constants.ColumnType
 import scala.collection.JavaConversions._
+import util.control.Breaks._
+import java.util
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue
 
 class StratioStreamingApiTests
   extends FunSpec
@@ -210,8 +213,7 @@ class StratioStreamingApiTests
       }
     }
   }
-  
-  
+
   describe("The remove query operation") {
     it("should remove the queries from an existing stream") {
       val alarmsStream = "alarms"
@@ -297,7 +299,58 @@ class StratioStreamingApiTests
     }
   }
 
+  describe("The listen operation") {
+    it("should return the stream flow") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", new Integer(1))
+      val secondColumnValue = new ColumnNameValue("column2", "testValue")
+      val streamData = Seq(firstColumnValue, secondColumnValue)
+      try {
+        streamingAPI.createStream(testStreamName, columnList)
+        val streams = streamingAPI.listenStream(testStreamName)
+        streamingAPI.insertData(testStreamName, streamData)
+        for (stream <- streams) {
+          val firstColumn = stream.message.getColumns.get(0)
+          firstColumn.getColumn should be("column1")
+          firstColumn.getValue should be(1)
+          firstColumn.getType should be("INT")
+          val secondColumn = stream.message.getColumns.get(1)
+          secondColumn.getColumn should be("column2")
+          secondColumn.getValue should be("testValue")
+          secondColumn.getType should be("STRING")
+          break
+        }
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+        case _ => assert(true)
+      } finally {
+        streamingAPI.stopListenStream(testStreamName)
+      }
+    }
 
+    it("should throw a StratioEngineStatusException when streaming engine is not running") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", new Integer(1))
+      val secondColumnValue = new ColumnNameValue("column2", "testValue")
+      val streamData = Seq(firstColumnValue, secondColumnValue)
+      streamingAPI.createStream(testStreamName, columnList)
+      removeEphemeralNode()
+      Thread.sleep(1000)
+      intercept [StratioEngineStatusException] {
+        streamingAPI.listenStream(testStreamName)
+      }
+    }
+
+    it("should throw a StratioAPISecurityException when listening to an internal stream") {
+      intercept [StratioAPISecurityException] {
+        streamingAPI.listenStream(internalTestStreamName)
+      }
+    }
+  }
 
   def removeEphemeralNode() {
     zookeeperConsumer.removeZNode(ZK_EPHEMERAL_NODE_PATH)

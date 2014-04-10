@@ -79,7 +79,6 @@ trait IStratioStreamingAPI {
    */
   @throws(classOf[StratioEngineStatusException])
   @throws(classOf[StratioAPISecurityException])
-  @throws(classOf[StratioEngineOperationException])
   def listenStream(streamName: String): KafkaStream[String, StratioStreamingMessage]
 
   /**
