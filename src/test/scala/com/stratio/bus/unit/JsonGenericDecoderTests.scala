@@ -1,4 +1,4 @@
-package com.stratio.bus
+package com.stratio.bus.unit
 
 import org.scalatest._
 import com.stratio.bus.kafka.JsonGenericDecoder

@@ -1,4 +1,4 @@
-package com.stratio.bus
+package com.stratio.bus.unit
 
 import org.scalatest.{ShouldMatchers, FunSpec}
 import java.util.UUID

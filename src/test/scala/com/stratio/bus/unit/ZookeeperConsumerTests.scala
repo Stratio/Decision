@@ -1,4 +1,4 @@
-package com.stratio.bus
+package com.stratio.bus.unit
 
 import org.scalatest.{BeforeAndAfterAll, GivenWhenThen, ShouldMatchers, FunSpec}
 import scala.concurrent._

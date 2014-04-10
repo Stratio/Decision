@@ -1,4 +1,4 @@
-package com.stratio.bus
+package com.stratio.bus.integration
 
 import org.scalatest._
 import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioStreamingException, StratioEngineStatusException, StratioAPISecurityException}
@@ -12,6 +12,7 @@ import scala.collection.JavaConversions._
 import util.control.Breaks._
 import java.util
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue
+import com.stratio.bus.StratioStreamingAPIFactory
 
 class StratioStreamingApiTests
   extends FunSpec
@@ -192,7 +193,7 @@ class StratioStreamingApiTests
       streamingAPI.createStream(alarmsStream, columnList)
       streamingAPI.createStream(testStreamName, columnList)
       removeEphemeralNode()
-      Thread.sleep(1000)
+      Thread.sleep(2000)
       intercept [StratioEngineStatusException] {
         streamingAPI.addQuery(testStreamName, theQuery)
       }
