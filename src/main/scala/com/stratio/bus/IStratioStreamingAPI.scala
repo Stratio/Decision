@@ -87,7 +87,6 @@ trait IStratioStreamingAPI {
    */
   @throws(classOf[StratioEngineStatusException])
   @throws(classOf[StratioAPISecurityException])
-  @throws(classOf[StratioEngineOperationException])
   def stopListenStream(streamName: String)
 
   /**
@@ -108,6 +107,7 @@ trait IStratioStreamingAPI {
    * Gets a list of all the stream that currently exists.
    * @return a list with the streams
    */
+  @throws(classOf[StratioEngineStatusException])
   def listStreams(): List[StratioStream]
 
   //def saveToCassandra(streamName: String)

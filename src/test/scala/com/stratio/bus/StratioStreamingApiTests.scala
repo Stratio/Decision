@@ -152,9 +152,6 @@ class StratioStreamingApiTests
     }
   }
 
-  // TODO
-  // describe("The insert operation")
-
   describe("The add query operation") {
     it("should add new queries to an existing stream") {
       val alarmsStream = "alarms"
@@ -310,6 +307,7 @@ class StratioStreamingApiTests
       try {
         streamingAPI.createStream(testStreamName, columnList)
         val streams = streamingAPI.listenStream(testStreamName)
+        Thread.sleep(2000)
         streamingAPI.insertData(testStreamName, streamData)
         for (stream <- streams) {
           val firstColumn = stream.message.getColumns.get(0)
@@ -348,6 +346,55 @@ class StratioStreamingApiTests
     it("should throw a StratioAPISecurityException when listening to an internal stream") {
       intercept [StratioAPISecurityException] {
         streamingAPI.listenStream(internalTestStreamName)
+      }
+    }
+  }
+
+  describe("The stop listen operation") {
+    it("should stop the stream flow") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", new Integer(1))
+      val secondColumnValue = new ColumnNameValue("column2", "testValue")
+      val streamData = Seq(firstColumnValue, secondColumnValue)
+      streamingAPI.createStream(testStreamName, columnList)
+      val streams = streamingAPI.listenStream(testStreamName)
+      Thread.sleep(2000)
+      streamingAPI.insertData(testStreamName, streamData)
+      streamingAPI.stopListenStream(testStreamName)
+      for (stream <- streams) {
+        fail()
+      }
+      assert(true)
+    }
+
+    it("should throw a StratioEngineStatusException when streaming engine is not running") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      streamingAPI.createStream(testStreamName, columnList)
+      streamingAPI.listenStream(testStreamName)
+      removeEphemeralNode()
+      Thread.sleep(1000)
+      intercept [StratioEngineStatusException] {
+        streamingAPI.stopListenStream(testStreamName)
+      }
+    }
+
+    it("should throw a StratioAPISecurityException when stop listening to an internal status") {
+      intercept [StratioAPISecurityException] {
+        streamingAPI.stopListenStream(internalTestStreamName)
+      }
+    }
+  }
+
+  describe("The list operation") {
+    it("should throw a StratioEngineStatusException when streaming engine is not running") {
+      removeEphemeralNode()
+      Thread.sleep(1000)
+      intercept[StratioEngineStatusException] {
+        streamingAPI.listStreams()
       }
     }
   }

@@ -112,6 +112,7 @@ class StratioStreamingAPI
     val kafkaConsumer = streamingListeners.get(streamName)
     kafkaConsumer match {
       case Some(consumer) => consumer.close()
+      case _ => //
     }
     streamingListeners.remove(streamName)
   }
@@ -137,6 +138,7 @@ class StratioStreamingAPI
   }
 
   def listStreams(): List[StratioStream] = {
+    checkStreamingStatus()
     val operation = LIST.toLowerCase
     val listStreamMessage = builder.withOperation(operation)
       .withSessionId(sessionId)
