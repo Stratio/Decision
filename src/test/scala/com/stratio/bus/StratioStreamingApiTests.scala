@@ -26,8 +26,11 @@ class StratioStreamingApiTests
 
 
   override def beforeEach() {
-    if (!zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH))
+    if (!zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH)) {
       zookeeperClient.create().forPath(ZK_EPHEMERAL_NODE_PATH)
+      //Delay to get rid of flakiness
+      Thread.sleep(1000)
+    }
     cleanStratioStreamingEngine()
   }
 
@@ -150,16 +153,16 @@ class StratioStreamingApiTests
   // describe("The insert operation")
 
   describe("The add query operation") {
-    it("should add a new query to an existing stream") {
+    it("should add new queries to an existing stream") {
       val alarmsStream = "alarms"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val theQuery = s"from $testStreamName select column1, column2 insert into alarms for current-events"
+      val theFirstQuery = s"from $testStreamName select column1, column2 insert into $alarmsStream for current-events"
       try {
         streamingAPI.createStream(alarmsStream, columnList)
         streamingAPI.createStream(testStreamName, columnList)
-        streamingAPI.addQuery(testStreamName, theQuery)
+        streamingAPI.addQuery(testStreamName, theFirstQuery)
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
@@ -195,7 +198,7 @@ class StratioStreamingApiTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when adding a query to a non user-defined stream", Tag("wip")) {
+    it("should throw a StratioAPISecurityException when adding a query to a non user-defined stream") {
       val internalStream = "stratio_stats_base"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
@@ -204,6 +207,54 @@ class StratioStreamingApiTests
       streamingAPI.createStream(testStreamName, columnList)
       intercept [StratioAPISecurityException] {
         streamingAPI.addQuery(internalStream, theQuery)
+      }
+    }
+  }
+  
+  
+  describe("The remove query operation") {
+    it("should remove the queries from an existing stream") {
+      val alarmsStream = "alarms"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val theQuery = s"from $testStreamName select column1, column2 insert into $alarmsStream for current-events"
+      try {
+        streamingAPI.createStream(alarmsStream, columnList)
+        streamingAPI.createStream(testStreamName, columnList)
+        val queryId = streamingAPI.addQuery(testStreamName, theQuery)
+        streamingAPI.removeQuery(testStreamName, queryId)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+
+      theNumberOfQueriesOfStream(testStreamName) should be(0)
+    }
+
+    it("should throw a StratioEngineOperationException when removing a non existing query") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val nonExistingQueryId = "1234"
+      intercept [StratioEngineOperationException] {
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.removeQuery(testStreamName, nonExistingQueryId)
+      }
+    }
+
+    it("should throw a StratioEngineStatusException when streaming engine is not running") {
+      val alarmsStream = "alarms"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val theQuery = s"from $testStreamName select column1, column2 insert into $alarmsStream for current-events"
+      streamingAPI.createStream(alarmsStream, columnList)
+      streamingAPI.createStream(testStreamName, columnList)
+      val queryId = streamingAPI.addQuery(testStreamName, theQuery)
+      removeEphemeralNode()
+      Thread.sleep(1000)
+      intercept [StratioEngineStatusException] {
+        streamingAPI.removeQuery(testStreamName, queryId)
       }
     }
   }

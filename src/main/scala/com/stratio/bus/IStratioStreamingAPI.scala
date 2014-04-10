@@ -48,11 +48,12 @@ trait IStratioStreamingAPI {
    * Adds a query to a stream.
    * @param streamName
    * @param query
+   * @return the query Id
    */
   @throws(classOf[StratioEngineStatusException])
   @throws(classOf[StratioAPISecurityException])
   @throws(classOf[StratioEngineOperationException])
-  def addQuery(streamName: String, query: String)
+  def addQuery(streamName: String, query: String): String
 
   /**
    * Removes a query from a stream.
@@ -60,7 +61,6 @@ trait IStratioStreamingAPI {
    * @param queryId
    */
   @throws(classOf[StratioEngineStatusException])
-  @throws(classOf[StratioAPISecurityException])
   @throws(classOf[StratioEngineOperationException])
   def removeQuery(streamName: String, queryId: String)
 

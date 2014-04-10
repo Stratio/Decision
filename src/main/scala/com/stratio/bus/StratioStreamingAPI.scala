@@ -1,6 +1,5 @@
 package com.stratio.bus
 
-import _root_.kafka.consumer.KafkaStream
 import com.typesafe.config.ConfigFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
@@ -54,12 +53,22 @@ class StratioStreamingAPI
     asyncOperation.performAsyncOperation(insertStreamMessage)
   }
 
-  def addQuery(streamName: String, query: String) = {
+  def addQuery(streamName: String, query: String): String = {
     checkStreamingStatus()
     val operation = ADD_QUERY.toLowerCase
     val addQueryStreamMessage = QueryMessageBuilder(sessionId).build(streamName, query, operation)
     checkSecurityConstraints(addQueryStreamMessage)
     syncOperation.performSyncOperation(addQueryStreamMessage)
+    getQueryId(streamName, query)
+  }
+
+  def getQueryId(streamName: String, query: String): String = {
+    val queries = queriesFromStream(streamName)
+    val addedQuery = queries.find(theQuery => theQuery.query.equals(query))
+    addedQuery match {
+      case Some(q) => q.queryId
+      case _ => ""
+    }
   }
 
   def removeQuery(streamName: String, queryId: String) = {
