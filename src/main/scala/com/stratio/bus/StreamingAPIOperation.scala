@@ -8,11 +8,10 @@ import scala.concurrent._
 import com.stratio.bus.kafka.KafkaProducer
 import com.stratio.streaming.commons.exceptions.StratioEngineOperationException
 import com.stratio.bus.zookeeper.ZookeeperConsumer
-import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
 
-class StreamingAPIOperation {
-  protected val config = ConfigFactory.load()
+class StreamingAPIOperation
+  extends StratioStreamingAPIConfig{
   protected val log = LoggerFactory.getLogger(getClass)
   protected val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
 

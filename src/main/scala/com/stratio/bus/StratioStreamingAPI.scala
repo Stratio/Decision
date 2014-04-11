@@ -1,6 +1,5 @@
 package com.stratio.bus
 
-import com.typesafe.config.ConfigFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import com.stratio.streaming.commons.messages.{ColumnNameTypeValue, StratioStreamingMessage}
@@ -152,8 +151,8 @@ class StratioStreamingAPI
   }
 }
 
-object StratioStreamingAPI {
-  val config = ConfigFactory.load()
+object StratioStreamingAPI
+ extends StratioStreamingAPIConfig {
   val streamingTopicName = TOPICS
   val sessionId = "" + System.currentTimeMillis()
   val brokerServer = config.getString("broker.server")
