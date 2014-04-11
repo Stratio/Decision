@@ -11,9 +11,8 @@ import com.stratio.bus.zookeeper.ZookeeperConsumer
 import org.slf4j.LoggerFactory
 
 class StreamingAPIOperation
-  extends StratioStreamingAPIConfig{
+  extends StratioStreamingAPIConfig {
   protected val log = LoggerFactory.getLogger(getClass)
-  protected val streamingAckTimeOut = config.getString("streaming.ack.timeout.in.seconds").toInt
 
   protected def addMessageToKafkaTopic(message: StratioStreamingMessage,
                                      creationUniqueId: String,
@@ -34,7 +33,7 @@ class StreamingAPIOperation
       message.getOperation.toLowerCase,
       message.getRequest_id)
     try {
-      Await.result(zookeeperConsumer.readZNode(zNodeFullPath), streamingAckTimeOut seconds)
+      Await.result(zookeeperConsumer.readZNode(zNodeFullPath), streamingAckTimeOutInSeconds seconds)
       val response = zookeeperConsumer.getZNodeData(zNodeFullPath)
       zookeeperConsumer.removeZNode(zNodeFullPath)
       response.get

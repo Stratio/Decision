@@ -155,8 +155,8 @@ object StratioStreamingAPI
  extends StratioStreamingAPIConfig {
   val streamingTopicName = TOPICS
   val sessionId = "" + System.currentTimeMillis()
-  val brokerServer = config.getString("broker.server")
-  val brokerPort = config.getString("broker.port")
+  val brokerServer = config.getString("kafka.server")
+  val brokerPort = config.getString("kafka.port")
   val kafkaBroker = s"$brokerServer:$brokerPort"
   val zookeeperServer = config.getString("zookeeper.server")
   val zookeeperPort = config.getString("zookeeper.port")
