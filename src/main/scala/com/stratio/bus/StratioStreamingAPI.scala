@@ -108,7 +108,7 @@ class StratioStreamingAPI
   }
 
 
-  def shutdownKafkaConsumerAndRemoveStreamingListener(streamName: String) {
+  private def shutdownKafkaConsumerAndRemoveStreamingListener(streamName: String) {
     val kafkaConsumer = streamingListeners.get(streamName)
     kafkaConsumer match {
       case Some(consumer) => consumer.close()
@@ -118,7 +118,6 @@ class StratioStreamingAPI
   }
 
   def queriesFromStream(stream: String): List[StratioQueryStream] = {
-    checkStreamingStatus()
     val stratioStreams = listStreams().toList
     val stratioStream = stratioStreams.find(element => element.getStreamName.equals(stream))
     stratioStream match {
@@ -128,7 +127,6 @@ class StratioStreamingAPI
   }
 
   def columnsFromStream(stream: String): List[ColumnNameTypeValue] = {
-    checkStreamingStatus()
     val stratioStreams = listStreams().toList
     val stratioStream = stratioStreams.find(element => element.getStreamName.equals(stream))
     stratioStream match {
@@ -166,18 +164,13 @@ object StratioStreamingAPI {
   val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
   var streamingUpAndRunning = false
   val streamingListeners = scala.collection.mutable.Map[String, KafkaConsumer]()
-
   lazy val kafkaProducer = new KafkaProducer(TOPICS, kafkaBroker)
-  //lazy val kafkaConsumer = new KafkaConsumer(LIST_STREAMS_TOPIC, zookeeperCluster)
- 
-
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
   lazy val zookeeperConsumer = {
     zookeeperClient.start()
     ZookeeperConsumer(zookeeperClient)
   }
-
   lazy val syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer)
   lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaProducer)
   lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer)

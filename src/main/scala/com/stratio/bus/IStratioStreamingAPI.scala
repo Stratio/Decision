@@ -89,6 +89,8 @@ trait IStratioStreamingAPI {
   @throws(classOf[StratioAPISecurityException])
   def stopListenStream(streamName: String)
 
+
+
   /**
    * Gets a list of the columns from a given stream.
    * @param stream
