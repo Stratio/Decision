@@ -4,8 +4,18 @@
   <groupId>com.stratio.streaming</groupId>
   <artifactId>StratioStreamingCommons</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.0.1-SNAPSHOT</version>
   <name>StratioStreamingCommons</name>
+  <distributionManagement>
+    <repository>
+       <id>stratio-releases</id>
+       <url>http://nexus.strat.io:8081/nexus/content/repositories/releases</url>
+    </repository>
+    <snapshotRepository>
+       <id>stratio-snapshots</id>
+       <url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
   <dependencies>
   	<dependency>
   		<groupId>com.google.guava</groupId>
