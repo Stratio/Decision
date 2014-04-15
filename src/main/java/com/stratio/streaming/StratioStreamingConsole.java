@@ -71,8 +71,9 @@ public class StratioStreamingConsole {
             
             if (line.startsWith(STREAM_OPERATIONS.ACTION.LISTEN.toLowerCase())
             		|| line.startsWith(STREAM_OPERATIONS.ACTION.STOP_LISTEN.toLowerCase())
-            		|| line.startsWith(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA.toLowerCase()) 
-            		|| line.startsWith(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR.toLowerCase()) 
+            		|| line.startsWith(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA.toLowerCase())
+                    /* [Commented out by Alberto R. -> SAVETO_DATACOLLECTOR operation removed from Commons]
+            		|| line.startsWith(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR.toLowerCase())*/
             		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.ADD_QUERY.toLowerCase())
             		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY.toLowerCase()) 
             		|| line.startsWith(STREAM_OPERATIONS.DEFINITION.ALTER.toLowerCase()) 
@@ -292,7 +293,8 @@ public class StratioStreamingConsole {
 			
 			if ((operation.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.DROP)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)
-					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)
+                    /* [Commented out by Alberto R. -> SAVETO_DATACOLLECTOR operation removed from Commons]
+					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)*/
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.LISTEN)
 					|| operation.equalsIgnoreCase(STREAM_OPERATIONS.ACTION.STOP_LISTEN))
 				&& command.split("@").length != 2) {

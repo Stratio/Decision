@@ -203,8 +203,9 @@ public class StreamingEngine {
 		JavaDStream<StratioStreamingMessage> saveToCassandra_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA))
 																	.map(keepPayloadFromMessageFunction);
 		
+		/* [Commented out by Alberto R. -> SAVETO_DATACOLLECTOR operation removed from Commons]
 		JavaDStream<StratioStreamingMessage> saveToDataCollector_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR))
-																	.map(keepPayloadFromMessageFunction);
+																	.map(keepPayloadFromMessageFunction);*/
 		
 		JavaDStream<StratioStreamingMessage> list_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.LIST))
 																	.map(keepPayloadFromMessageFunction);
@@ -229,8 +230,9 @@ public class StreamingEngine {
 		stop_listen_requests.foreachRDD(stopListenStreamFunction);
 		
 //		saveToCassandra_requests.foreachRDD(new SaveToCassandraStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster));
-		
-		saveToDataCollector_requests.foreachRDD(collectRequestForStatsFunction);
+
+/* [Commented out by Alberto R. -> SAVETO_DATACOLLECTOR operation removed from Commons]
+		saveToDataCollector_requests.foreachRDD(collectRequestForStatsFunction);*/
 		
 		list_requests.foreachRDD(listStreamsFunction);
 		

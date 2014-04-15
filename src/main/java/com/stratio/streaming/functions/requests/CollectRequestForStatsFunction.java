@@ -104,9 +104,10 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 		
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
 								resetValuesForOperation(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)));
-		
+
+		/* [Commented out by Alberto R. -> SAVETO_DATACOLLECTOR operation removed from Commons]
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
-								resetValuesForOperation(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)));
+								resetValuesForOperation(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR)));*/
 				
 		baseRequestsStream.send(SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STATS_NAMES.BASE), 
 								resetValuesForOperation(STREAM_OPERATIONS.DEFINITION.ADD_QUERY)));
@@ -149,8 +150,11 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 			return Integer.valueOf(53828);
 		case STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA:			
 			return Integer.valueOf(53829);
+
+        /* [Commented out by Alberto R. -> SAVETO_DATACOLLECTOR operation removed from Commons]
 		case STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR:			
-			return Integer.valueOf(53830);
+			return Integer.valueOf(53830);*/
+
 		case STREAM_OPERATIONS.DEFINITION.ADD_QUERY:			
 			return Integer.valueOf(53831);
 		case STREAM_OPERATIONS.DEFINITION.ALTER:			
