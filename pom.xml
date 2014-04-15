@@ -7,6 +7,16 @@
      <maven.compiler.source>1.7</maven.compiler.source>
      <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
+  <distributionManagement>
+     <repository>
+        <id>stratio-releases</id>
+        <url>http://nexus.strat.io:8081/nexus/content/repositories/releases</url>
+     </repository>
+     <snapshotRepository>
+        <id>stratio-snapshots</id>
+        <url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
+      </snapshotRepository>
+  </distributionManagement>
   <dependencies>
   	<dependency>
   		<groupId>org.apache.curator</groupId>
