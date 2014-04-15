@@ -44,6 +44,18 @@ How to start
   * To create the StratioBus distribution:
         sbt assembly
 
+  * To publish the artifact to a nexus repository you need to create a credentials file within the following directory: $USER_HOME/.ivy2.
+    The content of the file should be the following:
+
+     realm=Sonatype Nexus Repository Manager
+     host={yournexushost}
+     user={theuser}
+     password={thepassword}
+
+     To publish the artifact just type:
+
+       sbt publish
+
 Using the Bus
 =============
 
