@@ -14,6 +14,7 @@ import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
+import com.stratio.streaming.streams.StreamOperations;
 import com.stratio.streaming.utils.SiddhiUtils;
 
 public class CreateStreamFunction extends StratioStreamingBaseFunction {
@@ -29,16 +30,7 @@ public class CreateStreamFunction extends StratioStreamingBaseFunction {
 		super(siddhiManager, zookeeperCluster, kafkaCluster);
 	}
 	
-	private StreamDefinition buildDefineStreamSiddhiQL(StratioStreamingMessage request) {
-		
-		StreamDefinition newStream = QueryFactory.createStreamDefinition().name(request.getStreamName());
-		
-		for (ColumnNameTypeValue column : request.getColumns()) {
-			newStream.attribute(column.getColumn(), SiddhiUtils.decodeSiddhiType(column.getType()));			
-		}			
-		
-		return newStream;
-	}
+
 	
 
 	@Override
@@ -55,11 +47,7 @@ public class CreateStreamFunction extends StratioStreamingBaseFunction {
 				
 				try {
 										
-//					create stream in siddhi
-					getSiddhiManager().defineStream(buildDefineStreamSiddhiQL(request));
-					
-//					register stream in shared memory
-					SiddhiUtils.createStreamStatus(request.getStreamName(), getSiddhiManager());
+					StreamOperations.createStream(request, getSiddhiManager());
 					
 //					ack OK back to the bus
 					ackStreamingOperation(request, REPLY_CODES.OK);

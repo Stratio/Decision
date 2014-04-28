@@ -1,28 +1,37 @@
 package com.stratio.streaming.utils;
 
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.config.SiddhiConfiguration;
+import org.wso2.siddhi.query.api.QueryFactory;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.Attribute.Type;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
-import com.hazelcast.core.IMap;
-import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
-import com.stratio.streaming.streams.StreamStatus;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import com.stratio.streaming.streams.Casandra2PersistenceStore;
+import com.stratio.streaming.streams.StreamPersistence;
 
 public class SiddhiUtils {
 	
-	private static final String SIDDHI_TYPE_STRING 		= "STRING";
-	private static final String SIDDHI_TYPE_BOOLEAN 	= "BOOLEAN";
-	private static final String SIDDHI_TYPE_DOUBLE 		= "DOUBLE";
-	private static final String SIDDHI_TYPE_INT 		= "INTEGER";
-	private static final String SIDDHI_TYPE_LONG 		= "LONG";
-	private static final String SIDDHI_TYPE_FLOAT 		= "FLOAT";
+	private static Logger logger = LoggerFactory.getLogger(SiddhiUtils.class);
+	
+	
+	public static final String SIDDHI_TYPE_STRING 		= "STRING";
+	public static final String SIDDHI_TYPE_BOOLEAN 		= "BOOLEAN";
+	public static final String SIDDHI_TYPE_DOUBLE 		= "DOUBLE";
+	public static final String SIDDHI_TYPE_INT 			= "INTEGER";
+	public static final String SIDDHI_TYPE_LONG 		= "LONG";
+	public static final String SIDDHI_TYPE_FLOAT 		= "FLOAT";
+	
+	public static final String QUERY_PLAN_IDENTIFIER   = "StratioStreamingCEP-Cluster";
 	
 	
 	private SiddhiUtils() {
@@ -52,88 +61,119 @@ public class SiddhiUtils {
 		
 	}
 	
+	
+	public static String recoverStreamDefinition(StreamDefinition streamDefinition) {
+		
+		String attributesList = "";
+		
+		for (Attribute field: streamDefinition.getAttributeList()) {
+			attributesList += field.getName() + " " + field.getType().toString().toLowerCase() + ",";
+		}
+		
+		
+		return "define stream " + streamDefinition.getStreamId() + "(" + attributesList.substring(0, attributesList.length() -1) + ")";
+	}
+	
+	
+	public static StreamDefinition buildDefineStreamSiddhiQL(StratioStreamingMessage request) {
+		
+		StreamDefinition newStream = QueryFactory.createStreamDefinition().name(request.getStreamName());
+		
+		for (ColumnNameTypeValue column : request.getColumns()) {
+			newStream.attribute(column.getColumn(), SiddhiUtils.decodeSiddhiType(column.getType()));			
+		}			
+		
+		return newStream;
+	}
+	
+	public static boolean columnAlreadyExistsInStream(String columnName, StreamDefinition streamMetaData) {
+		
+		for(Attribute column:  streamMetaData.getAttributeList()) {
+			if (column.getName().equalsIgnoreCase(columnName)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	/**
+	 * 
+	 * - Instantiates the Siddhi CEP engine
+	 * - return the running CEP engine 
+	 * 
+	 * 
+	 * @return SiddhiManager
+	 */
+	public static SiddhiManager setupSiddhiManager() {
+		
+		
+		SiddhiConfiguration conf = new SiddhiConfiguration();	
+		conf.setInstanceIdentifier("StratioStreamingCEP-Instance-"+ UUID.randomUUID().toString());
+		conf.setQueryPlanIdentifier(QUERY_PLAN_IDENTIFIER);
+		conf.setDistributedProcessing(true);			
+		
+		
+		// Create Siddhi Manager
+		SiddhiManager siddhiManager = new SiddhiManager(conf);
+		
+		
+		siddhiManager.setPersistStore(new Casandra2PersistenceStore("node.stratio.com", "", ""));
+				
+		StreamPersistence.restoreLastRevision(siddhiManager);
+		
+		
+		return siddhiManager;						
+	}
+	
 	public static Object[] getOrderedValues(StreamDefinition streamMetaData, List<ColumnNameTypeValue> columns) throws AttributeNotExistException {
 		
 		Object[] orderedValues = new Object[streamMetaData.getAttributeList().size()];
 		
 		for (ColumnNameTypeValue column : columns) {
+
 			
-//			if attribute does not exist, a AttributeNotExistException exception wil be thrown
-			orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = column.getValue();
+//			if attribute does not exist, a AttributeNotExistException exception will be thrown
+			if (column.getValue() instanceof String) {
+				orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = decodeSiddhiValue((String) column.getValue(), streamMetaData.getAttributeType(column.getColumn()));
+			}
+			else {
+				orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = column.getValue();
+			}
+			
 		}
 
 		return orderedValues;
 		
 	}
-
 	
-	public static StreamStatus createStreamStatus(String streamName, SiddhiManager siddhiManager) {
+	
+	private static Object decodeSiddhiValue(String originalValue, Attribute.Type type) throws SiddhiPraserException {
 		
-		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
-		StreamStatus streamStatus = new StreamStatus(streamName, Boolean.TRUE);
-		streamStatusMap.put(streamName, streamStatus);
-		return streamStatus;
-		
-	}
-
-
-
-	public static StreamStatus getStreamStatus(String streamName, SiddhiManager siddhiManager) {	
-		
-		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
-		
-		if (streamStatusMap.get(streamName) != null) {
-			return (StreamStatus) streamStatusMap.get(streamName);
-		}
-		else {
-//			stream status does not exist, this is an special case
-//			the stream exists in siddhi becase a previous query has created it
-//			so we are going to register it as new
-			StreamStatus streamStatus = new StreamStatus(streamName, Boolean.FALSE);
-			streamStatusMap.put(streamName, streamStatus);
-			return streamStatus;
+		switch (type.toString()) {
+			case SIDDHI_TYPE_STRING:
+				return originalValue;
+			case SIDDHI_TYPE_BOOLEAN:
+				return Boolean.valueOf(originalValue);
+			case SIDDHI_TYPE_DOUBLE:
+				return Double.valueOf(originalValue);
+			case SIDDHI_TYPE_INT:
+				return Integer.valueOf(originalValue);
+			case SIDDHI_TYPE_LONG:
+				return Long.valueOf(originalValue);
+			case SIDDHI_TYPE_FLOAT:
+				return Float.valueOf(originalValue);
+			default:
+				throw new SiddhiPraserException("Unsupported Column type");
 		}
 		
 	}
 	
-	public static void addQueryToStreamStatus(String queryId, String query, String streamName, SiddhiManager siddhiManager) {
-		
-		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
-		StreamStatus streamStatus = (StreamStatus) streamStatusMap.get(streamName);
-		streamStatus.getAddedQueries().put(queryId, query);				
-		streamStatusMap.put(streamStatus.getStreamName(), streamStatus);
-		
-		
-	}
-	
-	public static String removeQueryInStreamStatus(String queryId, String streamName, SiddhiManager siddhiManager) {
-		
-		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
-		StreamStatus streamStatus = (StreamStatus) streamStatusMap.get(streamName);		
-		streamStatus.getAddedQueries().remove(queryId);		
-		streamStatusMap.put(streamStatus.getStreamName(), streamStatus);		
-		return queryId;
-	}
-	
-	public static void changeListenerStreamStatus(Boolean enabled, String streamName, SiddhiManager siddhiManager) {
-		
-		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
-		StreamStatus streamStatus = (StreamStatus) streamStatusMap.get(streamName);
-		streamStatus.setListen_enabled(enabled);
-		streamStatusMap.put(streamStatus.getStreamName(), streamStatus);
-		
-		
-	}
 	
 	
 	
-	public static void removeStreamStatus(String streamName, SiddhiManager siddhiManager) {
-		
-		IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
-		
-		streamStatusMap.remove(streamName);
-		
-	}
+
 	
 
 }

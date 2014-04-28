@@ -2,7 +2,6 @@ package com.stratio.streaming;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -14,19 +13,18 @@ import org.apache.spark.streaming.kafka.KafkaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.config.SiddhiConfiguration;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import ca.zmatrix.cli.ParseCmd;
 
+import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.stratio.streaming.commons.constants.BUS;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.functions.FilterMessagesByOperationFunction;
-import com.stratio.streaming.functions.KeepPayloadFromMessageFunction;
 import com.stratio.streaming.functions.dal.ListenStreamFunction;
+import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
 import com.stratio.streaming.functions.dal.StopListenStreamFunction;
 import com.stratio.streaming.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.streaming.functions.ddl.AlterStreamFunction;
@@ -35,8 +33,12 @@ import com.stratio.streaming.functions.ddl.DropStreamFunction;
 import com.stratio.streaming.functions.ddl.RemoveQueryToStreamFunction;
 import com.stratio.streaming.functions.dml.InsertIntoStreamFunction;
 import com.stratio.streaming.functions.dml.ListStreamsFunction;
+import com.stratio.streaming.functions.messages.FilterMessagesByOperationFunction;
+import com.stratio.streaming.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.streaming.functions.requests.CollectRequestForStatsFunction;
 import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
+import com.stratio.streaming.streams.StreamPersistence;
+import com.stratio.streaming.streams.StreamSharedStatus;
 import com.stratio.streaming.utils.SiddhiUtils;
 import com.stratio.streaming.utils.ZKUtils;
 
@@ -60,6 +62,7 @@ public class StreamingEngine {
 	
 	private static Logger logger = LoggerFactory.getLogger(StreamingEngine.class);
 	private static SiddhiManager siddhiManager;
+	private static JavaStreamingContext jssc;
 
 
 	public StreamingEngine() {
@@ -84,7 +87,7 @@ public class StreamingEngine {
 //        							.parm("--sparkMaster", "node.stratio.com:9999" ).rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}$").req()
         							.parm("--zookeeper-cluster", "node.stratio.com:2181").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()
         							.parm("--kafka-cluster", "node.stratio.com:9092").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()
-        							.parm("--cassandra-cluster", "node.stratio.com:9160").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
+        							.parm("--cassandra-cluster", "node.stratio.com").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])+)*$")
         							.parm("--auditEnabled", "false")
         							.parm("--statsEnabled", "true")
         							.build();  
@@ -93,12 +96,54 @@ public class StreamingEngine {
         String parseError    = cmd.validate(args);
         if( cmd.isValid(args) ) {
             R = (HashMap<String, String>) cmd.parse(args);            
-            System.out.println("Settings received:" + cmd.displayMap(R));
+            logger.info("Settings received:" + cmd.displayMap(R));
         }
         else { 
-        	System.out.println(parseError); 
+        	logger.error(parseError); 
         	System.exit(1); 
         }
+        
+        
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+            	
+            	logger.info("Shutting down Stratio Streaming..");
+            	
+//            	shutdown spark
+            	if (jssc != null) {
+            		jssc.stop();
+            	}
+
+//            	shutdown siddhi
+            	if (siddhiManager != null) {
+            		
+//            		remove All revisions (HA)
+            		StreamPersistence.removeEngineStatusFromCleanExit(getSiddhiManager());
+            		
+//                	shutdown listeners
+	        			
+        			try {
+        			
+        				getSiddhiManager().getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_LISTEN_TOPIC).publish("*");
+        				getSiddhiManager().getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_SAVE2CASSANDRA_TOPIC).publish("*");
+            		
+        			}
+        			catch(HazelcastInstanceNotActiveException notActive) {
+        				logger.info("Hazelcast is not active at this moment");
+        			}
+        	
+
+        			getSiddhiManager().shutdown();
+            	}        	
+
+            	
+//            	shutdown zookeeper
+            	ZKUtils.shutdownZKUtils();
+            	
+            	
+            	logger.info("Shutdown complete, bye¡");
+            }
+        });
         
         
         launchStratioStreamingEngine(R.get("--spark-master").toString().replace("_", "[") + "]",        		
@@ -138,6 +183,14 @@ public class StreamingEngine {
 
 		ZKUtils.getZKUtils(zkCluster).createEphemeralZNode(STREAMING.ZK_BASE_PATH + "/" + "engine", String.valueOf(System.currentTimeMillis()).getBytes());
 		
+	
+		
+//		Create the context with a x seconds batch size
+		jssc = new JavaStreamingContext(sparkMaster, StreamingEngine.class.getName(), 
+																new Duration(STREAMING.DURATION_MS), System.getenv("SPARK_HOME"), 
+																JavaStreamingContext.jarOfClass(StreamingEngine.class));
+		
+		
 		KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
 		CreateStreamFunction createStreamFunction = new CreateStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		AlterStreamFunction alterStreamFunction = new AlterStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
@@ -150,13 +203,7 @@ public class StreamingEngine {
 		DropStreamFunction dropStreamFunction = new DropStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
 		SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster, enableAuditing);
 		StopListenStreamFunction stopListenStreamFunction = new StopListenStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
-	
-		
-		
-//		Create the context with a x seconds batch size
-		JavaStreamingContext jssc = new JavaStreamingContext(sparkMaster, StreamingEngine.class.getName(), 
-																new Duration(STREAMING.DURATION_MS), System.getenv("SPARK_HOME"), 
-																JavaStreamingContext.jarOfClass(StreamingEngine.class));
+		SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster);
 		
 		
 		Map<String, Integer> topicMap = new HashMap<String, Integer>();
@@ -173,7 +220,7 @@ public class StreamingEngine {
 //		Start the Kafka stream  
 		JavaPairDStream<String, String> messages = KafkaUtils.createStream(jssc, zkCluster, BUS.STREAMING_GROUP_ID, topicMap);
 		
-		
+
 //		as we are using messages several times, the best option is to cache it
 		messages.cache();
 		
@@ -203,8 +250,6 @@ public class StreamingEngine {
 		JavaDStream<StratioStreamingMessage> saveToCassandra_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA))
 																	.map(keepPayloadFromMessageFunction);
 		
-		JavaDStream<StratioStreamingMessage> saveToDataCollector_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_DATACOLLECTOR))
-																	.map(keepPayloadFromMessageFunction);
 		
 		JavaDStream<StratioStreamingMessage> list_requests = messages.filter(new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.LIST))
 																	.map(keepPayloadFromMessageFunction);
@@ -228,17 +273,11 @@ public class StreamingEngine {
 		
 		stop_listen_requests.foreachRDD(stopListenStreamFunction);
 		
-//		saveToCassandra_requests.foreachRDD(new SaveToCassandraStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster));
-		
-		saveToDataCollector_requests.foreachRDD(collectRequestForStatsFunction);
-		
+		saveToCassandra_requests.foreachRDD(saveToCassandraStreamFunction);
+	
 		list_requests.foreachRDD(listStreamsFunction);
 		
-		drop_requests.foreachRDD(dropStreamFunction);
-		
-
-//		TODO take insert requests and saveToCassandra if persistence is enabled
-		
+		drop_requests.foreachRDD(dropStreamFunction);	
 		
 		
 		if (enableAuditing || enableStats) {
@@ -247,8 +286,10 @@ public class StreamingEngine {
 																.union(alter_requests)
 																.union(insert_requests)
 																.union(add_query_requests)
+																.union(remove_query_requests)
 																.union(listen_requests)
 																.union(stop_listen_requests)
+																.union(saveToCassandra_requests)
 																.union(list_requests)
 																.union(drop_requests);
 			
@@ -259,13 +300,13 @@ public class StreamingEngine {
 			}
 			
 			if (enableStats) {
-				
 				allRequests.foreachRDD(collectRequestForStatsFunction);				
 				
 			}			
 		}
 		
-		
+							
+	
 		
 		
 		
@@ -281,30 +322,33 @@ public class StreamingEngine {
 				
 				for(StreamDefinition streamMetaData : getSiddhiManager().getStreamDefinitions()) {
 					
-					String streamDefition = streamMetaData.getStreamId() 
-												+ " - userDefined:" + SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isUserDefined() + "- "
-												+ " - listenEnable:" + SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isListen_enabled() + "- ";
+					StringBuffer streamDefinition = new StringBuffer();
+					
+					streamDefinition.append(streamMetaData.getStreamId());												
 					
 					for (Attribute column : streamMetaData.getAttributeList()) {
-						streamDefition += " |" + column.getName() + "," + column.getType();
+						streamDefinition.append(" |" + column.getName() + "," + column.getType());
 					}
 					
-					HashMap<String, String> attachedQueries = SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).getAddedQueries();
-					
-					streamDefition += " /// " + attachedQueries.size() + " attachedQueries: (";
-					
-					for (String queryId : attachedQueries.keySet()) {
-						streamDefition += queryId + "/";
-					}
-					
-					
+					if (StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()) != null) {
+						HashMap<String, String> attachedQueries = StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).getAddedQueries();
 						
+						streamDefinition.append(" /// " + attachedQueries.size() + " attachedQueries: (");
+						
+						for (String queryId : attachedQueries.keySet()) {
+							streamDefinition.append(queryId + "/");
+						}
+						
+						streamDefinition.append(" - userDefined:" + StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isUserDefined() + "- ");
+						streamDefinition.append(" - listenEnable:" + StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isListen_enabled() + "- ");
+					}
 					
-					logger.info("** stream: " + streamDefition);
+					logger.info("** stream: " + streamDefinition);
 				}
 				
 				logger.info("********************************************");
 				
+				StreamPersistence.saveStreamingEngineStatus(getSiddhiManager());
 				
 				return null;
 			}
@@ -312,7 +356,7 @@ public class StreamingEngine {
 		});
 		
 		
-		
+		StreamPersistence.saveStreamingEngineStatus(getSiddhiManager());
 		messages.print();
 		jssc.start();
 		jssc.awaitTermination();
@@ -320,52 +364,12 @@ public class StreamingEngine {
 
 	}
 	
-	
-	/**
-	 * 
-	 * - Instantiates the Siddhi CEP engine
-	 * - return the running CEP engine 
-	 * 
-	 * 
-	 * @return SiddhiManager
-	 */
 	private static SiddhiManager getSiddhiManager() {
-		
 		if (siddhiManager == null) {
-			SiddhiConfiguration conf = new SiddhiConfiguration();		
-			conf.setInstanceIdentifier("StratioStreamingCEP-Instance-"+ UUID.randomUUID().toString());
-			conf.setQueryPlanIdentifier("StratioStreamingCEP-Cluster");
-			conf.setDistributedProcessing(true);
-			
-			
-			// Create Siddhi Manager
-			siddhiManager = new SiddhiManager(conf);
-
-			
-//			DEBUG STREAMS
-//			siddhiManager.addCallback("testStream", new StreamCallback() {
-//				@Override
-//				public void receive(Event[] events) {
-//					try {
-//						List<Tuple2<String, Object>> alarms = Lists.newArrayList();
-//						for (Event e : events) {
-//							
-//							logger.info(">>>>>>>>>>>>>>>>>> NEW event: time: " + e.getTimeStamp() + "/" + e.getData0() + "/" + e.getData1() + "/" + e.getData2());
-//							
-//						}					
-//						
-//					} catch (Exception e) {
-//						logger.info(">>>>>>>>>>>>>>>>>> SIDDHI EXCEPTION: " + e.getMessage());
-//					}
-//					
-//				}
-//				
-//			});
+			siddhiManager = SiddhiUtils.setupSiddhiManager();
 		}
 		
 		return siddhiManager;
-		
-							
 	}
 
 }

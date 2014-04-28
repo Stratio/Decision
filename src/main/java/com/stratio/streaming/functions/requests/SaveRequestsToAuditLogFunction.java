@@ -1,7 +1,5 @@
 package com.stratio.streaming.functions.requests;
 
-import java.util.UUID;
-
 import org.apache.cassandra.utils.UUIDGen;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -9,10 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Cluster.Builder;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.exceptions.InvalidQueryException;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.rdd.CassandraCellRDD;
+import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
 
@@ -21,6 +24,7 @@ public class SaveRequestsToAuditLogFunction extends StratioStreamingBaseFunction
 	private static Logger logger = LoggerFactory.getLogger(SaveRequestsToAuditLogFunction.class);
 	private String cassandraCluster;
 	private IDeepJobConfig<Cells> auditCassandraConfig;
+	private static final String AUDITING_TABLE = "auditing_requests";
 	
 
 	/**
@@ -32,7 +36,35 @@ public class SaveRequestsToAuditLogFunction extends StratioStreamingBaseFunction
 		super(siddhiManager, zookeeperCluster, kafkaCluster);
 		this.cassandraCluster = cassandraCluster;
 		if (auditEnabled) {
-			this.auditCassandraConfig = DeepJobConfigFactory.create().host("node.stratio.com").rpcPort(9160).keyspace("stratio_streaming").table("auditing_requests").createTableOnWrite(true).initialize();
+			
+			try {
+				Builder cBuilder = new Cluster.Builder();
+				
+				for (String node : cassandraCluster.split(",")) {
+					// Add data center to Cassandra cluster
+					cBuilder.addContactPoint(node);
+				}
+				Cluster cCluster = cBuilder.build();
+				Session cassandraSession = cCluster.connect();
+				
+				if (cassandraSession.getCluster().getMetadata().getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME) == null) {
+					cassandraSession.execute(STREAMING.CREATE_STREAMING_KEYSPACE);
+				}
+				
+				
+				this.auditCassandraConfig = DeepJobConfigFactory.createWriteConfig().createTableOnWrite(true).keyspace(STREAMING.STREAMING_KEYSPACE_NAME).table(AUDITING_TABLE).rpcPort(9160).host(cassandraCluster);
+				
+				cassandraSession.close();
+				cCluster.close();
+			}
+			catch(Exception e) {
+				logger.error("Auditing service can not be started. Reason: " + e.getMessage() + "//" + e.getClass());
+			}
+			
+			if (auditCassandraConfig != null) {
+				auditCassandraConfig.initialize();
+			}			
+			
 		}
 	}
 	
@@ -43,25 +75,25 @@ public class SaveRequestsToAuditLogFunction extends StratioStreamingBaseFunction
 		
 //		TODO when siddhi RDD is ready
 		
-		if (rdd.count() > 0) {
+		if (rdd.count() > 0 && auditCassandraConfig != null) {
 
 			JavaRDD<Cells> outRDD = rdd.map(new Function<StratioStreamingMessage, Cells>() {
 				@Override
 				public Cells call(StratioStreamingMessage request) {
 					
-					com.stratio.deep.entity.Cell<UUID>   requestTimeUUIDCell 		= com.stratio.deep.entity.Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
-					com.stratio.deep.entity.Cell<String> requestSessionIdCell 		= com.stratio.deep.entity.Cell.create("sessionId", request.getSession_id());
-					com.stratio.deep.entity.Cell<String> requestIdCell 				= com.stratio.deep.entity.Cell.create("requestId", request.getRequest_id());
-					com.stratio.deep.entity.Cell<String> requestStreamNameCell 		= com.stratio.deep.entity.Cell.create("streamName", request.getStreamName());
-					com.stratio.deep.entity.Cell<String> requestOperationNameCell 	= com.stratio.deep.entity.Cell.create("operation", request.getOperation());
-					com.stratio.deep.entity.Cell<String> requestDataCell 			= com.stratio.deep.entity.Cell.create("request", request.getRequest());
+					com.stratio.deep.entity.Cell requestTimeUUIDCell 		= com.stratio.deep.entity.Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
+					com.stratio.deep.entity.Cell requestSessionIdCell 		= com.stratio.deep.entity.Cell.create("sessionId", request.getSession_id());
+					com.stratio.deep.entity.Cell requestIdCell 				= com.stratio.deep.entity.Cell.create("requestId", request.getRequest_id());
+					com.stratio.deep.entity.Cell requestStreamNameCell 		= com.stratio.deep.entity.Cell.create("streamName", request.getStreamName());
+					com.stratio.deep.entity.Cell requestOperationNameCell 	= com.stratio.deep.entity.Cell.create("operation", request.getOperation());
+					com.stratio.deep.entity.Cell requestDataCell 			= com.stratio.deep.entity.Cell.create("request", request.getRequest());
 	
 					return new Cells(requestTimeUUIDCell, requestSessionIdCell, requestIdCell, requestStreamNameCell, requestOperationNameCell, requestDataCell);
 				}
 			});
 	
 	
-			CassandraCellRDD.saveRDDToCassandra(outRDD, auditCassandraConfig);			
+			CassandraCellRDD.cql3SaveRDDToCassandra(outRDD.rdd(), auditCassandraConfig);			
 		}
 
 		return null;

@@ -6,16 +6,13 @@ import org.apache.spark.api.java.JavaRDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.query.api.definition.Attribute;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.AttributeAlreadyExistException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
 import com.stratio.streaming.commons.constants.REPLY_CODES;
-import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.utils.SiddhiUtils;
+import com.stratio.streaming.streams.StreamOperations;
 
 public class AlterStreamFunction extends StratioStreamingBaseFunction {
 	
@@ -44,7 +41,7 @@ public class AlterStreamFunction extends StratioStreamingBaseFunction {
 				try {
 					
 //					add colums to the stream in siddhi
-					int addedColumns = enlargeStream(request);
+					int addedColumns = StreamOperations.enlargeStream(request, getSiddhiManager());
 															
 //					ack OK back to the bus
 					ackStreamingOperation(request, REPLY_CODES.OK);
@@ -64,45 +61,5 @@ public class AlterStreamFunction extends StratioStreamingBaseFunction {
 		}
 		
 		return null;
-	}
-	
-	
-	private int enlargeStream(StratioStreamingMessage request) {
-		
-		int addedColumns = 0;
-		StreamDefinition streamMetaData = getSiddhiManager().getStreamDefinition(request.getStreamName());
-		
-		for (ColumnNameTypeValue columnNameTypeValue: request.getColumns()) {
-			
-//			Siddhi will throw an exception if you try to add a column that already exists, 
-//			so we first try to find it in the stream
-			if (!columnAlreadyExistsInStream(columnNameTypeValue.getColumn(), streamMetaData)) {
-				
-				addedColumns++;
-				streamMetaData.attribute(columnNameTypeValue.getColumn(), SiddhiUtils.decodeSiddhiType(columnNameTypeValue.getType()));
-				
-			}
-			else {
-				throw new AttributeAlreadyExistException(columnNameTypeValue.getColumn());
-			}
-		}
-		
-		return addedColumns;
-
-	}
-	
-	private boolean columnAlreadyExistsInStream(String columnName, StreamDefinition streamMetaData) {
-		
-		for(Attribute column:  streamMetaData.getAttributeList()) {
-			if (column.getName().equalsIgnoreCase(columnName)) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-
-	
-	
+	}	
 }

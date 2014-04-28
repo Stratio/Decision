@@ -1,4 +1,4 @@
-package com.stratio.streaming.functions;
+package com.stratio.streaming.functions.messages;
 
 import org.apache.spark.api.java.function.Function;
 

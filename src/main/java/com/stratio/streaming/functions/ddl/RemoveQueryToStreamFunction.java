@@ -1,7 +1,6 @@
 package com.stratio.streaming.functions.ddl;
 
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.slf4j.Logger;
@@ -10,15 +9,13 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.exception.MalformedAttributeException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
-import com.hazelcast.core.IMap;
 import com.hazelcast.core.ITopic;
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.commons.messages.StreamQuery;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.streams.StreamStatus;
-import com.stratio.streaming.utils.SiddhiUtils;
+import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.streams.StreamSharedStatus;
 
 public class RemoveQueryToStreamFunction extends StratioStreamingBaseFunction {
 	
@@ -48,36 +45,12 @@ public class RemoveQueryToStreamFunction extends StratioStreamingBaseFunction {
 
 				
 //				check if query has been added before
-				if (SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().containsKey(request.getRequest())) {
+				if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()) != null &&
+						StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().containsKey(request.getRequest())) {
 					
 					try {
 
-//						remove query in stream status
-						String queryId = SiddhiUtils.removeQueryInStreamStatus(request.getRequest(), request.getStreamName(), getSiddhiManager());
-						
-//						remove query in siddhi
-						getSiddhiManager().removeQuery(queryId);
-						
-						
-//						recover all cached streams
-						IMap<Object, Object> streamStatusMap = getSiddhiManager().getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP);
-						
-//						we will see if siddhi has removed any streams automatically
-						for (Entry<Object, Object> streamStatus : streamStatusMap.entrySet()) {
-							
-							String streamName = (String)streamStatus.getKey();
-							
-//							if this stream does not exist in siddhi
-							if (getSiddhiManager().getStreamDefinition(streamName) == null) {
-//								stop all listeners
-								listenTopic.publish(streamName);
-								
-//								drop the streamStatus
-								SiddhiUtils.removeStreamStatus(streamName, getSiddhiManager());
-								
-							}
-						}
-
+						StreamOperations.removeQueryFromExistingStream(request, getSiddhiManager());
 
 //						ack OK to the Bus
 						ackStreamingOperation(request, REPLY_CODES.OK);

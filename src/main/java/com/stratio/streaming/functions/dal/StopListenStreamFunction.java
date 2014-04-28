@@ -12,7 +12,8 @@ import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.utils.SiddhiUtils;
+import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.streams.StreamSharedStatus;
 
 public class StopListenStreamFunction extends StratioStreamingBaseFunction {
 	
@@ -41,14 +42,13 @@ public class StopListenStreamFunction extends StratioStreamingBaseFunction {
 //			stream exists
 			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
 				
-				if (SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).isListen_enabled()) {
+				if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()) != null
+						&& StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()).isListen_enabled()) {
 					
 					
 					try {
 																							
-						listenTopic.publish(request.getStreamName());
-						
-						SiddhiUtils.changeListenerStreamStatus(Boolean.FALSE, request.getStreamName(), getSiddhiManager());																		
+						StreamOperations.stopListenStream(request, getSiddhiManager());									
 						
 						ackStreamingOperation(request, REPLY_CODES.OK);
 						

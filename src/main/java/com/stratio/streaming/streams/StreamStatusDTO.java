@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 
-public class StreamStatus implements Serializable {
+public class StreamStatusDTO implements Serializable {
 	
 	
 	
@@ -13,6 +13,7 @@ public class StreamStatus implements Serializable {
 	 */
 	private static final long serialVersionUID = -8455557383950387810L;
 	private String streamName;
+	private String streamDefinition;
 	private Boolean userDefined;
 	private Boolean listen_enabled;
 	private Boolean saveToCassandra_enabled;
@@ -24,7 +25,7 @@ public class StreamStatus implements Serializable {
 	 * @param listen_enabled
 	 * @param saveToCassandra_enabled
 	 */
-	public StreamStatus(String streamName, Boolean userDefined) {
+	public StreamStatusDTO(String streamName, Boolean userDefined) {
 		super();
 		this.streamName = streamName;
 		this.userDefined = userDefined;
@@ -58,11 +59,22 @@ public class StreamStatus implements Serializable {
 	public void setListen_enabled(Boolean listen_enabled) {
 		this.listen_enabled = listen_enabled;
 	}
-	public Boolean getSaveToCassandra_enabled() {
+	public Boolean isSaveToCassandra_enabled() {
 		return saveToCassandra_enabled;
 	}
 	public void setSaveToCassandra_enabled(Boolean saveToCassandra_enabled) {
 		this.saveToCassandra_enabled = saveToCassandra_enabled;
+	}
+
+	
+
+	public String getStreamDefinition() {
+		return streamDefinition;
+	}
+
+
+	public void setStreamDefinition(String streamDefinition) {
+		this.streamDefinition = streamDefinition;
 	}
 
 

@@ -1,6 +1,5 @@
 package com.stratio.streaming.functions.ddl;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.spark.api.java.JavaRDD;
@@ -8,17 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 
-import com.hazelcast.core.ITopic;
 import com.stratio.streaming.commons.constants.REPLY_CODES;
-import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.utils.SiddhiUtils;
+import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.streams.StreamSharedStatus;
 
 public class DropStreamFunction extends StratioStreamingBaseFunction {
 	
 	private static Logger logger = LoggerFactory.getLogger(DropStreamFunction.class);
-	private ITopic<String> listenTopic;
 	
 	
 	/**
@@ -28,7 +25,6 @@ public class DropStreamFunction extends StratioStreamingBaseFunction {
 
 	public DropStreamFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
 		super(siddhiManager, zookeeperCluster, kafkaCluster);
-		this.listenTopic = getSiddhiManager().getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_LISTEN_TOPIC);
 	}
 	
 
@@ -43,24 +39,11 @@ public class DropStreamFunction extends StratioStreamingBaseFunction {
 //			so there is no need to check if stream exists before dropping it.
 			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
 				
-				if (SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).isUserDefined()) {
+				if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()) != null
+						&& StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()).isUserDefined()) {
 				
-//					stop all listeners
-					listenTopic.publish(request.getStreamName());		
-					
-//					remove all queries
-					HashMap<String, String> attachedQueries = SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries();
-					
-					for (String queryId : attachedQueries.keySet()) {
-						getSiddhiManager().removeQuery(queryId);
-					}
-					
-//					then we removeStream in siddhi
-					getSiddhiManager().removeStream(request.getStreamName());
-	
-//					drop the streamStatus
-					SiddhiUtils.removeStreamStatus(request.getStreamName(), getSiddhiManager());
-					
+
+					StreamOperations.dropStream(request, getSiddhiManager());
 								
 //					ack OK back to the bus
 					ackStreamingOperation(request, REPLY_CODES.OK);

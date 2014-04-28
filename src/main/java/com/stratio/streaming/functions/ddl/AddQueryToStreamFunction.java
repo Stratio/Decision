@@ -7,14 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.DifferentDefinitionAlreadyExistException;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.MalformedAttributeException;
+import org.wso2.siddhi.query.api.exception.SourceNotExistException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.utils.SiddhiUtils;
+import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.streams.StreamSharedStatus;
 
 public class AddQueryToStreamFunction extends StratioStreamingBaseFunction {
 	
@@ -44,22 +45,13 @@ public class AddQueryToStreamFunction extends StratioStreamingBaseFunction {
 //				Siddhi will add a query even when the same query is already present
 //				So it's better to maintain a reminder of which queries have been added
 //				and to prevent adding queries twice.
-				if (SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().isEmpty() ||
-						!SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().containsValue(request.getRequest())) {
+				if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()) != null && 
+						(StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().isEmpty() ||
+						!StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().containsValue(request.getRequest()))) {
 					
 					try {
 
-//						add query to siddhi
-						String queryId = getSiddhiManager().addQuery(request.getRequest());
-						
-//						register query in stream status						
-						SiddhiUtils.addQueryToStreamStatus(queryId, request.getRequest(), request.getStreamName(), getSiddhiManager());
-						
-//						check the streams to see if there are new ones, inferred from queries (not user defined)
-						for(StreamDefinition streamMetaData : getSiddhiManager().getStreamDefinitions()) {
-//							by getting the stream, it will be created if don't exists (user defined is false)
-							SiddhiUtils.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager());
-						}
+						StreamOperations.addQueryToExistingStream(request, getSiddhiManager());
 						
 
 //						ack OK to the Bus
@@ -68,6 +60,9 @@ public class AddQueryToStreamFunction extends StratioStreamingBaseFunction {
 					} 
 					catch (MalformedAttributeException  se ) {
 						ackStreamingOperation(request, REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST);
+					}
+					catch (SourceNotExistException snee) {
+						ackStreamingOperation(request, REPLY_CODES.KO_SOURCE_STREAM_DOES_NOT_EXIST);
 					}
 					catch (SiddhiPraserException se) {
 						ackStreamingOperation(request, REPLY_CODES.KO_PARSER_ERROR);
@@ -90,4 +85,6 @@ public class AddQueryToStreamFunction extends StratioStreamingBaseFunction {
 
 		return null;
 	}
+
+
 }

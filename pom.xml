@@ -47,7 +47,7 @@
   	<dependency>
   		<groupId>com.stratio.deep</groupId>
   		<artifactId>StratioDeep</artifactId>
-  		<version>0.1.0</version>
+  		<version>0.2.1</version>
   	</dependency>
   	<dependency>
   		<groupId>org.wso2.siddhi</groupId>
@@ -63,6 +63,31 @@
   		<groupId>org.wso2.siddhi</groupId>
   		<artifactId>siddhi-query</artifactId>
   		<version>2.0.0-wso2v4</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.stratio.streaming</groupId>
+  		<artifactId>StratioStreamingCommons</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.apache.cassandra</groupId>
+  		<artifactId>cassandra-all</artifactId>
+  		<version>2.0.6</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.datastax.cassandra</groupId>
+  		<artifactId>cassandra-driver-core</artifactId>
+  		<version>2.0.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>me.prettyprint</groupId>
+  		<artifactId>hector-core</artifactId>
+  		<version>1.0-5</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.eaio.uuid</groupId>
+  		<artifactId>uuid</artifactId>
+  		<version>3.2</version>
   	</dependency>
   </dependencies>
   <repositories>
@@ -89,4 +114,16 @@
 			</releases>
 		</repository>
     </repositories>  
+    
 </project>
+<plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+    </plugins>

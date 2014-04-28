@@ -7,18 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 
-import com.hazelcast.core.ITopic;
-import com.stratio.streaming.callbacks.StreamToBusCallback;
 import com.stratio.streaming.commons.constants.REPLY_CODES;
-import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
-import com.stratio.streaming.utils.SiddhiUtils;
+import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.streams.StreamSharedStatus;
 
 public class ListenStreamFunction extends StratioStreamingBaseFunction {
 	
 	private static Logger logger = LoggerFactory.getLogger(ListenStreamFunction.class);
-	private ITopic<String> listenTopic;
 
 	/**
 	 * 
@@ -27,7 +24,6 @@ public class ListenStreamFunction extends StratioStreamingBaseFunction {
 
 	public ListenStreamFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
 		super(siddhiManager, zookeeperCluster, kafkaCluster);
-		this.listenTopic = getSiddhiManager().getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_LISTEN_TOPIC);
 	}
 	
 
@@ -42,19 +38,14 @@ public class ListenStreamFunction extends StratioStreamingBaseFunction {
 //			stream exists
 			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
 				
-				if (!SiddhiUtils.getStreamStatus(request.getStreamName(), getSiddhiManager()).isListen_enabled()) {
+				if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()) != null
+						&& !StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()).isListen_enabled()) {
 					
 					
 					try {
 						
-											
-						StreamToBusCallback streamCallBack = new StreamToBusCallback(getSiddhiManager().getStreamDefinition(request.getStreamName()), getKafkaCluster());
-						
-						listenTopic.addMessageListener(streamCallBack);
-						
-						getSiddhiManager().addCallback(request.getStreamName(), streamCallBack);
-						
-						SiddhiUtils.changeListenerStreamStatus(Boolean.TRUE, request.getStreamName(), getSiddhiManager());
+						StreamOperations.listenStream(request, getKafkaCluster(), getSiddhiManager());
+
 						
 						ackStreamingOperation(request, REPLY_CODES.OK);
 						

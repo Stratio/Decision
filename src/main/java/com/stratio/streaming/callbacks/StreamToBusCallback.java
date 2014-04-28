@@ -20,7 +20,7 @@ import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.functions.FilterMessagesByOperationFunction;
+import com.stratio.streaming.functions.messages.FilterMessagesByOperationFunction;
 import com.stratio.streaming.utils.DataToCollectorUtils;
 
 public class StreamToBusCallback extends StreamCallback implements MessageListener<String> {
@@ -119,7 +119,7 @@ public class StreamToBusCallback extends StreamCallback implements MessageListen
         return new ProducerConfig(properties);
     }
 	
-	public void shutdownCallback() {
+	private void shutdownCallback() {
 		if (running) {
 			this.producer.close();
 		}
@@ -128,7 +128,9 @@ public class StreamToBusCallback extends StreamCallback implements MessageListen
 	@Override
 	public void onMessage(Message<String> message) {
 		if (running) {
-			if (message.getMessageObject().equalsIgnoreCase(streamDefinition.getStreamId())) {
+			if (message.getMessageObject().equalsIgnoreCase(streamDefinition.getStreamId())
+					|| message.getMessageObject().equalsIgnoreCase("*")) {
+				
 				shutdownCallback();
 				running = Boolean.FALSE;
 				logger.debug("Shutting down listener for stream " + streamDefinition.getStreamId());

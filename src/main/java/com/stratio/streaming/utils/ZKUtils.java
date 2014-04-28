@@ -1,12 +1,12 @@
 package com.stratio.streaming.utils;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
@@ -22,23 +22,22 @@ public class ZKUtils {
 	private static Logger logger = LoggerFactory.getLogger(ZKUtils.class);
 	
 	private static ZKUtils self;
-	private String zookeeperCluster;
 	private CuratorFramework  client;
+	private ExecutorService backgroundZookeeperCleanerTasks;
 
 	private ZKUtils(String zookeeperCluster) throws Exception {
-		this.zookeeperCluster = zookeeperCluster;
 				
 //		ZOOKEPER CONNECTION
 		client = CuratorFrameworkFactory.newClient(zookeeperCluster, 25*1000, 10*1000, new ExponentialBackoffRetry(1000, 3));
 		client.start();
 		client.getZookeeperClient().blockUntilConnectedOrTimedOut();
 		
-		if (!client.isStarted()) {
+		if (client.getState().compareTo(CuratorFrameworkState.STARTED) != 0) {
 			 throw new Exception("Connection to Zookeeper timed out after seconds");
 		}
 		
 		
-		ExecutorService backgroundZookeeperCleanerTasks = Executors.newFixedThreadPool(1);
+		backgroundZookeeperCleanerTasks = Executors.newFixedThreadPool(1);
 		backgroundZookeeperCleanerTasks.submit(new ZookeeperBackgroundCleaner(client));
 		
 	}
@@ -49,6 +48,13 @@ public class ZKUtils {
 			self = new ZKUtils(zookeeperCluster);			
 		}
 		return self;
+	}
+	
+	public static void shutdownZKUtils() {
+		if (self != null) {
+			self.backgroundZookeeperCleanerTasks.shutdownNow();
+			self.client.close();
+		}
 	}
 	
 	public void createEphemeralZNode(String path, byte[] data) throws Exception {
@@ -107,7 +113,7 @@ public class ZKUtils {
 		
 		private CuratorFramework  client;
 		private static final long ZNODES_TTL = 600000; // 10 minutes 
-		private static final long CLEAN_INTERVAL = 300000; // 5 minutes
+		private static final long CLEAN_INTERVAL = 30000; // 5 minutes
 
 		/**
 		 * 
@@ -115,6 +121,7 @@ public class ZKUtils {
 		public ZookeeperBackgroundCleaner(CuratorFramework  client) {
 			this.client = client;
 			logger.debug("Starting ZookeeperBackgroundCleaner...");
+			logger.info("ZookeeperBackgroundCleaner BASE path " + STREAMING.ZK_BASE_PATH);
 		}
 		
 		
@@ -152,20 +159,19 @@ public class ZKUtils {
 		@Override
 		public void run() {
 			
+	
 			while(!Thread.currentThread().isInterrupted()) {
 				
 				try {
 					
-					logger.info("BASE path " + STREAMING.ZK_BASE_PATH);
-					
-					
-					int childsRemoved = removeOldChildZnodes(STREAMING.ZK_BASE_PATH);
-					
+					if (client.getState().compareTo(CuratorFrameworkState.STARTED) == 0) {
+						int childsRemoved = removeOldChildZnodes(STREAMING.ZK_BASE_PATH);
 						
+						logger.debug(childsRemoved + " old zNodes removed from ZK");
+					}
 					
 					
-					logger.debug(childsRemoved + " old zNodes removed from ZK");
-					Thread.currentThread().sleep(CLEAN_INTERVAL);
+					Thread.sleep(CLEAN_INTERVAL);
 					
 					
 				}
@@ -175,7 +181,7 @@ public class ZKUtils {
 				}
 				
 				catch (Exception e) {
-					logger.info("Error on Zookeeper Background Cleaner: "+ e.getMessage());
+					logger.info("Error on Zookeeper Background Cleaner: "+ e.getMessage());					
 				}
 				
 				
