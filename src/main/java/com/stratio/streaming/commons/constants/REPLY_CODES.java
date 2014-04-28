@@ -1,6 +1,8 @@
 package com.stratio.streaming.commons.constants;
 
 public abstract class REPLY_CODES {
+	
+	
 	public static final Integer OK 													= 1;
 	public static final Integer KO_PARSER_ERROR										= 2;
 	public static final Integer KO_STREAM_ALREADY_EXISTS 							= 3;
@@ -15,6 +17,7 @@ public abstract class REPLY_CODES {
 	public static final Integer KO_STREAM_IS_NOT_USER_DEFINED 						= 12;
 	public static final Integer KO_OUTPUTSTREAM_EXISTS_AND_DEFINITION_IS_DIFFERENT 	= 13;
 	public static final Integer KO_SAVE2CASSANDRA_STREAM_ALREADY_ENABLED		 	= 14;
+	public static final Integer KO_SOURCE_STREAM_DOES_NOT_EXIST					 	= 15;
 
 	
 	
@@ -65,7 +68,10 @@ public abstract class REPLY_CODES {
 			break;
 		case 14:
 			decodedReply = "KO: SAVE2CASSANDRA IN THIS STREAM IS ALREADY_ENABLED";
-			break;			
+			break;	
+		case 15:
+			decodedReply = "KO: SOURCE STREAM IN QUERY DOES NOT EXIST";
+			break;				
 		default:
 			decodedReply = "UNKOWN ERROR";
 			break;

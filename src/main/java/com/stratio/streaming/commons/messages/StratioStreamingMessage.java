@@ -121,12 +121,12 @@ public class StratioStreamingMessage implements Serializable {
 	}
 
 
-	public Boolean getUserDefined() {
+	public Boolean isUserDefined() {
 		return userDefined;
 	}
 
 
-	public void isUserDefined(Boolean userDefined) {
+	public void setUserDefined(Boolean userDefined) {
 		this.userDefined = userDefined;
 	}
 
