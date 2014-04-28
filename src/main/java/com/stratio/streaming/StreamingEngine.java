@@ -271,8 +271,8 @@ public class StreamingEngine {
 		
 		listen_requests.foreachRDD(listenStreamFunction);
 		
-		stop_listen_requests.foreachRDD(stopListenStreamFunction);
-		
+		stop_listen_requests.foreachRDD(stopListenStreamFunction);	
+
 		saveToCassandra_requests.foreachRDD(saveToCassandraStreamFunction);
 	
 		list_requests.foreachRDD(listStreamsFunction);

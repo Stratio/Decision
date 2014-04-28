@@ -3,6 +3,20 @@
   <groupId>com.stratio.streaming</groupId>
   <artifactId>StratioStreaming</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <properties>
+     <maven.compiler.source>1.7</maven.compiler.source>
+     <maven.compiler.target>1.7</maven.compiler.target>
+  </properties>
+  <distributionManagement>
+     <repository>
+        <id>stratio-releases</id>
+        <url>http://nexus.strat.io:8081/nexus/content/repositories/releases</url>
+     </repository>
+     <snapshotRepository>
+        <id>stratio-snapshots</id>
+        <url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
+      </snapshotRepository>
+  </distributionManagement>
   <dependencies>
   	<dependency>
   		<groupId>org.apache.curator</groupId>
@@ -89,6 +103,18 @@
   		<artifactId>uuid</artifactId>
   		<version>3.2</version>
   	</dependency>
+    <dependency>
+        <groupId>com.stratio.streaming</groupId>
+        <artifactId>StratioStreamingCommons</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+          <groupId>ca.zmatrix.cli</groupId>
+          <artifactId>parser</artifactId>
+          <version>0.0.93</version>
+          <scope>system</scope>
+          <systemPath>${project.basedir}/lib/parsecmd-0.0.93.jar</systemPath>
+    </dependency>
   </dependencies>
   <repositories>
         <repository>
