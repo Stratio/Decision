@@ -1,5 +1,4 @@
 
-
 Stratio Streaming
 =================
 
@@ -13,7 +12,7 @@ The key components of Streaming Engine provide a fault-tolerant, high availabili
 
 
 
-
+:one:
 
 #### <i class="icon-share"></i> Running Stratio Streaming Engine
 
