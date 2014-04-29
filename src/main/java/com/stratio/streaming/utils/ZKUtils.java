@@ -35,10 +35,11 @@ public class ZKUtils {
 		if (client.getState().compareTo(CuratorFrameworkState.STARTED) != 0) {
 			 throw new Exception("Connection to Zookeeper timed out after seconds");
 		}
+		else {		
+			backgroundZookeeperCleanerTasks = Executors.newFixedThreadPool(1);
+			backgroundZookeeperCleanerTasks.submit(new ZookeeperBackgroundCleaner(client));
+		}
 		
-		
-		backgroundZookeeperCleanerTasks = Executors.newFixedThreadPool(1);
-		backgroundZookeeperCleanerTasks.submit(new ZookeeperBackgroundCleaner(client));
 		
 	}
 	

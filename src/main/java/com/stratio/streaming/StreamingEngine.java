@@ -77,7 +77,7 @@ public class StreamingEngine {
 	 * @param args
 	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		
 //		DECODING ARGUMENTS FROM COMMAND LINE
 		String usage = "usage: --sparkMaster local --zookeeper-cluster fqdn:port,fqdn2:port --kafka-cluster fqdn:port,fqdn2:port --cassandra-cluster fqdn,fqdn2";
@@ -146,13 +146,17 @@ public class StreamingEngine {
         });
         
         
-        launchStratioStreamingEngine(R.get("--spark-master").toString().replace("_", "[") + "]",        		
-										R.get("--zookeeper-cluster").toString(),
-										R.get("--kafka-cluster").toString(),
-										BUS.TOPICS,
-										R.get("--cassandra-cluster").toString(),
-										Boolean.valueOf(R.get("--auditEnabled").toString()),
-										Boolean.valueOf(R.get("--statsEnabled").toString()));
+        try {
+			launchStratioStreamingEngine(R.get("--spark-master").toString().replace("_", "[") + "]",        		
+											R.get("--zookeeper-cluster").toString(),
+											R.get("--kafka-cluster").toString(),
+											BUS.TOPICS,
+											R.get("--cassandra-cluster").toString(),
+											Boolean.valueOf(R.get("--auditEnabled").toString()),
+											Boolean.valueOf(R.get("--statsEnabled").toString()));
+		} catch (Exception e) {
+			logger.error("General error: " + e.getMessage() + " // " + e.getClass());
+		}
 
 	}
 	
