@@ -1,6 +1,6 @@
 
 
-Stratio Streaming
+Stratio Streaming {#welcome}
 =================
 
 In a nutshell, Stratio Streaming is a real-time engine with Complex Event Processing capabilities with a built-in and powerful Streaming Query Language for doing on-demand operations on your streams.
@@ -12,7 +12,7 @@ The key components of Streaming Engine provide a fault-tolerant, high availabili
 
 
 
-
+:one:
 
 
 #### <i class="icon-share"></i> Running Stratio Streaming Engine
