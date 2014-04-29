@@ -1,4 +1,3 @@
-
 Stratio Streaming
 =================
 
@@ -11,10 +10,18 @@ The key components of Streaming Engine provide a fault-tolerant, high availabili
 
 
 
-
-:one:
-
-#### <i class="icon-share"></i> Running Stratio Streaming Engine
+:arrow_forward: Running Stratio Streaming Engine
 
 
-sudo sh /path_to_spark/spark-0.9.0-incubating/bin/run-mine com.stratio.streaming.StreamingEngine --spark-master local_2 --zookeeper-cluster node.stratio.com:2181 --kafka-cluster node.strao.com:9092
+**Usage**
+
+```
+--sparkMaster local --zookeeper-cluster fqdn:port,fqdn2:port --kafka-cluster fqdn:port,fqdn2:port --cassandra-cluster fqdn,fqdn2
+```
+
+
+**Using the provided script**
+
+```
+sudo sh run-stratio-streaming com.stratio.streaming.StreamingEngine --spark-master local_2 --zookeeper-cluster fqdn:port,fqdn2:port,... --kafka-cluster fqdn:port,fqdn2:port,... --cassandra-cluster fqdn,fqdn,...
+```
