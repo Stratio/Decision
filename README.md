@@ -1,2 +1,0 @@
-stratio-streaming-api
-=====================
