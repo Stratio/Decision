@@ -15,7 +15,7 @@ public interface STREAMING {
 	public interface STATS_NAMES {
 		public static final String BASE 						= "stratio_stats_base";
 		public static final String GLOBAL_STATS_BY_OPERATION 	= "stratio_stats_global_by_operation";
-		public static final String[] RESERVED_STREAMS 			= new String[]{BASE, GLOBAL_STATS_BY_OPERATION};
+		public static final String[] STATS_STREAMS 				= new String[]{BASE, GLOBAL_STATS_BY_OPERATION};
 		
 	}
 
