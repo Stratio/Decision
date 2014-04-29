@@ -12,10 +12,12 @@ import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 import com.hazelcast.core.ITopic;
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
 import com.stratio.streaming.streams.StreamOperations;
 import com.stratio.streaming.streams.StreamSharedStatus;
+import com.stratio.streaming.utils.SiddhiUtils;
 
 public class RemoveQueryToStreamFunction extends StratioStreamingBaseFunction {
 	
@@ -40,8 +42,11 @@ public class RemoveQueryToStreamFunction extends StratioStreamingBaseFunction {
 		
 		for (StratioStreamingMessage request : requests) {
 
-//			stream exists in siddhi
-			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
+				
+//			stream is allowed and exists in siddhi
+			if (SiddhiUtils.isStreamAllowedForThisOperation(request.getStreamName(), STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY)
+					&& getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
+
 
 				
 //				check if query has been added before

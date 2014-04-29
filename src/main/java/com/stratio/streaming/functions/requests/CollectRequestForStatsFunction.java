@@ -29,18 +29,18 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 	
 
 	protected interface STATS_STREAMS {
-		static final String BASE = "define stream " + STREAMING.STATS_NAMES.BASE + " (operation string, streamName string, index int, count int)";
+		static final String BASE = "define stream " + STREAMING.STATS_NAMES.BASE + " (operation string, streamName string, count int)";
 	}
 	
 	private interface STATS_QUERIES {
 		
 		static final String REQUEST_THROUGHPUT = "from " + STREAMING.STATS_NAMES.BASE + " #window.time( 1 sec ) " +
-												 " select 'TROUGHPUT' as operation, '" + STREAMING.STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, 54012 as index, count(*) as data" +
+												 " select 'TROUGHPUT' as operation, '" + STREAMING.STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, count(*) as data" +
 												 " insert into " + STREAMING.STATS_NAMES.GLOBAL_STATS_BY_OPERATION + " for current-events";
 		
 		
 		static final String GLOBAL_STATS_BY_OPERATION = "from " + STREAMING.STATS_NAMES.BASE +
-														" select operation, '" + STREAMING.STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, index, sum(count) as data group by operation insert into " + 
+														" select operation, '" + STREAMING.STATS_NAMES.GLOBAL_STATS_BY_OPERATION + "' as streamName, sum(count) as data group by operation insert into " + 
 														STREAMING.STATS_NAMES.GLOBAL_STATS_BY_OPERATION + 
 														" for current-events";
 	}
@@ -67,7 +67,7 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 			selectedFields.add(new ColumnNameTypeValue("operation", null, request.getOperation().toUpperCase()));
 			selectedFields.add(new ColumnNameTypeValue("streamName", null, request.getStreamName()));
 			selectedFields.add(new ColumnNameTypeValue("count", null, Integer.valueOf(1)));
-			selectedFields.add(new ColumnNameTypeValue("index", null, getIndexForOperation(request.getOperation())));
+//			selectedFields.add(new ColumnNameTypeValue("index", null, getIndexForOperation(request.getOperation())));
 			
 			
 			
@@ -136,7 +136,7 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
 		selectedFields.add(new ColumnNameTypeValue("operation", null, operation));
 		selectedFields.add(new ColumnNameTypeValue("streamName", null, "resetStats"));
 		selectedFields.add(new ColumnNameTypeValue("count", null, Integer.valueOf(0)));
-		selectedFields.add(new ColumnNameTypeValue("index", null, getIndexForOperation(operation)));
+//		selectedFields.add(new ColumnNameTypeValue("index", null, getIndexForOperation(operation)));
 		
 		return selectedFields;
 	}

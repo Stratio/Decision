@@ -10,10 +10,12 @@ import org.wso2.siddhi.core.SiddhiManager;
 import com.hazelcast.core.ITopic;
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
 import com.stratio.streaming.streams.StreamOperations;
 import com.stratio.streaming.streams.StreamSharedStatus;
+import com.stratio.streaming.utils.SiddhiUtils;
 
 public class StopListenStreamFunction extends StratioStreamingBaseFunction {
 	
@@ -37,11 +39,12 @@ public class StopListenStreamFunction extends StratioStreamingBaseFunction {
 		List<StratioStreamingMessage> requests = rdd.collect();
 		
 		for (StratioStreamingMessage request : requests) {
-
 			
-//			stream exists
-			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
-				
+			
+//			stream is allowed and exists in siddhi
+			if (SiddhiUtils.isStreamAllowedForThisOperation(request.getStreamName(), STREAM_OPERATIONS.ACTION.STOP_LISTEN)
+					&& getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
+			
 				if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()) != null
 						&& StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()).isListen_enabled()) {
 					

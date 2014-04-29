@@ -48,13 +48,7 @@ public class StreamSharedStatus {
 		else {
 //			stream status does not exist, this is an special case
 //			the stream exists in siddhi becase a previous query has created it
-//			so we are going to register it as new
-			
-//			avoid returning stats streams
-			if (Arrays.asList(STREAMING.STATS_NAMES.RESERVED_STREAMS).contains(streamName)) {
-				return null;
-			}
-			
+//			so we are going to register it as new			
 			StreamStatusDTO streamStatusDTO = new StreamStatusDTO(streamName, Boolean.FALSE);
 			streamStatusDTO.setStreamDefinition(SiddhiUtils.recoverStreamDefinition(siddhiManager.getStreamDefinition(streamName)));
 			streamStatusMap.put(streamName, streamStatusDTO);

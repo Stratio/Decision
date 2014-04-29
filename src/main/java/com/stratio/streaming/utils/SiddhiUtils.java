@@ -1,5 +1,6 @@
 package com.stratio.streaming.utils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,8 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
+import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.streams.Casandra2PersistenceStore;
@@ -170,7 +173,30 @@ public class SiddhiUtils {
 		
 	}
 	
-	
+//	TODO move to StreamingCommons
+	public static Boolean isStreamAllowedForThisOperation(String streamName, String operation) {
+		
+		switch (operation.toUpperCase()) {
+			case STREAM_OPERATIONS.DEFINITION.ADD_QUERY:
+			case STREAM_OPERATIONS.DEFINITION.ALTER:
+			case STREAM_OPERATIONS.DEFINITION.CREATE:
+			case STREAM_OPERATIONS.DEFINITION.DROP:
+			case STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY:
+			case STREAM_OPERATIONS.MANIPULATION.INSERT:
+				if (Arrays.asList(STREAMING.STATS_NAMES.STATS_STREAMS).contains(streamName)) {
+					return Boolean.FALSE;
+				}
+				return Boolean.TRUE;
+			
+			case STREAM_OPERATIONS.ACTION.LISTEN:
+			case STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA:
+			case STREAM_OPERATIONS.ACTION.STOP_LISTEN:
+
+				return Boolean.TRUE;
+			default:
+				return Boolean.FALSE;
+		}						
+	}
 	
 	
 

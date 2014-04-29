@@ -11,6 +11,7 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
 import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
@@ -42,7 +43,11 @@ public class CreateStreamFunction extends StratioStreamingBaseFunction {
 //			Siddhi doesn't throw an exception if stream exists and you try to recreate it in the same way
 //			but if you try to redefine a stream, siddhi will throw a DifferentDefinitionAlreadyExistException
 //			so, we avoid this scenario but checking first if stream exists
-			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) == null) {
+			
+//			stream is allowed and NOT exists in siddhi
+			if (SiddhiUtils.isStreamAllowedForThisOperation(request.getStreamName(), STREAM_OPERATIONS.DEFINITION.CREATE)
+					&& getSiddhiManager().getStreamDefinition(request.getStreamName()) == null) {
+
 				
 				
 				try {

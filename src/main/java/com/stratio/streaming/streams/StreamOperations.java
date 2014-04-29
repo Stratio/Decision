@@ -137,7 +137,7 @@ public class StreamOperations {
 		
 		for(StreamDefinition streamMetaData : siddhiManager.getStreamDefinitions()) {
 			
-			if (!Arrays.asList(STREAMING.STATS_NAMES.RESERVED_STREAMS).contains(streamMetaData.getStreamId())) {
+			if (!Arrays.asList(STREAMING.STATS_NAMES.STATS_STREAMS).contains(streamMetaData.getStreamId())) {
 			
 				List<ColumnNameTypeValue> columns = Lists.newArrayList();
 				List<StreamQuery> queries = Lists.newArrayList();

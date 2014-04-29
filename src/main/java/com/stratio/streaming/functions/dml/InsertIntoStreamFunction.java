@@ -18,6 +18,7 @@ import scala.Tuple2;
 import com.google.common.collect.Lists;
 import com.stratio.deep.entity.Cells;
 import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.StratioStreamingBaseFunction;
 import com.stratio.streaming.streams.StreamSharedStatus;
@@ -43,9 +44,13 @@ public class InsertIntoStreamFunction extends StratioStreamingBaseFunction {
 		List<StratioStreamingMessage> requests = rdd.collect();
 		
 		for (StratioStreamingMessage request : requests) {
+
+
 			
-//			stream exists
-			if (getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
+//			stream is allowed and exists in siddhi
+			if (SiddhiUtils.isStreamAllowedForThisOperation(request.getStreamName(), STREAM_OPERATIONS.MANIPULATION.INSERT)
+					&& getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
+
 				
 				try {															
 					
