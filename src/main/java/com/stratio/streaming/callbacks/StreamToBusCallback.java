@@ -20,8 +20,6 @@ import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.functions.messages.FilterMessagesByOperationFunction;
-import com.stratio.streaming.utils.DataToCollectorUtils;
 
 public class StreamToBusCallback extends StreamCallback implements MessageListener<String> {
 
@@ -84,7 +82,6 @@ public class StreamToBusCallback extends StreamCallback implements MessageListen
 			}
 			
 			sendEventsToBus(collected_events);
-			DataToCollectorUtils.sendData(collected_events);
 		}
 		
 	}
