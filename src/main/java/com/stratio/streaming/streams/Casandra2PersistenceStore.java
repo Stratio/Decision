@@ -70,13 +70,13 @@ public class Casandra2PersistenceStore implements PersistenceStore {
 
     
     
-    public Casandra2PersistenceStore(String cassadraUrl, String username, String password) {
+    public Casandra2PersistenceStore(String cassandraCluster, String username, String password) {
 
  
         Map<String, String> credentials = new HashMap<String, String>();
         credentials.put("username", username);
         credentials.put("password", password);
-        cluster = HFactory.createCluster("TestCluster", new CassandraHostConfigurator(cassadraUrl), credentials);
+        cluster = HFactory.createCluster("TestCluster", new CassandraHostConfigurator(cassandraCluster), credentials);
 
         init(cluster);
 

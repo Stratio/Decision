@@ -109,7 +109,7 @@ public class SiddhiUtils {
 	 * 
 	 * @return SiddhiManager
 	 */
-	public static SiddhiManager setupSiddhiManager() {
+	public static SiddhiManager setupSiddhiManager(String cassandraCluster) {
 		
 		
 		SiddhiConfiguration conf = new SiddhiConfiguration();	
@@ -122,7 +122,7 @@ public class SiddhiUtils {
 		SiddhiManager siddhiManager = new SiddhiManager(conf);
 		
 		
-		siddhiManager.setPersistStore(new Casandra2PersistenceStore("node.stratio.com", "", ""));
+		siddhiManager.setPersistStore(new Casandra2PersistenceStore(cassandraCluster, "", ""));
 				
 		StreamPersistence.restoreLastRevision(siddhiManager);
 		

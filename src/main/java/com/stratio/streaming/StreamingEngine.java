@@ -62,6 +62,7 @@ public class StreamingEngine {
 	
 	private static Logger logger = LoggerFactory.getLogger(StreamingEngine.class);
 	private static SiddhiManager siddhiManager;
+	private static String cassandraCluster;
 	private static JavaStreamingContext jssc;
 
 
@@ -180,9 +181,11 @@ public class StreamingEngine {
 														String zkCluster, 
 														String kafkaCluster, 
 														String topics, 
-														String cassandraCluster, 
+														String cassandraClusterParam, 
 														Boolean enableAuditing, 
 														Boolean enableStats) throws Exception {
+		
+		cassandraCluster = cassandraClusterParam;
 		
 
 		ZKUtils.getZKUtils(zkCluster).createEphemeralZNode(STREAMING.ZK_BASE_PATH + "/" + "engine", String.valueOf(System.currentTimeMillis()).getBytes());
@@ -370,7 +373,7 @@ public class StreamingEngine {
 	
 	private static SiddhiManager getSiddhiManager() {
 		if (siddhiManager == null) {
-			siddhiManager = SiddhiUtils.setupSiddhiManager();
+			siddhiManager = SiddhiUtils.setupSiddhiManager(cassandraCluster);
 		}
 		
 		return siddhiManager;
