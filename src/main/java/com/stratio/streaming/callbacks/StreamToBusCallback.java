@@ -48,7 +48,7 @@ public class StreamToBusCallback extends StreamCallback implements MessageListen
 			
 			for (Event e : events) {
 				
-				logger.info("event type: " + e.getClass() + " - " + e.getData(0) + e.getData(1));
+//				logger.info("event type: " + e.getClass() + " - " + e.getData(0) + e.getData(1));
 				
 				
 				

@@ -63,6 +63,7 @@ public class StreamingEngine {
 	private static Logger logger = LoggerFactory.getLogger(StreamingEngine.class);
 	private static SiddhiManager siddhiManager;
 	private static String cassandraCluster;
+	private static Boolean failOverEnabled;
 	private static JavaStreamingContext jssc;
 
 
@@ -90,7 +91,8 @@ public class StreamingEngine {
         							.parm("--kafka-cluster", 		"node.stratio.com:9092").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()
         							.parm("--cassandra-cluster", 	"node.stratio.com").rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])+)*$")
         							.parm("--auditEnabled", 		"false")
-        							.parm("--statsEnabled", 		"true")
+        							.parm("--statsEnabled", 		"false")
+        							.parm("--failOverEnabled", 		"false")
         							.build();  
        
         HashMap<String, String> R = new HashMap<String,String>();
@@ -154,7 +156,8 @@ public class StreamingEngine {
 											BUS.TOPICS,
 											R.get("--cassandra-cluster").toString(),
 											Boolean.valueOf(R.get("--auditEnabled").toString()),
-											Boolean.valueOf(R.get("--statsEnabled").toString()));
+											Boolean.valueOf(R.get("--statsEnabled").toString()),
+											Boolean.valueOf(R.get("--failOverEnabled").toString()));
 		} catch (Exception e) {
 			logger.error("General error: " + e.getMessage() + " // " + e.getClass());
 		}
@@ -183,9 +186,11 @@ public class StreamingEngine {
 														String topics, 
 														String cassandraClusterParam, 
 														Boolean enableAuditing, 
-														Boolean enableStats) throws Exception {
+														Boolean enableStats,
+														Boolean failOverEnabledParam) throws Exception {
 		
 		cassandraCluster = cassandraClusterParam;
+		failOverEnabled = failOverEnabledParam;
 		
 
 		ZKUtils.getZKUtils(zkCluster).createEphemeralZNode(STREAMING.ZK_BASE_PATH + "/" + "engine", String.valueOf(System.currentTimeMillis()).getBytes());
@@ -373,7 +378,7 @@ public class StreamingEngine {
 	
 	private static SiddhiManager getSiddhiManager() {
 		if (siddhiManager == null) {
-			siddhiManager = SiddhiUtils.setupSiddhiManager(cassandraCluster);
+			siddhiManager = SiddhiUtils.setupSiddhiManager(cassandraCluster, failOverEnabled);
 		}
 		
 		return siddhiManager;

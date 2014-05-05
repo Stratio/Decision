@@ -89,7 +89,7 @@ public class StreamOperations {
 	
 	public static void addQueryToExistingStream(StratioStreamingMessage request, SiddhiManager siddhiManager) {
 //		add query to siddhi
-		String queryId = siddhiManager.addQuery(request.getRequest());
+		String queryId = siddhiManager.addQuery(request.getRequest().replaceAll("timebatch", "timeBatch"));
 //		register query in stream status						
 		StreamSharedStatus.addQueryToStreamStatus(queryId, request.getRequest(), request.getStreamName(), siddhiManager);
 		

@@ -59,6 +59,7 @@ public class CreateStreamFunction extends StratioStreamingBaseFunction {
 					
 					
 				} catch (SiddhiPraserException spe) {
+					logger.info("-_---->" + spe.getMessage());
 					ackStreamingOperation(request, REPLY_CODES.KO_PARSER_ERROR);
 				}
 				

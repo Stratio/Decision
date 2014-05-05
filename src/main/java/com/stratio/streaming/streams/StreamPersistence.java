@@ -23,6 +23,10 @@ public class StreamPersistence {
 	
 	public static String saveStreamingEngineStatus(SiddhiManager siddhiManager) {
 		
+		if (siddhiManager.getSiddhiContext().getPersistenceService().getPersistenceStore() == null) {
+			return "";
+		}
+		
 		String revisionID = siddhiManager.persist();		
 		String executionPlan = "";
 		
@@ -56,9 +60,12 @@ public class StreamPersistence {
 	
 	public static void removeEngineStatusFromCleanExit(SiddhiManager siddhiManager) {
 		
-		Casandra2PersistenceStore cassandraPersistence = (Casandra2PersistenceStore) siddhiManager.getSiddhiContext().getPersistenceService().getPersistenceStore();
-		
-		cassandraPersistence.removeAllRevisions();
+		if (siddhiManager.getSiddhiContext().getPersistenceService().getPersistenceStore() != null) {
+			Casandra2PersistenceStore cassandraPersistence = (Casandra2PersistenceStore) siddhiManager.getSiddhiContext().getPersistenceService().getPersistenceStore();
+			
+			cassandraPersistence.removeAllRevisions();
+			
+		}
 		
 	}
 	

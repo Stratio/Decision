@@ -30,7 +30,7 @@ public class SiddhiUtils {
 	public static final String SIDDHI_TYPE_STRING 		= "STRING";
 	public static final String SIDDHI_TYPE_BOOLEAN 		= "BOOLEAN";
 	public static final String SIDDHI_TYPE_DOUBLE 		= "DOUBLE";
-	public static final String SIDDHI_TYPE_INT 			= "INTEGER";
+	public static final String SIDDHI_TYPE_INT 			= "INT";
 	public static final String SIDDHI_TYPE_LONG 		= "LONG";
 	public static final String SIDDHI_TYPE_FLOAT 		= "FLOAT";
 	
@@ -59,7 +59,7 @@ public class SiddhiUtils {
 			case SIDDHI_TYPE_FLOAT:
 				return Attribute.Type.FLOAT;
 			default:
-				throw new SiddhiPraserException("Unsupported Column type");
+				throw new SiddhiPraserException("Unsupported Column type: " + originalType);
 		}
 		
 	}
@@ -83,7 +83,13 @@ public class SiddhiUtils {
 		StreamDefinition newStream = QueryFactory.createStreamDefinition().name(request.getStreamName());
 		
 		for (ColumnNameTypeValue column : request.getColumns()) {
-			newStream.attribute(column.getColumn(), SiddhiUtils.decodeSiddhiType(column.getType()));			
+			logger.info(column.getColumn() + "//" + SiddhiUtils.decodeSiddhiType(column.getType()) );
+			try {
+				newStream.attribute(column.getColumn(), SiddhiUtils.decodeSiddhiType(column.getType()));
+			}
+			catch(SiddhiPraserException e) {
+				logger.info(e.getMessage() + "//" + column.getColumn() + "//" + column.getType());
+			}
 		}			
 		
 		return newStream;
@@ -109,7 +115,7 @@ public class SiddhiUtils {
 	 * 
 	 * @return SiddhiManager
 	 */
-	public static SiddhiManager setupSiddhiManager(String cassandraCluster) {
+	public static SiddhiManager setupSiddhiManager(String cassandraCluster, Boolean failOverEnabled) {
 		
 		
 		SiddhiConfiguration conf = new SiddhiConfiguration();	
@@ -122,10 +128,12 @@ public class SiddhiUtils {
 		SiddhiManager siddhiManager = new SiddhiManager(conf);
 		
 		
-		siddhiManager.setPersistStore(new Casandra2PersistenceStore(cassandraCluster, "", ""));
-				
-		StreamPersistence.restoreLastRevision(siddhiManager);
-		
+		if (failOverEnabled) {
+					
+			siddhiManager.setPersistStore(new Casandra2PersistenceStore(cassandraCluster, "", ""));
+					
+			StreamPersistence.restoreLastRevision(siddhiManager);
+		}
 		
 		return siddhiManager;						
 	}
