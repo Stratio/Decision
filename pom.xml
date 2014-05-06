@@ -5,7 +5,7 @@
   <artifactId>streaming-commons</artifactId>
   <packaging>jar</packaging>
   <version>0.1.0</version>
-  <name>StratioStreamingCommons</name>
+  <name>stratio-streaming-commons</name>
   <distributionManagement>
     <repository>
        <id>stratio-releases</id>
@@ -23,4 +23,5 @@
   		<version>14.0.1</version>
   	</dependency>
   </dependencies>
+  <url>https://github.com/Stratio/stratio-streaming-commons</url>
 </project>
