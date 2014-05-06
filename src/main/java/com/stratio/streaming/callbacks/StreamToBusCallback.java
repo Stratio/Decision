@@ -59,7 +59,7 @@ public class StreamToBusCallback extends StreamCallback implements MessageListen
 					
 					for (Attribute column : streamDefinition.getAttributeList()) {
 						
-						logger.info("event data size: " +ie.getData().length + " // attribute: " + column.getName() + " // position: " + streamDefinition.getAttributePosition(column.getName()));
+//						logger.info("event data size: " +ie.getData().length + " // attribute: " + column.getName() + " // position: " + streamDefinition.getAttributePosition(column.getName()));
 						
 //						avoid retrieving a value out of the scope
 //						outputStream could have more fields defined than the output events (projection)
@@ -108,10 +108,11 @@ public class StreamToBusCallback extends StreamCallback implements MessageListen
 		Properties properties = new Properties();
 		properties.put("serializer.class", "kafka.serializer.StringEncoder");
 		properties.put("metadata.broker.list", kafkaCluster);
+		properties.put("producer.type", "async");
 //			properties.put("request.required.acks", "1");
 //			properties.put("compress", "true");
 //			properties.put("compression.codec", "gzip");
-//			properties.put("producer.type", "sync");
+
  
         return new ProducerConfig(properties);
     }

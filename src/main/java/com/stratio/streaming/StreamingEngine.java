@@ -93,6 +93,7 @@ public class StreamingEngine {
         							.parm("--auditEnabled", 		"false")
         							.parm("--statsEnabled", 		"false")
         							.parm("--failOverEnabled", 		"false")
+        							.parm("--printStreams", 		"false")
         							.build();  
        
         HashMap<String, String> R = new HashMap<String,String>();
@@ -157,7 +158,8 @@ public class StreamingEngine {
 											R.get("--cassandra-cluster").toString(),
 											Boolean.valueOf(R.get("--auditEnabled").toString()),
 											Boolean.valueOf(R.get("--statsEnabled").toString()),
-											Boolean.valueOf(R.get("--failOverEnabled").toString()));
+											Boolean.valueOf(R.get("--failOverEnabled").toString()),
+											Boolean.valueOf(R.get("--printStreams").toString()));
 		} catch (Exception e) {
 			logger.error("General error: " + e.getMessage() + " // " + e.getClass());
 		}
@@ -187,7 +189,8 @@ public class StreamingEngine {
 														String cassandraClusterParam, 
 														Boolean enableAuditing, 
 														Boolean enableStats,
-														Boolean failOverEnabledParam) throws Exception {
+														Boolean failOverEnabledParam,
+														Boolean printStreams) throws Exception {
 		
 		cassandraCluster = cassandraClusterParam;
 		failOverEnabled = failOverEnabledParam;
@@ -319,57 +322,63 @@ public class StreamingEngine {
 		
 							
 	
+		StreamPersistence.saveStreamingEngineStatus(getSiddhiManager());
 		
 		
+		if (printStreams) {
+			
 		
-//		DEBUG STRATIO STREAMING ENGINE //
-		messages.count().foreach(new Function<JavaRDD<Long>, Void>() {
-
-			@Override
-			public Void call(JavaRDD<Long> arg0) throws Exception {
-				
-				logger.info("********************************************");						
-				logger.info("**       SIDDHI STREAMS                   **");
-				logger.info("** countSiddhi:" + siddhiManager.getStreamDefinitions().size() + " // countHazelcast: " + getSiddhiManager().getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP).size());											
-				
-				for(StreamDefinition streamMetaData : getSiddhiManager().getStreamDefinitions()) {
+	//		DEBUG STRATIO STREAMING ENGINE //
+			messages.count().foreach(new Function<JavaRDD<Long>, Void>() {
+	
+				@Override
+				public Void call(JavaRDD<Long> arg0) throws Exception {
 					
-					StringBuffer streamDefinition = new StringBuffer();
+					logger.info("********************************************");						
+					logger.info("**       SIDDHI STREAMS                   **");
+					logger.info("** countSiddhi:" + siddhiManager.getStreamDefinitions().size() + " // countHazelcast: " + getSiddhiManager().getSiddhiContext().getHazelcastInstance().getMap(STREAMING.STREAM_STATUS_MAP).size());											
 					
-					streamDefinition.append(streamMetaData.getStreamId());												
-					
-					for (Attribute column : streamMetaData.getAttributeList()) {
-						streamDefinition.append(" |" + column.getName() + "," + column.getType());
-					}
-					
-					if (StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()) != null) {
-						HashMap<String, String> attachedQueries = StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).getAddedQueries();
+					for(StreamDefinition streamMetaData : getSiddhiManager().getStreamDefinitions()) {
 						
-						streamDefinition.append(" /// " + attachedQueries.size() + " attachedQueries: (");
+						StringBuffer streamDefinition = new StringBuffer();
 						
-						for (String queryId : attachedQueries.keySet()) {
-							streamDefinition.append(queryId + "/");
+						streamDefinition.append(streamMetaData.getStreamId());												
+						
+						for (Attribute column : streamMetaData.getAttributeList()) {
+							streamDefinition.append(" |" + column.getName() + "," + column.getType());
 						}
 						
-						streamDefinition.append(" - userDefined:" + StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isUserDefined() + "- ");
-						streamDefinition.append(" - listenEnable:" + StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isListen_enabled() + "- ");
+						if (StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()) != null) {
+							HashMap<String, String> attachedQueries = StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).getAddedQueries();
+							
+							streamDefinition.append(" /// " + attachedQueries.size() + " attachedQueries: (");
+							
+							for (String queryId : attachedQueries.keySet()) {
+								streamDefinition.append(queryId + "/");
+							}
+							
+							streamDefinition.append(" - userDefined:" + StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isUserDefined() + "- ");
+							streamDefinition.append(" - listenEnable:" + StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()).isListen_enabled() + "- ");
+						}
+						
+						logger.info("** stream: " + streamDefinition);
 					}
 					
-					logger.info("** stream: " + streamDefinition);
+					logger.info("********************************************");
+					
+					StreamPersistence.saveStreamingEngineStatus(getSiddhiManager());
+					
+					return null;
 				}
 				
-				logger.info("********************************************");
-				
-				StreamPersistence.saveStreamingEngineStatus(getSiddhiManager());
-				
-				return null;
-			}
+			});
 			
-		});
+			
+			
+			messages.print();
+			
+		}
 		
-		
-		StreamPersistence.saveStreamingEngineStatus(getSiddhiManager());
-		messages.print();
 		jssc.start();
 		jssc.awaitTermination();
 		

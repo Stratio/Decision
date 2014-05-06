@@ -28,7 +28,7 @@ public class SiddhiUtils {
 	
 	
 	public static final String SIDDHI_TYPE_STRING 		= "STRING";
-	public static final String SIDDHI_TYPE_BOOLEAN 		= "BOOLEAN";
+	public static final String SIDDHI_TYPE_BOOLEAN 		= "BOOL";
 	public static final String SIDDHI_TYPE_DOUBLE 		= "DOUBLE";
 	public static final String SIDDHI_TYPE_INT 			= "INT";
 	public static final String SIDDHI_TYPE_LONG 		= "LONG";
@@ -176,7 +176,7 @@ public class SiddhiUtils {
 			case SIDDHI_TYPE_FLOAT:
 				return Float.valueOf(originalValue);
 			default:
-				throw new SiddhiPraserException("Unsupported Column type");
+				throw new SiddhiPraserException("Unsupported Column type: " + originalValue + "/" + type.toString());
 		}
 		
 	}
