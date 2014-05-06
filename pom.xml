@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.stratio.streaming</groupId>
-	<artifactId>streaming</artifactId>
+	<artifactId>streaming-engine</artifactId>
 	<version>0.1.0</version>
 	<properties>
 		<maven.compiler.source>1.7</maven.compiler.source>
@@ -91,8 +91,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.stratio.streaming</groupId>
-			<artifactId>StratioStreamingCommons</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>streaming-commons</artifactId>
+			<version>0.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.zmatrix.cli</groupId>
@@ -198,5 +198,7 @@
 <!--         </pluginRepository> -->
 <!--     </pluginRepositories> -->
 	
+	<name>stratio-streaming-engine</name>
+	<url>https://github.com/Stratio/stratio-streaming</url>
 </project>
 
