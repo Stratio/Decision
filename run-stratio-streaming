@@ -1,22 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 cygwin=false
 case "`uname`" in
     CYGWIN*) cygwin=true;;
@@ -42,25 +25,24 @@ fi
 
 # Figure out the JAR file that our examples were packaged into. This includes a bit of a hack
 # to avoid the -sources and -doc packages that are built by publish-local.
-EXAMPLES_DIR="$FWDIR"/stratio
-SPARK_EXAMPLES_JAR="$EXAMPLES_DIR/*"
-#export SPARK_EXAMPLES_JAR=`ls "$EXAMPLES_DIR"/*.jar`
+BASE_DIR="$FWDIR"/stratio
+STREAMING_ENGINE_JAR="$BASE_DIR/*"
+#export STREAMING_ENGINE_JAR=`ls "$BASE_DIR"/*.jar`
 
-if [ -z "$SPARK_EXAMPLES_JAR" ]; then
-  echo "Failed to find Spark examples assembly in $FWDIR/examples/target" >&2
-  echo "You need to build Spark with sbt/sbt assembly before running this program" >&2
+if [ -z "$STREAMING_ENGINE_JAR" ]; then
+  echo "Failed to find Stratio Streaming jar in $FWDIR/examples/target" >&2
   exit 1
 fi
 
 
-# Since the examples JAR ideally shouldn't include spark-core (that dependency should be
+# Since the JAR ideally shouldn't include spark-core (that dependency should be
 # "provided"), also add our standard Spark classpath, built using compute-classpath.sh.
 CLASSPATH=`$FWDIR/bin/compute-classpath.sh`
-CLASSPATH="$SPARK_EXAMPLES_JAR:$CLASSPATH"
+CLASSPATH="$STREAMING_ENGINE_JAR:$CLASSPATH"
 
 if $cygwin; then
     CLASSPATH=`cygpath -wp $CLASSPATH`
-    export SPARK_EXAMPLES_JAR=`cygpath -w $SPARK_EXAMPLES_JAR`
+    export STREAMING_ENGINE_JAR=`cygpath -w $STREAMING_ENGINE_JAR`
 fi
 
 # Find java binary
