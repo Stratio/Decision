@@ -44,10 +44,12 @@ How to start
   * To publish the artifact to a nexus repository you need to create a credentials file within the following directory: $USER_HOME/.ivy2.
     The content of the file should be the following:
 
+     ```
      realm=Sonatype Nexus Repository Manager
      host={yournexushost}
      user={theuser}
      password={thepassword}
+     ```
 
      To publish the artifact just type:
 
@@ -58,10 +60,12 @@ Using the Stratio Streaming API
 
   * Firstly, you need to include in your project CLASSPATH a file called stratio-streaming.conf with the following content:
 
+    ```
     kafka.server={kafkaServerAddress}
     kafka.port={kafkaServerPort}
     zookeeper.server={zookeeperServerAddress}
     zookeeper.port={zookeeperServerPort}
+    ```
 
   * To get an instance of the Stratio Streaming API:
 
