@@ -1,5 +1,5 @@
 StratiosStreamingCommons
 ========================
 
-Commons library created to share common configuration and properties between StratioBus and StratioStreaming
+Commons library created to share common configuration and properties between StratioStreamingAPI and StratioStreaming
 

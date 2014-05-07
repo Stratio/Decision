@@ -1,42 +1,132 @@
-<!--
-  Copyright 2014 Stratio
-  
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-  
-    http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
+<!-- Copyright 2014 Stratio Licensed under the Apache License, Version 2.0 
+	(the "License"); you may not use this file except in compliance with the 
+	License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.stratio.streaming</groupId>
-  <artifactId>streaming-commons</artifactId>
-  <packaging>jar</packaging>
-  <version>0.1.0</version>
-  <name>stratio-streaming-commons</name>
-  <distributionManagement>
-    <repository>
-       <id>stratio-releases</id>
-       <url>http://nexus.strat.io:8081/nexus/content/repositories/releases</url>
-    </repository>
-    <snapshotRepository>
-       <id>stratio-snapshots</id>
-       <url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
-  <dependencies>
-  	<dependency>
-  		<groupId>com.google.guava</groupId>
-  		<artifactId>guava</artifactId>
-  		<version>14.0.1</version>
-  	</dependency>
-  </dependencies>
-  <url>https://github.com/Stratio/stratio-streaming-commons</url>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.stratio.streaming</groupId>
+	<artifactId>streaming-commons</artifactId>
+	<packaging>jar</packaging>
+	<version>0.1.0</version>
+	<name>streaming-commons</name>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>dmorales-stratio</id>
+			<name>David Morales</name>
+			<email>dmorales@stratio.com</email>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>albertostratio</id>
+			<name>Alberto Rodríguez</name>
+			<email>arodriguez@stratio.com</email>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>eraffenne</id>
+			<name>Emmanuelle Raffenne</name>
+			<email>eraffenne@stratio.com</email>
+			<roles>
+				<role>tester</role>
+				<role>documentation</role>
+				<role>contributor</role>
+			</roles>
+		</developer>
+	</developers>
+	<distributionManagement>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>		
+	</distributionManagement>
+	<dependencies>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>14.0.1</version>
+		</dependency>
+	</dependencies>
+	<url>http://www.stratio.com</url>
+	<description>Commons library created to share common configuration and properties between StratioStreamingAPI and StratioStreaming</description>
+	<scm>
+		<url>https://github.com/Stratio/stratio-streaming-commons</url>
+		<connection>scm:git:git@github.com:Stratio/stratio-streaming-commons.git</connection>
+		<developerConnection>scm:git:git@github.com:Stratio/stratio-streaming-commons.git</developerConnection>
+	</scm>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<configuration>
+							<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+							<repositoryId>sonatype-nexus-staging</repositoryId>
+							<pomFile>pom.xml</pomFile>
+							<files>
+								<file>target/streaming-commons-0.1.0.jar</file>
+								<file>target/streaming-commons-0.1.0-javadoc.jar</file>
+								<file>target/streaming-commons-0.1.0-sources.jar</file>
+							</files>
+
+						</configuration>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+
+
 </project>
