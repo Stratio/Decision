@@ -13,7 +13,7 @@ object StreamsParser {
       new StratioStream(stream.getStreamName,
         stream.getColumns,
         stream.getQueries,
-        stream.getUserDefined)}
+        stream.isUserDefined)}
     )
     stratioStreams
   }
