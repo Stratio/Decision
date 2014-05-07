@@ -37,6 +37,7 @@ public class StratioStream implements Serializable {
         this.userDefined = userDefined;
     }
 
+
     public boolean getUserDefined() {
         return userDefined;
     }
