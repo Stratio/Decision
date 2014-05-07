@@ -32,7 +32,10 @@ mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
 
 test in assembly := {}
 
-resolvers += "Nexus snapshots" at "http://nexus.strat.io:8081/nexus/content/repositories/snapshots"
+resolvers ++= Seq(
+   "Nexus snapshots" at "http://nexus.strat.io:8081/nexus/content/repositories/snapshots",
+   "Nexus releases" at "http://nexus.strat.io:8081/nexus/content/repositories/releases"
+)
 
 libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.10" % "2.0" % "test",
@@ -40,7 +43,7 @@ libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.2.0",
   "org.apache.curator" % "curator-framework" % "2.4.1",
   "org.slf4j" % "slf4j-log4j12" % "1.7.5",
-  "com.stratio.streaming" % "StratioStreamingCommons" % "0.0.1-SNAPSHOT",
+  "com.stratio.streaming" % "streaming-commons" % "0.1.0",
   "com.google.code.gson" % "gson" % "2.2.4"
 )
 

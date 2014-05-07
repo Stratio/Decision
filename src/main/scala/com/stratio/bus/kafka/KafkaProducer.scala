@@ -4,8 +4,6 @@ import java.util.UUID
 import java.util.Properties
 import kafka.producer._
 import org.slf4j.LoggerFactory
-import com.stratio.streaming.commons.constants.TopicNames._
-
 
 case class KafkaProducer(topic: String,
                           brokerList: String,
