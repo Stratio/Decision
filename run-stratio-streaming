@@ -25,7 +25,7 @@ fi
 
 # Figure out the JAR file that our examples were packaged into. This includes a bit of a hack
 # to avoid the -sources and -doc packages that are built by publish-local.
-BASE_DIR="$FWDIR"/stratio
+BASE_DIR="$FWDIR"/stratio-streaming-engine
 STREAMING_ENGINE_JAR="$BASE_DIR/*"
 #export STREAMING_ENGINE_JAR=`ls "$BASE_DIR"/*.jar`
 
