@@ -35,11 +35,8 @@ How to start
   * To compile the project:
         sbt compile
 
-  * To run the tests:
-        ./start-test-env.sh 
+  * To run the tests (Stratio Streaming Engine should be up and running):
         sbt test
-
-        //TODO: Create the stop-test-env script
 
   * To create the Stratio Streaming API distribution:
         sbt assembly
