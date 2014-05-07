@@ -56,8 +56,15 @@ How to start
 
        sbt publish
 
-Using the Bus
-=============
+Using the Stratio Streaming API
+===============================
+
+  * Firstly, you need to include in your project CLASSPATH a file called stratio-streaming.conf with the following content:
+
+    kafka.server={kafkaServerAddress}
+    kafka.port={kafkaServerPort}
+    zookeeper.server={zookeeperServerAddress}
+    zookeeper.port={zookeeperServerPort}
 
   * To get an instance of the Stratio Streaming API:
 
