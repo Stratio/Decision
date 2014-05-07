@@ -57,5 +57,5 @@ publishTo := {
     Some("releases"  at nexus + "releases")
 }
 
-initialCommands := "import com.stratio.bus._"
+initialCommands := "import com.stratio.streaming.api._"
 
