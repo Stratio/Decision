@@ -1,6 +1,6 @@
 import AssemblyKeys._
 
-moduleName := "stratio-streaming-api"
+moduleName := "streaming-api"
 
 crossPaths := false
 
@@ -16,7 +16,7 @@ seq(assemblySettings: _*)
 
 jarName in assembly := "stratio-streaming-api-0.1.0.jar"
 
-addArtifact(Artifact("stratio-streaming-api"), sbtassembly.Plugin.AssemblyKeys.assembly)
+addArtifact(Artifact("streaming-api"), sbtassembly.Plugin.AssemblyKeys.assembly)
 
 mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
   {
