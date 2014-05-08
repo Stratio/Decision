@@ -23,16 +23,6 @@
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
-	<distributionManagement>
-		<repository>
-			<id>stratio-releases</id>
-			<url>http://nexus.strat.io:8081/nexus/content/repositories/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>stratio-snapshots</id>
-			<url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.curator</groupId>
@@ -68,11 +58,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.stratio.deep</groupId>
-			<artifactId>StratioDeep</artifactId>
-			<version>0.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.wso2.siddhi</groupId>
@@ -114,20 +99,13 @@
 			<artifactId>parser</artifactId>
 			<version>0.0.93</version>
 		</dependency>
+		<dependency>
+			<groupId>com.stratio.deep</groupId>
+			<artifactId>deep-core</artifactId>
+			<version>0.2.2</version>
+		</dependency>
 	</dependencies>
 	<repositories>
-		<repository>
-			<id>stratio-releases</id>
-			<url>http://nexus.strat.io:8081/nexus/content/repositories/releases</url>
-		</repository>
-		<repository>
-			<id>stratio-snapshots</id>
-			<url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
-		</repository>
-		<repository>
-			<id>spark-snapshots</id>
-			<url>http://nexus.strat.io:8081/nexus/content/repositories/spark-snapshots</url>
-		</repository>
 		<repository>
 			<id>wso2-nexus</id>
 			<name>WSO2 internal Repository</name>
@@ -174,7 +152,7 @@
 		
 
 <!--             <plugin> -->
-<!--                 <groupId>org.dstovall</groupId> -->
+<!--                 <grhttp://nexus.strat.io:8081/nexus/content/repositories/releasesoupId>org.dstovall</groupId> -->
 <!--                 <artifactId>onejar-maven-plugin</artifactId> -->
 <!--                 <version>1.4.4</version> -->
 <!--                 <executions> -->
