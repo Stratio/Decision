@@ -35,8 +35,11 @@ How to start
   * To compile the project:
         sbt compile
 
-  * To run the tests (Stratio Streaming Engine should be up and running):
+  * To run the unit tests:
         sbt test
+
+  * To run the integration tests (Stratio Streaming Engine should be up and running):
+        sbt integration:test
 
   * To create the Stratio Streaming API distribution:
         sbt assembly
