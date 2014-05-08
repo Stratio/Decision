@@ -110,6 +110,29 @@ class StratioStreamingIntegrationTests
     }
   }
 
+  describe("The insert operation") {
+    it("should throw a StratioEngineStatusException when streaming engine is not running") {
+      val firstColumnValue = new ColumnNameValue("column1", new Integer(111111))
+      val secondColumnValue = new ColumnNameValue("column2", "testString")
+      val columnValues = Seq(firstColumnValue, secondColumnValue)
+      removeEphemeralNode()
+      //Add some delay to wait for the event to be triggered
+      Thread.sleep(1000)
+      intercept [StratioEngineStatusException] {
+        streamingAPI.insertData(testStreamName, columnValues)
+      }
+    }
+
+    it("should throw a StratioAPISecurityException when insert data into a stream with the stratio_ prefix") {
+      val firstColumnValue = new ColumnNameValue("column1", new Integer(111111))
+      val secondColumnValue = new ColumnNameValue("column2", "testString")
+      val columnValues = Seq(firstColumnValue, secondColumnValue)
+      intercept [StratioAPISecurityException] {
+        streamingAPI.insertData(internalTestStreamName, columnValues)
+      }
+    }
+  }
+
   describe("The alter operation") {
     it("should add new columns to an existing stream") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
@@ -179,7 +202,7 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The add query operation") {
-    it("should add new queries to an existing stream", Tag("wip")) {
+    it("should add new queries to an existing stream") {
       val alarmsStream = "alarms"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
