@@ -20,7 +20,7 @@ import org.scalatest._
 import com.stratio.streaming.utils.StreamsParser
 import scala.collection.JavaConversions._
 
-class StreamsParserTests
+class StreamsParserUnitTests
   extends FunSpec
   with GivenWhenThen
   with ShouldMatchers {

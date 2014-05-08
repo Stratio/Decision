@@ -30,7 +30,7 @@ import java.util
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue
 import com.stratio.streaming.api.StratioStreamingAPIFactory
 
-class StratioStreamingApiTests
+class StratioStreamingIntegrationTests
   extends FunSpec
   with ShouldMatchers
   with BeforeAndAfterEach {
@@ -55,10 +55,19 @@ class StratioStreamingApiTests
   }
 
   describe("The create operation") {
-    it("should create a new stream when the stream does not exist") {
+    it("should create a new stream when the stream does not exist", Tag("wip")) {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val thirdStreamColumn = new ColumnNameType("column3", ColumnType.BOOLEAN)
+      val fourthStreamColumn = new ColumnNameType("column4", ColumnType.DOUBLE)
+      val fifthStreamColumn = new ColumnNameType("column5", ColumnType.FLOAT)
+      val sixthStreamColumn = new ColumnNameType("column6", ColumnType.LONG)
+      val columnList = Seq(firstStreamColumn,
+        secondStreamColumn,
+        thirdStreamColumn,
+        fourthStreamColumn,
+        fifthStreamColumn,
+        sixthStreamColumn)
       try {
         streamingAPI.createStream(testStreamName, columnList)
       } catch {
@@ -66,7 +75,7 @@ class StratioStreamingApiTests
       }
 
       theNumberOfUserDefinedStreams should be(1)
-      theNumberOfColumnsOfStream(testStreamName) should be(2)
+      theNumberOfColumnsOfStream(testStreamName) should be(6)
     }
 
     it("should throw a StratioEngineOperationException when creating a stream that already exists") {

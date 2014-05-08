@@ -19,7 +19,7 @@ package com.stratio.streaming.unit
 import org.scalatest._
 import com.stratio.streaming.kafka.JsonGenericDecoder
 
-class JsonGenericDecoderTests
+class JsonGenericDecoderUnitTests
   extends FunSpec
   with ShouldMatchers {
 

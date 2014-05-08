@@ -21,7 +21,7 @@ import java.util.UUID
 import com.stratio.streaming.kafka.{KafkaProducer, KafkaConsumer}
 
 
-class ConsumerProducerTests
+class ConsumerProducerUnitTests
   extends FunSpec
   with ShouldMatchers {
   describe("Simple producer and consumer") {
