@@ -2,3 +2,6 @@ target/
 *.iml
 *.ipr
 *.iws
+/bin
+*.project
+/.classpath
