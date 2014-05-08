@@ -1,10 +1,19 @@
 import AssemblyKeys._
+import SonatypeKeys._
+
+sonatypeSettings
+
+useGpg := true
+
+pgpReadOnly := false
 
 moduleName := "streaming-api"
 
 crossPaths := false
 
 organization := "com.stratio.streaming"
+
+profileName := "com.stratio"
 
 publishMavenStyle := true
 
@@ -50,11 +59,46 @@ libraryDependencies ++= Seq(
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 
 publishTo := {
-  val nexus = "http://nexus.strat.io:8081/nexus/content/repositories/"
-  if (version.value.trim.endsWith("SNAPSHOT"))
-    Some("snapshots" at nexus + "snapshots")
-  else
-    Some("releases"  at nexus + "releases")
+  val nexus = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+  Some("releases" at nexus)
+}
+
+// To sync with Maven central, you need to supply the following information:
+pomExtra := {
+  <url>http://www.stratio.com</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:git@github.com/Stratio/stratio-streaming-api.git</connection>
+    <developerConnection>scm:git:git@github.com:Stratio/stratio-streaming-api.git</developerConnection>
+    <url>https://github.com/Stratio/stratio-streaming-api</url>
+  </scm>
+  <developers>
+    <developer>
+      <id>dmorales</id>
+      <name>David Morales</name>
+      <email>dmorales@stratio.com</email>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+        <role>maintainer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>arodriguez</id>
+      <name>Alberto Rodriguez</name>
+      <email>arodriguez@stratio.com</email>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+        <role>maintainer</role>
+      </roles>
+    </developer>
+  </developers>
 }
 
 initialCommands := "import com.stratio.streaming.api._"
