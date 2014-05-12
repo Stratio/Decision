@@ -15,10 +15,13 @@
  ******************************************************************************/
 package com.stratio.streaming;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
@@ -80,11 +83,6 @@ public class StreamingEngine {
 	private static String cassandraCluster;
 	private static Boolean failOverEnabled;
 	private static JavaStreamingContext jssc;
-
-
-	public StreamingEngine() {
-		// TODO Auto-generated constructor stub
-	}
 
 	/**
 	 * 
@@ -160,13 +158,13 @@ public class StreamingEngine {
             	ZKUtils.shutdownZKUtils();
             	
             	
-            	logger.info("Shutdown complete, bye¡");
+            	logger.info("Shutdown complete, byeï¿½");
             }
         });
         
         
         try {
-			launchStratioStreamingEngine(R.get("--spark-master").toString().replace("_", "[") + "]",        		
+			launchStratioStreamingEngine(R.get("--spark-master").toString(),        		
 											R.get("--zookeeper-cluster").toString(),
 											R.get("--kafka-cluster").toString(),
 											BUS.TOPICS,
@@ -176,7 +174,7 @@ public class StreamingEngine {
 											Boolean.valueOf(R.get("--failOverEnabled").toString()),
 											Boolean.valueOf(R.get("--printStreams").toString()));
 		} catch (Exception e) {
-			logger.error("General error: " + e.getMessage() + " // " + e.getClass());
+			logger.error("General error: " + e.getMessage() + " // " + e.getClass(),e);
 		}
 
 	}
@@ -213,13 +211,14 @@ public class StreamingEngine {
 
 		ZKUtils.getZKUtils(zkCluster).createEphemeralZNode(STREAMING.ZK_BASE_PATH + "/" + "engine", String.valueOf(System.currentTimeMillis()).getBytes());
 		
-	
-		
 //		Create the context with a x seconds batch size
-		jssc = new JavaStreamingContext(sparkMaster, StreamingEngine.class.getName(), 
-																new Duration(STREAMING.DURATION_MS), System.getenv("SPARK_HOME"), 
-																JavaStreamingContext.jarOfClass(StreamingEngine.class));
-		
+//		jssc = new JavaStreamingContext(sparkMaster, StreamingEngine.class.getName(), 
+//																new Duration(STREAMING.DURATION_MS), System.getenv("SPARK_HOME"), 
+//																JavaStreamingContext.jarOfClass(StreamingEngine.class));
+		jssc = new JavaStreamingContext("local[2]",
+				StreamingEngine.class.getName(), new Duration(
+						STREAMING.DURATION_MS));
+		jssc.sparkContext().getConf().setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
 		
 		KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
 		CreateStreamFunction createStreamFunction = new CreateStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);

@@ -30,6 +30,8 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
+import com.hazelcast.config.Config;
+import com.hazelcast.instance.HazelcastInstanceFactory;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
@@ -136,93 +138,102 @@ public class SiddhiUtils {
 		SiddhiConfiguration conf = new SiddhiConfiguration();	
 		conf.setInstanceIdentifier("StratioStreamingCEP-Instance-"+ UUID.randomUUID().toString());
 		conf.setQueryPlanIdentifier(QUERY_PLAN_IDENTIFIER);
-		conf.setDistributedProcessing(true);			
+		conf.setDistributedProcessing(false);			
 		
 		
 		// Create Siddhi Manager
 		SiddhiManager siddhiManager = new SiddhiManager(conf);
 		
-		
+		siddhiManager.getSiddhiContext().setHazelcastInstance(
+				HazelcastInstanceFactory.newHazelcastInstance(
+						new Config().setInstanceName("stratio-streaming-hazelcast-instance")));
+
 		if (failOverEnabled) {
-					
-			siddhiManager.setPersistStore(new Casandra2PersistenceStore(cassandraCluster, "", ""));
-					
+
+			siddhiManager.setPersistStore(new Casandra2PersistenceStore(
+					cassandraCluster, "", ""));
+
 			StreamPersistence.restoreLastRevision(siddhiManager);
 		}
-		
-		return siddhiManager;						
+
+		return siddhiManager;
 	}
-	
-	public static Object[] getOrderedValues(StreamDefinition streamMetaData, List<ColumnNameTypeValue> columns) throws AttributeNotExistException {
-		
-		Object[] orderedValues = new Object[streamMetaData.getAttributeList().size()];
-		
+
+	public static Object[] getOrderedValues(StreamDefinition streamMetaData,
+			List<ColumnNameTypeValue> columns)
+			throws AttributeNotExistException {
+
+		Object[] orderedValues = new Object[streamMetaData.getAttributeList()
+				.size()];
+
 		for (ColumnNameTypeValue column : columns) {
 
-			
-//			if attribute does not exist, a AttributeNotExistException exception will be thrown
+			// if attribute does not exist, a AttributeNotExistException
+			// exception will be thrown
 			if (column.getValue() instanceof String) {
-				orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = decodeSiddhiValue((String) column.getValue(), streamMetaData.getAttributeType(column.getColumn()));
+				orderedValues[streamMetaData.getAttributePosition(column
+						.getColumn())] = decodeSiddhiValue(
+						(String) column.getValue(),
+						streamMetaData.getAttributeType(column.getColumn()));
+			} else {
+				orderedValues[streamMetaData.getAttributePosition(column
+						.getColumn())] = column.getValue();
 			}
-			else {
-				orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = column.getValue();
-			}
-			
+
 		}
 
 		return orderedValues;
-		
+
 	}
-	
-	
-	private static Object decodeSiddhiValue(String originalValue, Attribute.Type type) throws SiddhiPraserException {
-		
+
+	private static Object decodeSiddhiValue(String originalValue,
+			Attribute.Type type) throws SiddhiPraserException {
+
 		switch (type.toString()) {
-			case SIDDHI_TYPE_STRING:
-				return originalValue;
-			case SIDDHI_TYPE_BOOLEAN:
-				return Boolean.valueOf(originalValue);
-			case SIDDHI_TYPE_DOUBLE:
-				return Double.valueOf(originalValue);
-			case SIDDHI_TYPE_INT:
-				return Integer.valueOf(originalValue);
-			case SIDDHI_TYPE_LONG:
-				return Long.valueOf(originalValue);
-			case SIDDHI_TYPE_FLOAT:
-				return Float.valueOf(originalValue);
-			default:
-				throw new SiddhiPraserException("Unsupported Column type: " + originalValue + "/" + type.toString());
+		case SIDDHI_TYPE_STRING:
+			return originalValue;
+		case SIDDHI_TYPE_BOOLEAN:
+			return Boolean.valueOf(originalValue);
+		case SIDDHI_TYPE_DOUBLE:
+			return Double.valueOf(originalValue);
+		case SIDDHI_TYPE_INT:
+			return Integer.valueOf(originalValue);
+		case SIDDHI_TYPE_LONG:
+			return Long.valueOf(originalValue);
+		case SIDDHI_TYPE_FLOAT:
+			return Float.valueOf(originalValue);
+		default:
+			throw new SiddhiPraserException("Unsupported Column type: "
+					+ originalValue + "/" + type.toString());
 		}
-		
+
 	}
-	
-//	TODO move to StreamingCommons
-	public static Boolean isStreamAllowedForThisOperation(String streamName, String operation) {
-		
+
+	// TODO move to StreamingCommons
+	public static Boolean isStreamAllowedForThisOperation(String streamName,
+			String operation) {
+
 		switch (operation.toUpperCase()) {
-			case STREAM_OPERATIONS.DEFINITION.ADD_QUERY:
-			case STREAM_OPERATIONS.DEFINITION.ALTER:
-			case STREAM_OPERATIONS.DEFINITION.CREATE:
-			case STREAM_OPERATIONS.DEFINITION.DROP:
-			case STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY:
-			case STREAM_OPERATIONS.MANIPULATION.INSERT:
-				if (Arrays.asList(STREAMING.STATS_NAMES.STATS_STREAMS).contains(streamName)) {
-					return Boolean.FALSE;
-				}
-				return Boolean.TRUE;
-			
-			case STREAM_OPERATIONS.ACTION.LISTEN:
-			case STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA:
-			case STREAM_OPERATIONS.ACTION.STOP_LISTEN:
-
-				return Boolean.TRUE;
-			default:
+		case STREAM_OPERATIONS.DEFINITION.ADD_QUERY:
+		case STREAM_OPERATIONS.DEFINITION.ALTER:
+		case STREAM_OPERATIONS.DEFINITION.CREATE:
+		case STREAM_OPERATIONS.DEFINITION.DROP:
+		case STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY:
+		case STREAM_OPERATIONS.MANIPULATION.INSERT:
+			if (Arrays.asList(STREAMING.STATS_NAMES.STATS_STREAMS).contains(
+					streamName)) {
 				return Boolean.FALSE;
-		}						
-	}
-	
-	
+			}
+			return Boolean.TRUE;
 
-	
+		case STREAM_OPERATIONS.ACTION.LISTEN:
+		case STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA:
+		case STREAM_OPERATIONS.ACTION.STOP_LISTEN:
+
+			return Boolean.TRUE;
+		default:
+			return Boolean.FALSE;
+		}
+	}
 
 }
