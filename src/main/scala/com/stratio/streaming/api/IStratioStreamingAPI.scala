@@ -32,6 +32,22 @@ trait IStratioStreamingAPI {
   def initialize(): IStratioStreamingAPI
 
   /**
+   * /**
+   * Initializes the StratioStreamingAPI instance.
+   * @return
+   */
+   * @param kafkaServer
+   * @param kafkaPort
+   * @param theZookeeperServer
+   * @param theZookeeperPort
+   * @return
+   */
+  def initializeWithServerConfig(kafkaServer: String,
+                 kafkaPort: String,
+                 theZookeeperServer: String,
+                 theZookeeperPort: String): IStratioStreamingAPI
+
+  /**
    * Creates a new stream.
    * @param streamName
    * @param columns

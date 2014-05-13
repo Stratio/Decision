@@ -160,6 +160,24 @@ class StratioStreamingAPI
   }
 
   def initialize() = {
+    brokerServer = config.getString("kafka.server")
+    brokerPort = config.getString("kafka.port")
+    zookeeperServer = config.getString("zookeeper.server")
+    zookeeperPort = config.getString("zookeeper.port")
+    checkEphemeralNode()
+    startEphemeralNodeWatch()
+    initializeTopic()
+    this
+  }
+
+  def initializeWithServerConfig(kafkaServer: String,
+                 kafkaPort: String,
+                 theZookeeperServer: String,
+                 theZookeeperPort: String) = {
+    brokerServer = kafkaServer
+    brokerPort = kafkaPort
+    zookeeperServer = theZookeeperServer
+    zookeeperPort = theZookeeperPort
     checkEphemeralNode()
     startEphemeralNodeWatch()
     initializeTopic()
@@ -171,12 +189,12 @@ object StratioStreamingAPI
  extends StratioStreamingAPIConfig {
   val streamingTopicName = TOPICS
   val sessionId = "" + System.currentTimeMillis()
-  val brokerServer = config.getString("kafka.server")
-  val brokerPort = config.getString("kafka.port")
-  val kafkaBroker = s"$brokerServer:$brokerPort"
-  val zookeeperServer = config.getString("zookeeper.server")
-  val zookeeperPort = config.getString("zookeeper.port")
-  val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
+  var brokerServer = ""
+  var brokerPort = ""
+  lazy val kafkaBroker = s"$brokerServer:$brokerPort"
+  var zookeeperServer = ""
+  var zookeeperPort = ""
+  lazy val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
   var streamingUpAndRunning = false
   val streamingListeners = scala.collection.mutable.Map[String, KafkaConsumer]()
   lazy val kafkaProducer = new KafkaProducer(TOPICS, kafkaBroker)
