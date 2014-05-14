@@ -31,6 +31,8 @@ import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.instance.HazelcastInstanceFactory;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
@@ -133,9 +135,13 @@ public class SiddhiUtils {
         // Create Siddhi Manager
         SiddhiManager siddhiManager = new SiddhiManager(conf);
 
-        siddhiManager.getSiddhiContext().setHazelcastInstance(
-                HazelcastInstanceFactory.newHazelcastInstance(new Config()
-                        .setInstanceName("stratio-streaming-hazelcast-instance")));
+        Config config = new Config();
+        config.setInstanceName("stratio-streaming-hazelcast-instance");
+        NetworkConfig network = config.getNetworkConfig();
+        JoinConfig join = network.getJoin();
+        join.getMulticastConfig().setEnabled(false);
+
+        siddhiManager.getSiddhiContext().setHazelcastInstance(HazelcastInstanceFactory.newHazelcastInstance(config));
 
         if (failOverEnabled) {
 
