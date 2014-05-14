@@ -107,8 +107,10 @@ public class StreamingEngine {
                 .req()
                 .parm("--cassandra-cluster", "node.stratio.com")
                 .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])+)*$")
-                .parm("--auditEnabled", "false").parm("--statsEnabled", "false").parm("--failOverEnabled", "false")
-                .parm("--printStreams", "false").build();
+                .parm("--elasticsearch", "node.stratio.com:9300")
+                .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
+                .req().parm("--auditEnabled", "false").parm("--statsEnabled", "false")
+                .parm("--failOverEnabled", "false").parm("--printStreams", "false").build();
 
         HashMap<String, String> R = new HashMap<String, String>();
         String parseError = cmd.validate(args);
@@ -164,7 +166,7 @@ public class StreamingEngine {
                     .get("--kafka-cluster").toString(), BUS.TOPICS, R.get("--cassandra-cluster").toString(),
                     Boolean.valueOf(R.get("--auditEnabled").toString()), Boolean.valueOf(R.get("--statsEnabled")
                             .toString()), Boolean.valueOf(R.get("--failOverEnabled").toString()), Boolean.valueOf(R
-                            .get("--printStreams").toString()));
+                            .get("--printStreams").toString()), R.get("--elasticsearch").toString());
         } catch (Exception e) {
             logger.error("General error: " + e.getMessage() + " // " + e.getClass(), e);
         }
@@ -188,7 +190,7 @@ public class StreamingEngine {
      */
     private static void launchStratioStreamingEngine(String sparkMaster, String zkCluster, String kafkaCluster,
             String topics, String cassandraClusterParam, Boolean enableAuditing, Boolean enableStats,
-            Boolean failOverEnabledParam, Boolean printStreams) throws Exception {
+            Boolean failOverEnabledParam, Boolean printStreams, String elasticSearchUrl) throws Exception {
 
         cassandraCluster = cassandraClusterParam;
         failOverEnabled = failOverEnabledParam;
@@ -227,8 +229,10 @@ public class StreamingEngine {
                 kafkaCluster);
         SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
                 getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster);
+
+        HostAndPort elasticSearchConnectionData = HostAndPort.fromString(elasticSearchUrl);
         IndexStreamFunction indexStreamFunction = new IndexStreamFunction(siddhiManager, zkCluster, kafkaCluster,
-                "node.stratio.com", 9300);
+                elasticSearchConnectionData.getHostText(), elasticSearchConnectionData.getPortOrDefault(9300));
 
         Map<String, Integer> topicMap = new HashMap<String, Integer>();
         String[] topic_list = topics.split(",");
