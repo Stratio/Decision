@@ -1,6 +1,8 @@
 package com.stratio.streaming.callbacks;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -78,6 +80,10 @@ public class StreamToIndexerCallback extends StreamCallback implements MessageLi
                 for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
                     contentBuilder = contentBuilder.field(column.getColumn(), column.getValue());
                 }
+                // Add timestamp element to original object
+                contentBuilder = contentBuilder.field("@timestamp",
+                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
+
                 contentBuilder = contentBuilder.endObject();
                 IndexRequestBuilder request = elasticSearchClient.prepareIndex("stratiostreaming",
                         stratioStreamingMessage.getStreamName()).setSource(contentBuilder);
