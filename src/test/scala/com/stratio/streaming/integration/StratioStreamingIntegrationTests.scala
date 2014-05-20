@@ -33,16 +33,41 @@ import com.stratio.streaming.api.StratioStreamingAPIFactory
 class StratioStreamingIntegrationTests
   extends FunSpec
   with ShouldMatchers
-  with BeforeAndAfterEach {
+  with BeforeAndAfterEach
+  with BeforeAndAfterAll {
 
-  val zookeeperCluster = "localhost:2181"
+  var zookeeperCluster = "localhost:2181"
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
   val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
   zookeeperClient.start()
   val zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
-  lazy val streamingAPI = StratioStreamingAPIFactory.create().initialize()
+  var streamingAPI = StratioStreamingAPIFactory.create()
   val testStreamName = "unitTestsStream"
   val internalTestStreamName = "stratio_"
+
+  override def beforeAll(conf: ConfigMap) {
+    if (configurationHasBeenDefinedThroughCommandLine(conf)) {
+      val zookeeperHost = conf.get("zookeeperHost").get.toString
+      val zookeeperPort = conf.get("zookeeperPort").get.toString
+      val kafkaHost = conf.get("kafkaHost").get.toString
+      val kafkaPort = conf.get("kafkaPort").get.toString
+      streamingAPI.initializeWithServerConfig(kafkaHost,
+        kafkaPort,
+        zookeeperHost,
+        zookeeperPort)
+      zookeeperCluster = zookeeperHost+zookeeperPort
+    } else {
+      //Pickup the config from stratio-streaming.conf
+      streamingAPI.initialize()
+    }
+  }
+
+  def configurationHasBeenDefinedThroughCommandLine(conf: ConfigMap) = {
+    conf.get("zookeeperHost").isDefined &&
+    conf.get("zookeeperPort").isDefined &&
+    conf.get("kafkaHost").isDefined &&
+    conf.get("kafkaPort").isDefined
+  }
 
 
   override def beforeEach() {
