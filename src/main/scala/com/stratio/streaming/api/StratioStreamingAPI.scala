@@ -166,6 +166,14 @@ class StratioStreamingAPI
     syncOperation.performSyncOperation(indexStreamMessage)
   }
 
+  def stopIndexStream(streamName: String) = {
+    //TODO
+    /*checkStreamingStatus()
+    val operation = INDEX.toLowerCase
+    val indexStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    syncOperation.performSyncOperation(indexStreamMessage)*/
+  }
+
   def initialize() = {
     brokerServer = config.getString("kafka.server")
     brokerPort = config.getString("kafka.port")

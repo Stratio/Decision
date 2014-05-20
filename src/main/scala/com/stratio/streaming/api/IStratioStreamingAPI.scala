@@ -145,12 +145,16 @@ trait IStratioStreamingAPI {
   def listStreams(): List[StratioStream]
 
   /**
-   * Gets a list of all the stream that currently exists.
-   * @return a list with the streams
+   * Indexes the stream to the elasticsearch instance.
    */
   @throws(classOf[StratioEngineStatusException])
-  @throws(classOf[StratioAPISecurityException])
   def indexStream(stream: String)
+
+  /**
+   * Stops indexing the stream.
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def stopIndexStream(stream: String)
 
   //def saveToCassandra(streamName: String)
 }
