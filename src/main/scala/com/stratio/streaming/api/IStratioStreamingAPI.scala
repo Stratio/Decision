@@ -144,5 +144,13 @@ trait IStratioStreamingAPI {
   @throws(classOf[StratioEngineStatusException])
   def listStreams(): List[StratioStream]
 
+  /**
+   * Gets a list of all the stream that currently exists.
+   * @return a list with the streams
+   */
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPISecurityException])
+  def indexStream(stream: String)
+
   //def saveToCassandra(streamName: String)
 }

@@ -17,13 +17,13 @@ profileName := "com.stratio"
 
 publishMavenStyle := true
 
-version := "0.1.1"
+version := "0.2.0-SNAPSHOT"
 
 scalaVersion := "2.10.3"
 
 seq(assemblySettings: _*)
 
-jarName in assembly := "stratio-streaming-api-0.1.1.jar"
+jarName in assembly := "stratio-streaming-api-0.2.0-SNAPSHOT.jar"
 
 addArtifact(Artifact("streaming-api"), sbtassembly.Plugin.AssemblyKeys.assembly)
 
@@ -43,7 +43,8 @@ test in assembly := {}
 
 resolvers ++= Seq(
    "Nexus snapshots" at "http://nexus.strat.io:8081/nexus/content/repositories/snapshots",
-   "Nexus releases" at "http://nexus.strat.io:8081/nexus/content/repositories/releases"
+   "Nexus releases" at "http://nexus.strat.io:8081/nexus/content/repositories/releases",
+   "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository"
 )
 
 libraryDependencies ++= Seq(
@@ -52,7 +53,7 @@ libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.2.0",
   "org.apache.curator" % "curator-framework" % "2.4.1",
   "org.slf4j" % "slf4j-log4j12" % "1.7.5",
-  "com.stratio.streaming" % "streaming-commons" % "0.1.0",
+  "com.stratio.streaming" % "streaming-commons" % "0.2.0-SNAPSHOT",
   "com.google.code.gson" % "gson" % "2.2.4"
 )
 
