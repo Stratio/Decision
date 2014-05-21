@@ -60,8 +60,10 @@ libraryDependencies ++= Seq(
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 
 publishTo := {
-  val nexus = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-  Some("releases" at nexus)
+  if (version.value.trim.endsWith("SNAPSHOT"))
+    Some("snapshots" at "http://nexus.strat.io:8081/nexus/content/repositories/snapshots")
+  else
+    Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 }
 
 // To sync with Maven central, you need to supply the following information:
