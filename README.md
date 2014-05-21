@@ -64,14 +64,16 @@ How to start
 Using the Stratio Streaming API
 ===============================
 
-  * You can get a Stratio Streaming API with the following options:
+  * You can get a Stratio Streaming API instance with the following options:
 
     1º. Call the initializeWithServerConfig method with the Streaming Server params:
 
+        ```
         val stratioStreamingAPI = StratioStreamingAPIFactory.create().initializeWithServerConfig(kafkaHost,
                                                                     kafkaPort,
                                                                     zookeeperHost,
                                                                     zookeeperPort)
+        ```
 
     2º. Include in your project CLASSPATH a file called stratio-streaming.conf with the following content:
 
@@ -81,8 +83,7 @@ Using the Stratio Streaming API
         zookeeper.server={zookeeperServerAddress}
         zookeeper.port={zookeeperServerPort}
         ```
+     And then call the initialize method:
 
-        And then call the initialize method:
-
-        val stratioStreamingAPI = StratioStreamingAPIFactory.create().initialize()
+     val stratioStreamingAPI = StratioStreamingAPIFactory.create().initialize()
  
