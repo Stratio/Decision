@@ -19,7 +19,7 @@ package com.stratio.streaming.integration
 import org.scalatest._
 import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioStreamingException, StratioEngineStatusException, StratioAPISecurityException}
 import org.apache.curator.retry.ExponentialBackoffRetry
-import org.apache.curator.framework.CuratorFrameworkFactory
+import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import com.stratio.streaming.commons.constants.STREAMING._
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.messaging.{ColumnNameValue, ColumnNameType}
@@ -38,9 +38,8 @@ class StratioStreamingIntegrationTests
 
   var zookeeperCluster = "localhost:2181"
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
-  val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
-  zookeeperClient.start()
-  val zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
+  var zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
+  var zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
   var streamingAPI = StratioStreamingAPIFactory.create()
   val testStreamName = "unitTestsStream"
   val internalTestStreamName = "stratio_"
@@ -55,11 +54,15 @@ class StratioStreamingIntegrationTests
         kafkaPort,
         zookeeperHost,
         zookeeperPort)
-      zookeeperCluster = zookeeperHost+zookeeperPort
+      zookeeperCluster = s"$zookeeperHost:$zookeeperPort"
+      zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
+      zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
     } else {
       //Pickup the config from stratio-streaming.conf
       streamingAPI.initialize()
     }
+    zookeeperClient.start()
+    checkStatusAndCleanTheEngine()
   }
 
   def configurationHasBeenDefinedThroughCommandLine(conf: ConfigMap) = {
@@ -71,10 +74,14 @@ class StratioStreamingIntegrationTests
 
 
   override def beforeEach() {
+    checkStatusAndCleanTheEngine()
+  }
+
+  def checkStatusAndCleanTheEngine() {
     if (!zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH)) {
       zookeeperClient.create().forPath(ZK_EPHEMERAL_NODE_PATH)
       //Delay to get rid of flakiness
-      Thread.sleep(1000)
+      Thread.sleep(2000)
     }
     cleanStratioStreamingEngine()
   }
@@ -121,33 +128,9 @@ class StratioStreamingIntegrationTests
         streamingAPI.createStream(internalTestStreamName, columnList)
       }
     }
-
-    it("should throw a StratioEngineStatusException when streaming engine is not running") {
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      removeEphemeralNode()
-      //Add some delay to wait for the event to be triggered
-      Thread.sleep(1000)
-      intercept [StratioEngineStatusException] {
-        streamingAPI.createStream(testStreamName, columnList)
-      }
-    }
   }
 
   describe("The insert operation") {
-    it("should throw a StratioEngineStatusException when streaming engine is not running") {
-      val firstColumnValue = new ColumnNameValue("column1", new Integer(111111))
-      val secondColumnValue = new ColumnNameValue("column2", "testString")
-      val columnValues = Seq(firstColumnValue, secondColumnValue)
-      removeEphemeralNode()
-      //Add some delay to wait for the event to be triggered
-      Thread.sleep(1000)
-      intercept [StratioEngineStatusException] {
-        streamingAPI.insertData(testStreamName, columnValues)
-      }
-    }
-
     it("should throw a StratioAPISecurityException when insert data into a stream with the stratio_ prefix") {
       val firstColumnValue = new ColumnNameValue("column1", new Integer(111111))
       val secondColumnValue = new ColumnNameValue("column2", "testString")
@@ -210,24 +193,10 @@ class StratioStreamingIntegrationTests
         streamingAPI.alterStream(internalStream, newColumnList)
       }
     }
-
-    it("should throw a StratioEngineStatusException when streaming engine is not running") {
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val thirdStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val newColumnList = Seq(thirdStreamColumn)
-      streamingAPI.createStream(testStreamName, columnList)
-      removeEphemeralNode()
-      Thread.sleep(1000)
-      intercept [StratioEngineStatusException] {
-        streamingAPI.alterStream(testStreamName, newColumnList)
-      }
-    }
   }
 
   describe("The add query operation") {
-    it("should add new queries to an existing stream") {
+    it("should add new queries to an existing stream", Tag("wip")) {
       val alarmsStream = "alarms"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
@@ -249,7 +218,7 @@ class StratioStreamingIntegrationTests
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
-
+      Thread.sleep(2000)
       theNumberOfQueriesOfTheStream(testStreamName) should be(1)
     }
 
@@ -263,21 +232,6 @@ class StratioStreamingIntegrationTests
       streamingAPI.createStream(testStreamName, columnList)
       intercept [StratioEngineOperationException] {
           streamingAPI.addQuery(testStreamName, theQuery)
-      }
-    }
-
-    it("should throw a StratioEngineStatusException when streaming engine is not running") {
-      val alarmsStream = "alarms"
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val theQuery = s"from $testStreamName select column1, column2 insert into $alarmsStream for current-events"
-      streamingAPI.createStream(alarmsStream, columnList)
-      streamingAPI.createStream(testStreamName, columnList)
-      removeEphemeralNode()
-      Thread.sleep(2000)
-      intercept [StratioEngineStatusException] {
-        streamingAPI.addQuery(testStreamName, theQuery)
       }
     }
 
@@ -323,22 +277,6 @@ class StratioStreamingIntegrationTests
         streamingAPI.removeQuery(testStreamName, nonExistingQueryId)
       }
     }
-
-    it("should throw a StratioEngineStatusException when streaming engine is not running") {
-      val alarmsStream = "alarms"
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val theQuery = s"from $testStreamName select column1, column2 insert into $alarmsStream for current-events"
-      streamingAPI.createStream(alarmsStream, columnList)
-      streamingAPI.createStream(testStreamName, columnList)
-      val queryId = streamingAPI.addQuery(testStreamName, theQuery)
-      removeEphemeralNode()
-      Thread.sleep(1000)
-      intercept [StratioEngineStatusException] {
-        streamingAPI.removeQuery(testStreamName, queryId)
-      }
-    }
   }
 
   describe("The drop operation") {
@@ -366,15 +304,6 @@ class StratioStreamingIntegrationTests
     it("should throw a StratioAPISecurityException when removing a stream with the stratio_ prefix") {
       intercept [StratioAPISecurityException] {
         streamingAPI.dropStream(internalTestStreamName)
-      }
-    }
-
-    it("should throw a StratioEngineStatusException when streaming engine is not running") {
-      removeEphemeralNode()
-      //Add some delay to wait for the event to be triggered
-      Thread.sleep(1000)
-      intercept [StratioEngineStatusException] {
-        streamingAPI.dropStream(testStreamName)
       }
     }
   }
@@ -411,21 +340,6 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioEngineStatusException when streaming engine is not running") {
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val firstColumnValue = new ColumnNameValue("column1", new Integer(1))
-      val secondColumnValue = new ColumnNameValue("column2", "testValue")
-      val streamData = Seq(firstColumnValue, secondColumnValue)
-      streamingAPI.createStream(testStreamName, columnList)
-      removeEphemeralNode()
-      Thread.sleep(1000)
-      intercept [StratioEngineStatusException] {
-        streamingAPI.listenStream(testStreamName)
-      }
-    }
-
     it("should throw a StratioAPISecurityException when listening to an internal stream") {
       intercept [StratioAPISecurityException] {
         streamingAPI.listenStream(internalTestStreamName)
@@ -452,19 +366,6 @@ class StratioStreamingIntegrationTests
       assert(true)
     }
 
-    it("should throw a StratioEngineStatusException when streaming engine is not running") {
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      streamingAPI.createStream(testStreamName, columnList)
-      streamingAPI.listenStream(testStreamName)
-      removeEphemeralNode()
-      Thread.sleep(1000)
-      intercept [StratioEngineStatusException] {
-        streamingAPI.stopListenStream(testStreamName)
-      }
-    }
-
     it("should throw a StratioAPISecurityException when stop listening to an internal status") {
       intercept [StratioAPISecurityException] {
         streamingAPI.stopListenStream(internalTestStreamName)
@@ -478,6 +379,20 @@ class StratioStreamingIntegrationTests
       Thread.sleep(1000)
       intercept[StratioEngineStatusException] {
         streamingAPI.listStreams()
+      }
+    }
+  }
+
+  describe("The Streaming Engine") {
+    it("should throw a StratioEngineStatusException when streaming engine is not running") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      removeEphemeralNode()
+      //Add some delay to wait for the event to be triggered
+      Thread.sleep(1000)
+      intercept [StratioEngineStatusException] {
+        streamingAPI.createStream(testStreamName, columnList)
       }
     }
   }
