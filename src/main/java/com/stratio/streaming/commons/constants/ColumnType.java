@@ -17,9 +17,9 @@ package com.stratio.streaming.commons.constants;
 
 public enum ColumnType {
     STRING("STRING"),
-    BOOLEAN("BOOLEAN"),
+    BOOLEAN("BOOL"),
     DOUBLE("DOUBLE"),
-    INTEGER("INTEGER"),
+    INTEGER("INT"),
     LONG("LONG"),
     FLOAT("FLOAT");
 
