@@ -38,8 +38,11 @@ How to start
   * To run the unit tests:
         sbt test
 
-  * To run the integration tests (Stratio Streaming Engine should be up and running):
+  * To run the integration tests locally (Stratio Streaming Engine should be up and running):
         sbt integration:test
+
+  * To run the integration tests pointing to an external server:
+        sbt integration:testOnly -- -DzookeeperHost={yourZookeeperHost} -DzookeeperPort={yourZookeeperPort} -DkafkaHost={yourKafkaHost} -DkafkaPort={yourKafkaPort}
 
   * To create the Stratio Streaming API distribution:
         sbt assembly
@@ -61,16 +64,25 @@ How to start
 Using the Stratio Streaming API
 ===============================
 
-  * Firstly, you need to include in your project CLASSPATH a file called stratio-streaming.conf with the following content:
+  * You can get a Stratio Streaming API with the following options:
 
-    ```
-    kafka.server={kafkaServerAddress}
-    kafka.port={kafkaServerPort}
-    zookeeper.server={zookeeperServerAddress}
-    zookeeper.port={zookeeperServerPort}
-    ```
+    1º. Call the initializeWithServerConfig method with the Streaming Server params:
 
-  * To get an instance of the Stratio Streaming API:
+        val stratioStreamingAPI = StratioStreamingAPIFactory.create().initializeWithServerConfig(kafkaHost,
+                                                                    kafkaPort,
+                                                                    zookeeperHost,
+                                                                    zookeeperPort)
 
-    val stratioStreamingAPI = StratioStreamingAPIFactory.create().initialize()
+    2º. Include in your project CLASSPATH a file called stratio-streaming.conf with the following content:
+
+        ```
+        kafka.server={kafkaServerAddress}
+        kafka.port={kafkaServerPort}
+        zookeeper.server={zookeeperServerAddress}
+        zookeeper.port={zookeeperServerPort}
+        ```
+
+        And then call the initialize method:
+
+        val stratioStreamingAPI = StratioStreamingAPIFactory.create().initialize()
  
