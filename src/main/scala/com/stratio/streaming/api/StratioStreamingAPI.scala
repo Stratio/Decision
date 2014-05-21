@@ -159,6 +159,13 @@ class StratioStreamingAPI
     statusOperation.getListStreams(listStreamMessage)
   }
 
+  def saveToCassandra(streamName: String) = {
+    checkStreamingStatus()
+    val operation = SAVETO_CASSANDRA.toLowerCase
+    val saveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    syncOperation.performSyncOperation(saveToCassandraMessage)
+  }
+  
   def indexStream(streamName: String) = {
     checkStreamingStatus()
     val operation = INDEX.toLowerCase
@@ -173,6 +180,8 @@ class StratioStreamingAPI
     val indexStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(indexStreamMessage)*/
   }
+  
+  
 
   def initialize() = {
     brokerServer = config.getString("kafka.server")
