@@ -54,7 +54,8 @@ libraryDependencies ++= Seq(
   "org.apache.curator" % "curator-framework" % "2.4.1",
   "org.slf4j" % "slf4j-log4j12" % "1.7.5",
   "com.stratio.streaming" % "streaming-commons" % "0.2.0-SNAPSHOT",
-  "com.google.code.gson" % "gson" % "2.2.4"
+  "com.google.code.gson" % "gson" % "2.2.4",
+  "org.scalaj" %% "scalaj-http" % "0.3.15"
 )
 
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")

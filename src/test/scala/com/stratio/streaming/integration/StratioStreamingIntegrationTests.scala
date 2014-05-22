@@ -28,10 +28,14 @@ import scala.collection.JavaConversions._
 import util.control.Breaks._
 import java.util
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue
-import com.stratio.streaming.api.StratioStreamingAPIFactory
+import com.stratio.streaming.api.{StratioStreamingAPIConfig, StratioStreamingAPIFactory}
+import scalaj.http.Http
+import com.stratio.streaming.api.StratioStreamingAPI._
+import com.stratio.streaming.zookeeper.ZookeeperConsumer
 
 class StratioStreamingIntegrationTests
-  extends FunSpec
+  extends  FunSpec
+  with StratioStreamingAPIConfig
   with ShouldMatchers
   with BeforeAndAfterEach
   with BeforeAndAfterAll {
@@ -43,6 +47,9 @@ class StratioStreamingIntegrationTests
   var streamingAPI = StratioStreamingAPIFactory.create()
   val testStreamName = "unitTestsStream"
   val internalTestStreamName = "stratio_"
+  val elasticSearchIndex = "stratiostreaming"
+  var elasticSearchHost = ""
+  var elasticSearchPort = ""
 
   override def beforeAll(conf: ConfigMap) {
     if (configurationHasBeenDefinedThroughCommandLine(conf)) {
@@ -50,6 +57,8 @@ class StratioStreamingIntegrationTests
       val zookeeperPort = conf.get("zookeeperPort").get.toString
       val kafkaHost = conf.get("kafkaHost").get.toString
       val kafkaPort = conf.get("kafkaPort").get.toString
+      elasticSearchHost = conf.get("elasticSearchHost").get.toString
+      elasticSearchPort = conf.get("elasticSearchPort").get.toString
       streamingAPI.initializeWithServerConfig(kafkaHost,
         kafkaPort,
         zookeeperHost,
@@ -59,6 +68,8 @@ class StratioStreamingIntegrationTests
       zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
     } else {
       //Pickup the config from stratio-streaming.conf
+      elasticSearchHost = config.getString("elasticsearch.server")
+      elasticSearchPort = config.getString("elasticsearch.port")
       streamingAPI.initialize()
     }
     zookeeperClient.start()
@@ -69,7 +80,9 @@ class StratioStreamingIntegrationTests
     conf.get("zookeeperHost").isDefined &&
     conf.get("zookeeperPort").isDefined &&
     conf.get("kafkaHost").isDefined &&
-    conf.get("kafkaPort").isDefined
+    conf.get("kafkaPort").isDefined &&
+    conf.get("elasticSearchHost").isDefined &&
+    conf.get("elasticSearchPort").isDefined
   }
 
 
@@ -196,7 +209,7 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The add query operation") {
-    it("should add new queries to an existing stream", Tag("wip")) {
+    it("should add new queries to an existing stream") {
       val alarmsStream = "alarms"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
@@ -373,13 +386,21 @@ class StratioStreamingIntegrationTests
     }
   }
 
-  describe("The list operation") {
-    it("should throw a StratioEngineStatusException when streaming engine is not running") {
-      removeEphemeralNode()
-      Thread.sleep(1000)
-      intercept[StratioEngineStatusException] {
-        streamingAPI.listStreams()
+  describe("The index operation") {
+    it("should index the stream to elasticsearch") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue")
+      val streamData = Seq(firstColumnValue)
+      try {
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.indexStream(testStreamName)
+        streamingAPI.insertData(testStreamName, streamData)
+        Thread.sleep(3000)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
       }
+      theStreamIsIndexed(testStreamName) should be(true)
     }
   }
 
@@ -421,4 +442,7 @@ class StratioStreamingIntegrationTests
     streamingAPI.queriesFromStream(streamName).size
   }
 
+  def theStreamIsIndexed(streamName: String) = {
+    Http(s"http://$elasticSearchHost:$elasticSearchPort/$elasticSearchIndex/_mapping/$streamName").asString.contains(streamName)
+  }
 }
