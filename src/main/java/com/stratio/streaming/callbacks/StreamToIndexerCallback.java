@@ -31,6 +31,7 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 public class StreamToIndexerCallback extends StreamCallback implements MessageListener<String> {
 
     private static Logger logger = LoggerFactory.getLogger(StreamToCassandraCallback.class);
+    private final SimpleDateFormat elasicSearchTimestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
     private final StreamDefinition streamDefinition;
     private final Client elasticSearchClient;
@@ -81,8 +82,7 @@ public class StreamToIndexerCallback extends StreamCallback implements MessageLi
                     contentBuilder = contentBuilder.field(column.getColumn(), column.getValue());
                 }
                 // Add timestamp element to original object
-                contentBuilder = contentBuilder.field("@timestamp",
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
+                contentBuilder = contentBuilder.field("@timestamp", elasicSearchTimestampFormat.format(new Date()));
 
                 contentBuilder = contentBuilder.endObject();
                 IndexRequestBuilder request = elasticSearchClient.prepareIndex("stratiostreaming",
