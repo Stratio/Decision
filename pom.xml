@@ -10,7 +10,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.stratio.streaming</groupId>
 	<artifactId>streaming-engine</artifactId>
-	<version>0.1.0</version>
+	<version>0.2.0-SNAPSHOT</version>
 	<properties>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
@@ -96,7 +96,7 @@
 		<dependency>
 			<groupId>com.stratio.streaming</groupId>
 			<artifactId>streaming-commons</artifactId>
-			<version>0.1.0</version>
+			<version>0.2.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.zmatrix.cli</groupId>
@@ -121,19 +121,14 @@
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
+			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.7</version>
-			<scope>runtime</scope>
 		</dependency>
+		<!-- CONFIG -->
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>1.1.2</version>
+			<groupId>com.typesafe</groupId>
+			<artifactId>config</artifactId>
+			<version>1.2.1</version>
 		</dependency>
 	</dependencies>
 	<repositories>
