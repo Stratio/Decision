@@ -15,8 +15,11 @@
  ******************************************************************************/
 package com.stratio.streaming;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -30,8 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
-
-import ca.zmatrix.cli.ParseCmd;
 
 import com.google.common.net.HostAndPort;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
@@ -60,6 +61,8 @@ import com.stratio.streaming.streams.StreamPersistence;
 import com.stratio.streaming.streams.StreamSharedStatus;
 import com.stratio.streaming.utils.SiddhiUtils;
 import com.stratio.streaming.utils.ZKUtils;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 /**
  * @author dmorales
@@ -81,46 +84,13 @@ public class StreamingEngine {
     private static JavaStreamingContext jssc;
 
     /**
-     * 
-     * usage: --sparkMaster local --zookeeper-cluster fqdn:port --kafka-cluster
-     * fqdn:port
-     * 
-     * 
      * @param args
+     * @throws MalformedURLException
      * @throws Exception
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MalformedURLException {
 
-        // DECODING ARGUMENTS FROM COMMAND LINE
-        String usage = "usage: --sparkMaster local --zookeeper-cluster fqdn:port,fqdn2:port --kafka-cluster fqdn:port,fqdn2:port --cassandra-cluster fqdn,fqdn2";
-        ParseCmd cmd = new ParseCmd.Builder()
-                .help(usage)
-                .parm("--spark-master", "local")
-                .req()
-                // .parm("--sparkMaster", "node.stratio.com:9999"
-                // ).rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}$").req()
-                .parm("--zookeeper-cluster", "node.stratio.com:2181")
-                .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
-                .req()
-                .parm("--kafka-cluster", "node.stratio.com:9092")
-                .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
-                .req()
-                .parm("--cassandra-cluster", "node.stratio.com")
-                .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])+)*$")
-                .parm("--elasticsearch", "node.stratio.com:9300")
-                .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
-                .req().parm("--auditEnabled", "false").parm("--statsEnabled", "false")
-                .parm("--failOverEnabled", "false").parm("--printStreams", "false").build();
-
-        HashMap<String, String> R = new HashMap<String, String>();
-        String parseError = cmd.validate(args);
-        if (cmd.isValid(args)) {
-            R = (HashMap<String, String>) cmd.parse(args);
-            logger.info("Settings received:" + cmd.displayMap(R));
-        } else {
-            logger.error(parseError);
-            System.exit(1);
-        }
+        Config config = loadConfig(args);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -162,11 +132,7 @@ public class StreamingEngine {
         });
 
         try {
-            launchStratioStreamingEngine(R.get("--spark-master").toString(), R.get("--zookeeper-cluster").toString(), R
-                    .get("--kafka-cluster").toString(), BUS.TOPICS, R.get("--cassandra-cluster").toString(),
-                    Boolean.valueOf(R.get("--auditEnabled").toString()), Boolean.valueOf(R.get("--statsEnabled")
-                            .toString()), Boolean.valueOf(R.get("--failOverEnabled").toString()), Boolean.valueOf(R
-                            .get("--printStreams").toString()), R.get("--elasticsearch").toString());
+            launchStratioStreamingEngine(config);
         } catch (Exception e) {
             logger.error("General error: " + e.getMessage() + " // " + e.getClass(), e);
         }
@@ -188,12 +154,21 @@ public class StreamingEngine {
      * @param topics
      * @throws Exception
      */
-    private static void launchStratioStreamingEngine(String sparkMaster, String zkCluster, String kafkaCluster,
-            String topics, String cassandraClusterParam, Boolean enableAuditing, Boolean enableStats,
-            Boolean failOverEnabledParam, Boolean printStreams, String elasticSearchUrl) throws Exception {
+    private static void launchStratioStreamingEngine(Config config) throws Exception {
 
-        cassandraCluster = cassandraClusterParam;
-        failOverEnabled = failOverEnabledParam;
+        cassandraCluster = config.getString("cassandra.host");
+        failOverEnabled = config.getBoolean("failOverEnabled");
+        String kafkaCluster = config.getString("kafka.host");
+        String zkCluster = config.getString("zookeeper.host");
+        String elasticSearchUrl = config.getString("elasticsearch.host");
+
+        boolean enableAuditing = config.getBoolean("auditEnabled");
+        boolean enableStats = config.getBoolean("statsEnabled");
+        boolean printStreams = config.getBoolean("printStreams");
+
+        long streamingBatchTime = config.getDuration("spark.streamingBatchTime", TimeUnit.MILLISECONDS);
+
+        String topics = BUS.TOPICS;
 
         ZKUtils.getZKUtils(zkCluster).createEphemeralZNode(STREAMING.ZK_BASE_PATH + "/" + "engine",
                 String.valueOf(System.currentTimeMillis()).getBytes());
@@ -203,8 +178,8 @@ public class StreamingEngine {
         // StreamingEngine.class.getName(),
         // new Duration(STREAMING.DURATION_MS), System.getenv("SPARK_HOME"),
         // JavaStreamingContext.jarOfClass(StreamingEngine.class));
-        jssc = new JavaStreamingContext("local[2]", StreamingEngine.class.getName(),
-                new Duration(STREAMING.DURATION_MS));
+        jssc = new JavaStreamingContext(config.getString("spark.host"), StreamingEngine.class.getName(), new Duration(
+                streamingBatchTime));
         jssc.sparkContext().getConf().setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
@@ -240,15 +215,12 @@ public class StreamingEngine {
         // building the topic map, by using the num of partitions of each topic
         HostAndPort kafkaConnectionData = HostAndPort.fromString(kafkaCluster);
         TopicService topicService = new KafkaTopicService(zkCluster, kafkaConnectionData.getHostText(),
-                kafkaConnectionData.getPortOrDefault(9092), 10000, 10000);
+                kafkaConnectionData.getPortOrDefault(9092), config.getInt("kafka.connectionTimeout"),
+                config.getInt("kafka.sessionTimeout"));
         for (String topic : topic_list) {
-            // TODO replicationFactor and partitions variables set by
-            // configuration
-            topicService.createTopicIfNotExist(topic, 1, 1);
+            topicService.createTopicIfNotExist(topic, config.getInt("kafka.replicationFactor"),
+                    config.getInt("kafka.partitions"));
             Integer partitions = topicService.getNumPartitionsForTopic(topic);
-            if (partitions == null) {
-                partitions = 2;
-            }
             topicMap.put(topic, partitions);
         }
 
@@ -353,16 +325,19 @@ public class StreamingEngine {
             // DEBUG STRATIO STREAMING ENGINE //
             messages.count().foreach(new Function<JavaRDD<Long>, Void>() {
 
+                private static final long serialVersionUID = -2371501158355376325L;
+
                 @Override
                 public Void call(JavaRDD<Long> arg0) throws Exception {
-
-                    logger.info("********************************************");
-                    logger.info("**       SIDDHI STREAMS                   **");
-                    logger.info("** countSiddhi:"
-                            + siddhiManager.getStreamDefinitions().size()
-                            + " // countHazelcast: "
-                            + getSiddhiManager().getSiddhiContext().getHazelcastInstance()
-                                    .getMap(STREAMING.STREAM_STATUS_MAP).size());
+                    StringBuffer sb = new StringBuffer();
+                    sb.append("\n********************************************\n");
+                    sb.append("**            SIDDHI STREAMS              **\n");
+                    sb.append("** countSiddhi:");
+                    sb.append(siddhiManager.getStreamDefinitions().size());
+                    sb.append(" // countHazelcast: ");
+                    sb.append(getSiddhiManager().getSiddhiContext().getHazelcastInstance()
+                            .getMap(STREAMING.STREAM_STATUS_MAP).size());
+                    sb.append("     **\n");
 
                     for (StreamDefinition streamMetaData : getSiddhiManager().getStreamDefinitions()) {
 
@@ -392,10 +367,12 @@ public class StreamingEngine {
                                             getSiddhiManager()).isListen_enabled() + "- ");
                         }
 
-                        logger.info("** stream: " + streamDefinition);
+                        sb.append("** stream: ".concat(streamDefinition.toString()).concat("\n"));
                     }
 
-                    logger.info("********************************************");
+                    sb.append("********************************************\n");
+
+                    logger.info(sb.toString());
 
                     StreamPersistence.saveStreamingEngineStatus(getSiddhiManager());
 
@@ -421,4 +398,14 @@ public class StreamingEngine {
         return siddhiManager;
     }
 
+    private static Config loadConfig(String[] externalPath) throws MalformedURLException {
+        Config conf = null;
+        if (externalPath.length != 0) {
+            conf = ConfigFactory.parseURL(new URL(externalPath[0]));
+        } else {
+            logger.warn("External path is not defined, using default classpath configuration file");
+            conf = ConfigFactory.load("streaming-default");
+        }
+        return conf;
+    }
 }
