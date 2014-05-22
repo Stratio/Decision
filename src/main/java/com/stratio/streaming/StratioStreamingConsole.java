@@ -16,7 +16,6 @@
 package com.stratio.streaming;
 
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,8 +32,6 @@ import org.apache.curator.framework.api.CuratorListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ca.zmatrix.cli.ParseCmd;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -106,33 +103,22 @@ public class StratioStreamingConsole {
 
         // DECODING ARGUMENTS FROM COMMAND LINE
         String usage = "usage: --broker-list ip:port";
-        ParseCmd cmd = new ParseCmd.Builder()
-                .help(usage)
-                .parm("--broker-list", "node.stratio.com:9999")
-                .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
-                .req()
-                .parm("--zookeeper", "node.stratio.com:9999")
-                .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
-                .req().build();
+        // ParseCmd cmd = new ParseCmd.Builder()
+        // .help(usage)
+        // .parm("--broker-list", "node.stratio.com:9999")
+        // .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
+        // .req()
+        // .parm("--zookeeper", "node.stratio.com:9999")
+        // .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
+        // .req().build();
 
-        HashMap<String, String> R = new HashMap<String, String>();
-        String parseError = cmd.validate(args);
-        if (cmd.isValid(args)) {
-            R = (HashMap<String, String>) cmd.parse(args);
-            logger.info("Launching with these params:");
-            logger.info(cmd.displayMap(R));
-        } else {
-            logger.error(parseError);
-            System.exit(1);
-        }
-
-        this.brokerList = R.get("--broker-list").toString();
+        this.brokerList = "TODO";
         this.sessionId = "" + System.currentTimeMillis();
         this.producer = new Producer<String, String>(createProducerConfig());
 
         // ZOOKEPER CONNECTION
-        client = CuratorFrameworkFactory.newClient(R.get("--zookeeper"), 25 * 1000, 10 * 1000,
-                new ExponentialBackoffRetry(1000, 3));
+        client = CuratorFrameworkFactory.newClient("ZOOKEEPER TODO", 25 * 1000, 10 * 1000, new ExponentialBackoffRetry(
+                1000, 3));
 
         client.start();
         client.getZookeeperClient().blockUntilConnectedOrTimedOut();
