@@ -59,6 +59,7 @@ import com.stratio.streaming.functions.requests.CollectRequestForStatsFunction;
 import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
 import com.stratio.streaming.streams.StreamPersistence;
 import com.stratio.streaming.streams.StreamSharedStatus;
+import com.stratio.streaming.streams.StreamStatusDTO.StreamAction;
 import com.stratio.streaming.utils.SiddhiUtils;
 import com.stratio.streaming.utils.ZKUtils;
 import com.typesafe.config.Config;
@@ -364,7 +365,7 @@ public class StreamingEngine {
                                             getSiddhiManager()).isUserDefined() + "- ");
                             streamDefinition.append(" - listenEnable:"
                                     + StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(),
-                                            getSiddhiManager()).isListen_enabled() + "- ");
+                                            getSiddhiManager()).isActionEnabled(StreamAction.LISTEN) + "- ");
                         }
 
                         sb.append("** stream: ".concat(streamDefinition.toString()).concat("\n"));

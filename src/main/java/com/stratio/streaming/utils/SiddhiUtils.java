@@ -45,6 +45,7 @@ public class SiddhiUtils {
 
     private static Logger logger = LoggerFactory.getLogger(SiddhiUtils.class);
 
+    // TODO delete when ColumnType in commons are ready
     public static final String SIDDHI_TYPE_STRING = "STRING";
     public static final String SIDDHI_TYPE_BOOLEAN = "BOOL";
     public static final String SIDDHI_TYPE_DOUBLE = "DOUBLE";

@@ -78,9 +78,7 @@ public class StratioStreamingConsole {
                 break;
             }
 
-            line = line.toLowerCase();
-
-            if (line.startsWith(STREAM_OPERATIONS.ACTION.LISTEN.toLowerCase())
+            if (line.toLowerCase().startsWith(STREAM_OPERATIONS.ACTION.LISTEN.toLowerCase())
                     || line.startsWith(STREAM_OPERATIONS.ACTION.STOP_LISTEN.toLowerCase())
                     || line.startsWith(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA.toLowerCase())
                     || line.startsWith(STREAM_OPERATIONS.ACTION.INDEX.toLowerCase())

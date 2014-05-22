@@ -17,8 +17,14 @@ package com.stratio.streaming.streams;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class StreamStatusDTO implements Serializable {
+
+    public static enum StreamAction {
+        LISTEN, SAVE_TO_CASSANDRA, INDEXED;
+    }
 
     /**
 	 * 
@@ -27,9 +33,9 @@ public class StreamStatusDTO implements Serializable {
     private String streamName;
     private String streamDefinition;
     private Boolean userDefined;
-    private Boolean listen_enabled;
-    private Boolean saveToCassandra_enabled;
-    private Boolean streamToIndexer_enabled;
+
+    private final Set<StreamAction> actionsEnabled;
+
     private HashMap<String, String> addedQueries;
 
     /**
@@ -41,10 +47,20 @@ public class StreamStatusDTO implements Serializable {
         super();
         this.streamName = streamName;
         this.userDefined = userDefined;
-        this.listen_enabled = false;
-        this.saveToCassandra_enabled = false;
-        this.streamToIndexer_enabled = false;
-        this.addedQueries = new HashMap<String, String>();
+        this.actionsEnabled = new HashSet<>();
+        this.addedQueries = new HashMap<>();
+    }
+
+    public void enableAction(StreamAction action) {
+        actionsEnabled.add(action);
+    }
+
+    public void disableAction(StreamAction action) {
+        actionsEnabled.remove(action);
+    }
+
+    public boolean isActionEnabled(StreamAction action) {
+        return actionsEnabled.contains(action);
     }
 
     public Boolean isUserDefined() {
@@ -61,30 +77,6 @@ public class StreamStatusDTO implements Serializable {
 
     public void setStreamName(String streamName) {
         this.streamName = streamName;
-    }
-
-    public Boolean isListen_enabled() {
-        return listen_enabled;
-    }
-
-    public void setListen_enabled(Boolean listen_enabled) {
-        this.listen_enabled = listen_enabled;
-    }
-
-    public Boolean isSaveToCassandra_enabled() {
-        return saveToCassandra_enabled;
-    }
-
-    public void setSaveToCassandra_enabled(Boolean saveToCassandra_enabled) {
-        this.saveToCassandra_enabled = saveToCassandra_enabled;
-    }
-
-    public boolean isStreamToIndexer_enabled() {
-        return streamToIndexer_enabled;
-    }
-
-    public void setStreamToIndexer_enabled(Boolean streamToIndexer_enabled) {
-        this.streamToIndexer_enabled = streamToIndexer_enabled;
     }
 
     public String getStreamDefinition() {
