@@ -15,70 +15,42 @@
  ******************************************************************************/
 package com.stratio.streaming.functions.dal;
 
-import java.util.List;
-
-import org.apache.spark.api.java.JavaRDD;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.functions.StratioStreamingBaseFunction;
+import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.streams.StreamOperations;
-import com.stratio.streaming.streams.StreamSharedStatus;
-import com.stratio.streaming.streams.StreamStatusDTO.StreamAction;
-import com.stratio.streaming.utils.SiddhiUtils;
 
-public class ListenStreamFunction extends StratioStreamingBaseFunction {
+public class ListenStreamFunction extends ActionBaseFunction {
+    private static final long serialVersionUID = 4566359991793310850L;
 
-    private static Logger logger = LoggerFactory.getLogger(ListenStreamFunction.class);
+    private final String kafkaCluster;
 
-    /**
-	 * 
-	 */
-    private static final long serialVersionUID = 7911766880059394316L;
-
-    public ListenStreamFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
-        super(siddhiManager, zookeeperCluster, kafkaCluster);
+    public ListenStreamFunction(SiddhiManager siddhiManager, String zookeeperHost, String kafkaCluster) {
+        super(siddhiManager, zookeeperHost);
+        this.kafkaCluster = kafkaCluster;
     }
 
     @Override
-    public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
+    protected String getStartOperationCommand() {
+        return STREAM_OPERATIONS.ACTION.LISTEN;
+    }
 
-        List<StratioStreamingMessage> requests = rdd.collect();
+    @Override
+    protected String getStopOperationCommand() {
+        return STREAM_OPERATIONS.ACTION.STOP_LISTEN;
+    }
 
-        for (StratioStreamingMessage request : requests) {
+    @Override
+    protected void startAction(StratioStreamingMessage message) {
+        StreamOperations.listenStream(message, kafkaCluster, getSiddhiManager());
 
-            // stream is allowed and exists in siddhi
-            if (SiddhiUtils.isStreamAllowedForThisOperation(request.getStreamName(), STREAM_OPERATIONS.ACTION.LISTEN)
-                    && getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
+    }
 
-                if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()) != null
-                        && !StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager())
-                                .isActionEnabled(StreamAction.LISTEN)) {
-
-                    try {
-
-                        StreamOperations.listenStream(request, getKafkaCluster(), getSiddhiManager());
-
-                        ackStreamingOperation(request, REPLY_CODES.OK);
-
-                    } catch (Exception e) {
-                        ackStreamingOperation(request, REPLY_CODES.KO_GENERAL_ERROR);
-                    }
-
-                } else {
-                    ackStreamingOperation(request, REPLY_CODES.KO_LISTENER_ALREADY_EXISTS);
-                }
-
-            } else {
-                ackStreamingOperation(request, REPLY_CODES.KO_STREAM_DOES_NOT_EXIST);
-            }
-        }
-
-        return null;
+    @Override
+    protected void stopAction(StratioStreamingMessage message) {
+        StreamOperations.stopListenStream(message, getSiddhiManager());
     }
 
 }
