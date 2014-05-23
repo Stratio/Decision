@@ -121,20 +121,22 @@ trait IStratioStreamingAPI {
   @throws(classOf[StratioAPISecurityException])
   def stopListenStream(streamName: String)
 
-
-
   /**
    * Gets a list of the columns from a given stream.
    * @param stream
-   * @return a list with the columns from the given stream
+   * @throws com.stratio.streaming.commons.exceptions.StratioEngineOperationException
+   * @return
    */
+  @throws(classOf[StratioEngineOperationException])
   def columnsFromStream(stream: String): List[ColumnNameTypeValue]
 
   /**
-   * Gets a list of the queries from a given stream.
-   * @param stream
-   * @return a list with the queries from the given stream
+   *  Gets a list of the queries from a given stream.
+    * @param stream
+   * @throws com.stratio.streaming.commons.exceptions.StratioEngineOperationException
+   * @return
    */
+  @throws(classOf[StratioEngineOperationException])
   def queriesFromStream(stream: String): List[StratioQueryStream]
 
   /**
