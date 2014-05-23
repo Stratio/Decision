@@ -186,9 +186,9 @@ class StratioStreamingAPI
 
   def initialize() = {
     brokerServer = config.getString("kafka.server")
-    brokerPort = config.getString("kafka.port")
+    brokerPort = config.getInt("kafka.port")
     zookeeperServer = config.getString("zookeeper.server")
-    zookeeperPort = config.getString("zookeeper.port")
+    zookeeperPort = config.getInt("zookeeper.port")
     checkEphemeralNode()
     startEphemeralNodeWatch()
     initializeTopic()
@@ -196,9 +196,9 @@ class StratioStreamingAPI
   }
 
   def initializeWithServerConfig(kafkaServer: String,
-                 kafkaPort: String,
+                 kafkaPort: Int,
                  theZookeeperServer: String,
-                 theZookeeperPort: String) = {
+                 theZookeeperPort: Int) = {
     brokerServer = kafkaServer
     brokerPort = kafkaPort
     zookeeperServer = theZookeeperServer
@@ -215,10 +215,10 @@ object StratioStreamingAPI
   val streamingTopicName = TOPICS
   val sessionId = "" + System.currentTimeMillis()
   var brokerServer = ""
-  var brokerPort = ""
+  var brokerPort = 0
   lazy val kafkaBroker = s"$brokerServer:$brokerPort"
   var zookeeperServer = ""
-  var zookeeperPort = ""
+  var zookeeperPort = 0
   lazy val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
   var streamingUpAndRunning = false
   val streamingListeners = scala.collection.mutable.Map[String, KafkaConsumer]()
@@ -248,7 +248,7 @@ object StratioStreamingAPI
   }
 
   def initializeTopic() {
-    topicService = new KafkaTopicService(zookeeperCluster, brokerServer, brokerPort.toInt, 10000, 10000)
+    topicService = new KafkaTopicService(zookeeperCluster, brokerServer, brokerPort, 10000, 10000)
     topicService.createTopicIfNotExist(streamingTopicName, 1, 1)
   }
 

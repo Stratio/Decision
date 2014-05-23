@@ -43,9 +43,9 @@ trait IStratioStreamingAPI {
    * @return
    */
   def initializeWithServerConfig(kafkaServer: String,
-                 kafkaPort: String,
+                 kafkaPort: Int,
                  theZookeeperServer: String,
-                 theZookeeperPort: String): IStratioStreamingAPI
+                 theZookeeperPort: Int): IStratioStreamingAPI
 
   /**
    * Creates a new stream.
