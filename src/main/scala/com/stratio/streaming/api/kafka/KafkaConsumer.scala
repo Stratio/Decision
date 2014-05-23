@@ -44,24 +44,6 @@ class KafkaConsumer(topic: String,
 
   val stream = connector.createMessageStreamsByFilter(filterSpec, 1, new StringDecoder(), new JsonGenericDecoder()).get(0)
 
-  /*def read(write: (Array[Byte])=>Unit) = {
-     Future {
-      for(messageAndTopic <- stream) {
-        try {
-          write(messageAndTopic.message)
-        } catch {
-          case e: Throwable =>
-            if (true) {
-              error("Error processing message, skipping this message: ", e)
-            } else {
-              throw e
-            }
-        }
-      }
-     }
-
-  }*/
-
   def close() {
     connector.shutdown()
   }

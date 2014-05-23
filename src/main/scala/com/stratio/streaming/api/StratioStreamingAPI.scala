@@ -19,7 +19,7 @@ package com.stratio.streaming.api
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import com.stratio.streaming.commons.messages.{ColumnNameTypeValue, StratioStreamingMessage}
-import com.stratio.streaming.kafka.{KafkaConsumer, KafkaTopicUtils}
+import com.stratio.streaming.kafka.KafkaConsumer
 import com.stratio.streaming.commons.constants.BUS._
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION._
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION._
@@ -40,6 +40,7 @@ import com.stratio.streaming.kafka.KafkaProducer
 import com.stratio.streaming.dto.StratioQueryStream
 import com.stratio.streaming.messaging.QueryMessageBuilder
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.commons.kafka.service.{TopicService, KafkaTopicService}
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
@@ -224,6 +225,7 @@ object StratioStreamingAPI
   lazy val kafkaProducer = new KafkaProducer(TOPICS, kafkaBroker)
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
+  var topicService: TopicService = _
   lazy val zookeeperConsumer = {
     zookeeperClient.start()
     ZookeeperConsumer(zookeeperClient)
@@ -246,7 +248,8 @@ object StratioStreamingAPI
   }
 
   def initializeTopic() {
-    KafkaTopicUtils.createTopicIfNotExists(zookeeperCluster, streamingTopicName)
+    topicService = new KafkaTopicService(zookeeperCluster, brokerServer, brokerPort.toInt, 10000, 10000)
+    topicService.createTopicIfNotExist(streamingTopicName, 1, 1)
   }
 
   def checkSecurityConstraints(message: StratioStreamingMessage) {
