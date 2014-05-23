@@ -19,18 +19,14 @@ package com.stratio.streaming.integration
 import org.scalatest._
 import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioStreamingException, StratioEngineStatusException, StratioAPISecurityException}
 import org.apache.curator.retry.ExponentialBackoffRetry
-import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
+import org.apache.curator.framework.CuratorFrameworkFactory
 import com.stratio.streaming.commons.constants.STREAMING._
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.messaging.{ColumnNameValue, ColumnNameType}
 import com.stratio.streaming.commons.constants.ColumnType
 import scala.collection.JavaConversions._
 import util.control.Breaks._
-import java.util
-import com.stratio.streaming.commons.messages.ColumnNameTypeValue
 import com.stratio.streaming.api.{StratioStreamingAPIConfig, StratioStreamingAPIFactory}
 import scalaj.http.Http
-import com.stratio.streaming.api.StratioStreamingAPI._
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 
 class StratioStreamingIntegrationTests
@@ -60,9 +56,9 @@ class StratioStreamingIntegrationTests
       elasticSearchHost = conf.get("elasticSearchHost").get.toString
       elasticSearchPort = conf.get("elasticSearchPort").get.toString
       streamingAPI.initializeWithServerConfig(kafkaHost,
-        kafkaPort,
+        kafkaPort.toInt,
         zookeeperHost,
-        zookeeperPort)
+        zookeeperPort.toInt)
       zookeeperCluster = s"$zookeeperHost:$zookeeperPort"
       zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
       zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
