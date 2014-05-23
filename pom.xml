@@ -99,11 +99,6 @@
 			<version>0.2.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>ca.zmatrix.cli</groupId>
-			<artifactId>parser</artifactId>
-			<version>0.0.93</version>
-		</dependency>
-		<dependency>
 			<groupId>com.stratio.deep</groupId>
 			<artifactId>deep-core</artifactId>
 			<version>0.2.2</version>
@@ -174,46 +169,8 @@
 					</execution>
 				</executions>
 			</plugin>
-
-
-
-			<!-- <plugin> -->
-			<!-- <grhttp://nexus.strat.io:8081/nexus/content/repositories/releasesoupId>org.dstovall</groupId> -->
-			<!-- <artifactId>onejar-maven-plugin</artifactId> -->
-			<!-- <version>1.4.4</version> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <configuration> -->
-			<!-- Optional -->
-			<!-- <onejarVersion>0.97</onejarVersion> -->
-			<!-- Optional, use only if you need to include native libraries (dll's) -->
-			<!-- <bi -->
-			<!-- <binlibs> -->
-			<!-- <fileSet> -->
-			<!-- <directory>${project.basedir}/lib</directory> -->
-			<!-- <includes> -->
-			<!-- <include>parsecmd-0.0.93.jar</include> -->
-			<!-- </includes> -->
-			<!-- </fileSet> -->
-			<!-- </binlibs> -->
-			<!-- Optional, default is "onejar" -->
-			<!-- <classifier>onejar</classifier> -->
-			<!-- </configuration> -->
-			<!-- <goals> -->
-			<!-- <goal>one-jar</goal> -->
-			<!-- </goals> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- </plugin> -->
 		</plugins>
 	</build>
-
-	<!-- <pluginRepositories> -->
-	<!-- <pluginRepository> -->
-	<!-- <id>onejar-maven-plugin.googlecode.com</id> -->
-	<!-- <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url> -->
-	<!-- </pluginRepository> -->
-	<!-- </pluginRepositories> -->
 
 	<name>stratio-streaming-engine</name>
 	<url>https://github.com/Stratio/stratio-streaming</url>
