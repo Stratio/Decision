@@ -54,6 +54,10 @@ public class StratioStreamingConsole {
 
     public static void main(String[] args) throws Exception {
 
+        if (args == null || args.length != 2) {
+            throw new Exception("Usage: [KAFKA_CLUSTER:PORT] [ZOOKEEPER_CLUSTER:PORT]");
+        }
+
         StratioStreamingConsole self = new StratioStreamingConsole();
 
         ConsoleReader reader = new ConsoleReader();
@@ -101,24 +105,12 @@ public class StratioStreamingConsole {
 
     private void start(String[] args) throws Exception {
 
-        // DECODING ARGUMENTS FROM COMMAND LINE
-        String usage = "usage: --broker-list ip:port";
-        // ParseCmd cmd = new ParseCmd.Builder()
-        // .help(usage)
-        // .parm("--broker-list", "node.stratio.com:9999")
-        // .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
-        // .req()
-        // .parm("--zookeeper", "node.stratio.com:9999")
-        // .rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$")
-        // .req().build();
-
-        this.brokerList = "TODO";
+        this.brokerList = args[0];
         this.sessionId = "" + System.currentTimeMillis();
         this.producer = new Producer<String, String>(createProducerConfig());
 
         // ZOOKEPER CONNECTION
-        client = CuratorFrameworkFactory.newClient("ZOOKEEPER TODO", 25 * 1000, 10 * 1000, new ExponentialBackoffRetry(
-                1000, 3));
+        client = CuratorFrameworkFactory.newClient(args[1], 25 * 1000, 10 * 1000, new ExponentialBackoffRetry(1000, 3));
 
         client.start();
         client.getZookeeperClient().blockUntilConnectedOrTimedOut();
