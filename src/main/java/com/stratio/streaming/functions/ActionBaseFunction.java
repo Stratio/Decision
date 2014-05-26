@@ -44,10 +44,11 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
             try {
                 if (validOperation(message)) {
                     boolean defaultResponse = false;
-                    if (getStartOperationCommand() != null && getStartOperationCommand().equals(message.getOperation())) {
+                    if (getStartOperationCommand() != null
+                            && getStartOperationCommand().equalsIgnoreCase(message.getOperation())) {
                         defaultResponse = startAction(message);
                     } else if (getStopOperationCommand() != null
-                            && getStopOperationCommand().equals(message.getOperation())) {
+                            && getStopOperationCommand().equalsIgnoreCase(message.getOperation())) {
                         defaultResponse = stopAction(message);
                     }
                     if (defaultResponse) {
