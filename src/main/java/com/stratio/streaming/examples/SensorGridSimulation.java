@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.stratio.streaming.examples;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -77,28 +76,8 @@ public class SensorGridSimulation {
     }
 
     protected void launchSensorStreaming(String[] args) throws Exception {
-        // DECODING ARGUMENTS FROM COMMAND LINE
-        String usage = "usage: --broker-list ip:port --events n";
-        // ParseCmd cmd = new ParseCmd.Builder()
-        // .help(usage)
-        // .parm("--broker-list", "node.stratio.com:9092"
-        // ).rex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+(,(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[0-9]{1,4}+)*$").req()
-        // .parm("--events", "1000" ).req()
-        // .build();
 
-        HashMap<String, String> R = new HashMap<String, String>();
-        // String parseError = cmd.validate(args);
-        // if( cmd.isValid(args) ) {
-        // R = (HashMap<String, String>) cmd.parse(args);
-        // logger.info("Launching with these params:");
-        // logger.info(cmd.displayMap(R));
-        // }
-        // else {
-        // logger.error(parseError);
-        // System.exit(1);
-        // }
-
-        launchStreamingSensorsData(R.get("--broker-list").toString(), Integer.parseInt(R.get("--events")));
+        launchStreamingSensorsData(args[0], Integer.parseInt(args[1]));
 
     }
 
