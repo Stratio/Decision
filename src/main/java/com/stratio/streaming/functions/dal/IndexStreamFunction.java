@@ -10,6 +10,7 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.ActionEnabledValidation;
 import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamExistsValidation;
 import com.stratio.streaming.streams.StreamOperations;
 import com.stratio.streaming.streams.StreamStatusDTO.StreamAction;
 
@@ -53,6 +54,7 @@ public class IndexStreamFunction extends ActionBaseFunction {
     protected void addRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new ActionEnabledValidation(getSiddhiManager(), StreamAction.INDEXED,
                 REPLY_CODES.KO_INDEX_STREAM_ALREADY_ENABLED));
+        validators.add(new StreamExistsValidation(getSiddhiManager()));
     }
 
 }

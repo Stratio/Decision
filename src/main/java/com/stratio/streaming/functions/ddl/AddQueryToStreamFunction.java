@@ -30,6 +30,7 @@ import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.QueryExistsValidation;
 import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamExistsValidation;
 import com.stratio.streaming.streams.StreamOperations;
 
 public class AddQueryToStreamFunction extends ActionBaseFunction {
@@ -76,5 +77,6 @@ public class AddQueryToStreamFunction extends ActionBaseFunction {
     @Override
     protected void addRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new QueryExistsValidation(getSiddhiManager()));
+        validators.add(new StreamExistsValidation(getSiddhiManager()));
     }
 }

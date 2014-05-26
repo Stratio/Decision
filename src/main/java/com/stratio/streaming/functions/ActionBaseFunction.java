@@ -15,7 +15,6 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamAllowedValidation;
-import com.stratio.streaming.functions.validator.StreamExistsValidation;
 import com.stratio.streaming.utils.ZKUtils;
 
 public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreamingMessage>, Void> {
@@ -33,7 +32,6 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
         this.siddhiManager = siddhiManager;
         this.zookeeperHost = zookeeperHost;
 
-        validators.add(new StreamExistsValidation(getSiddhiManager()));
         validators.add(new StreamAllowedValidation(getSiddhiManager()));
         addRequestsValidations(validators);
     }

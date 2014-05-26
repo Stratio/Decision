@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.stratio.streaming.functions.ddl;
 
+import java.util.Set;
+
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.exception.AttributeAlreadyExistException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
@@ -24,6 +26,8 @@ import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.ActionBaseFunction;
+import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamExistsValidation;
 import com.stratio.streaming.streams.StreamOperations;
 
 public class AlterStreamFunction extends ActionBaseFunction {
@@ -61,5 +65,10 @@ public class AlterStreamFunction extends ActionBaseFunction {
     protected boolean stopAction(StratioStreamingMessage message) throws RequestValidationException {
         // nothing to do
         return true;
+    }
+
+    @Override
+    protected void addRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamExistsValidation(getSiddhiManager()));
     }
 }
