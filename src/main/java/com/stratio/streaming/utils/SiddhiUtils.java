@@ -216,6 +216,7 @@ public class SiddhiUtils {
         case STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA:
         case STREAM_OPERATIONS.ACTION.INDEX:
         case STREAM_OPERATIONS.ACTION.STOP_LISTEN:
+        case STREAM_OPERATIONS.MANIPULATION.LIST:
 
             return Boolean.TRUE;
         default:
