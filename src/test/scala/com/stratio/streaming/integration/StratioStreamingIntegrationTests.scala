@@ -28,6 +28,7 @@ import util.control.Breaks._
 import com.stratio.streaming.api.{StratioStreamingAPIConfig, StratioStreamingAPIFactory}
 import scalaj.http.Http
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.commons.constants._;
 
 class StratioStreamingIntegrationTests
   extends  FunSpec
@@ -119,7 +120,7 @@ class StratioStreamingIntegrationTests
       theNumberOfColumnsOfTheStream(testStreamName) should be(6)
     }
 
-    it("should throw a StratioEngineOperationException when creating a stream that already exists", Tag("wip")) {
+    it("should throw a StratioEngineOperationException when creating a stream that already exists") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
@@ -129,12 +130,13 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when creating a stream with the stratio_ prefix") {
+    it("should throw a StratioAPISecurityException when creating an internal stream", Tag("wip")) {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val statStream = STREAMING.STATS_NAMES.STATS_STREAMS(0)
       intercept [StratioAPISecurityException] {
-        streamingAPI.createStream(internalTestStreamName, columnList)
+        streamingAPI.createStream(statStream, columnList)
       }
     }
   }
