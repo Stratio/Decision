@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 
 import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.dto.ActionCallbackDto;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.dto.ActionCallbackDto;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamAllowedValidation;
