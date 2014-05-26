@@ -119,7 +119,7 @@ class StratioStreamingIntegrationTests
       theNumberOfColumnsOfTheStream(testStreamName) should be(6)
     }
 
-    it("should throw a StratioEngineOperationException when creating a stream that already exists") {
+    it("should throw a StratioEngineOperationException when creating a stream that already exists", Tag("wip")) {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)

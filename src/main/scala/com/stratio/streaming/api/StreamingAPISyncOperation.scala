@@ -22,6 +22,8 @@ import com.stratio.streaming.commons.exceptions.StratioEngineOperationException
 import com.stratio.streaming.kafka.KafkaProducer
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants.REPLY_CODES._
+import com.google.gson.Gson
+import com.stratio.streaming.commons.dto.ActionCallbackDto
 
 case class StreamingAPISyncOperation(
   kafkaProducer: KafkaProducer,
@@ -42,25 +44,18 @@ case class StreamingAPISyncOperation(
   }
 
   private def manageStreamingResponse(response: String, message: StratioStreamingMessage) = {
-    val replyCode = getResponseCode(response)
+    val responseDto = new Gson().fromJson(response, classOf[ActionCallbackDto])
+    val replyCode = responseDto.getErrorCode
     replyCode match {
-      case Some(OK) => log.info("StratioEngine Ack received for: "+message.getRequest)
+      case OK => log.info("StratioEngine Ack received for: "+message.getRequest)
       case _ => {
-        createLogError(response, message.getRequest)
-        throw new StratioEngineOperationException("StratioEngine error: "+getReadableErrorFromCode(replyCode.get))
+        createLogError(replyCode, responseDto.getDescription)
+        throw new StratioEngineOperationException("StratioEngine error: "+responseDto.getDescription)
       }
     }
   }
 
-  private def getResponseCode(response: String): Option[Integer] = {
-    try {
-      Some(new Integer(response))
-    } catch {
-      case ex: NumberFormatException => None
-    }
-  }
-
-  private def createLogError(responseCode: String, queryString: String) = {
+  private def createLogError(responseCode: Int, queryString: String) = {
     log.error(s"StratioAPI - [ACK_CODE,QUERY_STRING]: [$responseCode,$queryString]")
   }
 }
