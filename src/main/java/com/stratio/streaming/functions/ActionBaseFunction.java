@@ -23,36 +23,45 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
 
     protected static Logger log = LoggerFactory.getLogger(ActionBaseFunction.class);
 
-    private final Set<RequestValidation> validators;
+    private final Set<RequestValidation> stopValidators;
+    private final Set<RequestValidation> startValidators;
     private final transient SiddhiManager siddhiManager;
     private final String zookeeperHost;
 
     public ActionBaseFunction(SiddhiManager siddhiManager, String zookeeperHost) {
-        this.validators = new HashSet<>();
+        this.stopValidators = new HashSet<>();
+        this.startValidators = new HashSet<>();
         this.siddhiManager = siddhiManager;
         this.zookeeperHost = zookeeperHost;
 
-        validators.add(new StreamAllowedValidation(getSiddhiManager()));
-        addRequestsValidations(validators);
+        startValidators.add(new StreamAllowedValidation(getSiddhiManager()));
+        stopValidators.add(new StreamAllowedValidation(getSiddhiManager()));
+        addStartRequestsValidations(startValidators);
+        addStopRequestsValidations(stopValidators);
     }
 
     @Override
     public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
         for (StratioStreamingMessage message : rdd.collect()) {
             try {
-                if (validOperation(message)) {
-                    boolean defaultResponse = false;
-                    if (getStartOperationCommand() != null
-                            && getStartOperationCommand().equalsIgnoreCase(message.getOperation())) {
+
+                boolean defaultResponse = false;
+                if (getStartOperationCommand() != null
+                        && getStartOperationCommand().equalsIgnoreCase(message.getOperation())) {
+                    if (validOperation(message, startValidators)) {
                         defaultResponse = startAction(message);
-                    } else if (getStopOperationCommand() != null
-                            && getStopOperationCommand().equalsIgnoreCase(message.getOperation())) {
+                    }
+                } else if (getStopOperationCommand() != null
+                        && getStopOperationCommand().equalsIgnoreCase(message.getOperation())) {
+                    if (validOperation(message, stopValidators)) {
                         defaultResponse = stopAction(message);
                     }
-                    if (defaultResponse) {
-                        ackStreamingOperation(message, new ActionCallbackDto(REPLY_CODES.OK));
-                    }
                 }
+
+                if (defaultResponse) {
+                    ackStreamingOperation(message, new ActionCallbackDto(REPLY_CODES.OK));
+                }
+
             } catch (RequestValidationException e) {
                 log.error("Custom validation error", e);
                 ackStreamingOperation(message, new ActionCallbackDto(e.getCode(), e.getMessage()));
@@ -64,7 +73,7 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
         return null;
     }
 
-    private boolean validOperation(StratioStreamingMessage request) throws Exception {
+    private boolean validOperation(StratioStreamingMessage request, Set<RequestValidation> validators) throws Exception {
         log.debug("Validating request operation {} in session id {}", request.getRequest_id(), request.getSession_id());
         for (RequestValidation validation : validators) {
             try {
@@ -108,12 +117,8 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
 
     protected abstract boolean stopAction(StratioStreamingMessage message) throws RequestValidationException;
 
-    /**
-     * Override this method to add more validators to the action
-     * 
-     * @param validators
-     */
-    protected void addRequestsValidations(Set<RequestValidation> validators) {
-    }
+    protected abstract void addStopRequestsValidations(Set<RequestValidation> validators);
+
+    protected abstract void addStartRequestsValidations(Set<RequestValidation> validators);
 
 }

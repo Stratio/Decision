@@ -29,8 +29,9 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.QueryExistsValidation;
+import com.stratio.streaming.functions.validator.QueryNotExistsValidation;
 import com.stratio.streaming.functions.validator.RequestValidation;
-import com.stratio.streaming.functions.validator.StreamExistsValidation;
+import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
 import com.stratio.streaming.streams.StreamOperations;
 
 public class AddQueryToStreamFunction extends ActionBaseFunction {
@@ -75,8 +76,15 @@ public class AddQueryToStreamFunction extends ActionBaseFunction {
     }
 
     @Override
-    protected void addRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new QueryExistsValidation(getSiddhiManager()));
-        validators.add(new StreamExistsValidation(getSiddhiManager()));
+    protected void addStopRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+        validators.add(new QueryNotExistsValidation(getSiddhiManager()));
     }
+
+    @Override
+    protected void addStartRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new QueryExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+    }
+
 }

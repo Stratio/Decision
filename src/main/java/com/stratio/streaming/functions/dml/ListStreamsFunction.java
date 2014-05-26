@@ -16,6 +16,7 @@
 package com.stratio.streaming.functions.dml;
 
 import java.util.List;
+import java.util.Set;
 
 import org.wso2.siddhi.core.SiddhiManager;
 
@@ -25,6 +26,8 @@ import com.stratio.streaming.commons.messages.ListStreamsMessage;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.ActionBaseFunction;
+import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamAllowedValidation;
 import com.stratio.streaming.streams.StreamOperations;
 import com.stratio.streaming.utils.ZKUtils;
 
@@ -62,5 +65,14 @@ public class ListStreamsFunction extends ActionBaseFunction {
     protected boolean stopAction(StratioStreamingMessage message) throws RequestValidationException {
         // nothing to do
         return true;
+    }
+
+    @Override
+    protected void addStopRequestsValidations(Set<RequestValidation> validators) {
+    }
+
+    @Override
+    protected void addStartRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamAllowedValidation(getSiddhiManager()));
     }
 }

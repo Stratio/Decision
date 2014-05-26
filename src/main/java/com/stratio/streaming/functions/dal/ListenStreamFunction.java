@@ -25,7 +25,7 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.ActionEnabledValidation;
 import com.stratio.streaming.functions.validator.RequestValidation;
-import com.stratio.streaming.functions.validator.StreamExistsValidation;
+import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
 import com.stratio.streaming.streams.StreamOperations;
 import com.stratio.streaming.streams.StreamStatusDTO.StreamAction;
 
@@ -62,9 +62,14 @@ public class ListenStreamFunction extends ActionBaseFunction {
     }
 
     @Override
-    protected void addRequestsValidations(Set<RequestValidation> validators) {
+    protected void addStopRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+    }
+
+    @Override
+    protected void addStartRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new ActionEnabledValidation(getSiddhiManager(), StreamAction.LISTEN,
                 REPLY_CODES.KO_LISTENER_ALREADY_EXISTS));
-        validators.add(new StreamExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
     }
 }
