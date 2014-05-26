@@ -16,9 +16,11 @@ public class StreamExistsValidation extends BaseSiddhiRequestValidation {
 
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
-        if (getSm().getStreamDefinition(request.getStreamName()) == null) {
-            throw new RequestValidationException(REPLY_CODES.KO_STREAM_DOES_NOT_EXIST, String.format(
-                    STREAM_DOES_NOT_EXIST_MESSAGE, request.getStreamName()));
+        if (request.getStreamName() != null && !"".equals(request.getStreamName())) {
+            if (getSm().getStreamDefinition(request.getStreamName()) == null) {
+                throw new RequestValidationException(REPLY_CODES.KO_STREAM_DOES_NOT_EXIST, String.format(
+                        STREAM_DOES_NOT_EXIST_MESSAGE, request.getStreamName()));
+            }
         }
     }
 }
