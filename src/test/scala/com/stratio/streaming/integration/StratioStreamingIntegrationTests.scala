@@ -400,6 +400,25 @@ class StratioStreamingIntegrationTests
     }
   }
 
+  /*
+  describe("The add to cassandra operation") {
+    it("should add a row to cassandra when insert data in a stream with the SAVE_TO_CASSANDRA operation defined", Tag("wip")) {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue")
+      val streamData = Seq(firstColumnValue)
+      try {
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.saveToCassandra(testStreamName)
+        streamingAPI.insertData(testStreamName, streamData)
+        Thread.sleep(3000)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+      theRowHasBeenStored(testStreamName) should be(true)
+    }
+  }*/
+
   describe("The Streaming Engine") {
     it("should throw a StratioEngineStatusException when streaming engine is not running") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
