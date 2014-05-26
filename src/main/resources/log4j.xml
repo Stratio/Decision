@@ -8,10 +8,10 @@
 		</layout>
 	</appender>
 	<root>
-		<priority value="debug" />
+		<priority value="DEBUG" />
 		<appender-ref ref="console" />
 	</root>
 	<logger name="org.apache">
-		<level value="info" />
+		<level value="ERROR" />
 	</logger>
 </log4j:configuration>
