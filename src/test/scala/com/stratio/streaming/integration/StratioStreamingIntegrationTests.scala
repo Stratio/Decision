@@ -130,7 +130,7 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when creating an internal stream", Tag("wip")) {
+    it("should throw a StratioAPISecurityException when creating an internal stream") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
@@ -191,15 +191,11 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when adding a column to a non user-defined stream") {
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val thirdStreamColumn = new ColumnNameType("column3", ColumnType.INTEGER)
+    it("should throw a StratioAPISecurityException when adding a column to an internal stream") {
+      val thirdStreamColumn = new ColumnNameType("newColumn", ColumnType.INTEGER)
       val newColumnList = Seq(thirdStreamColumn)
-      val internalStream = "stratio_stats_base"
+      val internalStream = STREAMING.STATS_NAMES.STATS_STREAMS(0)
       //Creates a stream to trigger the internal streams creation
-      streamingAPI.createStream(testStreamName, columnList)
       intercept [StratioAPISecurityException] {
         streamingAPI.alterStream(internalStream, newColumnList)
       }
