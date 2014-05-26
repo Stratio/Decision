@@ -15,7 +15,7 @@
  */
 
 import sbt._
-import Keys._
+import sbt.Keys._
 
 object MainBuild extends Build {
   lazy val root =
@@ -24,7 +24,10 @@ object MainBuild extends Build {
       .settings( inConfig(IntegrationTest)(Defaults.testTasks) : _*)
       .settings(
       testOptions in Test := Seq(Tests.Filter(unitFilter)),
-      testOptions in IntegrationTest := Seq(Tests.Filter(itFilter))
+      testOptions in IntegrationTest := Seq(Tests.Filter(itFilter)),
+      testOptions in IntegrationTest <+= (target in IntegrationTest) map {
+        t => Tests.Argument("-o","-u", t + "/test-reports")
+      }
     )
 
   def itFilter(name: String): Boolean = name endsWith "IntegrationTests"
