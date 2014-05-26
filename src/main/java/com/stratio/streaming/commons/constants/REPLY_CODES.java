@@ -33,6 +33,7 @@ public abstract class REPLY_CODES {
     public static final Integer KO_SAVE2CASSANDRA_STREAM_ALREADY_ENABLED = 14;
     public static final Integer KO_SOURCE_STREAM_DOES_NOT_EXIST = 15;
     public static final Integer KO_INDEX_STREAM_ALREADY_ENABLED = 16;
+    public static final Integer KO_STREAM_OPERATION_NOT_ALLOWED = 17;
 
     public static String getReadableErrorFromCode(Integer code) {
 
@@ -86,6 +87,9 @@ public abstract class REPLY_CODES {
             break;
         case 16:
             decodedReply = "KO: INDEX IN THIS STREAM IS ALREADY_ENABLED";
+            break;
+        case 17:
+            decodedReply = "KO: STREAM OPERATION NOT ALLOWED";
             break;
         default:
             decodedReply = "UNKOWN ERROR";
