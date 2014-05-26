@@ -17,6 +17,7 @@ package com.stratio.streaming;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -371,11 +372,12 @@ public class StreamingEngine {
 
             });
 
-            messages.print();
+            // messages.print();
 
         }
 
         jssc.start();
+        logger.info("Stratio streaming started at {}", new Date());
         jssc.awaitTermination();
 
     }
