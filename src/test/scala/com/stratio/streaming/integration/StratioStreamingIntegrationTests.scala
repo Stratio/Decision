@@ -47,6 +47,7 @@ class StratioStreamingIntegrationTests
   val elasticSearchIndex = "stratiostreaming"
   var elasticSearchHost = ""
   var elasticSearchPort = ""
+  val internalStreamName = STREAMING.STATS_NAMES.STATS_STREAMS(0)
 
   override def beforeAll(conf: ConfigMap) {
     if (configurationHasBeenDefinedThroughCommandLine(conf)) {
@@ -134,7 +135,7 @@ class StratioStreamingIntegrationTests
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val statStream = STREAMING.STATS_NAMES.STATS_STREAMS(0)
+      val statStream = internalStreamName
       intercept [StratioAPISecurityException] {
         streamingAPI.createStream(statStream, columnList)
       }
@@ -241,15 +242,10 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when adding a query to a non user-defined stream") {
-      val internalStream = "stratio_stats_base"
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val theQuery = s"from $testStreamName select column1, column2 insert into $internalStream for current-events"
-      streamingAPI.createStream(testStreamName, columnList)
+    it("should throw a StratioAPISecurityException when adding a query to an internal stream", Tag("wip")) {
+      val theQuery = s"from $testStreamName select column1, column2 insert into $internalStreamName for current-events"
       intercept [StratioAPISecurityException] {
-        streamingAPI.addQuery(internalStream, theQuery)
+        streamingAPI.addQuery(internalStreamName, theQuery)
       }
     }
   }
