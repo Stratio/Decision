@@ -38,14 +38,15 @@ public class IndexStreamFunction extends ActionBaseFunction {
     }
 
     @Override
-    protected void startAction(StratioStreamingMessage message) {
+    protected boolean startAction(StratioStreamingMessage message) {
         StreamOperations.streamToIndexer(message, elasticSearchHost, elasticSearchPort, getSiddhiManager());
+        return true;
     }
 
     @Override
-    protected void stopAction(StratioStreamingMessage message) {
-        // TODO Auto-generated method stub
-
+    protected boolean stopAction(StratioStreamingMessage message) {
+        // TODO IMPLEMENT STOP INDEX ACTION
+        throw new UnsupportedOperationException("STOP CASSANDRA NOT IMPLEMENTED YET");
     }
 
     @Override

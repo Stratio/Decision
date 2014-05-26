@@ -15,12 +15,18 @@
  ******************************************************************************/
 package com.stratio.streaming.functions.dal;
 
+import java.util.Set;
+
 import org.wso2.siddhi.core.SiddhiManager;
 
+import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.ActionBaseFunction;
+import com.stratio.streaming.functions.validator.ActionEnabledValidation;
+import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.streams.StreamStatusDTO.StreamAction;
 
 public class SaveToCassandraStreamFunction extends ActionBaseFunction {
 
@@ -44,14 +50,20 @@ public class SaveToCassandraStreamFunction extends ActionBaseFunction {
     }
 
     @Override
-    protected void startAction(StratioStreamingMessage message) {
+    protected boolean startAction(StratioStreamingMessage message) {
         StreamOperations.save2cassandraStream(message, cassandraCluster, getSiddhiManager());
+        return true;
     }
 
     @Override
-    protected void stopAction(StratioStreamingMessage message) {
+    protected boolean stopAction(StratioStreamingMessage message) {
         // TODO implement stop save to cassandra
         throw new UnsupportedOperationException("STOP CASSANDRA NOT IMPLEMENTED YET");
     }
 
+    @Override
+    protected void addRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new ActionEnabledValidation(getSiddhiManager(), StreamAction.SAVE_TO_CASSANDRA,
+                REPLY_CODES.KO_SAVE2CASSANDRA_STREAM_ALREADY_ENABLED));
+    }
 }

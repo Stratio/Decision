@@ -14,6 +14,7 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.dto.ActionCallbackDto;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamAllowedValidation;
 import com.stratio.streaming.functions.validator.StreamExistsValidation;
 import com.stratio.streaming.utils.ZKUtils;
 
@@ -21,7 +22,7 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
 
     private static final long serialVersionUID = -4662722852153543463L;
 
-    private static Logger log = LoggerFactory.getLogger(ActionBaseFunction.class);
+    protected static Logger log = LoggerFactory.getLogger(ActionBaseFunction.class);
 
     private final Set<RequestValidation> validators;
     private final transient SiddhiManager siddhiManager;
@@ -32,7 +33,8 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
         this.siddhiManager = siddhiManager;
         this.zookeeperHost = zookeeperHost;
 
-        validators.add(new StreamExistsValidation(siddhiManager));
+        validators.add(new StreamExistsValidation(getSiddhiManager()));
+        validators.add(new StreamAllowedValidation(getSiddhiManager()));
         addRequestsValidations(validators);
     }
 
@@ -41,14 +43,22 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
         for (StratioStreamingMessage message : rdd.collect()) {
             try {
                 if (validOperation(message)) {
-                    if (getStartOperationCommand().equals(message.getOperation())) {
-                        startAction(message);
-                    } else if (getStopOperationCommand().equals(message.getOperation())) {
-                        stopAction(message);
+                    boolean defaultResponse = false;
+                    if (getStartOperationCommand() != null && getStartOperationCommand().equals(message.getOperation())) {
+                        defaultResponse = startAction(message);
+                    } else if (getStopOperationCommand() != null
+                            && getStopOperationCommand().equals(message.getOperation())) {
+                        defaultResponse = stopAction(message);
                     }
-                    ackStreamingOperation(message, new ActionCallbackDto(REPLY_CODES.OK));
+                    if (defaultResponse) {
+                        ackStreamingOperation(message, new ActionCallbackDto(REPLY_CODES.OK));
+                    }
                 }
+            } catch (RequestValidationException e) {
+                log.error("Custom validation error", e);
+                ackStreamingOperation(message, new ActionCallbackDto(e.getCode(), e.getMessage()));
             } catch (Exception e) {
+                log.error("Fatal validation error", e);
                 ackStreamingOperation(message, new ActionCallbackDto(REPLY_CODES.KO_GENERAL_ERROR, e.getMessage()));
             }
         }
@@ -61,6 +71,7 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
             try {
                 validation.validate(request);
             } catch (RequestValidationException e) {
+                log.error("Action validation error", e);
                 ackStreamingOperation(request, new ActionCallbackDto(e.getCode(), e.getMessage()));
                 return false;
             }
@@ -69,26 +80,40 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
     }
 
     private void ackStreamingOperation(StratioStreamingMessage message, ActionCallbackDto reply) throws Exception {
-        // TODO check this refactor
-        // if
-        // (!request.getOperation().equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.INSERT))
-        // {
         ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
-        // }
     }
 
     public SiddhiManager getSiddhiManager() {
         return siddhiManager;
     }
 
+    public String getZookeeperHost() {
+        return zookeeperHost;
+    }
+
+    /**
+     * Start operation command to execute this start action
+     * 
+     * @return string represents operation command
+     */
     protected abstract String getStartOperationCommand();
 
+    /**
+     * Stop operation command to execute this stop action
+     * 
+     * @return string represents operation command
+     */
     protected abstract String getStopOperationCommand();
 
-    protected abstract void startAction(StratioStreamingMessage message);
+    protected abstract boolean startAction(StratioStreamingMessage message) throws RequestValidationException;
 
-    protected abstract void stopAction(StratioStreamingMessage message);
+    protected abstract boolean stopAction(StratioStreamingMessage message) throws RequestValidationException;
 
+    /**
+     * Override this method to add more validators to the action
+     * 
+     * @param validators
+     */
     protected void addRequestsValidations(Set<RequestValidation> validators) {
     }
 
