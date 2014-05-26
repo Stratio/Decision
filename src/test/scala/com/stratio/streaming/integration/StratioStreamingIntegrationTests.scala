@@ -195,7 +195,6 @@ class StratioStreamingIntegrationTests
       val thirdStreamColumn = new ColumnNameType("newColumn", ColumnType.INTEGER)
       val newColumnList = Seq(thirdStreamColumn)
       val internalStream = STREAMING.STATS_NAMES.STATS_STREAMS(0)
-      //Creates a stream to trigger the internal streams creation
       intercept [StratioAPISecurityException] {
         streamingAPI.alterStream(internalStream, newColumnList)
       }
@@ -308,9 +307,9 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when removing a stream with the stratio_ prefix") {
+    it("should throw a StratioAPISecurityException when removing an internal stream") {
       intercept [StratioAPISecurityException] {
-        streamingAPI.dropStream(internalTestStreamName)
+        streamingAPI.dropStream(STREAMING.STATS_NAMES.STATS_STREAMS(1))
       }
     }
   }
