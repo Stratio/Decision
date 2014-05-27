@@ -1,6 +1,5 @@
 package com.stratio.streaming.shell.converter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,14 +11,14 @@ import org.springframework.stereotype.Component;
 
 import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.messaging.ColumnNameType;
+import com.stratio.streaming.shell.converter.wrapper.ColumnNameTypeList;
 
 @Component
-public class ColumnNameTypeConverter implements Converter<List<ColumnNameType>> {
+public class ColumnNameTypeConverter implements Converter<ColumnNameTypeList> {
 
     @Override
     public boolean supports(Class<?> type, String optionContext) {
-        // TODO change to compare the internal list object
-        if (type.equals(List.class)) {
+        if (type.equals(ColumnNameTypeList.class)) {
             return true;
         } else {
             return false;
@@ -27,10 +26,10 @@ public class ColumnNameTypeConverter implements Converter<List<ColumnNameType>> 
     }
 
     @Override
-    public List<ColumnNameType> convertFromText(String value, Class<?> targetType, String optionContext) {
+    public ColumnNameTypeList convertFromText(String value, Class<?> targetType, String optionContext) {
 
         String[] keyValueArray = value.split(",");
-        List<ColumnNameType> result = new ArrayList<>();
+        ColumnNameTypeList result = new ColumnNameTypeList();
         for (String keyValueString : keyValueArray) {
             String[] keyTypeArray = keyValueString.split("\\.");
             if (keyTypeArray.length != 2) {
