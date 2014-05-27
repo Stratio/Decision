@@ -1,5 +1,6 @@
 import AssemblyKeys._
 import SonatypeKeys._
+import aether.Aether._
 
 sonatypeSettings
 
@@ -8,6 +9,8 @@ useGpg := true
 pgpReadOnly := false
 
 moduleName := "streaming-api"
+
+name := "streaming-api"
 
 crossPaths := false
 
@@ -50,14 +53,14 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.10" % "2.0" % "test",
+  "com.datastax.cassandra" % "cassandra-driver-core" % "2.0.2" exclude("org.jboss", "netty"),
   "org.apache.kafka" % "kafka_2.10" % "0.8.1" exclude("com.sun.jdmk", "jmxtools") exclude("com.sun.jmx", "jmxri") exclude("org.apache.zookeeper", "zookeeper"),
   "com.typesafe" % "config" % "1.2.0",
   "org.apache.curator" % "curator-framework" % "2.4.1",
   "org.slf4j" % "slf4j-log4j12" % "1.7.5",
-  "com.stratio.streaming" % "streaming-commons" % "0.2.0-SNAPSHOT",
+  "com.stratio.streaming" % "streaming-commons" % "0.3.0-SNAPSHOT",
   "com.google.code.gson" % "gson" % "2.2.4",
-  "org.scalaj" %% "scalaj-http" % "0.3.15",
-  "com.datastax.cassandra" % "cassandra-driver-core" % "2.0.2"
+  "org.scalaj" %% "scalaj-http" % "0.3.15"
 )
 
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
@@ -68,6 +71,8 @@ publishTo := {
   else
     Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 }
+
+aetherPublishBothSettings
 
 // To sync with Maven central, you need to supply the following information:
 pomExtra := {
