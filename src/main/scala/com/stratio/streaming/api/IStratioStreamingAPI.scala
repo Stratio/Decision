@@ -164,4 +164,11 @@ trait IStratioStreamingAPI {
    */
   @throws(classOf[StratioEngineStatusException])
   def saveToCassandra(streamName: String)
+
+  /**
+   * Stops saving the stream to cassandra DB.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def stopSaveToCassandra(streamName: String)
 }
