@@ -34,6 +34,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.instance.HazelcastInstanceFactory;
+import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
@@ -45,39 +46,48 @@ public class SiddhiUtils {
 
     private static Logger logger = LoggerFactory.getLogger(SiddhiUtils.class);
 
-    // TODO delete when ColumnType in commons are ready
-    public static final String SIDDHI_TYPE_STRING = "STRING";
-    public static final String SIDDHI_TYPE_BOOLEAN = "BOOL";
-    public static final String SIDDHI_TYPE_DOUBLE = "DOUBLE";
-    public static final String SIDDHI_TYPE_INT = "INT";
-    public static final String SIDDHI_TYPE_LONG = "LONG";
-    public static final String SIDDHI_TYPE_FLOAT = "FLOAT";
-
     public static final String QUERY_PLAN_IDENTIFIER = "StratioStreamingCEP-Cluster";
 
     private SiddhiUtils() {
 
     }
 
-    public static Type decodeSiddhiType(String originalType) throws SiddhiPraserException {
-
-        switch (originalType.toUpperCase()) {
-        case SIDDHI_TYPE_STRING:
+    public static Type decodeSiddhiType(ColumnType originalType) throws SiddhiPraserException {
+        switch (originalType) {
+        case STRING:
             return Attribute.Type.STRING;
-        case SIDDHI_TYPE_BOOLEAN:
+        case BOOLEAN:
             return Attribute.Type.BOOL;
-        case SIDDHI_TYPE_DOUBLE:
+        case DOUBLE:
             return Attribute.Type.DOUBLE;
-        case SIDDHI_TYPE_INT:
+        case INTEGER:
             return Attribute.Type.INT;
-        case SIDDHI_TYPE_LONG:
+        case LONG:
             return Attribute.Type.LONG;
-        case SIDDHI_TYPE_FLOAT:
+        case FLOAT:
             return Attribute.Type.FLOAT;
         default:
             throw new SiddhiPraserException("Unsupported Column type: " + originalType);
         }
+    }
 
+    public static ColumnType encodeSiddhiType(Type type) throws SiddhiPraserException {
+        switch (type) {
+        case STRING:
+            return ColumnType.STRING;
+        case BOOL:
+            return ColumnType.BOOLEAN;
+        case DOUBLE:
+            return ColumnType.DOUBLE;
+        case INT:
+            return ColumnType.INTEGER;
+        case LONG:
+            return ColumnType.LONG;
+        case FLOAT:
+            return ColumnType.FLOAT;
+        default:
+            throw new SiddhiPraserException("Unsupported Column type: " + type);
+        }
     }
 
     public static String recoverStreamDefinition(StreamDefinition streamDefinition) {
@@ -178,18 +188,18 @@ public class SiddhiUtils {
 
     private static Object decodeSiddhiValue(String originalValue, Attribute.Type type) throws SiddhiPraserException {
 
-        switch (type.toString()) {
-        case SIDDHI_TYPE_STRING:
+        switch (type) {
+        case STRING:
             return originalValue;
-        case SIDDHI_TYPE_BOOLEAN:
+        case BOOL:
             return Boolean.valueOf(originalValue);
-        case SIDDHI_TYPE_DOUBLE:
+        case DOUBLE:
             return Double.valueOf(originalValue);
-        case SIDDHI_TYPE_INT:
+        case INT:
             return Integer.valueOf(originalValue);
-        case SIDDHI_TYPE_LONG:
+        case LONG:
             return Long.valueOf(originalValue);
-        case SIDDHI_TYPE_FLOAT:
+        case FLOAT:
             return Float.valueOf(originalValue);
         default:
             throw new SiddhiPraserException("Unsupported Column type: " + originalValue + "/" + type.toString());
