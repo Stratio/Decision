@@ -16,12 +16,7 @@
 package com.stratio.streaming.commons.constants;
 
 public enum ColumnType {
-    STRING("STRING"),
-    BOOLEAN("BOOL"),
-    DOUBLE("DOUBLE"),
-    INTEGER("INT"),
-    LONG("LONG"),
-    FLOAT("FLOAT");
+    STRING("STRING"), BOOLEAN("BOOL"), DOUBLE("DOUBLE"), INTEGER("INT"), LONG("LONG"), FLOAT("FLOAT");
 
     private String value;
 
@@ -30,6 +25,6 @@ public enum ColumnType {
     }
 
     public String getValue() {
-       return value;
+        return value;
     }
 }
