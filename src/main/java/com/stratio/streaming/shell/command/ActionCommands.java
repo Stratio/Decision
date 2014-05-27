@@ -17,7 +17,7 @@ public class ActionCommands implements CommandMarker {
     @Autowired
     private IStratioStreamingAPI stratioStreamingApi;
 
-    @CliCommand(value = "save index start", help = "index stream events")
+    @CliCommand(value = "index start", help = "index stream events")
     public String indexStart(
             @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
@@ -28,7 +28,7 @@ public class ActionCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "save index stop", help = "stop index stream events")
+    @CliCommand(value = "index stop", help = "stop index stream events")
     public String indexStop(
             @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
