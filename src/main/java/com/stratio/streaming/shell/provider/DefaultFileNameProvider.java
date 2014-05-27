@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 public class DefaultFileNameProvider extends DefaultHistoryFileNameProvider {
 
     public String getHistoryFileName() {
-        return "log.log";
+        return "history.log";
     }
 
     @Override
