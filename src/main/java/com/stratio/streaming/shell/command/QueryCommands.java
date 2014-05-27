@@ -30,4 +30,16 @@ public class QueryCommands implements CommandMarker {
         }
     }
 
+    @CliCommand(value = "remove query", help = "remove an existing query")
+    public String drop(
+            @CliOption(key = { "stream" }, help = "Stream to deattach query", mandatory = true, optionContext = "stream") final String streamName,
+            @CliOption(key = { "id" }, help = "query id", mandatory = true) final String queryId) {
+        try {
+            stratioStreamingApi.removeQuery(streamName, queryId);
+            return "Query ".concat(streamName).concat(" dropped correctly with id ".concat(queryId));
+        } catch (StratioEngineStatusException | StratioEngineOperationException e) {
+            throw new ShellException(e);
+        }
+    }
+
 }
