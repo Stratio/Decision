@@ -20,10 +20,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.shell.plugin.support.DefaultBannerProvider;
+import org.springframework.shell.support.util.FileUtils;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
 import com.stratio.streaming.api.IStratioStreamingAPI;
+import com.stratio.streaming.shell.Main;
 
 /**
  * @author Jarred Li
@@ -50,7 +52,16 @@ public class StratioStreamingBannerProvider extends DefaultBannerProvider {
 
     @Override
     public String getBanner() {
-        return generateBanner();
+        StringBuilder sb = new StringBuilder();
+        sb.append(FileUtils.readBanner(Main.class, "/banner.txt"));
+        sb.append(OsUtils.LINE_SEPARATOR);
+        sb.append("Version:" + this.getVersion() + OsUtils.LINE_SEPARATOR);
+        sb.append(OsUtils.LINE_SEPARATOR);
+        sb.append("Connection urls: " + OsUtils.LINE_SEPARATOR);
+        sb.append("    - Kafka: " + kafkaHost + ":" + kafkaPort + OsUtils.LINE_SEPARATOR);
+        sb.append("    - Zookeeper: " + zookeeperHost + ":" + zookeeperPort + OsUtils.LINE_SEPARATOR);
+
+        return sb.toString();
     }
 
     @Override
@@ -68,31 +79,4 @@ public class StratioStreamingBannerProvider extends DefaultBannerProvider {
         return "Init Banner Provider";
     }
 
-    private String generateBanner() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("  _____ _             _   _         _____ _                            _             "
-                + OsUtils.LINE_SEPARATOR);
-        buf.append(" /  ___| |           | | (_)       /  ___| |                          (_)            "
-                + OsUtils.LINE_SEPARATOR);
-        buf.append(" \\ `--.| |_ _ __ __ _| |_ _  ___   \\ `--.| |_ _ __ ___  __ _ _ __ ___  _ _ __   __ _ "
-                + OsUtils.LINE_SEPARATOR);
-        buf.append("  `--. \\ __| '__/ _` | __| |/ _ \\   `--. \\ __| '__/ _ \\/ _` | '_ ` _ \\| | '_ \\ / _` |"
-                + OsUtils.LINE_SEPARATOR);
-        buf.append(" /\\__/ / |_| | | (_| | |_| | (_) | /\\__/ / |_| | |  __/ (_| | | | | | | | | | | (_| |"
-                + OsUtils.LINE_SEPARATOR);
-        buf.append(" \\____/ \\__|_|  \\__,_|\\__|_|\\___/  \\____/ \\__|_|  \\___|\\__,_|_| |_| |_|_|_| |_|\\__, |"
-                + OsUtils.LINE_SEPARATOR);
-        buf.append("                                                                                __/ |"
-                + OsUtils.LINE_SEPARATOR);
-        buf.append("                                                                               |___/ "
-                + OsUtils.LINE_SEPARATOR);
-
-        buf.append("Version:" + this.getVersion() + OsUtils.LINE_SEPARATOR);
-        buf.append(OsUtils.LINE_SEPARATOR);
-        buf.append("Connection urls: " + OsUtils.LINE_SEPARATOR);
-        buf.append("    - Kafka: " + kafkaHost + ":" + kafkaPort + OsUtils.LINE_SEPARATOR);
-        buf.append("    - Zookeeper: " + zookeeperHost + ":" + zookeeperPort + OsUtils.LINE_SEPARATOR);
-
-        return buf.toString();
-    }
 }
