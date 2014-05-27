@@ -46,8 +46,8 @@ public class IndexStreamFunction extends ActionBaseFunction {
 
     @Override
     protected boolean stopAction(StratioStreamingMessage message) {
-        // TODO IMPLEMENT STOP INDEX ACTION
-        throw new UnsupportedOperationException("STOP CASSANDRA NOT IMPLEMENTED YET");
+        StreamOperations.stopStreamToIndexer(message, getSiddhiManager());
+        return true;
     }
 
     @Override
