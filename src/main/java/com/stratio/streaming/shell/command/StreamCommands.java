@@ -21,8 +21,10 @@ import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
 import com.stratio.streaming.commons.exceptions.StratioStreamingException;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.streams.StratioStream;
-import com.stratio.streaming.messaging.ColumnNameType;
+import com.stratio.streaming.shell.converter.wrapper.ColumnNameTypeList;
+import com.stratio.streaming.shell.converter.wrapper.ColumnNameValueList;
 import com.stratio.streaming.shell.dao.CachedStreamsDAO;
+import com.stratio.streaming.shell.renderer.Renderer;
 
 @Component
 public class StreamCommands implements CommandMarker {
@@ -33,26 +35,14 @@ public class StreamCommands implements CommandMarker {
     @Autowired
     private CachedStreamsDAO cachedStreamsDAO;
 
+    @Autowired
+    private Renderer<List<StratioStream>> stratioStreamRenderer;
+
     @CliCommand(value = "list", help = "list all streams into engine")
     public String list() {
         try {
-            // TODO refactor. Use constants to define columns
             List<StratioStream> streams = cachedStreamsDAO.listUncachedStreams();
-
-            List<String> columns = Arrays.asList("Name", "User defined", "Queries", "Elements");
-            List<Map<String, Object>> data = new ArrayList<>();
-
-            for (StratioStream stratioStream : streams) {
-                Map<String, Object> row = new HashMap<>();
-                row.put("Name", stratioStream.getStreamName());
-                row.put("User defined", stratioStream.getUserDefined());
-                row.put("Queries", stratioStream.getQueries().size());
-                row.put("Elements", stratioStream.getColumns().size());
-
-                data.add(row);
-            }
-
-            return TableRenderer.renderMapDataAsTable(data, columns);
+            return stratioStreamRenderer.render(streams);
         } catch (StratioStreamingException e) {
             throw new ShellException(e);
         }
@@ -82,7 +72,7 @@ public class StreamCommands implements CommandMarker {
     @CliCommand(value = "create", help = "create new stream")
     public String create(
             @CliOption(key = { "stream" }, help = "The new stream name", mandatory = true) final String streamName,
-            @CliOption(key = { "definition" }, help = "Stream definition. Comma seaparated name.type fields. Example: 'id.int,name.string,age.int,date.long", mandatory = true) final List<ColumnNameType> columns) {
+            @CliOption(key = { "definition" }, help = "Stream definition. Comma seaparated name.type fields. Example: 'id.int,name.string,age.int,date.long", mandatory = true) final ColumnNameTypeList columns) {
         try {
             cachedStreamsDAO.newStream(streamName, columns);
             return "Stream ".concat(streamName).concat(" created correctly");
@@ -106,12 +96,24 @@ public class StreamCommands implements CommandMarker {
     @CliCommand(value = "alter", help = "alter existing stream")
     public String alter(
             @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName,
-            @CliOption(key = { "definition" }, help = "Stream definition to add. Comma seaparated name.type fields. Example: 'id.int,name.string,age.int,date.long", mandatory = true) final List<ColumnNameType> columns) {
+            @CliOption(key = { "definition" }, help = "Stream definition to add. Comma seaparated name.type fields. Example: 'id.int,name.string,age.int,date.long", mandatory = true) final ColumnNameTypeList columns) {
         try {
             stratioStreamingApi.alterStream(streamName, columns);
             return "Stream ".concat(streamName).concat(" altered correctly");
 
         } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException e) {
+            throw new ShellException(e);
+        }
+    }
+
+    @CliCommand(value = "insert", help = "insert events into existing stream")
+    public String insert(
+            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName,
+            @CliOption(key = { "values" }, help = "Values to add. Comma seaparated name.value fields. Example: 'id.345,name.Test test test,age.26,date.1401198535", mandatory = true) final ColumnNameValueList columns) {
+        try {
+            stratioStreamingApi.insertData(streamName, columns);
+            return "Added an event to stream ".concat(streamName).concat(" correctly");
+        } catch (StratioEngineStatusException | StratioAPISecurityException e) {
             throw new ShellException(e);
         }
     }
