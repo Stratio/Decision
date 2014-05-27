@@ -16,7 +16,7 @@ _This project was created with maven._
 - _Execute '/bin/shell' in unix systems or '/bin/shell.bat' in windows._
 - _To change properies, edit '/conf/shell.properties' file_
 
-## Available commands
+### _Available commands_
 
 TODO
 
