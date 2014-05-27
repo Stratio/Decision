@@ -162,7 +162,8 @@ public class StreamOperations {
                 boolean isUserDefined = false;
 
                 for (Attribute column : streamMetaData.getAttributeList()) {
-                    columns.add(new ColumnNameTypeValue(column.getName(), column.getType().toString(), null));
+                    columns.add(new ColumnNameTypeValue(column.getName(),
+                            SiddhiUtils.encodeSiddhiType(column.getType()), null));
                 }
 
                 if (StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), siddhiManager) != null) {
@@ -227,6 +228,14 @@ public class StreamOperations {
         StreamSharedStatus.changeSave2CassandraStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager);
     }
 
+    public static void stopSave2cassandraStream(StratioStreamingMessage request, SiddhiManager siddhiManager) {
+
+        siddhiManager.getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_SAVE2CASSANDRA_TOPIC)
+                .publish(request.getStreamName());
+
+        StreamSharedStatus.changeSave2CassandraStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager);
+    }
+
     public static void streamToIndexer(StratioStreamingMessage request, String elasticSearchHost,
             int elasticSearchPort, SiddhiManager siddhiManager) {
 
@@ -240,5 +249,12 @@ public class StreamOperations {
         siddhiManager.addCallback(request.getStreamName(), streamToIndexerCallback);
 
         StreamSharedStatus.changeIndexerStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager);
+    }
+
+    public static void stopStreamToIndexer(StratioStreamingMessage request, SiddhiManager siddhiManager) {
+
+        siddhiManager.getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_INDEXER_TOPIC)
+                .publish(request.getStreamName());
+        StreamSharedStatus.changeIndexerStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager);
     }
 }

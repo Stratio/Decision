@@ -58,8 +58,8 @@ public class SaveToCassandraStreamFunction extends ActionBaseFunction {
 
     @Override
     protected boolean stopAction(StratioStreamingMessage message) {
-        // TODO implement stop save to cassandra
-        throw new UnsupportedOperationException("STOP CASSANDRA NOT IMPLEMENTED YET");
+        StreamOperations.stopSave2cassandraStream(message, getSiddhiManager());
+        return true;
     }
 
     @Override
