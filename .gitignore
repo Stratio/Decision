@@ -9,3 +9,6 @@ lib/*.js
 lib/*.css
 *.html
 *.js
+*.project
+*.classpath
+*.cache
