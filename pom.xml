@@ -137,6 +137,16 @@
 				<checksumPolicy>ignore</checksumPolicy>
 			</releases>
 		</repository>
+		<repository>
+			<id>stratio-snapshots</id>
+			<name>Stratop snapshots</name>
+			<url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots/</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>ignore</checksumPolicy>
+			</releases>
+		</repository>
 	</repositories>
 	<distributionManagement>
 		<snapshotRepository>
