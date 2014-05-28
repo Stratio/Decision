@@ -45,7 +45,7 @@ public class StreamToIndexerCallback extends StreamCallback implements MessageLi
                 .build();
         this.elasticSearchClient = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress(
                 elasticSearchHost, elasticSearchPort));
-        running = Boolean.FALSE;
+        running = Boolean.TRUE;
     }
 
     @Override
