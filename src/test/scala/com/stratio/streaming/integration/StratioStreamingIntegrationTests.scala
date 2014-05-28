@@ -28,6 +28,10 @@ import util.control.Breaks._
 import com.stratio.streaming.api.{StratioStreamingAPIConfig, StratioStreamingAPIFactory}
 import scalaj.http.Http
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.commons.constants._
+import com.datastax.driver.core.{Row, Cluster}
+import com.datastax.driver.core.querybuilder.QueryBuilder
+;
 
 class StratioStreamingIntegrationTests
   extends  FunSpec
@@ -46,6 +50,8 @@ class StratioStreamingIntegrationTests
   val elasticSearchIndex = "stratiostreaming"
   var elasticSearchHost = ""
   var elasticSearchPort = ""
+  var cassandraHost = ""
+  val internalStreamName = STREAMING.STATS_NAMES.STATS_STREAMS(0)
 
   override def beforeAll(conf: ConfigMap) {
     if (configurationHasBeenDefinedThroughCommandLine(conf)) {
@@ -62,10 +68,12 @@ class StratioStreamingIntegrationTests
       zookeeperCluster = s"$zookeeperHost:$zookeeperPort"
       zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
       zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
+      cassandraHost = conf.get("cassandraHost").get.toString
     } else {
       //Pickup the config from stratio-streaming.conf
       elasticSearchHost = config.getString("elasticsearch.server")
       elasticSearchPort = config.getString("elasticsearch.port")
+      cassandraHost = config.getString("cassandra.host")
       streamingAPI.initialize()
     }
     zookeeperClient.start()
@@ -78,7 +86,8 @@ class StratioStreamingIntegrationTests
     conf.get("kafkaHost").isDefined &&
     conf.get("kafkaPort").isDefined &&
     conf.get("elasticSearchHost").isDefined &&
-    conf.get("elasticSearchPort").isDefined
+    conf.get("elasticSearchPort").isDefined &&
+    conf.get("cassandraHost").isDefined
   }
 
 
@@ -96,7 +105,7 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The create operation") {
-    it("should create a new stream when the stream does not exist") {
+    it("should create a new stream when the stream does not exist", Tag("wip")) {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val thirdStreamColumn = new ColumnNameType("column3", ColumnType.BOOLEAN)
@@ -119,7 +128,7 @@ class StratioStreamingIntegrationTests
       theNumberOfColumnsOfTheStream(testStreamName) should be(6)
     }
 
-    it("should throw a StratioEngineOperationException when creating a stream that already exists", Tag("wip")) {
+    it("should throw a StratioEngineOperationException when creating a stream that already exists") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
@@ -129,23 +138,13 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when creating a stream with the stratio_ prefix") {
+    it("should throw a StratioAPISecurityException when creating an internal stream") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val statStream = internalStreamName
       intercept [StratioAPISecurityException] {
-        streamingAPI.createStream(internalTestStreamName, columnList)
-      }
-    }
-  }
-
-  describe("The insert operation") {
-    it("should throw a StratioAPISecurityException when insert data into a stream with the stratio_ prefix") {
-      val firstColumnValue = new ColumnNameValue("column1", new Integer(111111))
-      val secondColumnValue = new ColumnNameValue("column2", "testString")
-      val columnValues = Seq(firstColumnValue, secondColumnValue)
-      intercept [StratioAPISecurityException] {
-        streamingAPI.insertData(internalTestStreamName, columnValues)
+        streamingAPI.createStream(statStream, columnList)
       }
     }
   }
@@ -189,15 +188,10 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when adding a column to a non user-defined stream") {
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val thirdStreamColumn = new ColumnNameType("column3", ColumnType.INTEGER)
+    it("should throw a StratioAPISecurityException when adding a column to an internal stream") {
+      val thirdStreamColumn = new ColumnNameType("newColumn", ColumnType.INTEGER)
       val newColumnList = Seq(thirdStreamColumn)
-      val internalStream = "stratio_stats_base"
-      //Creates a stream to trigger the internal streams creation
-      streamingAPI.createStream(testStreamName, columnList)
+      val internalStream = STREAMING.STATS_NAMES.STATS_STREAMS(0)
       intercept [StratioAPISecurityException] {
         streamingAPI.alterStream(internalStream, newColumnList)
       }
@@ -244,15 +238,10 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when adding a query to a non user-defined stream") {
-      val internalStream = "stratio_stats_base"
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
-      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val theQuery = s"from $testStreamName select column1, column2 insert into $internalStream for current-events"
-      streamingAPI.createStream(testStreamName, columnList)
+    it("should throw a StratioAPISecurityException when adding a query to an internal stream") {
+      val theQuery = s"from $testStreamName select column1, column2 insert into $internalStreamName for current-events"
       intercept [StratioAPISecurityException] {
-        streamingAPI.addQuery(internalStream, theQuery)
+        streamingAPI.addQuery(internalStreamName, theQuery)
       }
     }
   }
@@ -310,9 +299,9 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when removing a stream with the stratio_ prefix") {
+    it("should throw a StratioAPISecurityException when removing an internal stream") {
       intercept [StratioAPISecurityException] {
-        streamingAPI.dropStream(internalTestStreamName)
+        streamingAPI.dropStream(STREAMING.STATS_NAMES.STATS_STREAMS(1))
       }
     }
   }
@@ -348,12 +337,6 @@ class StratioStreamingIntegrationTests
         streamingAPI.stopListenStream(testStreamName)
       }
     }
-
-    it("should throw a StratioAPISecurityException when listening to an internal stream") {
-      intercept [StratioAPISecurityException] {
-        streamingAPI.listenStream(internalTestStreamName)
-      }
-    }
   }
 
   describe("The stop listen operation") {
@@ -373,12 +356,6 @@ class StratioStreamingIntegrationTests
         fail()
       }
       assert(true)
-    }
-
-    it("should throw a StratioAPISecurityException when stop listening to an internal status") {
-      intercept [StratioAPISecurityException] {
-        streamingAPI.stopListenStream(internalTestStreamName)
-      }
     }
   }
 
@@ -400,24 +377,74 @@ class StratioStreamingIntegrationTests
     }
   }
 
-  /*
-  describe("The add to cassandra operation") {
-    it("should add a row to cassandra when insert data in a stream with the SAVE_TO_CASSANDRA operation defined", Tag("wip")) {
+
+  describe("The save to cassandra operation") {
+    it("should add a row to cassandra after inserting data in a stream with the SAVE_TO_CASSANDRA operation defined") {
+      val cassandraStreamName = "cassandrastream1"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.BOOLEAN)
+      val thirdStreamColumn = new ColumnNameType("column3", ColumnType.FLOAT)
+      val fourthStreamColumn = new ColumnNameType("column4", ColumnType.INTEGER)
+      val fifthStreamColumn = new ColumnNameType("column5", ColumnType.DOUBLE)
+      val sixthStreamColumn = new ColumnNameType("column6", ColumnType.LONG)
+      val columnList = Seq(firstStreamColumn,
+        secondStreamColumn,
+        thirdStreamColumn,
+        fourthStreamColumn,
+        fifthStreamColumn,
+        sixthStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue")
+      val secondColumnValue = new ColumnNameValue("column2", new java.lang.Boolean(true))
+      val thirdColumnValue = new ColumnNameValue("column3", new java.lang.Float(2.0))
+      val fourthColumnValue = new ColumnNameValue("column4", new java.lang.Integer(4))
+      val fifthColumnValue = new ColumnNameValue("column5", new java.lang.Double(5))
+      val sixthColumnValue = new ColumnNameValue("column6", new java.lang.Long(600000))
+      val streamData = Seq(firstColumnValue,
+        secondColumnValue,
+        thirdColumnValue,
+        fourthColumnValue,
+        fifthColumnValue,
+        sixthColumnValue)
+      try {
+        streamingAPI.createStream(cassandraStreamName, columnList)
+        streamingAPI.saveToCassandra(cassandraStreamName)
+        streamingAPI.insertData(cassandraStreamName, streamData)
+        Thread.sleep(2000)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+      val storedRow = fetchStoredRowFromCassandra(cassandraStreamName).get(0)
+      storedRow.getString("column1") should be("testValue")
+      storedRow.getBool("column2") should be(java.lang.Boolean.TRUE)
+      storedRow.getFloat("column3") should be(2.0)
+      storedRow.getFloat("column4") should be(4)
+      storedRow.getDouble("column5") should be(5)
+      storedRow.getDouble("column6") should be(600000)
+      cleanCassandraTable(cassandraStreamName)
+    }
+
+    ignore("should stop adding rows to cassandra after inserting data in a stream with the stopSaveToCassandra operation defined") {
+      val cassandraStreamName = "cassandrastream2"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
       val firstColumnValue = new ColumnNameValue("column1", "testValue")
       val streamData = Seq(firstColumnValue)
       try {
-        streamingAPI.createStream(testStreamName, columnList)
-        streamingAPI.saveToCassandra(testStreamName)
-        streamingAPI.insertData(testStreamName, streamData)
-        Thread.sleep(3000)
+        streamingAPI.createStream(cassandraStreamName, columnList)
+        streamingAPI.saveToCassandra(cassandraStreamName)
+        Thread.sleep(2000)
+        streamingAPI.insertData(cassandraStreamName, streamData)
+        streamingAPI.stopSaveToCassandra(cassandraStreamName)
+        Thread.sleep(2000)
+        streamingAPI.insertData(cassandraStreamName, streamData)
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
-      theRowHasBeenStored(testStreamName) should be(true)
+      val storedRows = fetchStoredRowFromCassandra(cassandraStreamName)
+      storedRows.size() should be(1)
+      cleanCassandraTable(cassandraStreamName)
     }
-  }*/
+  }
 
   describe("The Streaming Engine") {
     it("should throw a StratioEngineStatusException when streaming engine is not running") {
@@ -459,5 +486,26 @@ class StratioStreamingIntegrationTests
 
   def theStreamIsIndexed(streamName: String) = {
     Http(s"http://$elasticSearchHost:$elasticSearchPort/$elasticSearchIndex/_mapping/$streamName").asString.contains(streamName)
+  }
+
+  def cleanCassandraTable(streamName: String) = {
+    val cluster = Cluster.builder()
+      .addContactPoint(cassandraHost)
+      .build()
+    val session = cluster.connect()
+    val truncateQuery = QueryBuilder.truncate(STREAMING.STREAMING_KEYSPACE_NAME, streamName)
+    session.execute(truncateQuery)
+    session.close()
+  }
+
+  def fetchStoredRowFromCassandra(streamName: String) = {
+    val cluster = Cluster.builder()
+                    .addContactPoint(cassandraHost)
+                    .build()
+    val session = cluster.connect()
+    val selectAllQuery = QueryBuilder.select()
+                  .all()
+                  .from(STREAMING.STREAMING_KEYSPACE_NAME, streamName)
+    session.execute(selectAllQuery).all()
   }
 }

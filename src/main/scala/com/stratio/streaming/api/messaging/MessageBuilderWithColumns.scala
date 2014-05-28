@@ -24,7 +24,7 @@ import MessageBuilder._
 
 case class MessageBuilderWithColumns(sessionId: String, operation: String) {
   def build(streamName: String, columns: List[ColumnNameType]) = {
-    val columnNameTypeValueList = columns.toList.map(element => new ColumnNameTypeValue(element.columnName, element.columnType.getValue, null))
+    val columnNameTypeValueList = columns.toList.map(element => new ColumnNameTypeValue(element.columnName, element.columnType, null))
     builder.withColumns(columnNameTypeValueList)
       .withOperation(operation)
       .withStreamName(streamName)

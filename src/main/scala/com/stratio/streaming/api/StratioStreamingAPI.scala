@@ -50,7 +50,6 @@ class StratioStreamingAPI
     checkStreamingStatus()
     val operation = DEFINITION.CREATE.toLowerCase
     val creationStreamMessage = MessageBuilderWithColumns(sessionId, operation).build(streamName, columns)
-    checkSecurityConstraints(creationStreamMessage)
     syncOperation.performSyncOperation(creationStreamMessage)
   }
 
@@ -58,14 +57,12 @@ class StratioStreamingAPI
     checkStreamingStatus()
     val operation = ALTER.toLowerCase
     val alterStreamMessage = MessageBuilderWithColumns(sessionId, operation).build(streamName, columns)
-    checkSecurityConstraints(alterStreamMessage)
     syncOperation.performSyncOperation(alterStreamMessage)
   }
 
   def insertData(streamName: String, data: List[ColumnNameValue]) = {
     checkStreamingStatus()
     val insertStreamMessage = InsertMessageBuilder(sessionId).build(streamName, data)
-    checkSecurityConstraints(insertStreamMessage)
     asyncOperation.performAsyncOperation(insertStreamMessage)
   }
 
@@ -73,7 +70,6 @@ class StratioStreamingAPI
     checkStreamingStatus()
     val operation = ADD_QUERY.toLowerCase
     val addQueryStreamMessage = QueryMessageBuilder(sessionId).build(streamName, query, operation)
-    checkSecurityConstraints(addQueryStreamMessage)
     syncOperation.performSyncOperation(addQueryStreamMessage)
     getQueryId(streamName, query)
   }
@@ -91,7 +87,6 @@ class StratioStreamingAPI
     checkStreamingStatus()
     val operation = REMOVE_QUERY.toLowerCase
     val removeQueryMessage = QueryMessageBuilder(sessionId).build(streamName, queryId, operation)
-    checkSecurityConstraints(removeQueryMessage)
     syncOperation.performSyncOperation(removeQueryMessage)
   }
 
@@ -99,7 +94,6 @@ class StratioStreamingAPI
     checkStreamingStatus()
     val operation = DROP.toLowerCase
     val dropStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
-    checkSecurityConstraints(dropStreamMessage)
     syncOperation.performSyncOperation(dropStreamMessage)
   }
 
@@ -107,7 +101,6 @@ class StratioStreamingAPI
     checkStreamingStatus()
     val operation = LISTEN.toLowerCase
     val listenStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
-    checkSecurityConstraints(listenStreamMessage)
     syncOperation.performSyncOperation(listenStreamMessage)
     val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster)
     streamingListeners.put(streamName, kafkaConsumer)
@@ -118,7 +111,6 @@ class StratioStreamingAPI
     checkStreamingStatus()
     val operation = STOP_LISTEN.toLowerCase
     val stopListenStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
-    checkSecurityConstraints(stopListenStreamMessage)
     shutdownKafkaConsumerAndRemoveStreamingListener(streamName)
     syncOperation.performSyncOperation(stopListenStreamMessage)
   }
@@ -165,6 +157,13 @@ class StratioStreamingAPI
     val operation = SAVETO_CASSANDRA.toLowerCase
     val saveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(saveToCassandraMessage)
+  }
+
+  def stopSaveToCassandra(streamName: String) = {
+    checkStreamingStatus()
+    val operation = STOP_SAVETO_CASSANDRA.toLowerCase
+    val stopSaveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    syncOperation.performSyncOperation(stopSaveToCassandraMessage)
   }
   
   def indexStream(streamName: String) = {
@@ -250,11 +249,6 @@ object StratioStreamingAPI
   def initializeTopic() {
     topicService = new KafkaTopicService(zookeeperCluster, brokerServer, brokerPort, 10000, 10000)
     topicService.createTopicIfNotExist(streamingTopicName, 1, 1)
-  }
-
-  def checkSecurityConstraints(message: StratioStreamingMessage) {
-     if (message.getStreamName.startsWith("stratio_"))
-       throw new StratioAPISecurityException("StratioStreamingAPI - the stream is not user defined")
   }
 
   def checkStreamingStatus() {

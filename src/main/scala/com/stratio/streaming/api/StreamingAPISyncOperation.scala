@@ -18,7 +18,7 @@ package com.stratio.streaming.api
 
 import java.util.UUID
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
-import com.stratio.streaming.commons.exceptions.StratioEngineOperationException
+import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineOperationException}
 import com.stratio.streaming.kafka.KafkaProducer
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants.REPLY_CODES._
@@ -48,6 +48,11 @@ case class StreamingAPISyncOperation(
     val replyCode = responseDto.getErrorCode
     replyCode match {
       case OK => log.info("StratioEngine Ack received for: "+message.getRequest)
+      case KO_STREAM_OPERATION_NOT_ALLOWED |
+          KO_STREAM_IS_NOT_USER_DEFINED => {
+        createLogError(replyCode, responseDto.getDescription)
+        throw new StratioAPISecurityException(responseDto.getDescription)
+      }
       case _ => {
         createLogError(replyCode, responseDto.getDescription)
         throw new StratioEngineOperationException("StratioEngine error: "+responseDto.getDescription)
