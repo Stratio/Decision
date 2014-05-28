@@ -19,7 +19,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 
 import com.hazelcast.core.IMap;
 import com.stratio.streaming.commons.constants.STREAMING;
-import com.stratio.streaming.streams.StreamStatusDTO.StreamAction;
+import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.utils.SiddhiUtils;
 
 public class StreamSharedStatus {
