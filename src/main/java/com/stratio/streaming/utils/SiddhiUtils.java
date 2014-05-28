@@ -173,9 +173,13 @@ public class SiddhiUtils {
 
             // if attribute does not exist, a AttributeNotExistException
             // exception will be thrown
+            // TODO change this. create a conversor engine to treat data types.
             if (column.getValue() instanceof String) {
                 orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = decodeSiddhiValue(
                         (String) column.getValue(), streamMetaData.getAttributeType(column.getColumn()));
+            } else if (column.getValue() instanceof Double) {
+                orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = decodeSiddhiValue(
+                        (Double) column.getValue(), streamMetaData.getAttributeType(column.getColumn()));
             } else {
                 orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = column.getValue();
             }
@@ -201,6 +205,25 @@ public class SiddhiUtils {
             return Long.valueOf(originalValue);
         case FLOAT:
             return Float.valueOf(originalValue);
+        default:
+            throw new SiddhiPraserException("Unsupported Column type: " + originalValue + "/" + type.toString());
+        }
+
+    }
+
+    private static Object decodeSiddhiValue(Double originalValue, Attribute.Type type) throws SiddhiPraserException {
+
+        switch (type) {
+        case STRING:
+            return String.valueOf(originalValue);
+        case DOUBLE:
+            return Double.valueOf(originalValue);
+        case INT:
+            return originalValue.intValue();
+        case LONG:
+            return originalValue.longValue();
+        case FLOAT:
+            return originalValue.floatValue();
         default:
             throw new SiddhiPraserException("Unsupported Column type: " + originalValue + "/" + type.toString());
         }
