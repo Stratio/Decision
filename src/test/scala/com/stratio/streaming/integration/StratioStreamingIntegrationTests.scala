@@ -105,7 +105,7 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The create operation") {
-    it("should create a new stream when the stream does not exist") {
+    it("should create a new stream when the stream does not exist", Tag("wip")) {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val thirdStreamColumn = new ColumnNameType("column3", ColumnType.BOOLEAN)
@@ -145,17 +145,6 @@ class StratioStreamingIntegrationTests
       val statStream = internalStreamName
       intercept [StratioAPISecurityException] {
         streamingAPI.createStream(statStream, columnList)
-      }
-    }
-  }
-
-  describe("The insert operation") {
-    it("should throw a StratioAPISecurityException when insert data into a stream with the stratio_ prefix") {
-      val firstColumnValue = new ColumnNameValue("column1", new Integer(111111))
-      val secondColumnValue = new ColumnNameValue("column2", "testString")
-      val columnValues = Seq(firstColumnValue, secondColumnValue)
-      intercept [StratioAPISecurityException] {
-        streamingAPI.insertData(internalTestStreamName, columnValues)
       }
     }
   }
@@ -348,12 +337,6 @@ class StratioStreamingIntegrationTests
         streamingAPI.stopListenStream(testStreamName)
       }
     }
-
-    it("should throw a StratioAPISecurityException when listening to an internal stream") {
-      intercept [StratioAPISecurityException] {
-        streamingAPI.listenStream(internalTestStreamName)
-      }
-    }
   }
 
   describe("The stop listen operation") {
@@ -373,12 +356,6 @@ class StratioStreamingIntegrationTests
         fail()
       }
       assert(true)
-    }
-
-    it("should throw a StratioAPISecurityException when stop listening to an internal status") {
-      intercept [StratioAPISecurityException] {
-        streamingAPI.stopListenStream(internalTestStreamName)
-      }
     }
   }
 
@@ -402,7 +379,7 @@ class StratioStreamingIntegrationTests
 
 
   describe("The save to cassandra operation") {
-    it("should add a row to cassandra after inserting data in a stream with the SAVE_TO_CASSANDRA operation defined", Tag("wip")) {
+    it("should add a row to cassandra after inserting data in a stream with the SAVE_TO_CASSANDRA operation defined") {
       val cassandraStreamName = "cassandrastream1"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.BOOLEAN)
@@ -446,7 +423,7 @@ class StratioStreamingIntegrationTests
       cleanCassandraTable(cassandraStreamName)
     }
 
-    it("should stop adding rows to cassandra after inserting data in a stream with the stopSaveToCassandra operation defined", Tag("wip")) {
+    ignore("should stop adding rows to cassandra after inserting data in a stream with the stopSaveToCassandra operation defined") {
       val cassandraStreamName = "cassandrastream2"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
