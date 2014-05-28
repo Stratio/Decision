@@ -138,6 +138,13 @@
 			</releases>
 		</repository>
 	</repositories>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>stratio-snapshots</id>
+			<name>Stratio Snapshots</name>
+			<url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
