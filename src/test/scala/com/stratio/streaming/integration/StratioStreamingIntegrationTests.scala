@@ -142,9 +142,8 @@ class StratioStreamingIntegrationTests
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
-      val statStream = internalStreamName
       intercept [StratioAPISecurityException] {
-        streamingAPI.createStream(statStream, columnList)
+        streamingAPI.createStream(internalStreamName, columnList)
       }
     }
   }
@@ -360,50 +359,41 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The index operation") {
-    it("should index the stream to elasticsearch", Tag("wip")) {
+    it("should index the stream to elasticsearch and stop indexing") {
       cleanElasticSearchIndexes()
-      val indexedStreamName = "indexedstream1"
+      val indexedStreamName = "testindexedstream"
+      val indexedData1 = "testValue1"
+      val indexedData2 = "testValue2"
+      val indexedData3 = "testValue3"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
-      val firstColumnValue = new ColumnNameValue("column1", "testValue")
-      val streamData = Seq(firstColumnValue)
+      val columnDataIndexed1 = new ColumnNameValue("column1", indexedData1)
+      val columnDataIndexed2 = new ColumnNameValue("column1", indexedData2)
+      val columnDataNotIndexed = new ColumnNameValue("column1", indexedData3)
+      val streamDataIndexed1 = Seq(columnDataIndexed1)
+      val streamDataIndexed2 = Seq(columnDataIndexed2)
+      val streamDataNotIndexed = Seq(columnDataNotIndexed)
       try {
         streamingAPI.createStream(indexedStreamName, columnList)
         streamingAPI.indexStream(indexedStreamName)
-        streamingAPI.insertData(indexedStreamName, streamData)
-        Thread.sleep(3000)
-      } catch {
-        case ssEx: StratioStreamingException => fail()
-      }
-      theStreamIsIndexed(indexedStreamName) should be(true)
-    }
-
-    it("should stop indexing the stream to elasticsearch", Tag("wip")) {
-      cleanElasticSearchIndexes()
-      val indexedStreamName = "indexedstream2"
-      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
-      val columnList = Seq(firstStreamColumn)
-      val firstColumnValue = new ColumnNameValue("column1", "testValue")
-      val streamData = Seq(firstColumnValue)
-      try {
-        streamingAPI.createStream(indexedStreamName, columnList)
-        streamingAPI.indexStream(indexedStreamName)
-        streamingAPI.insertData(indexedStreamName, streamData)
-        Thread.sleep(3000)
-        theStreamIsIndexed(indexedStreamName) should be(true)
+        streamingAPI.insertData(indexedStreamName, streamDataIndexed1)
+        Thread.sleep(10000)
+        theStreamContainsTheData(indexedData1) should be(true)
+        streamingAPI.insertData(indexedStreamName, streamDataIndexed2)
         streamingAPI.stopIndexStream(indexedStreamName)
-        Thread.sleep(3000)
+        streamingAPI.insertData(indexedStreamName, streamDataNotIndexed)
+        Thread.sleep(10000)
+        theStreamContainsTheData(indexedData2) should be(true)
+        theStreamContainsTheData(indexedData3) should be(false)
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
-      theStreamIsIndexed(indexedStreamName) should be(false)
     }
   }
 
-
   describe("The save to cassandra operation") {
-    it("should add a row to cassandra after inserting data in a stream with the SAVE_TO_CASSANDRA operation defined") {
-      val cassandraStreamName = "cassandrastream1"
+    it("should add a row to cassandra") {
+      val cassandraStreamName = "cassandrastreamtable1"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.BOOLEAN)
       val thirdStreamColumn = new ColumnNameType("column3", ColumnType.FLOAT)
@@ -437,19 +427,19 @@ class StratioStreamingIntegrationTests
         case ssEx: StratioStreamingException => fail()
       }
       val storedRows = fetchStoredRowFromCassandra(cassandraStreamName)
-      storedRows.length should be(1)
+      storedRows.size() should be(1)
       val storedRow = storedRows.get(0)
       storedRow.getString("column1") should be("testValue")
       storedRow.getBool("column2") should be(java.lang.Boolean.TRUE)
       storedRow.getFloat("column3") should be(2.0)
-      storedRow.getFloat("column4") should be(4)
+      storedRow.getInt("column4") should be(4)
       storedRow.getDouble("column5") should be(5)
       storedRow.getDouble("column6") should be(600000)
       cleanCassandraTable(cassandraStreamName)
     }
 
-    ignore("should stop adding rows to cassandra after inserting data in a stream with the stopSaveToCassandra operation defined") {
-      val cassandraStreamName = "cassandrastream2"
+    it("should stop adding rows to cassandra") {
+      val cassandraStreamName = "cassandrastreamtable2"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
       val firstColumnValue = new ColumnNameValue("column1", "testValue")
@@ -463,15 +453,18 @@ class StratioStreamingIntegrationTests
         Thread.sleep(2000)
         streamingAPI.insertData(cassandraStreamName, streamData)
       } catch {
-        case ssEx: StratioStreamingException => fail()
+        case ssEx: StratioStreamingException => {
+          println(ssEx.getMessage)
+          fail()
+        }
       }
       val storedRows = fetchStoredRowFromCassandra(cassandraStreamName)
       storedRows.size() should be(1)
       cleanCassandraTable(cassandraStreamName)
     }
 
-    ignore("should adding rows to cassandra after altering a stream") {
-      val cassandraStreamName = "cassandrastream3"
+    it("should adding rows to cassandra after altering a stream", Tag("cassandra")) {
+      val cassandraStreamName = "cassandrastreamtable8"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
@@ -483,11 +476,12 @@ class StratioStreamingIntegrationTests
       try {
         streamingAPI.createStream(cassandraStreamName, columnList)
         streamingAPI.saveToCassandra(cassandraStreamName)
-        Thread.sleep(2000)
         streamingAPI.insertData(cassandraStreamName, streamData)
-        Thread.sleep(2000)
+        Thread.sleep(3000)
         streamingAPI.alterStream(cassandraStreamName, columnList2)
+        Thread.sleep(3000)
         streamingAPI.insertData(cassandraStreamName, streamData2)
+        Thread.sleep(3000)
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
@@ -520,7 +514,7 @@ class StratioStreamingIntegrationTests
   }
 
   def cleanElasticSearchIndexes() {
-    Http(s"http://$elasticSearchHost:$elasticSearchPort/$elasticSearchIndex/").method("DELETE")
+    Http(s"http://$elasticSearchHost:$elasticSearchPort/$elasticSearchIndex/").option(HttpOptions.method("DELETE"))
   }
 
   def userDefinedStreams() = {
@@ -539,8 +533,9 @@ class StratioStreamingIntegrationTests
     streamingAPI.queriesFromStream(streamName).size
   }
 
-  def theStreamIsIndexed(streamName: String) = {
-    Http(s"http://$elasticSearchHost:$elasticSearchPort/$elasticSearchIndex/_mapping/$streamName").asString.contains(streamName)
+  def theStreamContainsTheData(data: String) = {
+    val elasticSearchResponse = Http(s"http://$elasticSearchHost:$elasticSearchPort/$elasticSearchIndex/_search").asString
+    elasticSearchResponse.contains(data)
   }
 
   def cleanCassandraTable(streamName: String) = {
@@ -561,6 +556,8 @@ class StratioStreamingIntegrationTests
     val selectAllQuery = QueryBuilder.select()
                   .all()
                   .from(STREAMING.STREAMING_KEYSPACE_NAME, streamName)
-    session.execute(selectAllQuery).all()
+    val resultsFromCassandra = session.execute(selectAllQuery).all()
+    session.close()
+    resultsFromCassandra
   }
 }
