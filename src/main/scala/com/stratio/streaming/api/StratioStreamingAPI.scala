@@ -174,11 +174,10 @@ class StratioStreamingAPI
   }
 
   def stopIndexStream(streamName: String) = {
-    //TODO
-    /*checkStreamingStatus()
-    val operation = INDEX.toLowerCase
+    checkStreamingStatus()
+    val operation = STOP_INDEX.toLowerCase
     val indexStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
-    syncOperation.performSyncOperation(indexStreamMessage)*/
+    syncOperation.performSyncOperation(indexStreamMessage)
   }
   
   
