@@ -20,11 +20,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class StreamStatusDTO implements Serializable {
+import com.stratio.streaming.commons.constants.StreamAction;
 
-    public static enum StreamAction {
-        LISTEN, SAVE_TO_CASSANDRA, INDEXED;
-    }
+public class StreamStatusDTO implements Serializable {
 
     /**
 	 * 
@@ -61,6 +59,10 @@ public class StreamStatusDTO implements Serializable {
 
     public boolean isActionEnabled(StreamAction action) {
         return actionsEnabled.contains(action);
+    }
+
+    public Set<StreamAction> getActionsEnabled() {
+        return actionsEnabled;
     }
 
     public Boolean isUserDefined() {
