@@ -22,6 +22,7 @@ import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
 
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
+import com.stratio.streaming.commons.dto.ActionCallbackDto;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.ActionBaseFunction;
@@ -59,6 +60,11 @@ public class InsertIntoStreamFunction extends ActionBaseFunction {
             throw new RequestValidationException(REPLY_CODES.KO_GENERAL_ERROR, e.getMessage());
         }
         return false;
+    }
+
+    @Override
+    protected void ackStreamingOperation(StratioStreamingMessage message, ActionCallbackDto reply) throws Exception {
+        log.debug("Overriding zookeeper inser action.Data: {}", reply);
     }
 
     @Override

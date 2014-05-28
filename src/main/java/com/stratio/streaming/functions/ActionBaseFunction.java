@@ -87,7 +87,7 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
         return true;
     }
 
-    private void ackStreamingOperation(StratioStreamingMessage message, ActionCallbackDto reply) throws Exception {
+    protected void ackStreamingOperation(StratioStreamingMessage message, ActionCallbackDto reply) throws Exception {
         ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
     }
 
