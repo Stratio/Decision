@@ -42,7 +42,7 @@ How to start
         sbt integration:test
 
   * To run the integration tests pointing to an external server:
-        sbt integration:testOnly -- -DzookeeperHost={yourZookeeperHost} -DzookeeperPort={yourZookeeperPort} -DkafkaHost={yourKafkaHost} -DkafkaPort={yourKafkaPort}
+        sbt integration:testOnly -- -DzookeeperHost={yourZookeeperHost} -DzookeeperPort={yourZookeeperPort} -DkafkaHost={yourKafkaHost} -DkafkaPort={yourKafkaPort} -DelasticSearchHost=node.stratio.com -DelasticSearchPort=9200 -DcassandraHost=node.stratio.com
 
   * To create the Stratio Streaming API distribution:
         sbt assembly
