@@ -40,6 +40,7 @@ import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.stratio.streaming.commons.constants.BUS;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
+import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.kafka.service.KafkaTopicService;
 import com.stratio.streaming.commons.kafka.service.TopicService;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
@@ -57,7 +58,6 @@ import com.stratio.streaming.functions.requests.CollectRequestForStatsFunction;
 import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
 import com.stratio.streaming.streams.StreamPersistence;
 import com.stratio.streaming.streams.StreamSharedStatus;
-import com.stratio.streaming.streams.StreamStatusDTO.StreamAction;
 import com.stratio.streaming.utils.SiddhiUtils;
 import com.stratio.streaming.utils.ZKUtils;
 import com.typesafe.config.Config;
@@ -261,6 +261,10 @@ public class StreamingEngine {
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.INDEX)).map(
                 keepPayloadFromMessageFunction);
 
+        JavaDStream<StratioStreamingMessage> stopStreamToIndexer_requests = messages.filter(
+                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_INDEX)).map(
+                keepPayloadFromMessageFunction);
+
         JavaDStream<StratioStreamingMessage> list_requests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.LIST)).map(
                 keepPayloadFromMessageFunction);
@@ -286,6 +290,8 @@ public class StreamingEngine {
         saveToCassandra_requests.foreachRDD(saveToCassandraStreamFunction);
 
         streamToIndexer_requests.foreachRDD(indexStreamFunction);
+
+        stopStreamToIndexer_requests.foreachRDD(indexStreamFunction);
 
         list_requests.foreachRDD(listStreamsFunction);
 
