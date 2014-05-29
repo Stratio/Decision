@@ -27,7 +27,7 @@ import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.MANIPULATION._
 import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
 import org.apache.curator.framework.api.CuratorEventType._
 import com.stratio.streaming.commons.constants.STREAMING._
-import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioAPISecurityException, StratioEngineStatusException}
+import com.stratio.streaming.commons.exceptions.{StratioEngineConnectionException, StratioEngineOperationException, StratioAPISecurityException, StratioEngineStatusException}
 import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import java.util.List
@@ -183,28 +183,36 @@ class StratioStreamingAPI
   
 
   def initialize() = {
-    brokerServer = config.getString("kafka.server")
-    brokerPort = config.getInt("kafka.port")
-    zookeeperServer = config.getString("zookeeper.server")
-    zookeeperPort = config.getInt("zookeeper.port")
-    checkEphemeralNode()
-    startEphemeralNodeWatch()
-    initializeTopic()
-    this
+    try {
+      brokerServer = config.getString("kafka.server")
+      brokerPort = config.getInt("kafka.port")
+      zookeeperServer = config.getString("zookeeper.server")
+      zookeeperPort = config.getInt("zookeeper.port")
+      checkEphemeralNode()
+      startEphemeralNodeWatch()
+      initializeTopic()
+      this
+    } catch {
+        case ex: Exception => throw new StratioEngineConnectionException("Unable to connect to statio streaming")
+    }
   }
 
   def initializeWithServerConfig(kafkaServer: String,
                  kafkaPort: Int,
                  theZookeeperServer: String,
                  theZookeeperPort: Int) = {
-    brokerServer = kafkaServer
-    brokerPort = kafkaPort
-    zookeeperServer = theZookeeperServer
-    zookeeperPort = theZookeeperPort
-    checkEphemeralNode()
-    startEphemeralNodeWatch()
-    initializeTopic()
-    this
+    try {
+      brokerServer = kafkaServer
+      brokerPort = kafkaPort
+      zookeeperServer = theZookeeperServer
+      zookeeperPort = theZookeeperPort
+      checkEphemeralNode()
+      startEphemeralNodeWatch()
+      initializeTopic()
+      this
+    } catch {
+      case ex: Exception => throw new StratioEngineConnectionException("Unable to connect to statio streaming")
+    }
   }
 }
 

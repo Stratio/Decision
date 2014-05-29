@@ -20,7 +20,7 @@ import _root_.kafka.consumer.KafkaStream
 import com.stratio.streaming.commons.streams.StratioStream
 import java.util.List
 import com.stratio.streaming.messaging.{ColumnNameValue, ColumnNameType}
-import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineStatusException, StratioEngineOperationException}
+import com.stratio.streaming.commons.exceptions.{StratioEngineConnectionException, StratioAPISecurityException, StratioEngineStatusException, StratioEngineOperationException}
 import com.stratio.streaming.dto.StratioQueryStream
 import com.stratio.streaming.commons.messages.{StratioStreamingMessage, ColumnNameTypeValue}
 
@@ -29,6 +29,7 @@ trait IStratioStreamingAPI {
    * Initializes the StratioStreamingAPI instance.
    * @return
    */
+  @throws(classOf[StratioEngineConnectionException])
   def initialize(): IStratioStreamingAPI
 
   /**
@@ -42,6 +43,7 @@ trait IStratioStreamingAPI {
    * @param theZookeeperPort
    * @return
    */
+  @throws(classOf[StratioEngineConnectionException])
   def initializeWithServerConfig(kafkaServer: String,
                  kafkaPort: Int,
                  theZookeeperServer: String,
