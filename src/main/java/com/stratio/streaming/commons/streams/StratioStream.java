@@ -15,26 +15,31 @@
  ******************************************************************************/
 package com.stratio.streaming.commons.streams;
 
+import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StreamQuery;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 public class StratioStream implements Serializable {
     private String streamName;
     private List<ColumnNameTypeValue> columns;
     private List<StreamQuery> queries;
+    private Set<StreamAction> activeActions;
     private boolean userDefined;
 
     public StratioStream(String streamName,
                          List<ColumnNameTypeValue> columns,
                          List<StreamQuery> queries,
+                         Set<StreamAction> activeActions,
                          boolean userDefined) {
         this.streamName = streamName;
         this.columns = columns;
         this.queries = queries;
         this.userDefined = userDefined;
+        this.activeActions = activeActions;
     }
 
 
@@ -68,5 +73,13 @@ public class StratioStream implements Serializable {
 
     public void setColumns(List<ColumnNameTypeValue> columns) {
         this.columns = columns;
+    }
+
+    public Set<StreamAction> getActiveActions() {
+        return activeActions;
+    }
+
+    public void setActiveActions(Set<StreamAction> activeActions) {
+        this.activeActions = activeActions;
     }
 }
