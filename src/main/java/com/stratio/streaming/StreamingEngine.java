@@ -257,6 +257,10 @@ public class StreamingEngine {
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)).map(
                 keepPayloadFromMessageFunction);
 
+        JavaDStream<StratioStreamingMessage> stop_saveToCassandra_requests = messages.filter(
+                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA)).map(
+                keepPayloadFromMessageFunction);
+
         JavaDStream<StratioStreamingMessage> streamToIndexer_requests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.INDEX)).map(
                 keepPayloadFromMessageFunction);
@@ -288,6 +292,8 @@ public class StreamingEngine {
         stop_listen_requests.foreachRDD(listenStreamFunction);
 
         saveToCassandra_requests.foreachRDD(saveToCassandraStreamFunction);
+
+        stop_saveToCassandra_requests.foreach(saveToCassandraStreamFunction);
 
         streamToIndexer_requests.foreachRDD(indexStreamFunction);
 
