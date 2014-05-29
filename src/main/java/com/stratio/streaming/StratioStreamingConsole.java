@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.stratio.streaming.commons.constants.BUS;
+import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
@@ -79,9 +80,7 @@ public class StratioStreamingConsole {
                 break;
             }
 
-            line = line.toLowerCase();
-
-            if (line.startsWith(STREAM_OPERATIONS.ACTION.LISTEN.toLowerCase())
+            if (line.toLowerCase().startsWith(STREAM_OPERATIONS.ACTION.LISTEN.toLowerCase())
                     || line.startsWith(STREAM_OPERATIONS.ACTION.STOP_LISTEN.toLowerCase())
                     || line.startsWith(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA.toLowerCase())
                     || line.startsWith(STREAM_OPERATIONS.ACTION.INDEX.toLowerCase())
@@ -326,7 +325,7 @@ public class StratioStreamingConsole {
                 if (command.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.CREATE)
                         || command.equalsIgnoreCase(STREAM_OPERATIONS.DEFINITION.ALTER)) {
 
-                    decodedColumns.add(new ColumnNameTypeValue(firstPart, secondPart, null));
+                    decodedColumns.add(new ColumnNameTypeValue(firstPart, ColumnType.valueOf(secondPart), null));
                 }
                 if (command.equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.INSERT)) {
                     decodedColumns.add(new ColumnNameTypeValue(firstPart, null, secondPart));

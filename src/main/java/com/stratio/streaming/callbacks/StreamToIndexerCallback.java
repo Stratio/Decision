@@ -27,14 +27,17 @@ import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import com.stratio.streaming.utils.SiddhiUtils;
 
 public class StreamToIndexerCallback extends StreamCallback implements MessageListener<String> {
 
-    private static Logger logger = LoggerFactory.getLogger(StreamToCassandraCallback.class);
+    private static Logger logger = LoggerFactory.getLogger(StreamToIndexerCallback.class);
     private final SimpleDateFormat elasicSearchTimestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
     private final StreamDefinition streamDefinition;
     private final Client elasticSearchClient;
+
+    private boolean running;
 
     public StreamToIndexerCallback(StreamDefinition streamDefinition, String elasticSearchHost, int elasticSearchPort) {
         this.streamDefinition = streamDefinition;
@@ -42,60 +45,70 @@ public class StreamToIndexerCallback extends StreamCallback implements MessageLi
                 .build();
         this.elasticSearchClient = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress(
                 elasticSearchHost, elasticSearchPort));
+        running = Boolean.TRUE;
     }
 
     @Override
     public void onMessage(Message<String> message) {
-        logger.debug("New on message {}", message);
+        if (running) {
+            if (message.getMessageObject().equalsIgnoreCase(streamDefinition.getStreamId())
+                    || message.getMessageObject().equalsIgnoreCase("*")) {
 
+                logger.debug("Shutting down index for stream {}", streamDefinition.getStreamId());
+                elasticSearchClient.close();
+                running = Boolean.FALSE;
+            }
+        }
     }
 
     @Override
     public void receive(Event[] events) {
-        List<StratioStreamingMessage> collected_events = Lists.newArrayList();
-        for (Event e : events) {
-            if (e instanceof InEvent) {
-                InEvent ie = (InEvent) e;
-                List<ColumnNameTypeValue> columns = Lists.newArrayList();
-                for (Attribute column : streamDefinition.getAttributeList()) {
+        if (running) {
+            List<StratioStreamingMessage> collected_events = Lists.newArrayList();
+            for (Event e : events) {
+                if (e instanceof InEvent) {
+                    InEvent ie = (InEvent) e;
+                    List<ColumnNameTypeValue> columns = Lists.newArrayList();
+                    for (Attribute column : streamDefinition.getAttributeList()) {
 
-                    // avoid retrieving a value out of the scope
-                    // outputStream could have more fields defined than the
-                    // output events (projection)
-                    if (ie.getData().length >= streamDefinition.getAttributePosition(column.getName()) + 1) {
-                        columns.add(new ColumnNameTypeValue(column.getName(), column.getType().toString(), ie
-                                .getData(streamDefinition.getAttributePosition(column.getName()))));
+                        // avoid retrieving a value out of the scope
+                        // outputStream could have more fields defined than the
+                        // output events (projection)
+                        if (ie.getData().length >= streamDefinition.getAttributePosition(column.getName()) + 1) {
+                            columns.add(new ColumnNameTypeValue(column.getName(), SiddhiUtils.encodeSiddhiType(column
+                                    .getType()), ie.getData(streamDefinition.getAttributePosition(column.getName()))));
+                        }
                     }
+                    collected_events.add(new StratioStreamingMessage(streamDefinition.getStreamId(), // value.streamName
+                            ie.getTimeStamp(), // value.timestamp
+                            columns)); // value.columns
                 }
-                collected_events.add(new StratioStreamingMessage(streamDefinition.getStreamId(), // value.streamName
-                        ie.getTimeStamp(), // value.timestamp
-                        columns)); // value.columns
-            }
-        }
-
-        BulkRequestBuilder bulkBuilder = elasticSearchClient.prepareBulk();
-        for (StratioStreamingMessage stratioStreamingMessage : collected_events) {
-            try {
-                XContentBuilder contentBuilder = XContentFactory.jsonBuilder().startObject();
-
-                for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
-                    contentBuilder = contentBuilder.field(column.getColumn(), column.getValue());
-                }
-                // Add timestamp element to original object
-                contentBuilder = contentBuilder.field("@timestamp", elasicSearchTimestampFormat.format(new Date()));
-
-                contentBuilder = contentBuilder.endObject();
-                IndexRequestBuilder request = elasticSearchClient.prepareIndex("stratiostreaming",
-                        stratioStreamingMessage.getStreamName()).setSource(contentBuilder);
-                bulkBuilder.add(request);
-
-            } catch (IOException e) {
-                logger.error("Error generating a index to event element into stream {}",
-                        stratioStreamingMessage.getStreamName(), e);
             }
 
-        }
+            BulkRequestBuilder bulkBuilder = elasticSearchClient.prepareBulk();
+            for (StratioStreamingMessage stratioStreamingMessage : collected_events) {
+                try {
+                    XContentBuilder contentBuilder = XContentFactory.jsonBuilder().startObject();
 
-        bulkBuilder.execute().actionGet();
+                    for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
+                        contentBuilder = contentBuilder.field(column.getColumn(), column.getValue());
+                    }
+                    // Add timestamp element to original object
+                    contentBuilder = contentBuilder.field("@timestamp", elasicSearchTimestampFormat.format(new Date()));
+
+                    contentBuilder = contentBuilder.endObject();
+                    IndexRequestBuilder request = elasticSearchClient.prepareIndex("stratiostreaming",
+                            stratioStreamingMessage.getStreamName()).setSource(contentBuilder);
+                    bulkBuilder.add(request);
+
+                } catch (IOException e) {
+                    logger.error("Error generating a index to event element into stream {}",
+                            stratioStreamingMessage.getStreamName(), e);
+                }
+
+            }
+
+            bulkBuilder.execute().actionGet();
+        }
     }
 }

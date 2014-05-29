@@ -15,11 +15,8 @@
  ******************************************************************************/
 package com.stratio.streaming.functions.ddl;
 
-import java.util.List;
+import java.util.Set;
 
-import org.apache.spark.api.java.JavaRDD;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.DifferentDefinitionAlreadyExistException;
 import org.wso2.siddhi.query.api.exception.MalformedAttributeException;
@@ -29,81 +26,65 @@ import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.functions.StratioStreamingBaseFunction;
+import com.stratio.streaming.exception.RequestValidationException;
+import com.stratio.streaming.functions.ActionBaseFunction;
+import com.stratio.streaming.functions.validator.QueryExistsValidation;
+import com.stratio.streaming.functions.validator.QueryNotExistsValidation;
+import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
 import com.stratio.streaming.streams.StreamOperations;
-import com.stratio.streaming.streams.StreamSharedStatus;
-import com.stratio.streaming.utils.SiddhiUtils;
 
-public class AddQueryToStreamFunction extends StratioStreamingBaseFunction {
-	
-	private static Logger logger = LoggerFactory.getLogger(AddQueryToStreamFunction.class);	
+public class AddQueryToStreamFunction extends ActionBaseFunction {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7911766880059394316L;
+    private static final long serialVersionUID = -9194965881511759849L;
 
-	public AddQueryToStreamFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
-		super(siddhiManager, zookeeperCluster, kafkaCluster);
-	}
-	
+    public AddQueryToStreamFunction(SiddhiManager siddhiManager, String zookeeperHost) {
+        super(siddhiManager, zookeeperHost);
+    }
 
-	@Override
-	public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
+    @Override
+    protected String getStartOperationCommand() {
+        return STREAM_OPERATIONS.DEFINITION.ADD_QUERY;
+    }
 
-		List<StratioStreamingMessage> requests = rdd.collect();
-		
-		for (StratioStreamingMessage request : requests) {
+    @Override
+    protected String getStopOperationCommand() {
+        return STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY;
+    }
 
-			
-//			stream is allowed and exists in siddhi
-			if (SiddhiUtils.isStreamAllowedForThisOperation(request.getStreamName(), STREAM_OPERATIONS.DEFINITION.ADD_QUERY)
-					&& getSiddhiManager().getStreamDefinition(request.getStreamName()) != null) {
+    @Override
+    protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
+        try {
+            StreamOperations.addQueryToExistingStream(message, getSiddhiManager());
+        } catch (MalformedAttributeException e) {
+            throw new RequestValidationException(REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST, e.getMessage());
+        } catch (SourceNotExistException e) {
+            throw new RequestValidationException(REPLY_CODES.KO_SOURCE_STREAM_DOES_NOT_EXIST, e.getMessage());
+        } catch (SiddhiPraserException e) {
+            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e.getMessage());
+        } catch (DifferentDefinitionAlreadyExistException e) {
+            throw new RequestValidationException(REPLY_CODES.KO_OUTPUTSTREAM_EXISTS_AND_DEFINITION_IS_DIFFERENT,
+                    e.getMessage());
+        }
+        return true;
+    }
 
-							
-//				Siddhi will add a query even when the same query is already present
-//				So it's better to maintain a reminder of which queries have been added
-//				and to prevent adding queries twice.
-				if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()) != null && 
-						(StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().isEmpty() ||
-						!StreamSharedStatus.getStreamStatus(request.getStreamName(), getSiddhiManager()).getAddedQueries().containsValue(request.getRequest()))) {
-					
-					try {
+    @Override
+    protected boolean stopAction(StratioStreamingMessage message) {
+        StreamOperations.removeQueryFromExistingStream(message, getSiddhiManager());
+        return true;
+    }
 
-						StreamOperations.addQueryToExistingStream(request, getSiddhiManager());
-						
+    @Override
+    protected void addStopRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+        validators.add(new QueryNotExistsValidation(getSiddhiManager()));
+    }
 
-//						ack OK to the Bus
-						ackStreamingOperation(request, REPLY_CODES.OK);
-						
-					} 
-					catch (MalformedAttributeException  se ) {
-						ackStreamingOperation(request, REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST);
-					}
-					catch (SourceNotExistException snee) {
-						ackStreamingOperation(request, REPLY_CODES.KO_SOURCE_STREAM_DOES_NOT_EXIST);
-					}
-					catch (SiddhiPraserException se) {
-						ackStreamingOperation(request, REPLY_CODES.KO_PARSER_ERROR);
-					}
-					catch (DifferentDefinitionAlreadyExistException ddaee) {
-						ackStreamingOperation(request, REPLY_CODES.KO_OUTPUTSTREAM_EXISTS_AND_DEFINITION_IS_DIFFERENT);
-					}
-					
-				}			 		
-				else {
-					ackStreamingOperation(request, REPLY_CODES.KO_QUERY_ALREADY_EXISTS);
-				}
-
-			}
-			else {
-				ackStreamingOperation(request, REPLY_CODES.KO_STREAM_DOES_NOT_EXIST);
-			}
-			
-		}
-
-		return null;
-	}
-
+    @Override
+    protected void addStartRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new QueryExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+    }
 
 }

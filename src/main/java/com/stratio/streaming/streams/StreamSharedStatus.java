@@ -19,6 +19,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 
 import com.hazelcast.core.IMap;
 import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.utils.SiddhiUtils;
 
 public class StreamSharedStatus {
@@ -97,7 +98,11 @@ public class StreamSharedStatus {
         IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance()
                 .getMap(STREAMING.STREAM_STATUS_MAP);
         StreamStatusDTO streamStatusDTO = (StreamStatusDTO) streamStatusMap.get(streamName);
-        streamStatusDTO.setListen_enabled(enabled);
+        if (enabled) {
+            streamStatusDTO.enableAction(StreamAction.LISTEN);
+        } else {
+            streamStatusDTO.disableAction(StreamAction.LISTEN);
+        }
         streamStatusMap.put(streamStatusDTO.getStreamName(), streamStatusDTO);
 
     }
@@ -116,7 +121,11 @@ public class StreamSharedStatus {
         IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance()
                 .getMap(STREAMING.STREAM_STATUS_MAP);
         StreamStatusDTO streamStatusDTO = (StreamStatusDTO) streamStatusMap.get(streamName);
-        streamStatusDTO.setSaveToCassandra_enabled(enabled);
+        if (enabled) {
+            streamStatusDTO.enableAction(StreamAction.SAVE_TO_CASSANDRA);
+        } else {
+            streamStatusDTO.disableAction(StreamAction.SAVE_TO_CASSANDRA);
+        }
         streamStatusMap.put(streamStatusDTO.getStreamName(), streamStatusDTO);
 
     }
@@ -126,7 +135,11 @@ public class StreamSharedStatus {
         IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance()
                 .getMap(STREAMING.STREAM_STATUS_MAP);
         StreamStatusDTO streamStatusDTO = (StreamStatusDTO) streamStatusMap.get(streamName);
-        streamStatusDTO.setStreamToIndexer_enabled(enabled);
+        if (enabled) {
+            streamStatusDTO.enableAction(StreamAction.INDEXED);
+        } else {
+            streamStatusDTO.disableAction(StreamAction.INDEXED);
+        }
         streamStatusMap.put(streamStatusDTO.getStreamName(), streamStatusDTO);
 
     }

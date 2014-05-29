@@ -17,6 +17,7 @@ package com.stratio.streaming;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -39,18 +40,16 @@ import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.stratio.streaming.commons.constants.BUS;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
+import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.kafka.service.KafkaTopicService;
 import com.stratio.streaming.commons.kafka.service.TopicService;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.dal.IndexStreamFunction;
 import com.stratio.streaming.functions.dal.ListenStreamFunction;
 import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
-import com.stratio.streaming.functions.dal.StopListenStreamFunction;
 import com.stratio.streaming.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.streaming.functions.ddl.AlterStreamFunction;
 import com.stratio.streaming.functions.ddl.CreateStreamFunction;
-import com.stratio.streaming.functions.ddl.DropStreamFunction;
-import com.stratio.streaming.functions.ddl.RemoveQueryToStreamFunction;
 import com.stratio.streaming.functions.dml.InsertIntoStreamFunction;
 import com.stratio.streaming.functions.dml.ListStreamsFunction;
 import com.stratio.streaming.functions.messages.FilterMessagesByOperationFunction;
@@ -183,30 +182,22 @@ public class StreamingEngine {
         jssc.sparkContext().getConf().setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
-        CreateStreamFunction createStreamFunction = new CreateStreamFunction(getSiddhiManager(), zkCluster,
-                kafkaCluster);
-        AlterStreamFunction alterStreamFunction = new AlterStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
-        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(getSiddhiManager(), zkCluster,
-                kafkaCluster);
-        AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(getSiddhiManager(), zkCluster,
-                kafkaCluster);
-        RemoveQueryToStreamFunction removeQueryToStreamFunction = new RemoveQueryToStreamFunction(getSiddhiManager(),
-                zkCluster, kafkaCluster);
+        CreateStreamFunction createStreamFunction = new CreateStreamFunction(getSiddhiManager(), zkCluster);
+        AlterStreamFunction alterStreamFunction = new AlterStreamFunction(getSiddhiManager(), zkCluster);
+        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(getSiddhiManager(), zkCluster);
+        AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(getSiddhiManager(), zkCluster);
         ListenStreamFunction listenStreamFunction = new ListenStreamFunction(getSiddhiManager(), zkCluster,
                 kafkaCluster);
         CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(
                 getSiddhiManager(), zkCluster, kafkaCluster);
-        ListStreamsFunction listStreamsFunction = new ListStreamsFunction(getSiddhiManager(), zkCluster, kafkaCluster);
-        DropStreamFunction dropStreamFunction = new DropStreamFunction(getSiddhiManager(), zkCluster, kafkaCluster);
+        ListStreamsFunction listStreamsFunction = new ListStreamsFunction(getSiddhiManager(), zkCluster);
         SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(
                 getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster, enableAuditing);
-        StopListenStreamFunction stopListenStreamFunction = new StopListenStreamFunction(getSiddhiManager(), zkCluster,
-                kafkaCluster);
         SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
-                getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster);
+                getSiddhiManager(), zkCluster, cassandraCluster);
 
         HostAndPort elasticSearchConnectionData = HostAndPort.fromString(elasticSearchUrl);
-        IndexStreamFunction indexStreamFunction = new IndexStreamFunction(siddhiManager, zkCluster, kafkaCluster,
+        IndexStreamFunction indexStreamFunction = new IndexStreamFunction(getSiddhiManager(), zkCluster,
                 elasticSearchConnectionData.getHostText(), elasticSearchConnectionData.getPortOrDefault(9300));
 
         Map<String, Integer> topicMap = new HashMap<String, Integer>();
@@ -266,8 +257,16 @@ public class StreamingEngine {
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)).map(
                 keepPayloadFromMessageFunction);
 
+        JavaDStream<StratioStreamingMessage> stop_saveToCassandra_requests = messages.filter(
+                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA)).map(
+                keepPayloadFromMessageFunction);
+
         JavaDStream<StratioStreamingMessage> streamToIndexer_requests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.INDEX)).map(
+                keepPayloadFromMessageFunction);
+
+        JavaDStream<StratioStreamingMessage> stopStreamToIndexer_requests = messages.filter(
+                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_INDEX)).map(
                 keepPayloadFromMessageFunction);
 
         JavaDStream<StratioStreamingMessage> list_requests = messages.filter(
@@ -286,19 +285,23 @@ public class StreamingEngine {
 
         add_query_requests.foreachRDD(addQueryToStreamFunction);
 
-        remove_query_requests.foreachRDD(removeQueryToStreamFunction);
+        remove_query_requests.foreachRDD(addQueryToStreamFunction);
 
         listen_requests.foreachRDD(listenStreamFunction);
 
-        stop_listen_requests.foreachRDD(stopListenStreamFunction);
+        stop_listen_requests.foreachRDD(listenStreamFunction);
 
         saveToCassandra_requests.foreachRDD(saveToCassandraStreamFunction);
 
+        stop_saveToCassandra_requests.foreach(saveToCassandraStreamFunction);
+
         streamToIndexer_requests.foreachRDD(indexStreamFunction);
+
+        stopStreamToIndexer_requests.foreachRDD(indexStreamFunction);
 
         list_requests.foreachRDD(listStreamsFunction);
 
-        drop_requests.foreachRDD(dropStreamFunction);
+        drop_requests.foreachRDD(createStreamFunction);
 
         if (enableAuditing || enableStats) {
 
@@ -364,7 +367,7 @@ public class StreamingEngine {
                                             getSiddhiManager()).isUserDefined() + "- ");
                             streamDefinition.append(" - listenEnable:"
                                     + StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(),
-                                            getSiddhiManager()).isListen_enabled() + "- ");
+                                            getSiddhiManager()).isActionEnabled(StreamAction.LISTEN) + "- ");
                         }
 
                         sb.append("** stream: ".concat(streamDefinition.toString()).concat("\n"));
@@ -381,11 +384,12 @@ public class StreamingEngine {
 
             });
 
-            messages.print();
+            // messages.print();
 
         }
 
         jssc.start();
+        logger.info("Stratio streaming started at {}", new Date());
         jssc.awaitTermination();
 
     }

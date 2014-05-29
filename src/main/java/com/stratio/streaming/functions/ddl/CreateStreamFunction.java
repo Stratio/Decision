@@ -15,68 +15,63 @@
  ******************************************************************************/
 package com.stratio.streaming.functions.ddl;
 
-import java.util.List;
+import java.util.Set;
 
-import org.apache.spark.api.java.JavaRDD;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.functions.StratioStreamingBaseFunction;
+import com.stratio.streaming.exception.RequestValidationException;
+import com.stratio.streaming.functions.ActionBaseFunction;
+import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamExistsValidation;
+import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
 import com.stratio.streaming.streams.StreamOperations;
-import com.stratio.streaming.utils.SiddhiUtils;
 
-public class CreateStreamFunction extends StratioStreamingBaseFunction {
+public class CreateStreamFunction extends ActionBaseFunction {
 
-    private static Logger logger = LoggerFactory.getLogger(CreateStreamFunction.class);
+    private static final long serialVersionUID = -3888212615838168602L;
 
-    /**
-	 * 
-	 */
-    private static final long serialVersionUID = 7911766880059394316L;
-
-    public CreateStreamFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
-        super(siddhiManager, zookeeperCluster, kafkaCluster);
+    public CreateStreamFunction(SiddhiManager siddhiManager, String zookeeperHost) {
+        super(siddhiManager, zookeeperHost);
     }
 
     @Override
-    public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
-
-        List<StratioStreamingMessage> requests = rdd.collect();
-
-        for (StratioStreamingMessage request : requests) {
-            // Siddhi doesn't throw an exception if stream exists and you try to
-            // recreate it in the same way
-            // but if you try to redefine a stream, siddhi will throw a
-            // DifferentDefinitionAlreadyExistException
-            // so, we avoid this scenario but checking first if stream exists
-
-            // stream is allowed and NOT exists in siddhi
-            if (SiddhiUtils.isStreamAllowedForThisOperation(request.getStreamName(),
-                    STREAM_OPERATIONS.DEFINITION.CREATE)
-                    && getSiddhiManager().getStreamDefinition(request.getStreamName()) == null) {
-
-                try {
-
-                    StreamOperations.createStream(request, getSiddhiManager());
-
-                    // ack OK back to the bus
-                    ackStreamingOperation(request, REPLY_CODES.OK);
-
-                } catch (SiddhiPraserException spe) {
-                    logger.error("Parser error", spe);
-                    ackStreamingOperation(request, REPLY_CODES.KO_PARSER_ERROR);
-                }
-
-            } else {
-                ackStreamingOperation(request, REPLY_CODES.KO_STREAM_ALREADY_EXISTS);
-            }
-        }
-
-        return null;
+    protected String getStartOperationCommand() {
+        return STREAM_OPERATIONS.DEFINITION.CREATE;
     }
+
+    @Override
+    protected String getStopOperationCommand() {
+        return STREAM_OPERATIONS.DEFINITION.DROP;
+    }
+
+    @Override
+    protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
+        try {
+            StreamOperations.createStream(message, getSiddhiManager());
+        } catch (SiddhiPraserException e) {
+            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e.getMessage());
+        }
+        return true;
+    }
+
+    @Override
+    protected boolean stopAction(StratioStreamingMessage message) throws RequestValidationException {
+        StreamOperations.dropStream(message, getSiddhiManager());
+        return true;
+    }
+
+    @Override
+    protected void addStopRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+    }
+
+    @Override
+    protected void addStartRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamExistsValidation(getSiddhiManager()));
+    }
+
 }

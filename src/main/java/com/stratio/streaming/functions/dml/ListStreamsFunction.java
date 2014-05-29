@@ -16,50 +16,63 @@
 package com.stratio.streaming.functions.dml;
 
 import java.util.List;
+import java.util.Set;
 
-import org.apache.spark.api.java.JavaRDD;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 
+import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ListStreamsMessage;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.functions.StratioStreamingBaseFunction;
+import com.stratio.streaming.exception.RequestValidationException;
+import com.stratio.streaming.functions.ActionBaseFunction;
+import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamAllowedValidation;
 import com.stratio.streaming.streams.StreamOperations;
 import com.stratio.streaming.utils.ZKUtils;
 
-public class ListStreamsFunction extends StratioStreamingBaseFunction {
-	
-	private static Logger logger = LoggerFactory.getLogger(ListStreamsFunction.class);
-	private String zookeeperCluster;
+public class ListStreamsFunction extends ActionBaseFunction {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7911766880059394316L;
+    private static final long serialVersionUID = 3580834398296372380L;
 
-	public ListStreamsFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
-		super(siddhiManager, zookeeperCluster, kafkaCluster);
-		this.zookeeperCluster = zookeeperCluster;
-	}
-	
+    public ListStreamsFunction(SiddhiManager siddhiManager, String zookeeperHost) {
+        super(siddhiManager, zookeeperHost);
+    }
 
-	@Override
-	public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
-		
-		List<StratioStreamingMessage> requests = rdd.collect();
-		
-		for (StratioStreamingMessage request : requests) {
-			
-			List<StratioStreamingMessage> existingStreams = StreamOperations.listStreams(request, getSiddhiManager());
-			
-			ZKUtils.getZKUtils(zookeeperCluster).createZNodeJsonReply(request, new ListStreamsMessage(existingStreams.size(), //value.count
-																										System.currentTimeMillis(), 					//value.time
-																										existingStreams));                         		//value.streams																				
+    @Override
+    protected String getStartOperationCommand() {
+        return STREAM_OPERATIONS.MANIPULATION.LIST;
+    }
 
-		}		
-		
-		return null;
-	}
+    @Override
+    protected String getStopOperationCommand() {
+        return null;
+    }
 
+    @Override
+    protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
+        List<StratioStreamingMessage> existingStreams = StreamOperations.listStreams(message, getSiddhiManager());
+        try {
+            ZKUtils.getZKUtils(getZookeeperHost()).createZNodeJsonReply(message,
+                    new ListStreamsMessage(existingStreams.size(), System.currentTimeMillis(), existingStreams));
+        } catch (Exception e) {
+            throw new RequestValidationException(REPLY_CODES.KO_GENERAL_ERROR, e.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    protected boolean stopAction(StratioStreamingMessage message) throws RequestValidationException {
+        // nothing to do
+        return true;
+    }
+
+    @Override
+    protected void addStopRequestsValidations(Set<RequestValidation> validators) {
+    }
+
+    @Override
+    protected void addStartRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamAllowedValidation(getSiddhiManager()));
+    }
 }

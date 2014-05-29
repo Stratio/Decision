@@ -31,59 +31,49 @@ import com.stratio.streaming.utils.ZKUtils;
 
 /**
  * @author dmorales
- *
+ * 
  */
+@Deprecated
 public abstract class StratioStreamingBaseFunction extends Function<JavaRDD<StratioStreamingMessage>, Void> {
-	
-	private static Logger logger = LoggerFactory.getLogger(StratioStreamingBaseFunction.class);
-	
-	private String zookeeperCluster;
-	private String kafkaCluster;
-	private transient SiddhiManager siddhiManager;
 
-	/**
+    private static Logger logger = LoggerFactory.getLogger(StratioStreamingBaseFunction.class);
+
+    private String zookeeperCluster;
+    private String kafkaCluster;
+    private transient SiddhiManager siddhiManager;
+
+    /**
 	 * 
 	 */
-	public StratioStreamingBaseFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
-		super();
-		this.zookeeperCluster = zookeeperCluster;
-		this.kafkaCluster = kafkaCluster;
-		this.siddhiManager = siddhiManager;
-	}
-	
-	
-	protected void ackStreamingOperation(StratioStreamingMessage request, Integer reply) throws Exception {		
-		
-		ZKUtils.getZKUtils(zookeeperCluster).createZNodeACK(request, reply);
-		
-		if (!request.getOperation().equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.INSERT)) {
-			
-			logger.info("==> REQUEST HAS BEEN PROCESSED:" 
-								+ " // stream:" 	+ request.getStreamName()  
-								+ " // operation:"  + request.getOperation() 
-								+ " // request:" 	+ request.getRequest()
-								+ " // ACK:" 		+ REPLY_CODES.getReadableErrorFromCode(reply));
-		}
-	}
+    public StratioStreamingBaseFunction(SiddhiManager siddhiManager, String zookeeperCluster, String kafkaCluster) {
+        super();
+        this.zookeeperCluster = zookeeperCluster;
+        this.kafkaCluster = kafkaCluster;
+        this.siddhiManager = siddhiManager;
+    }
 
+    protected void ackStreamingOperation(StratioStreamingMessage request, Integer reply) throws Exception {
 
-	protected SiddhiManager getSiddhiManager() {
-		return siddhiManager;
-	}
+        ZKUtils.getZKUtils(zookeeperCluster).createZNodeJsonReply(request, reply);
 
+        if (!request.getOperation().equalsIgnoreCase(STREAM_OPERATIONS.MANIPULATION.INSERT)) {
 
-	protected String getZookeeperCluster() {
-		return zookeeperCluster;
-	}
+            logger.info("==> REQUEST HAS BEEN PROCESSED:" + " // stream:" + request.getStreamName() + " // operation:"
+                    + request.getOperation() + " // request:" + request.getRequest() + " // ACK:"
+                    + REPLY_CODES.getReadableErrorFromCode(reply));
+        }
+    }
 
+    protected SiddhiManager getSiddhiManager() {
+        return siddhiManager;
+    }
 
-	protected String getKafkaCluster() {
-		return kafkaCluster;
-	}
-	
-	
-	
+    protected String getZookeeperCluster() {
+        return zookeeperCluster;
+    }
 
-	
+    protected String getKafkaCluster() {
+        return kafkaCluster;
+    }
 
 }

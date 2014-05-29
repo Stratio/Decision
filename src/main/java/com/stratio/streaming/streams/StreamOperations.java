@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -26,12 +27,14 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.AttributeAlreadyExistException;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.ITopic;
 import com.stratio.streaming.callbacks.StreamToBusCallback;
 import com.stratio.streaming.callbacks.StreamToCassandraCallback;
 import com.stratio.streaming.callbacks.StreamToIndexerCallback;
 import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.commons.messages.StreamQuery;
@@ -159,27 +162,33 @@ public class StreamOperations {
 
                 List<ColumnNameTypeValue> columns = Lists.newArrayList();
                 List<StreamQuery> queries = Lists.newArrayList();
+                Set<StreamAction> actions = Sets.newHashSet();
                 boolean isUserDefined = false;
 
                 for (Attribute column : streamMetaData.getAttributeList()) {
-                    columns.add(new ColumnNameTypeValue(column.getName(), column.getType().toString(), null));
+                    columns.add(new ColumnNameTypeValue(column.getName(),
+                            SiddhiUtils.encodeSiddhiType(column.getType()), null));
                 }
 
-                if (StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), siddhiManager) != null) {
-                    HashMap<String, String> attachedQueries = StreamSharedStatus.getStreamStatus(
-                            streamMetaData.getStreamId(), siddhiManager).getAddedQueries();
+                StreamStatusDTO streamStatus = StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(),
+                        siddhiManager);
+
+                if (streamStatus != null) {
+                    HashMap<String, String> attachedQueries = streamStatus.getAddedQueries();
 
                     for (Entry<String, String> entry : attachedQueries.entrySet()) {
                         queries.add(new StreamQuery(entry.getKey(), entry.getValue()));
                     }
 
-                    isUserDefined = StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), siddhiManager)
-                            .isUserDefined();
+                    isUserDefined = streamStatus.isUserDefined();
+
+                    actions = streamStatus.getActionsEnabled();
                 }
 
                 StratioStreamingMessage streamMessage = new StratioStreamingMessage(streamMetaData.getId(), columns,
                         queries);
                 streamMessage.setUserDefined(isUserDefined);
+                streamMessage.setActiveActions(actions);
 
                 streams.add(streamMessage);
             }
@@ -227,6 +236,14 @@ public class StreamOperations {
         StreamSharedStatus.changeSave2CassandraStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager);
     }
 
+    public static void stopSave2cassandraStream(StratioStreamingMessage request, SiddhiManager siddhiManager) {
+
+        siddhiManager.getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_SAVE2CASSANDRA_TOPIC)
+                .publish(request.getStreamName());
+
+        StreamSharedStatus.changeSave2CassandraStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager);
+    }
+
     public static void streamToIndexer(StratioStreamingMessage request, String elasticSearchHost,
             int elasticSearchPort, SiddhiManager siddhiManager) {
 
@@ -240,5 +257,12 @@ public class StreamOperations {
         siddhiManager.addCallback(request.getStreamName(), streamToIndexerCallback);
 
         StreamSharedStatus.changeIndexerStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager);
+    }
+
+    public static void stopStreamToIndexer(StratioStreamingMessage request, SiddhiManager siddhiManager) {
+
+        siddhiManager.getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_INDEXER_TOPIC)
+                .publish(request.getStreamName());
+        StreamSharedStatus.changeIndexerStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager);
     }
 }
