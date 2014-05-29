@@ -29,6 +29,7 @@ object StreamsParser {
       new StratioStream(stream.getStreamName,
         stream.getColumns,
         stream.getQueries,
+        stream.getActiveActions,
         stream.isUserDefined)}
     )
     stratioStreams

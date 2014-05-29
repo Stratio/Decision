@@ -359,7 +359,7 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The index operation") {
-    it("should index the stream to elasticsearch and stop indexing") {
+    it("should index the stream to elasticsearch and stop indexing", Tag("index")) {
       cleanElasticSearchIndexes()
       val indexedStreamName = "testindexedstream"
       val indexedData1 = "testValue1"
@@ -392,8 +392,8 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The save to cassandra operation") {
-    it("should add a row to cassandra") {
-      val cassandraStreamName = "cassandrastreamtable1"
+    it("should add a row to cassandra", Tag("cassandra")) {
+      val cassandraStreamName = "cassandrastreamtabletest1"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.BOOLEAN)
       val thirdStreamColumn = new ColumnNameType("column3", ColumnType.FLOAT)
@@ -438,8 +438,8 @@ class StratioStreamingIntegrationTests
       cleanCassandraTable(cassandraStreamName)
     }
 
-    it("should stop adding rows to cassandra") {
-      val cassandraStreamName = "cassandrastreamtable2"
+    it("should stop adding rows to cassandra", Tag("cassandra")) {
+      val cassandraStreamName = "cassandrastreamtabletest2"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
       val firstColumnValue = new ColumnNameValue("column1", "testValue")
@@ -452,6 +452,7 @@ class StratioStreamingIntegrationTests
         streamingAPI.stopSaveToCassandra(cassandraStreamName)
         Thread.sleep(2000)
         streamingAPI.insertData(cassandraStreamName, streamData)
+        Thread.sleep(2000)
       } catch {
         case ssEx: StratioStreamingException => {
           println(ssEx.getMessage)
@@ -464,7 +465,7 @@ class StratioStreamingIntegrationTests
     }
 
     it("should adding rows to cassandra after altering a stream", Tag("cassandra")) {
-      val cassandraStreamName = "cassandrastreamtable8"
+      val cassandraStreamName = "cassandrastreamtabletest3"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
