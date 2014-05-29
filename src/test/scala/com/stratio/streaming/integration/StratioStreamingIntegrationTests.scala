@@ -492,6 +492,34 @@ class StratioStreamingIntegrationTests
     }
   }
 
+  describe("The list operation") {
+    it("should receive the enabled operations info", Tag("list")) {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      try {
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.listenStream(testStreamName)
+        streamingAPI.saveToCassandra(testStreamName)
+        streamingAPI.indexStream(testStreamName)
+        Thread.sleep(3000)
+        val streamInfo = streamingAPI.listStreams().get(0)
+        streamInfo.getActiveActions should contain(StreamAction.LISTEN)
+        streamInfo.getActiveActions should contain(StreamAction.SAVE_TO_CASSANDRA)
+        streamInfo.getActiveActions should contain(StreamAction.INDEXED)
+        streamingAPI.stopListenStream(testStreamName)
+        streamingAPI.stopIndexStream(testStreamName)
+        streamingAPI.stopSaveToCassandra(testStreamName)
+        Thread.sleep(3000)
+        val streamDisabledInfo = streamingAPI.listStreams().get(0)
+        streamDisabledInfo.getActiveActions should not contain(StreamAction.LISTEN)
+        streamDisabledInfo.getActiveActions should not contain(StreamAction.SAVE_TO_CASSANDRA)
+        streamDisabledInfo.getActiveActions should not contain(StreamAction.INDEXED)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+    }
+  }
+
   describe("The Streaming Engine") {
     it("should throw a StratioEngineStatusException when streaming engine is not running") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
