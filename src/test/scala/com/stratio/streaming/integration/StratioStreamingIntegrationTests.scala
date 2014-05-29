@@ -21,17 +21,19 @@ import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.framework.CuratorFrameworkFactory
 import com.stratio.streaming.commons.constants.STREAMING._
+import com.stratio.streaming.commons.constants.STREAMING.STATS_NAMES._
 import com.stratio.streaming.messaging.{ColumnNameValue, ColumnNameType}
-import com.stratio.streaming.commons.constants.ColumnType
 import scala.collection.JavaConversions._
 import util.control.Breaks._
 import com.stratio.streaming.api.{StratioStreamingAPIConfig, StratioStreamingAPIFactory}
-import scalaj.http.{HttpOptions, Http}
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants._
-import com.datastax.driver.core.{Row, Cluster}
+import com.datastax.driver.core.Cluster
 import com.datastax.driver.core.querybuilder.QueryBuilder
-;
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.client.methods.{HttpGet, HttpDelete}
+import org.apache.http.util.EntityUtils
+
 
 class StratioStreamingIntegrationTests
   extends  FunSpec
@@ -543,11 +545,15 @@ class StratioStreamingIntegrationTests
   }
 
   def cleanElasticSearchIndexes() {
-    Http(s"http://$elasticSearchHost:$elasticSearchPort/$elasticSearchIndex/").option(HttpOptions.method("DELETE"))
+    val url = s"http://$elasticSearchHost:$elasticSearchPort/$elasticSearchIndex/"
+    val client = HttpClientBuilder.create().build()
+    val request = new HttpDelete(url)
+    client.execute(request)
+    client.close()
   }
 
   def userDefinedStreams() = {
-    streamingAPI.listStreams().filterNot(stream => stream.getStreamName.startsWith("stratio_"))
+    streamingAPI.listStreams().filterNot(stream => STATS_STREAMS.contains(stream.getStreamName))
   }
 
   def theNumberOfUserDefinedStreams() = {
@@ -563,7 +569,12 @@ class StratioStreamingIntegrationTests
   }
 
   def theStreamContainsTheData(data: String) = {
-    val elasticSearchResponse = Http(s"http://$elasticSearchHost:$elasticSearchPort/$elasticSearchIndex/_search").asString
+    val url = s"http://$elasticSearchHost:$elasticSearchPort/$elasticSearchIndex/_search"
+    val client = HttpClientBuilder.create().build()
+    val request = new HttpGet(url)
+    val response = client.execute(request)
+    val responseEntity = response.getEntity()
+    val elasticSearchResponse = EntityUtils.toString(responseEntity)
     elasticSearchResponse.contains(data)
   }
 
