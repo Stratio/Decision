@@ -20,5 +20,5 @@ import com.typesafe.config.ConfigFactory
 
 trait StratioStreamingAPIConfig {
   val config = ConfigFactory.load("stratio-streaming.conf")
-  val streamingAckTimeOutInSeconds = 8
+  val streamingAckTimeOutInSeconds = 16
 }
