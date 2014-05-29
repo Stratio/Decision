@@ -1,6 +1,6 @@
 package com.stratio.streaming.functions;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.spark.api.java.JavaRDD;
@@ -29,13 +29,14 @@ public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreami
     private final String zookeeperHost;
 
     public ActionBaseFunction(SiddhiManager siddhiManager, String zookeeperHost) {
-        this.stopValidators = new HashSet<>();
-        this.startValidators = new HashSet<>();
+        this.stopValidators = new LinkedHashSet<>();
+        this.startValidators = new LinkedHashSet<>();
         this.siddhiManager = siddhiManager;
         this.zookeeperHost = zookeeperHost;
 
         startValidators.add(new StreamAllowedValidation(getSiddhiManager()));
         stopValidators.add(new StreamAllowedValidation(getSiddhiManager()));
+
         addStartRequestsValidations(startValidators);
         addStopRequestsValidations(stopValidators);
     }
