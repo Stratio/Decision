@@ -51,22 +51,26 @@ public class StreamCommands implements CommandMarker {
     @CliCommand(value = "columns", help = "list all streams querys into engine")
     public String listQuerys(
             @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+        // TODO create new renderer to render this table
+        try {
 
-        // TODO refactor. Use constants to define columns
-        List<ColumnNameTypeValue> columnsValues = stratioStreamingApi.columnsFromStream(streamName);
+            List<ColumnNameTypeValue> columnsValues = stratioStreamingApi.columnsFromStream(streamName);
 
-        List<String> columns = Arrays.asList("Column", "Type");
-        List<Map<String, Object>> data = new ArrayList<>();
+            List<String> columns = Arrays.asList("Column", "Type");
+            List<Map<String, Object>> data = new ArrayList<>();
 
-        for (ColumnNameTypeValue columnValue : columnsValues) {
-            Map<String, Object> row = new HashMap<>();
-            row.put("Column", columnValue.getColumn());
-            row.put("Type", columnValue.getType());
+            for (ColumnNameTypeValue columnValue : columnsValues) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("Column", columnValue.getColumn());
+                row.put("Type", columnValue.getType());
 
-            data.add(row);
+                data.add(row);
+            }
+
+            return TableRenderer.renderMapDataAsTable(data, columns);
+        } catch (StratioEngineOperationException e) {
+            throw new ShellException(e);
         }
-
-        return TableRenderer.renderMapDataAsTable(data, columns);
     }
 
     @CliCommand(value = "create", help = "create new stream")
