@@ -17,7 +17,6 @@
 		<junit.version>4.11</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.shell</groupId>
@@ -105,6 +104,17 @@
 		</plugins>
 	</build>
 	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<id>stratio-snapshots</id>
+			<name>Stratio Snapshots</name>
+			<url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
+			<layout>default</layout>
+		</repository>
 		<repository>
 			<id>libs-milestone</id>
 			<url>http://repo.spring.io/libs-milestone/</url>
