@@ -18,13 +18,13 @@ public class StreamingApiConfiguration {
     private String kafkaHost;
 
     @Value("${kafka.port}")
-    private String kafkaPort;
+    private Integer kafkaPort;
 
     @Value("${zookeeper.host}")
     private String zookeeperHost;
 
     @Value("${zookeeper.port}")
-    private String zookeeperPort;
+    private Integer zookeeperPort;
 
     @Bean
     public IStratioStreamingAPI stratioStreamingApi() {
