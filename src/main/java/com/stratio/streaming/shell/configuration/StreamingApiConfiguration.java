@@ -8,6 +8,7 @@ import org.springframework.context.annotation.PropertySource;
 
 import com.stratio.streaming.api.IStratioStreamingAPI;
 import com.stratio.streaming.api.StratioStreamingAPIFactory;
+import com.stratio.streaming.commons.exceptions.StratioEngineConnectionException;
 
 @Configuration
 @PropertySource("classpath:shell.properties")
@@ -28,7 +29,11 @@ public class StreamingApiConfiguration {
 
     @Bean
     public IStratioStreamingAPI stratioStreamingApi() {
-        return StratioStreamingAPIFactory.create().initializeWithServerConfig(kafkaHost, kafkaPort, zookeeperHost,
-                zookeeperPort);
+        try {
+            return StratioStreamingAPIFactory.create().initializeWithServerConfig(kafkaHost, kafkaPort, zookeeperHost,
+                    zookeeperPort);
+        } catch (StratioEngineConnectionException e) {
+            throw new RuntimeException("Problem creating streming api", e);
+        }
     }
 }
