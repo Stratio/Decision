@@ -212,6 +212,9 @@ public class StreamingEngine {
             topicService.createTopicIfNotExist(topic, config.getInt("kafka.replicationFactor"),
                     config.getInt("kafka.partitions"));
             Integer partitions = topicService.getNumPartitionsForTopic(topic);
+            if (partitions == 0) {
+                partitions = config.getInt("kafka.partitions");
+            }
             topicMap.put(topic, partitions);
         }
 
