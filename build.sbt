@@ -26,7 +26,7 @@ scalaVersion := "2.10.3"
 
 seq(assemblySettings: _*)
 
-jarName in assembly := "streaming-api-0.2.0-SNAPSHOT.jar"
+jarName in assembly := "streaming-api-0.2.0.jar"
 
 addArtifact(Artifact("streaming-api"), sbtassembly.Plugin.AssemblyKeys.assembly)
 
@@ -58,7 +58,7 @@ libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.2.0",
   "org.apache.curator" % "curator-framework" % "2.4.1",
   "org.slf4j" % "slf4j-log4j12" % "1.7.5",
-  "com.stratio.streaming" % "streaming-commons" % "0.2.0-SNAPSHOT",
+  "com.stratio.streaming" % "streaming-commons" % "0.2.0",
   "com.google.code.gson" % "gson" % "2.2.4",
   "org.apache.httpcomponents" % "httpclient" % "4.3.3"
 )
