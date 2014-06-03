@@ -55,7 +55,7 @@ class StreamingAPIOperation
       response.get
     } catch {
       case e: TimeoutException => {
-        log.error("StratioAPI - Ack timeout expired for: "+message.getRequest)
+        log.error("Ack timeout expired for: "+message.getRequest)
         throw new StratioEngineOperationException("Acknowledge timeout expired"+message.getRequest)
       }
     }

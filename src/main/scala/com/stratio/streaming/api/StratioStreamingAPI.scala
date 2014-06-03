@@ -41,6 +41,7 @@ import com.stratio.streaming.dto.StratioQueryStream
 import com.stratio.streaming.messaging.QueryMessageBuilder
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.kafka.service.{TopicService, KafkaTopicService}
+import org.slf4j.LoggerFactory
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
@@ -188,6 +189,7 @@ class StratioStreamingAPI
       brokerPort = config.getInt("kafka.port")
       zookeeperServer = config.getString("zookeeper.server")
       zookeeperPort = config.getInt("zookeeper.port")
+      log.info("Establishing connection with the engine.")
       checkEphemeralNode()
       startEphemeralNodeWatch()
       initializeTopic()
@@ -206,6 +208,7 @@ class StratioStreamingAPI
       brokerPort = kafkaPort
       zookeeperServer = theZookeeperServer
       zookeeperPort = theZookeeperPort
+      log.info("Establishing connection with the engine.")
       checkEphemeralNode()
       startEphemeralNodeWatch()
       initializeTopic()
@@ -218,6 +221,7 @@ class StratioStreamingAPI
 
 object StratioStreamingAPI
  extends StratioStreamingAPIConfig {
+  lazy val log = LoggerFactory.getLogger(getClass)
   val streamingTopicName = TOPICS
   val sessionId = "" + System.currentTimeMillis()
   var brokerServer = ""

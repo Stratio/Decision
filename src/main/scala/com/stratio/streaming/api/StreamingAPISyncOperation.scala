@@ -60,7 +60,7 @@ case class StreamingAPISyncOperation(
     }
   }
 
-  private def createLogError(responseCode: Int, queryString: String) = {
-    log.error(s"StratioAPI - [ACK_CODE,QUERY_STRING]: [$responseCode,$queryString]")
+  private def createLogError(responseCode: Int, errorDescription: String) = {
+    log.error(s"StratioAPI - [ACK_CODE,QUERY_STRING]: [$responseCode,$errorDescription]")
   }
 }
