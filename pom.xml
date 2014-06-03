@@ -145,9 +145,9 @@
 									<repositoryId>sonatype-nexus-staging</repositoryId>
 									<pomFile>pom.xml</pomFile>
 									<files>
-										<file>target/streaming-commons-0.1.0.jar</file>
-										<file>target/streaming-commons-0.1.0-javadoc.jar</file>
-										<file>target/streaming-commons-0.1.0-sources.jar</file>
+										<file>target/streaming-commons-${project.version}.jar</file>
+										<file>target/streaming-commons-${project.version}-javadoc.jar</file>
+										<file>target/streaming-commons-${project.version}-sources.jar</file>
 									</files>
 
 								</configuration>
