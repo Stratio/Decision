@@ -21,7 +21,7 @@
 
 	<groupId>com.stratio.streaming.shell</groupId>
 	<artifactId>streaming-shell</artifactId>
-	<version>0.1.0</version>
+	<version>0.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>stratio streaming shell</name>
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>com.stratio.streaming</groupId>
 			<artifactId>streaming-api</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
 		</dependency>
 		<!-- CONFIG -->
 		<dependency>
