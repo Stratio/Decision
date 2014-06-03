@@ -21,7 +21,7 @@
 
 	<groupId>com.stratio.streaming.shell</groupId>
 	<artifactId>streaming-shell</artifactId>
-	<version>1.0.0.SNAPSHOT</version>
+	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>stratio streaming shell</name>
