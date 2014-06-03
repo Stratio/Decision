@@ -20,13 +20,13 @@ profileName := "com.stratio"
 
 publishMavenStyle := true
 
-version := "0.2.0-SNAPSHOT"
+version := "0.2.0"
 
 scalaVersion := "2.10.3"
 
 seq(assemblySettings: _*)
 
-jarName in assembly := "stratio-streaming-api-0.2.0-SNAPSHOT.jar"
+jarName in assembly := "streaming-api-0.2.0-SNAPSHOT.jar"
 
 addArtifact(Artifact("streaming-api"), sbtassembly.Plugin.AssemblyKeys.assembly)
 
