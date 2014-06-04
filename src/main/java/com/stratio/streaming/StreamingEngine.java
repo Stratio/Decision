@@ -16,7 +16,6 @@
 package com.stratio.streaming;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,7 +88,7 @@ public class StreamingEngine {
      */
     public static void main(String[] args) throws MalformedURLException {
 
-        Config config = loadConfig(args);
+        Config config = loadConfig();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -405,14 +404,8 @@ public class StreamingEngine {
         return siddhiManager;
     }
 
-    private static Config loadConfig(String[] externalPath) throws MalformedURLException {
-        Config conf = null;
-        if (externalPath.length != 0) {
-            conf = ConfigFactory.parseURL(new URL(externalPath[0]));
-        } else {
-            logger.warn("External path is not defined, using default classpath configuration file");
-            conf = ConfigFactory.load("streaming-default");
-        }
+    private static Config loadConfig() throws MalformedURLException {
+        Config conf = ConfigFactory.load("config");
         return conf;
     }
 }
