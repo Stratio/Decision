@@ -17,7 +17,7 @@ import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamAllowedValidation;
 import com.stratio.streaming.utils.ZKUtils;
 
-public abstract class ActionBaseFunction extends Function<JavaRDD<StratioStreamingMessage>, Void> {
+public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStreamingMessage>, Void> {
 
     private static final long serialVersionUID = -4662722852153543463L;
 

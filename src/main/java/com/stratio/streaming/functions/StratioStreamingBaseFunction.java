@@ -34,7 +34,7 @@ import com.stratio.streaming.utils.ZKUtils;
  * 
  */
 @Deprecated
-public abstract class StratioStreamingBaseFunction extends Function<JavaRDD<StratioStreamingMessage>, Void> {
+public abstract class StratioStreamingBaseFunction implements Function<JavaRDD<StratioStreamingMessage>, Void> {
 
     private static Logger logger = LoggerFactory.getLogger(StratioStreamingBaseFunction.class);
 
