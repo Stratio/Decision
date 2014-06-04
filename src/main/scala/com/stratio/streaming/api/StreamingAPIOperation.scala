@@ -44,12 +44,13 @@ class StreamingAPIOperation
   }
 
   protected def waitForTheStreamingResponse(zookeeperConsumer: ZookeeperConsumer,
-                                  message: StratioStreamingMessage) = {
+                                  message: StratioStreamingMessage,
+                                  ackTimeOutInMs: Int) = {
     val zNodeFullPath = getOperationZNodeFullPath(
       message.getOperation.toLowerCase,
       message.getRequest_id)
     try {
-      Await.result(zookeeperConsumer.readZNode(zNodeFullPath), streamingAckTimeOutInSeconds seconds)
+      Await.result(zookeeperConsumer.readZNode(zNodeFullPath), ackTimeOutInMs milliseconds)
       val response = zookeeperConsumer.getZNodeData(zNodeFullPath)
       zookeeperConsumer.removeZNode(zNodeFullPath)
       response.get

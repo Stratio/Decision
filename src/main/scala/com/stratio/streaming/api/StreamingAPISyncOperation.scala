@@ -27,7 +27,8 @@ import com.stratio.streaming.commons.dto.ActionCallbackDto
 
 case class StreamingAPISyncOperation(
   kafkaProducer: KafkaProducer,
-  zookeeperConsumer: ZookeeperConsumer)
+  zookeeperConsumer: ZookeeperConsumer,
+  ackTimeOutInMs: Int)
   extends StreamingAPIOperation {
 
   /**
@@ -39,15 +40,17 @@ case class StreamingAPISyncOperation(
   def performSyncOperation(message: StratioStreamingMessage) = {
     val zNodeUniqueId = UUID.randomUUID().toString
     addMessageToKafkaTopic(message, zNodeUniqueId, kafkaProducer)
-    val syncOperationResponse = waitForTheStreamingResponse(zookeeperConsumer, message)
+    val syncOperationResponse = waitForTheStreamingResponse(zookeeperConsumer, message, ackTimeOutInMs)
     manageStreamingResponse(syncOperationResponse, message)
   }
 
   private def manageStreamingResponse(response: String, message: StratioStreamingMessage) = {
     val responseDto = new Gson().fromJson(response, classOf[ActionCallbackDto])
     val replyCode = responseDto.getErrorCode
+    val messageOperation = message.getOperation
+    val streamName = message.getStreamName
     replyCode match {
-      case OK => log.info("StratioEngine Ack received for: "+message.getRequest)
+      case OK => log.info(s"StratioEngine Ack received for the operation $messageOperation on the $streamName stream")
       case KO_STREAM_OPERATION_NOT_ALLOWED |
           KO_STREAM_IS_NOT_USER_DEFINED => {
         createLogError(replyCode, responseDto.getDescription)

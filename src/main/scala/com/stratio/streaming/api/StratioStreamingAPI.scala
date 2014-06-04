@@ -207,6 +207,7 @@ class StratioStreamingAPI
       brokerPort = kafkaPort
       zookeeperServer = theZookeeperServer
       zookeeperPort = theZookeeperPort
+
       log.info("Establishing connection with the engine...")
       checkEphemeralNode()
       startEphemeralNodeWatch()
@@ -216,6 +217,11 @@ class StratioStreamingAPI
     } catch {
         case _ => throw new StratioEngineConnectionException("Unable to connect to statio streaming")
     }
+  }
+
+  def defineAcknowledgeTimeOut(timeOutInMs: Int) = {
+    ackTimeOut = timeOutInMs
+    this
   }
 }
 
@@ -236,13 +242,14 @@ object StratioStreamingAPI
   val retryPolicy = new RetryOneTime(500)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
   var topicService: TopicService = _
+  var ackTimeOut = 8000
   lazy val zookeeperConsumer = {
     zookeeperClient.start()
     ZookeeperConsumer(zookeeperClient)
   }
-  lazy val syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer)
+  lazy val syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
   lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaProducer)
-  lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer)
+  lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
 
   def checkEphemeralNode() {
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_PATH
