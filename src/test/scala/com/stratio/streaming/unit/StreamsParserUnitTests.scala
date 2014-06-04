@@ -19,6 +19,7 @@ package com.stratio.streaming.unit
 import org.scalatest._
 import com.stratio.streaming.utils.StreamsParser
 import scala.collection.JavaConversions._
+import com.stratio.streaming.commons.constants.ColumnType
 
 class StreamsParserUnitTests
   extends FunSpec
@@ -38,7 +39,7 @@ class StreamsParserUnitTests
       val firstStreamColumns = firstStream.getColumns.toList
       val firstStreamfirstColumn = firstStreamColumns(0)
       firstStreamfirstColumn.getColumn should be ("operation")
-      firstStreamfirstColumn.getType should be ("STRING")
+      firstStreamfirstColumn.getType should be (ColumnType.STRING)
     }
   }
 }
