@@ -429,6 +429,7 @@ class StratioStreamingIntegrationTests
         case ssEx: StratioStreamingException => fail()
       }
       val storedRows = fetchStoredRowFromCassandra(cassandraStreamName)
+      cleanCassandraTable(cassandraStreamName)
       storedRows.size() should be(1)
       val storedRow = storedRows.get(0)
       storedRow.getString("column1") should be("testValue")
@@ -437,7 +438,6 @@ class StratioStreamingIntegrationTests
       storedRow.getInt("column4") should be(4)
       storedRow.getDouble("column5") should be(5)
       storedRow.getDouble("column6") should be(600000)
-      cleanCassandraTable(cassandraStreamName)
     }
 
     it("should stop adding rows to cassandra", Tag("cassandra")) {
@@ -462,11 +462,11 @@ class StratioStreamingIntegrationTests
         }
       }
       val storedRows = fetchStoredRowFromCassandra(cassandraStreamName)
-      storedRows.size() should be(1)
       cleanCassandraTable(cassandraStreamName)
+      storedRows.size() should be(1)
     }
 
-    it("should adding rows to cassandra after altering a stream", Tag("cassandra")) {
+    it("should adding rows to cassandra after altering a stream", Tag("cassandra3")) {
       val cassandraStreamName = "cassandrastreamtabletest3"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
@@ -489,8 +489,8 @@ class StratioStreamingIntegrationTests
         case ssEx: StratioStreamingException => fail()
       }
       val storedRows = fetchStoredRowFromCassandra(cassandraStreamName)
-      storedRows.size() should be(2)
       cleanCassandraTable(cassandraStreamName)
+      storedRows.size() should be(2)
     }
   }
 
