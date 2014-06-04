@@ -22,9 +22,10 @@ import com.stratio.streaming.commons.streams.StratioStream
 import scala.collection.JavaConversions._
 
 object StreamsParser {
+  val theGsonParser = new Gson()
 
   def parse(json: String) = {
-    val listStreams = new Gson().fromJson(json, classOf[ListStreamsMessage]).getStreams.toList
+    val listStreams = theGsonParser.fromJson(json, classOf[ListStreamsMessage]).getStreams.toList
     val stratioStreams = listStreams.map(stream => {
       new StratioStream(stream.getStreamName,
         stream.getColumns,
