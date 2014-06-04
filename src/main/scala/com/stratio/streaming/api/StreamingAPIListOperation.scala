@@ -26,13 +26,14 @@ import com.stratio.streaming.utils.StreamsParser
 import java.util.List
 
 class StreamingAPIListOperation(kafkaProducer: KafkaProducer,
-                             zookeeperConsumer: ZookeeperConsumer)
+                             zookeeperConsumer: ZookeeperConsumer,
+                                 ackTimeOutInMs: Int)
   extends StreamingAPIOperation {
 
   def getListStreams(message: StratioStreamingMessage): List[StratioStream] = {
     val zNodeUniqueId = UUID.randomUUID().toString
     addMessageToKafkaTopic(message, zNodeUniqueId, kafkaProducer)
-    val jsonStreamingResponse = waitForTheStreamingResponse(zookeeperConsumer, message)
+    val jsonStreamingResponse = waitForTheStreamingResponse(zookeeperConsumer, message, ackTimeOutInMs)
     val parsedList = StreamsParser.parse(jsonStreamingResponse)
     parsedList
   }

@@ -43,11 +43,11 @@ case class KafkaProducer(topic: String,
 
   def send(message: String, key: String) = {
     try {
-      log.info("Stratio Streaming API - Sending KeyedMessage[key, value]: ["+key+","+message+"]")
+      log.info("Sending KeyedMessage[key, value]: ["+key+","+message+"]")
       producer.send(new KeyedMessage(topic, key, message))
     } catch {
       case e: Exception =>
-        log.error("Stratio Streaming API - Error sending KeyedMessage[key, value]: ["+key+","+message+"]")
+        log.error("Error sending KeyedMessage[key, value]: ["+key+","+message+"]")
         log.error("Exception: "+e.getMessage)
     }
   }

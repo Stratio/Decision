@@ -18,14 +18,14 @@ package com.stratio.streaming.zookeeper
 
 import scala.concurrent.{ExecutionContext, Future}
 import ExecutionContext.Implicits.global
-import com.typesafe.config.ConfigFactory
 import org.apache.curator.framework.CuratorFramework
 import scala.Predef._
 import scala.Some
+import org.slf4j.LoggerFactory
+import org.apache.zookeeper.data.Stat
 
 case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
-  val config = ConfigFactory.load()
-
+  val log = LoggerFactory.getLogger(getClass)
   def readZNode(fullPath: String) = {
     Future {
       var nodeExists = zNodeExists(fullPath)
@@ -48,11 +48,22 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
   }
 
   def zNodeExists(zNodeName: String) = {
-    val zNode = checkZNode(zNodeName)
-    zNode != null
+    checkZNode(zNodeName) match {
+      case Some(true) => true
+      case _ => false
+    }
   }
 
-  private def checkZNode(zNodeName: String) = zooKeeperClient.checkExists().forPath(zNodeName)
-
-  //private def zNodeExists(zNode: Stat) = zNode != null
+  private def checkZNode(zNodeName: String) = {
+    try {
+      val zNodeStat = zooKeeperClient.checkExists().forPath(zNodeName)
+      val zNodeExists = zNodeStat != null
+      Some(zNodeExists)
+    } catch {
+      case _ => {
+        log.warn("Unable to check zNode: "+zNodeName)
+        None
+      }
+    }
+  }
 }

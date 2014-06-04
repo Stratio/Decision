@@ -16,7 +16,7 @@
 
 package com.stratio.streaming.api
 
-import org.apache.curator.retry.ExponentialBackoffRetry
+import org.apache.curator.retry.{RetryUntilElapsed, RetryOneTime, RetryNTimes, ExponentialBackoffRetry}
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import com.stratio.streaming.commons.messages.{ColumnNameTypeValue, StratioStreamingMessage}
 import com.stratio.streaming.kafka.KafkaConsumer
@@ -41,6 +41,7 @@ import com.stratio.streaming.dto.StratioQueryStream
 import com.stratio.streaming.messaging.QueryMessageBuilder
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.kafka.service.{TopicService, KafkaTopicService}
+import org.slf4j.LoggerFactory
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
@@ -179,8 +180,6 @@ class StratioStreamingAPI
     val indexStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(indexStreamMessage)
   }
-  
-  
 
   def initialize() = {
     try {
@@ -188,8 +187,10 @@ class StratioStreamingAPI
       brokerPort = config.getInt("kafka.port")
       zookeeperServer = config.getString("zookeeper.server")
       zookeeperPort = config.getInt("zookeeper.port")
+      log.info("Establishing connection with the engine...")
       checkEphemeralNode()
       startEphemeralNodeWatch()
+      log.info("Initializing kafka topic...")
       initializeTopic()
       this
     } catch {
@@ -206,18 +207,27 @@ class StratioStreamingAPI
       brokerPort = kafkaPort
       zookeeperServer = theZookeeperServer
       zookeeperPort = theZookeeperPort
+
+      log.info("Establishing connection with the engine...")
       checkEphemeralNode()
       startEphemeralNodeWatch()
+      log.info("Initializing kafka topic...")
       initializeTopic()
       this
     } catch {
-      case ex: Exception => throw new StratioEngineConnectionException("Unable to connect to statio streaming")
+        case _ => throw new StratioEngineConnectionException("Unable to connect to statio streaming")
     }
+  }
+
+  def defineAcknowledgeTimeOut(timeOutInMs: Int) = {
+    ackTimeOut = timeOutInMs
+    this
   }
 }
 
 object StratioStreamingAPI
  extends StratioStreamingAPIConfig {
+  lazy val log = LoggerFactory.getLogger(getClass)
   val streamingTopicName = TOPICS
   val sessionId = "" + System.currentTimeMillis()
   var brokerServer = ""
@@ -229,21 +239,24 @@ object StratioStreamingAPI
   var streamingUpAndRunning = false
   val streamingListeners = scala.collection.mutable.Map[String, KafkaConsumer]()
   lazy val kafkaProducer = new KafkaProducer(TOPICS, kafkaBroker)
-  val retryPolicy = new ExponentialBackoffRetry(1000, 3)
+  val retryPolicy = new RetryOneTime(500)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
   var topicService: TopicService = _
+  var ackTimeOut = 8000
   lazy val zookeeperConsumer = {
     zookeeperClient.start()
     ZookeeperConsumer(zookeeperClient)
   }
-  lazy val syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer)
+  lazy val syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
   lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaProducer)
-  lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer)
+  lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
 
   def checkEphemeralNode() {
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_PATH
-    if (!zookeeperConsumer.zNodeExists(ephemeralNodePath))
+    if (!zookeeperConsumer.zNodeExists(ephemeralNodePath)) {
+      log.warn("Ephemeral node does not exist")
       throw new StratioEngineStatusException("Stratio streaming is down")
+    }
     else
       streamingUpAndRunning = true
   }

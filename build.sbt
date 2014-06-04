@@ -20,13 +20,13 @@ profileName := "com.stratio"
 
 publishMavenStyle := true
 
-version := "0.2.0"
+version := "0.3.0-SNAPSHOT"
 
 scalaVersion := "2.10.3"
 
 seq(assemblySettings: _*)
 
-jarName in assembly := "streaming-api-0.2.0.jar"
+jarName in assembly := "streaming-api-0.3.0-SNAPSHOT.jar"
 
 addArtifact(Artifact("streaming-api"), sbtassembly.Plugin.AssemblyKeys.assembly)
 
@@ -54,7 +54,7 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.10" % "2.0" % "test",
   "com.datastax.cassandra" % "cassandra-driver-core" % "2.0.2" exclude("org.jboss", "netty"),
-  "org.apache.kafka" % "kafka_2.10" % "0.8.1" exclude("com.sun.jdmk", "jmxtools") exclude("com.sun.jmx", "jmxri") exclude("org.apache.zookeeper", "zookeeper"),
+  "org.apache.kafka" % "kafka_2.10" % "0.8.1.1" exclude("com.sun.jdmk", "jmxtools") exclude("com.sun.jmx", "jmxri") exclude("org.apache.zookeeper", "zookeeper"),
   "com.typesafe" % "config" % "1.2.0",
   "org.apache.curator" % "curator-framework" % "2.4.1",
   "org.slf4j" % "slf4j-log4j12" % "1.7.5",

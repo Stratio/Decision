@@ -173,4 +173,14 @@ trait IStratioStreamingAPI {
    */
   @throws(classOf[StratioEngineStatusException])
   def stopSaveToCassandra(streamName: String)
+
+  /**
+   * Allows the client to define the time that the API
+   * will wait for the engine responses.
+   *
+   * @param timeOutInMs
+   * @throws com.stratio.streaming.commons.exceptions.StratioEngineStatusException
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def defineAcknowledgeTimeOut(timeOutInMs: Int): IStratioStreamingAPI
 }
