@@ -1,2 +1,8 @@
 *.project
 *.settings/*
+
+#IntellijIDEA files
+*.idea
+*.iml
+*.ipr
+*.iws
