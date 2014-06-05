@@ -1,0 +1,17 @@
+.idea/
+.idea_modules/
+target/
+logs/
+kafka-minimized/logs/
+lib/*.png
+lib/*.gif
+lib/*.js
+lib/*.css
+*.html
+*.js
+*.project
+*.classpath
+*.cache
+*.iml
+*.ipr
+*.iws
