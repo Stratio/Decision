@@ -46,6 +46,7 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.dal.IndexStreamFunction;
 import com.stratio.streaming.functions.dal.ListenStreamFunction;
 import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
+import com.stratio.streaming.functions.dal.SaveToMongoStreamFunction;
 import com.stratio.streaming.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.streaming.functions.ddl.AlterStreamFunction;
 import com.stratio.streaming.functions.ddl.CreateStreamFunction;
@@ -91,6 +92,7 @@ public class StreamingEngine {
         Config config = loadConfig();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
             public void run() {
 
                 logger.info("Shutting down Stratio Streaming..");
@@ -195,6 +197,9 @@ public class StreamingEngine {
         SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
                 getSiddhiManager(), zkCluster, cassandraCluster);
 
+        SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(getSiddhiManager(),
+                zkCluster, "node.stratio.com", 27017, null, null);
+
         HostAndPort elasticSearchConnectionData = HostAndPort.fromString(elasticSearchUrl);
         IndexStreamFunction indexStreamFunction = new IndexStreamFunction(getSiddhiManager(), zkCluster,
                 elasticSearchConnectionData.getHostText(), elasticSearchConnectionData.getPortOrDefault(9300));
@@ -263,6 +268,14 @@ public class StreamingEngine {
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA)).map(
                 keepPayloadFromMessageFunction);
 
+        JavaDStream<StratioStreamingMessage> saveToMongo_requests = messages.filter(
+                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_MONGO)).map(
+                keepPayloadFromMessageFunction);
+
+        JavaDStream<StratioStreamingMessage> stop_saveToMongo_requests = messages.filter(
+                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_MONGO)).map(
+                keepPayloadFromMessageFunction);
+
         JavaDStream<StratioStreamingMessage> streamToIndexer_requests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.INDEX)).map(
                 keepPayloadFromMessageFunction);
@@ -296,6 +309,10 @@ public class StreamingEngine {
         saveToCassandra_requests.foreachRDD(saveToCassandraStreamFunction);
 
         stop_saveToCassandra_requests.foreach(saveToCassandraStreamFunction);
+
+        saveToMongo_requests.foreachRDD(saveToMongoStreamFunction);
+
+        stop_saveToMongo_requests.foreach(saveToMongoStreamFunction);
 
         streamToIndexer_requests.foreachRDD(indexStreamFunction);
 
