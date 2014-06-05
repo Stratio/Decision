@@ -16,9 +16,9 @@
 
 package com.stratio.streaming.api
 
-import org.apache.curator.retry.{RetryUntilElapsed, RetryOneTime, RetryNTimes, ExponentialBackoffRetry}
+import org.apache.curator.retry.RetryOneTime
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
-import com.stratio.streaming.commons.messages.{ColumnNameTypeValue, StratioStreamingMessage}
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue
 import com.stratio.streaming.kafka.KafkaConsumer
 import com.stratio.streaming.commons.constants.BUS._
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION._
@@ -27,7 +27,7 @@ import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.MANIPULATION._
 import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
 import org.apache.curator.framework.api.CuratorEventType._
 import com.stratio.streaming.commons.constants.STREAMING._
-import com.stratio.streaming.commons.exceptions.{StratioEngineConnectionException, StratioEngineOperationException, StratioAPISecurityException, StratioEngineStatusException}
+import com.stratio.streaming.commons.exceptions.{StratioEngineConnectionException, StratioEngineOperationException, StratioEngineStatusException}
 import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import java.util.List
