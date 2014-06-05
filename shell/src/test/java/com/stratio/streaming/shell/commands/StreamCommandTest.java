@@ -35,7 +35,7 @@ import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
 import com.stratio.streaming.commons.streams.StratioStream;
 import com.stratio.streaming.messaging.ColumnNameType;
 
-public class StreamCommandTests {
+public class StreamCommandTest {
 
     private static JLineShellComponent shell;
 
@@ -51,14 +51,14 @@ public class StreamCommandTests {
     }
 
     @Test
-    public void testListWith0Streams() throws StratioEngineStatusException {
+    public void listWith0StreamsTest() throws StratioEngineStatusException {
         Mockito.when(stratioStreamingApi.listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("list");
         assertEquals(true, cr.isSuccess());
     }
 
     @Test
-    public void createStream() throws StratioEngineStatusException, StratioAPISecurityException,
+    public void createStreamTest() throws StratioEngineStatusException, StratioAPISecurityException,
             StratioEngineOperationException {
         // TODO
         String streamName = "testStream";
