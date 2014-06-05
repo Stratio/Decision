@@ -12,3 +12,6 @@ lib/*.css
 *.project
 *.classpath
 *.cache
+*.iml
+*.ipr
+*.iws

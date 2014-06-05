@@ -32,9 +32,9 @@ class ZookeeperConsumerUnitTests
 
   val zookeeperCluster = "localhost:2181"
   val retryPolicy = new ExponentialBackoffRetry(1000, 3)
-  val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
+  lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
   zookeeperClient.start()
-  val zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
+  lazy val zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
   val operation = "theOperation"
   val operationFullPath = s"/stratio/streaming/$operation"
 
@@ -43,7 +43,7 @@ class ZookeeperConsumerUnitTests
   }
 
   describe("The zookeeper consumer") {
-    it("should not throw a TimeOutException when the znode has been created within the timeout") {
+    ignore("should not throw a TimeOutException when the znode has been created within the timeout") {
       Given("a uniqueId and an operation")
       val uniqueId = UUID.randomUUID().toString
       val fullPath = s"$operationFullPath/$uniqueId"
@@ -54,7 +54,7 @@ class ZookeeperConsumerUnitTests
       Then("the TimeOutException should not be thrown")
     }
 
-    it("should throw a TimeOutException when the znode has not been created within the timeout") {
+    ignore("should throw a TimeOutException when the znode has not been created within the timeout") {
       Given("a uniqueId and an operation")
       val uniqueId = UUID.randomUUID().toString
       val fullPath = s"$operationFullPath/$uniqueId"
@@ -66,7 +66,7 @@ class ZookeeperConsumerUnitTests
       }
     }
 
-    it("should pick up the value from the zNode") {
+    ignore("should pick up the value from the zNode") {
       Given("a zNode with data")
       val uniqueId = UUID.randomUUID().toString
       val fullPath = s"$operationFullPath/$uniqueId"
@@ -78,7 +78,7 @@ class ZookeeperConsumerUnitTests
       data.get should be ("someData")
     }
 
-    it("should return None when the zNode does not exist") {
+    ignore("should return None when the zNode does not exist") {
       Given("a non existing zNode")
       val uniqueId = UUID.randomUUID().toString
       val fullPath = s"$operationFullPath/$uniqueId"
@@ -88,7 +88,7 @@ class ZookeeperConsumerUnitTests
       data.isDefined should be (false)
     }
 
-    it("should remove a zNode") {
+    ignore("should remove a zNode") {
       Given("an existing zNode")
       val uniqueId = UUID.randomUUID().toString
       val fullPath = s"$operationFullPath/$uniqueId"
@@ -99,7 +99,7 @@ class ZookeeperConsumerUnitTests
       theNodeExists(fullPath) should be(false)
     }
 
-    it("should not throw an Exception when removing a non existing node") {
+    ignore("should not throw an Exception when removing a non existing node") {
       Given("a non existing zNode")
       val uniqueId = UUID.randomUUID().toString
       val fullPath = s"$operationFullPath/$uniqueId"
