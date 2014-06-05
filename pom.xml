@@ -45,6 +45,16 @@
 			</roles>
 		</developer>
 		<developer>
+			<id>ajnavarro-stratio</id>
+			<name>Antonio Jesus Navarro</name>
+			<email>ajnavarro@stratio.com</email>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+		<developer>
 			<id>eraffenne</id>
 			<name>Emmanuelle Raffenne</name>
 			<email>eraffenne@stratio.com</email>

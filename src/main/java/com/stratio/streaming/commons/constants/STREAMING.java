@@ -20,6 +20,7 @@ public interface STREAMING {
     public static final String STREAM_STATUS_MAP = "stratio_stream_map";
     public static final String INTERNAL_LISTEN_TOPIC = "stratio_listen";
     public static final String INTERNAL_SAVE2CASSANDRA_TOPIC = "stratio_save2cassandra";
+    public static final String INTERNAL_SAVE2MONGO_TOPIC = "stratio_save2mongo";
     public static final String INTERNAL_INDEXER_TOPIC = "stratio_index";
     public static final String ZK_EPHEMERAL_NODE_PATH = "/stratio/streaming/engine";
     public static final String STREAMING_KEYSPACE_NAME = "stratio_streaming";
