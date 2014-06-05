@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+	<id>app</id>
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>target/appassembler</directory>
+			<outputDirectory>streaming-${version}</outputDirectory>
+			<excludes>
+				<exclude>bin/**</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>target/appassembler/bin</directory>
+			<outputDirectory>streaming-${version}/bin</outputDirectory>
+			<includes>
+				<include>*</include>
+			</includes>
+			<fileMode>0755</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+		<fileSet>
+			<directory>src/main/resources</directory>
+			<outputDirectory>streaming-${version}</outputDirectory>
+			<excludes>
+				<exclude>*.properties</exclude>
+				<exclude>*.xml</exclude>
+				<exclude>*.conf</exclude>
+			</excludes>
+		</fileSet>
+	</fileSets>
+</assembly>
