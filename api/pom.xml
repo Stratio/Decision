@@ -164,7 +164,13 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.3.3</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>${mongo.driver}</version>
+        </dependency>
+
+    </dependencies>
 
 	<build>
 		<pluginManagement>
