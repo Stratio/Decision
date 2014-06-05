@@ -165,6 +165,20 @@ class StratioStreamingAPI
     val stopSaveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(stopSaveToCassandraMessage)
   }
+
+  def saveToMongo(streamName: String) = {
+    checkStreamingStatus()
+    val operation = SAVETO_MONGO.toLowerCase
+    val saveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    syncOperation.performSyncOperation(saveToCassandraMessage)
+  }
+
+  def stopSaveToMongo(streamName: String) = {
+    checkStreamingStatus()
+    val operation = STOP_SAVETO_MONGO.toLowerCase
+    val stopSaveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    syncOperation.performSyncOperation(stopSaveToCassandraMessage)
+  }
   
   def indexStream(streamName: String) = {
     checkStreamingStatus()

@@ -174,6 +174,20 @@ trait IStratioStreamingAPI {
   def stopSaveToCassandra(streamName: String)
 
   /**
+   * Saves the stream to MongoDB.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def saveToMongo(streamName: String)
+
+  /**
+   * Stops saving the stream to MongoDB.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def stopSaveToMongo(streamName: String)
+
+  /**
    * Allows the client to define the time that the API
    * will wait for the engine responses.
    *
