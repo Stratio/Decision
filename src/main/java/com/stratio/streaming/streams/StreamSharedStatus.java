@@ -116,32 +116,18 @@ public class StreamSharedStatus {
 
     }
 
-    public static void changeSave2CassandraStreamStatus(Boolean enabled, String streamName, SiddhiManager siddhiManager) {
+    public static void changeActionStreamStatus(Boolean enable, String streamName, SiddhiManager siddhiManager,
+            StreamAction action) {
 
         IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance()
                 .getMap(STREAMING.STREAM_STATUS_MAP);
         StreamStatusDTO streamStatusDTO = (StreamStatusDTO) streamStatusMap.get(streamName);
-        if (enabled) {
-            streamStatusDTO.enableAction(StreamAction.SAVE_TO_CASSANDRA);
+        if (enable) {
+            streamStatusDTO.enableAction(action);
         } else {
-            streamStatusDTO.disableAction(StreamAction.SAVE_TO_CASSANDRA);
+            streamStatusDTO.disableAction(action);
         }
         streamStatusMap.put(streamStatusDTO.getStreamName(), streamStatusDTO);
 
     }
-
-    public static void changeIndexerStreamStatus(Boolean enabled, String streamName, SiddhiManager siddhiManager) {
-
-        IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance()
-                .getMap(STREAMING.STREAM_STATUS_MAP);
-        StreamStatusDTO streamStatusDTO = (StreamStatusDTO) streamStatusMap.get(streamName);
-        if (enabled) {
-            streamStatusDTO.enableAction(StreamAction.INDEXED);
-        } else {
-            streamStatusDTO.disableAction(StreamAction.INDEXED);
-        }
-        streamStatusMap.put(streamStatusDTO.getStreamName(), streamStatusDTO);
-
-    }
-
 }

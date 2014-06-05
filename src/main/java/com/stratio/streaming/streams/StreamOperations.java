@@ -33,6 +33,7 @@ import com.hazelcast.core.ITopic;
 import com.stratio.streaming.callbacks.StreamToBusCallback;
 import com.stratio.streaming.callbacks.StreamToCassandraCallback;
 import com.stratio.streaming.callbacks.StreamToIndexerCallback;
+import com.stratio.streaming.callbacks.StreamToMongoCallback;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
@@ -43,7 +44,6 @@ import com.stratio.streaming.utils.SiddhiUtils;
 public class StreamOperations {
 
     private StreamOperations() {
-        // TODO Auto-generated constructor stub
     }
 
     public static void createStream(StratioStreamingMessage request, SiddhiManager siddhiManager) {
@@ -233,7 +233,8 @@ public class StreamOperations {
 
         siddhiManager.addCallback(request.getStreamName(), cassandraCallBack);
 
-        StreamSharedStatus.changeSave2CassandraStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager);
+        StreamSharedStatus.changeActionStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager,
+                StreamAction.SAVE_TO_CASSANDRA);
     }
 
     public static void stopSave2cassandraStream(StratioStreamingMessage request, SiddhiManager siddhiManager) {
@@ -241,7 +242,8 @@ public class StreamOperations {
         siddhiManager.getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_SAVE2CASSANDRA_TOPIC)
                 .publish(request.getStreamName());
 
-        StreamSharedStatus.changeSave2CassandraStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager);
+        StreamSharedStatus.changeActionStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager,
+                StreamAction.SAVE_TO_CASSANDRA);
     }
 
     public static void streamToIndexer(StratioStreamingMessage request, String elasticSearchHost,
@@ -256,13 +258,40 @@ public class StreamOperations {
 
         siddhiManager.addCallback(request.getStreamName(), streamToIndexerCallback);
 
-        StreamSharedStatus.changeIndexerStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager);
+        StreamSharedStatus.changeActionStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager,
+                StreamAction.INDEXED);
     }
 
     public static void stopStreamToIndexer(StratioStreamingMessage request, SiddhiManager siddhiManager) {
 
         siddhiManager.getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_INDEXER_TOPIC)
                 .publish(request.getStreamName());
-        StreamSharedStatus.changeIndexerStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager);
+        StreamSharedStatus.changeActionStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager,
+                StreamAction.INDEXED);
+    }
+
+    public static void save2mongoStream(StratioStreamingMessage request, String mongoCluster,
+            SiddhiManager siddhiManager) {
+
+        StreamToMongoCallback mongoCallBack = new StreamToMongoCallback(siddhiManager.getStreamDefinition(request
+                .getStreamName()), mongoCluster);
+
+        ITopic<String> save2mongoTopic = siddhiManager.getSiddhiContext().getHazelcastInstance()
+                .getTopic(STREAMING.INTERNAL_SAVE2MONGO_TOPIC);
+        save2mongoTopic.addMessageListener(mongoCallBack);
+
+        siddhiManager.addCallback(request.getStreamName(), mongoCallBack);
+
+        StreamSharedStatus.changeActionStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager,
+                StreamAction.SAVE_TO_MONGO);
+    }
+
+    public static void stopSave2mongoStream(StratioStreamingMessage request, SiddhiManager siddhiManager) {
+
+        siddhiManager.getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_SAVE2MONGO_TOPIC)
+                .publish(request.getStreamName());
+
+        StreamSharedStatus.changeActionStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager,
+                StreamAction.SAVE_TO_MONGO);
     }
 }
