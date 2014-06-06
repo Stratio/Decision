@@ -198,7 +198,8 @@ public class StreamingEngine {
                 getSiddhiManager(), zkCluster, cassandraCluster);
 
         SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(getSiddhiManager(),
-                zkCluster, "node.stratio.com", 27017, null, null);
+                zkCluster, config.getString("mongo.host"), config.getInt("mongo.port"), (String) valueOrNull(config,
+                        "mongo.username"), (String) valueOrNull(config, "mongo.password"));
 
         HostAndPort elasticSearchConnectionData = HostAndPort.fromString(elasticSearchUrl);
         IndexStreamFunction indexStreamFunction = new IndexStreamFunction(getSiddhiManager(), zkCluster,
@@ -424,5 +425,14 @@ public class StreamingEngine {
     private static Config loadConfig() throws MalformedURLException {
         Config conf = ConfigFactory.load("config");
         return conf;
+    }
+
+    // TODO refactor
+    private static Object valueOrNull(Config config, String key) {
+        if (config.hasPath(key)) {
+            return config.getAnyRef(key);
+        } else {
+            return null;
+        }
     }
 }
