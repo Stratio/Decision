@@ -23,7 +23,7 @@ import com.stratio.streaming.commons.constants.STREAMING._
 import com.stratio.streaming.commons.constants.STREAMING.STATS_NAMES._
 import com.stratio.streaming.messaging.{ColumnNameValue, ColumnNameType}
 import scala.collection.JavaConversions._
-import util.control.Breaks._
+import scala.util.control.Breaks._
 import com.stratio.streaming.api.{StratioStreamingAPIConfig, StratioStreamingAPIFactory}
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants._
@@ -32,6 +32,8 @@ import com.datastax.driver.core.querybuilder.QueryBuilder
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.client.methods.{HttpGet, HttpDelete}
 import org.apache.http.util.EntityUtils
+import com.mongodb._
+import com.stratio.streaming.zookeeper.ZookeeperConsumer
 
 
 class StratioStreamingIntegrationTests
@@ -52,7 +54,10 @@ class StratioStreamingIntegrationTests
   var elasticSearchHost = ""
   var elasticSearchPort = ""
   var cassandraHost = ""
+  var mongoHost = ""
   val internalStreamName = STREAMING.STATS_NAMES.STATS_STREAMS(0)
+  var mongoClient:MongoClient = _
+  var mongoDataBase:DB = _
 
   override def beforeAll(conf: ConfigMap) {
     if (configurationHasBeenDefinedThroughCommandLine(conf)) {
@@ -70,14 +75,18 @@ class StratioStreamingIntegrationTests
       zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
       zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
       cassandraHost = conf.get("cassandraHost").get.toString
+      mongoHost = conf.get("mongoHost").get.toString
     } else {
       //Pickup the config from stratio-streaming.conf
       elasticSearchHost = config.getString("elasticsearch.server")
       elasticSearchPort = config.getString("elasticsearch.port")
       cassandraHost = config.getString("cassandra.host")
+      mongoHost = config.getString("mongo.host")
       streamingAPI.initialize()
     }
     zookeeperClient.start()
+    mongoClient = new MongoClient(mongoHost)
+    mongoDataBase = mongoClient.getDB(STREAMING_KEYSPACE_NAME)
     checkStatusAndCleanTheEngine()
   }
 
@@ -88,7 +97,8 @@ class StratioStreamingIntegrationTests
     conf.get("kafkaPort").isDefined &&
     conf.get("elasticSearchHost").isDefined &&
     conf.get("elasticSearchPort").isDefined &&
-    conf.get("cassandraHost").isDefined
+    conf.get("cassandraHost").isDefined &&
+    conf.get("mongoHost").isDefined
   }
 
 
@@ -427,7 +437,7 @@ class StratioStreamingIntegrationTests
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
-      val storedRows = fetchStoredRowFromCassandra(cassandraStreamName)
+      val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
       cleanCassandraTable(cassandraStreamName)
       storedRows.size() should be(1)
       val storedRow = storedRows.get(0)
@@ -460,7 +470,7 @@ class StratioStreamingIntegrationTests
           fail()
         }
       }
-      val storedRows = fetchStoredRowFromCassandra(cassandraStreamName)
+      val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
       cleanCassandraTable(cassandraStreamName)
       storedRows.size() should be(1)
     }
@@ -487,9 +497,116 @@ class StratioStreamingIntegrationTests
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
-      val storedRows = fetchStoredRowFromCassandra(cassandraStreamName)
+      val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
       cleanCassandraTable(cassandraStreamName)
       storedRows.size() should be(2)
+    }
+  }
+
+  describe("The save to mongodb operation") {
+    it("should add a document to mongodb", Tag("mongodb")) {
+      val mongoDBStreamName = "mongoDBTestStream"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.BOOLEAN)
+      val thirdStreamColumn = new ColumnNameType("column3", ColumnType.FLOAT)
+      val fourthStreamColumn = new ColumnNameType("column4", ColumnType.INTEGER)
+      val fifthStreamColumn = new ColumnNameType("column5", ColumnType.DOUBLE)
+      val sixthStreamColumn = new ColumnNameType("column6", ColumnType.LONG)
+      val columnList = Seq(firstStreamColumn,
+        secondStreamColumn,
+        thirdStreamColumn,
+        fourthStreamColumn,
+        fifthStreamColumn,
+        sixthStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue")
+      val secondColumnValue = new ColumnNameValue("column2", new java.lang.Boolean(true))
+      val thirdColumnValue = new ColumnNameValue("column3", new java.lang.Float(2.0))
+      val fourthColumnValue = new ColumnNameValue("column4", new java.lang.Integer(4))
+      val fifthColumnValue = new ColumnNameValue("column5", new java.lang.Double(5))
+      val sixthColumnValue = new ColumnNameValue("column6", new java.lang.Long(600000))
+      val streamData = Seq(firstColumnValue,
+        secondColumnValue,
+        thirdColumnValue,
+        fourthColumnValue,
+        fifthColumnValue,
+        sixthColumnValue)
+      try {
+        streamingAPI.createStream(mongoDBStreamName, columnList)
+        streamingAPI.saveToMongo(mongoDBStreamName)
+        streamingAPI.insertData(mongoDBStreamName, streamData)
+        Thread.sleep(2000)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+      val storedDocuments = fetchStoredDocumentsFromMongo(mongoDBStreamName)
+      cleanMongoDBTable(mongoDBStreamName)
+      storedDocuments.count should be(1)
+      val storedDocument = storedDocuments.findOne
+      storedDocument.get("column1") should be("testValue")
+      storedDocument.get("column2") should be(java.lang.Boolean.TRUE)
+      storedDocument.get("column3") should be(2.0)
+      storedDocument.get("column4") should be(4)
+      storedDocument.get("column5") should be(5)
+      storedDocument.get("column6") should be(600000)
+    }
+
+    it("should stop adding documents to mongodb", Tag("mongodb")) {
+      val mongoDBStreamName = "mongoDBTestStream2"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue")
+      val streamData = Seq(firstColumnValue)
+      try {
+        streamingAPI.createStream(mongoDBStreamName, columnList)
+        streamingAPI.saveToMongo(mongoDBStreamName)
+        Thread.sleep(2000)
+        streamingAPI.insertData(mongoDBStreamName, streamData)
+        streamingAPI.stopSaveToMongo(mongoDBStreamName)
+        Thread.sleep(2000)
+        streamingAPI.insertData(mongoDBStreamName, streamData)
+        Thread.sleep(2000)
+      } catch {
+        case ssEx: StratioStreamingException => {
+          println(ssEx.getMessage)
+          fail()
+        }
+      }
+      val storedDocuments = fetchStoredDocumentsFromMongo(mongoDBStreamName)
+      cleanMongoDBTable(mongoDBStreamName)
+      storedDocuments.count should be(1)
+    }
+
+    it("should adding documents to mongodb after altering a stream", Tag("mongodb")) {
+      val mongoDBStreamName = "mongoDBTestStream3"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      val columnList2 = Seq(secondStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue")
+      val secondColumnValue = new ColumnNameValue("column2", "testValue2")
+      val streamData = Seq(firstColumnValue)
+      val streamData2 = Seq(firstColumnValue, secondColumnValue)
+      try {
+        streamingAPI.createStream(mongoDBStreamName, columnList)
+        streamingAPI.saveToMongo(mongoDBStreamName)
+        streamingAPI.insertData(mongoDBStreamName, streamData)
+        Thread.sleep(3000)
+        streamingAPI.alterStream(mongoDBStreamName, columnList2)
+        Thread.sleep(3000)
+        streamingAPI.insertData(mongoDBStreamName, streamData2)
+        Thread.sleep(3000)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+      val storedDocuments = fetchStoredDocumentsFromMongo(mongoDBStreamName)
+      cleanMongoDBTable(mongoDBStreamName)
+      storedDocuments.count should be(2)
+      val query = new BasicDBObject("column2", "testValue2")
+      val cursor = storedDocuments.find(query)
+      val element = cursor.next()
+      element.get("column1") should be("testValue")
+      element.get("column2") should be(java.lang.Boolean.TRUE)
+      element.get("column3") should be(2.0)
     }
   }
 
@@ -582,21 +699,30 @@ class StratioStreamingIntegrationTests
       .addContactPoint(cassandraHost)
       .build()
     val session = cluster.connect()
-    val truncateQuery = QueryBuilder.truncate(STREAMING.STREAMING_KEYSPACE_NAME, streamName)
+    val truncateQuery = QueryBuilder.truncate(STREAMING_KEYSPACE_NAME, streamName)
     session.execute(truncateQuery)
     session.close()
   }
 
-  def fetchStoredRowFromCassandra(streamName: String) = {
+  def fetchStoredRowsFromCassandra(streamName: String) = {
     val cluster = Cluster.builder()
                     .addContactPoint(cassandraHost)
                     .build()
     val session = cluster.connect()
     val selectAllQuery = QueryBuilder.select()
                   .all()
-                  .from(STREAMING.STREAMING_KEYSPACE_NAME, streamName)
+                  .from(STREAMING_KEYSPACE_NAME, streamName)
     val resultsFromCassandra = session.execute(selectAllQuery).all()
     session.close()
     resultsFromCassandra
+  }
+
+  def cleanMongoDBTable(streamName: String) = {
+    val collection = mongoDataBase.getCollection(streamName)
+    collection.drop()
+  }
+
+  def fetchStoredDocumentsFromMongo(streamName: String) = {
+    mongoDataBase.getCollection(streamName)
   }
 }
