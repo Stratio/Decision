@@ -614,8 +614,9 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The save to mongodb operation") {
-    it("should add a document to mongodb", Tag("mongodb1")) {
-      val mongoDBStreamName = "testStreamMongoDb1"
+    it("should add a document to mongodb", Tag("mongodb")) {
+      val mongoDBStreamName = "mongoDBTestStream1"
+      cleanMongoDBTable(mongoDBStreamName)
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.BOOLEAN)
       val thirdStreamColumn = new ColumnNameType("column3", ColumnType.FLOAT)
@@ -664,6 +665,7 @@ class StratioStreamingIntegrationTests
 
     it("should stop adding documents to mongodb", Tag("mongodb")) {
       val mongoDBStreamName = "mongoDBTestStream2"
+      cleanMongoDBTable(mongoDBStreamName)
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
       val firstColumnValue = new ColumnNameValue("column1", "testValue")
@@ -684,12 +686,13 @@ class StratioStreamingIntegrationTests
         }
       }
       val storedDocuments = fetchStoredDocumentsFromMongo(mongoDBStreamName)
-      cleanMongoDBTable(mongoDBStreamName)
       storedDocuments.count should be(1)
+      cleanMongoDBTable(mongoDBStreamName)
     }
 
     it("should adding documents to mongodb after altering a stream", Tag("mongodb")) {
       val mongoDBStreamName = "mongoDBTestStream3"
+      cleanMongoDBTable(mongoDBStreamName)
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
@@ -711,14 +714,35 @@ class StratioStreamingIntegrationTests
         case ssEx: StratioStreamingException => fail()
       }
       val storedDocuments = fetchStoredDocumentsFromMongo(mongoDBStreamName)
-      cleanMongoDBTable(mongoDBStreamName)
       storedDocuments.count should be(2)
       val query = new BasicDBObject("column2", "testValue2")
       val cursor = storedDocuments.find(query)
       val element = cursor.next()
       element.get("column1") should be("testValue")
-      element.get("column2") should be(java.lang.Boolean.TRUE)
-      element.get("column3") should be(2.0)
+      element.get("column2") should be("testValue2")
+      cleanMongoDBTable(mongoDBStreamName)
+    }
+
+    it("should throw a StratioEngineOperation when the save2mongo operation has been already defined", Tag("mongodb")) {
+      val mongoDBStreamName = "mongoDBTestStream4"
+      cleanMongoDBTable(mongoDBStreamName)
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue")
+      val streamData = Seq(firstColumnValue)
+      try {
+        streamingAPI.createStream(mongoDBStreamName, columnList)
+        streamingAPI.saveToMongo(mongoDBStreamName)
+        streamingAPI.insertData(mongoDBStreamName, streamData)
+        Thread.sleep(3000)
+        intercept[StratioEngineOperationException] {
+          streamingAPI.saveToMongo(mongoDBStreamName)
+        }
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      } finally {
+        cleanMongoDBTable(mongoDBStreamName)
+      }
     }
   }
 
