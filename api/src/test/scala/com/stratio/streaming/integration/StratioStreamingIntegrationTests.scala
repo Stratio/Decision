@@ -249,7 +249,7 @@ class StratioStreamingIntegrationTests
       theNumberOfQueriesOfTheStream(testStreamName) should be(1)
     }
 
-    it("should throw a StratioEngineOperationException when creating an existing query", Tag("wip")) {
+    it("should throw a StratioEngineOperationException when creating an existing query") {
       val alarmsStream = "alarms2"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
@@ -385,6 +385,29 @@ class StratioStreamingIntegrationTests
       } catch {
         case ssEx: StratioStreamingException => fail()
         case _ => assert(true)
+      } finally {
+        streamingAPI.stopListenStream(testStreamName)
+      }
+    }
+
+    it("should throw a StratioEngineOperationException when the listener already exists") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", new Integer(1))
+      val secondColumnValue = new ColumnNameValue("column2", "testValue")
+      val streamData = Seq(firstColumnValue, secondColumnValue)
+      try {
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.listenStream(testStreamName)
+        Thread.sleep(2000)
+        streamingAPI.insertData(testStreamName, streamData)
+        Thread.sleep(2000)
+        intercept [StratioEngineOperationException] {
+          streamingAPI.listenStream(testStreamName)
+        }
+      } catch {
+        case ssEx: StratioStreamingException => fail()
       } finally {
         streamingAPI.stopListenStream(testStreamName)
       }
