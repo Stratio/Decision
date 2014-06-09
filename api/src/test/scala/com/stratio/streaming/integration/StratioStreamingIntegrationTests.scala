@@ -566,6 +566,26 @@ class StratioStreamingIntegrationTests
       cleanCassandraTable(cassandraStreamName)
       storedRows.size() should be(2)
     }
+
+    it("should throw a StratioEngineOperationException when the save2cassandra operation has been already defined", Tag("cassandra")) {
+      val cassandraStreamName = "cassandrastreamtabletest4"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue")
+      val streamData = Seq(firstColumnValue)
+      try {
+        streamingAPI.createStream(cassandraStreamName, columnList)
+        streamingAPI.saveToCassandra(cassandraStreamName)
+        streamingAPI.insertData(cassandraStreamName, streamData)
+        Thread.sleep(2000)
+        intercept[StratioEngineOperationException] {
+          streamingAPI.saveToCassandra(cassandraStreamName)
+        }
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+    }
+
   }
 
   describe("The save to mongodb operation") {
