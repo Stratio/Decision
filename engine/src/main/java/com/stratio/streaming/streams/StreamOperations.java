@@ -15,6 +15,7 @@
  */
 package com.stratio.streaming.streams;
 
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -270,11 +271,11 @@ public class StreamOperations {
                 StreamAction.INDEXED);
     }
 
-    public static void save2mongoStream(StratioStreamingMessage request, String mongoCluster,
-            SiddhiManager siddhiManager) {
+    public static void save2mongoStream(StratioStreamingMessage request, String mongoHost, int mongoPort,
+            String username, String password, SiddhiManager siddhiManager) throws UnknownHostException {
 
         StreamToMongoCallback mongoCallBack = new StreamToMongoCallback(siddhiManager.getStreamDefinition(request
-                .getStreamName()), mongoCluster);
+                .getStreamName()), mongoHost, mongoPort, username, password);
 
         ITopic<String> save2mongoTopic = siddhiManager.getSiddhiContext().getHazelcastInstance()
                 .getTopic(STREAMING.INTERNAL_SAVE2MONGO_TOPIC);
