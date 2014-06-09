@@ -17,7 +17,7 @@ package com.stratio.streaming.integration
 
 import org.scalatest._
 import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioStreamingException, StratioEngineStatusException, StratioAPISecurityException}
-import org.apache.curator.retry.{RetryOneTime, ExponentialBackoffRetry}
+import org.apache.curator.retry.RetryOneTime
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import com.stratio.streaming.commons.constants.STREAMING._
 import com.stratio.streaming.commons.constants.STREAMING.STATS_NAMES._
@@ -25,7 +25,6 @@ import com.stratio.streaming.messaging.{ColumnNameValue, ColumnNameType}
 import scala.collection.JavaConversions._
 import scala.util.control.Breaks._
 import com.stratio.streaming.api.{StratioStreamingAPIConfig, StratioStreamingAPIFactory}
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants._
 import com.datastax.driver.core.{Session, Cluster}
 import com.datastax.driver.core.querybuilder.QueryBuilder
@@ -793,7 +792,11 @@ class StratioStreamingIntegrationTests
   }
 
   def cleanStratioStreamingEngine() {
-    userDefinedStreams.foreach(stream => streamingAPI.dropStream(stream.getStreamName))
+    try {
+      userDefinedStreams.foreach(stream => streamingAPI.dropStream(stream.getStreamName))
+    } catch {
+      case ex: StratioEngineOperationException => //Avoid non-existing streams problems
+    }
   }
 
   def cleanElasticSearchIndexes() {
