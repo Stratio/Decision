@@ -249,6 +249,34 @@ class StratioStreamingIntegrationTests
       theNumberOfQueriesOfTheStream(testStreamName) should be(1)
     }
 
+    it("should throw a StratioEngineOperationException when creating an existing query", Tag("wip")) {
+      val alarmsStream = "alarms2"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val thirdStreamColumn = new ColumnNameType("column3", ColumnType.BOOLEAN)
+      val fourthStreamColumn = new ColumnNameType("column4", ColumnType.DOUBLE)
+      val fifthStreamColumn = new ColumnNameType("column5", ColumnType.FLOAT)
+      val sixthStreamColumn = new ColumnNameType("column6", ColumnType.LONG)
+      val columnList = Seq(firstStreamColumn,
+        secondStreamColumn,
+        thirdStreamColumn,
+        fourthStreamColumn,
+        fifthStreamColumn,
+        sixthStreamColumn)
+      val theFirstQuery = s"from $testStreamName select column1, column2, column3, column4, column5, column6 insert into $alarmsStream for current-events"
+      try {
+        streamingAPI.createStream(alarmsStream, columnList)
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.addQuery(testStreamName, theFirstQuery)
+        Thread.sleep(2000)
+        intercept[StratioEngineOperationException] {
+          streamingAPI.addQuery(testStreamName, theFirstQuery)
+        }
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+    }
+
     it("should throw a StratioEngineOperationException when creating a wrong query") {
       val alarmsStream = "alarms"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
