@@ -39,6 +39,7 @@ import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.utils.SiddhiUtils;
@@ -66,7 +67,7 @@ public class StreamToMongoCallback extends StreamCallback implements MessageList
                     username, password);
             mongoClient = new MongoClient(adresses);
         }
-        streamingDb = mongoClient.getDB("stratiostreaming");
+        streamingDb = mongoClient.getDB(STREAMING.STREAMING_KEYSPACE_NAME);
     }
 
     @Override
@@ -108,8 +109,10 @@ public class StreamToMongoCallback extends StreamCallback implements MessageList
             BulkWriteOperation bulkInsertOperation = elementsToInsert.get(event.getStreamName());
 
             if (bulkInsertOperation == null) {
-                bulkInsertOperation = elementsToInsert.put(event.getStreamName(),
-                        streamingDb.getCollection(event.getStreamName()).initializeUnorderedBulkOperation());
+                bulkInsertOperation = streamingDb.getCollection(event.getStreamName())
+                        .initializeUnorderedBulkOperation();
+
+                elementsToInsert.put(event.getStreamName(), bulkInsertOperation);
                 streamingDb.getCollection(event.getStreamName()).createIndex(new BasicDBObject("timestamp", -1));
             }
             bulkInsertOperation.insert(object);
