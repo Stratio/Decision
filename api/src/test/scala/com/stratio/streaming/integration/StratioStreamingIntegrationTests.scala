@@ -17,8 +17,8 @@ package com.stratio.streaming.integration
 
 import org.scalatest._
 import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioStreamingException, StratioEngineStatusException, StratioAPISecurityException}
-import org.apache.curator.retry.ExponentialBackoffRetry
-import org.apache.curator.framework.CuratorFrameworkFactory
+import org.apache.curator.retry.{RetryOneTime, ExponentialBackoffRetry}
+import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import com.stratio.streaming.commons.constants.STREAMING._
 import com.stratio.streaming.commons.constants.STREAMING.STATS_NAMES._
 import com.stratio.streaming.messaging.{ColumnNameValue, ColumnNameType}
@@ -43,10 +43,10 @@ class StratioStreamingIntegrationTests
   with BeforeAndAfterEach
   with BeforeAndAfterAll {
 
-  var zookeeperCluster = "localhost:2181"
-  val retryPolicy = new ExponentialBackoffRetry(1000, 3)
-  var zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
-  var zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
+  var zookeeperCluster: String = _
+  val retryPolicy = new RetryOneTime(500)
+  var zookeeperClient: CuratorFramework = _ //CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
+  var zookeeperConsumer: ZookeeperConsumer = _ //new ZookeeperConsumer(zookeeperClient)
   var streamingAPI = StratioStreamingAPIFactory.create()
   val testStreamName = "unitTestsStream"
   val internalTestStreamName = "stratio_"
@@ -78,6 +78,9 @@ class StratioStreamingIntegrationTests
       mongoHost = conf.get("mongoHost").get.toString
     } else {
       //Pickup the config from stratio-streaming.conf
+      zookeeperCluster = config.getString("zookeeper.server")+":"+config.getString("zookeeper.port")
+      zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
+      zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
       elasticSearchHost = config.getString("elasticsearch.server")
       elasticSearchPort = config.getString("elasticsearch.port")
       cassandraHost = config.getString("cassandra.host")
@@ -504,8 +507,8 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The save to mongodb operation") {
-    it("should add a document to mongodb", Tag("mongodb")) {
-      val mongoDBStreamName = "mongoDBTestStream"
+    it("should add a document to mongodb", Tag("mongodb1")) {
+      val mongoDBStreamName = "testStreamMongoDb1"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.BOOLEAN)
       val thirdStreamColumn = new ColumnNameType("column3", ColumnType.FLOAT)
@@ -530,11 +533,13 @@ class StratioStreamingIntegrationTests
         fourthColumnValue,
         fifthColumnValue,
         sixthColumnValue)
+
       try {
         streamingAPI.createStream(mongoDBStreamName, columnList)
         streamingAPI.saveToMongo(mongoDBStreamName)
+        Thread.sleep(3000)
         streamingAPI.insertData(mongoDBStreamName, streamData)
-        Thread.sleep(2000)
+        Thread.sleep(3000)
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
