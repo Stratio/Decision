@@ -437,7 +437,7 @@ class StratioStreamingIntegrationTests
   describe("The index operation") {
     it("should index the stream to elasticsearch and stop indexing", Tag("index")) {
       cleanElasticSearchIndexes()
-      val indexedStreamName = "testindexedstream"
+      val indexedStreamName = "testindexedstream1"
       val indexedData1 = "testValue1"
       val indexedData2 = "testValue2"
       val indexedData3 = "testValue3"
@@ -461,6 +461,31 @@ class StratioStreamingIntegrationTests
         Thread.sleep(10000)
         theStreamContainsTheData(indexedData2) should be(true)
         theStreamContainsTheData(indexedData3) should be(false)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+    }
+
+    it("should throw a StratioEngineOperationException when the index operation has been already defined", Tag("index")) {
+      cleanElasticSearchIndexes()
+      val indexedStreamName = "testindexedstream2"
+      val indexedData1 = "testValue1"
+      val indexedData2 = "testValue2"
+      val indexedData3 = "testValue3"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      val columnDataIndexed1 = new ColumnNameValue("column1", indexedData1)
+      val columnDataIndexed2 = new ColumnNameValue("column1", indexedData2)
+      val columnDataNotIndexed = new ColumnNameValue("column1", indexedData3)
+      val streamDataIndexed1 = Seq(columnDataIndexed1)
+      try {
+        streamingAPI.createStream(indexedStreamName, columnList)
+        streamingAPI.indexStream(indexedStreamName)
+        streamingAPI.insertData(indexedStreamName, streamDataIndexed1)
+        Thread.sleep(10000)
+        intercept[StratioEngineOperationException] {
+          streamingAPI.indexStream(indexedStreamName)
+        }
       } catch {
         case ssEx: StratioStreamingException => fail()
       }
@@ -626,7 +651,6 @@ class StratioStreamingIntegrationTests
         case ssEx: StratioStreamingException => fail()
       }
       val storedDocuments = fetchStoredDocumentsFromMongo(mongoDBStreamName)
-      cleanMongoDBTable(mongoDBStreamName)
       storedDocuments.count should be(1)
       val storedDocument = storedDocuments.findOne
       storedDocument.get("column1") should be("testValue")
@@ -635,6 +659,7 @@ class StratioStreamingIntegrationTests
       storedDocument.get("column4") should be(4)
       storedDocument.get("column5") should be(5)
       storedDocument.get("column6") should be(600000)
+      cleanMongoDBTable(mongoDBStreamName)
     }
 
     it("should stop adding documents to mongodb", Tag("mongodb")) {
