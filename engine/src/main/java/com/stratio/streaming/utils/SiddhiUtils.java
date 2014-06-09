@@ -15,6 +15,7 @@
  */
 package com.stratio.streaming.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +40,7 @@ import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import com.stratio.streaming.extensions.DistinctWindowExtension;
 import com.stratio.streaming.streams.Casandra2PersistenceStore;
 import com.stratio.streaming.streams.StreamPersistence;
 
@@ -142,6 +144,11 @@ public class SiddhiUtils {
         conf.setInstanceIdentifier("StratioStreamingCEP-Instance-" + UUID.randomUUID().toString());
         conf.setQueryPlanIdentifier(QUERY_PLAN_IDENTIFIER);
         conf.setDistributedProcessing(false);
+
+        @SuppressWarnings("rawtypes")
+        List<Class> extensions = new ArrayList<>();
+        extensions.add(DistinctWindowExtension.class);
+        conf.setSiddhiExtensions(extensions);
 
         // Create Siddhi Manager
         SiddhiManager siddhiManager = new SiddhiManager(conf);
