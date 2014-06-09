@@ -343,6 +343,25 @@ class StratioStreamingIntegrationTests
       theNumberOfUserDefinedStreams should be(0)
     }
 
+    it("should remove the streams created automatically after adding a query") {
+      val alarmsStream = "alarms"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val columnList = Seq(firstStreamColumn)
+      val theFirstQuery = s"from $testStreamName select column1 insert into $alarmsStream for current-events"
+      try {
+        //It should also create the alarms stream
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.addQuery(testStreamName, theFirstQuery)
+        Thread.sleep(2000)
+        theNumberOfUserDefinedStreams() should be(2)
+        streamingAPI.dropStream(testStreamName)
+        Thread.sleep(2000)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+      theNumberOfUserDefinedStreams() should be(0)
+    }
+
     it("should throw a StratioEngineOperationException when removing a stream that does not exist") {
       val nonExistingStream = "nonExistingStream"
       intercept [StratioEngineOperationException] {
