@@ -56,6 +56,8 @@ public class StreamListRenderer implements Renderer<List<StratioStream>> {
             row.put(ACTIVE_ACTIONS, stratioStream.getActiveActions().toString());
 
             queryTables.append(renderQueriesTable(stratioStream.getQueries(), stratioStream.getStreamName()));
+
+            data.add(row);
         }
 
         StringBuilder result = new StringBuilder();

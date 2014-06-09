@@ -21,10 +21,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.shell.Bootstrap;
@@ -34,6 +35,7 @@ import org.springframework.util.FileCopyUtils;
 
 import com.stratio.streaming.api.IStratioStreamingAPI;
 import com.stratio.streaming.commons.constants.ColumnType;
+import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
 import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
 import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
@@ -65,10 +67,8 @@ public class StreamCommandTest {
     }
 
     @Test
-    @Ignore
-    public void createStreamTest() throws StratioEngineStatusException, StratioAPISecurityException,
-            StratioEngineOperationException {
-        // TODO
+    public void listWithOneStreamTest() throws StratioEngineStatusException, StratioAPISecurityException,
+            StratioEngineOperationException, IOException {
         String streamName = "testStream";
         List<ColumnNameTypeValue> values = new ArrayList<>();
         values.add(new ColumnNameTypeValue("column1", ColumnType.STRING, null));
@@ -76,14 +76,41 @@ public class StreamCommandTest {
         values.add(new ColumnNameTypeValue("column3", ColumnType.BOOLEAN, null));
 
         List<StratioStream> streams = new ArrayList<>();
-        StratioStream stream = new StratioStream(streamName, values, new ArrayList<StreamQuery>(), null, true);
+        StratioStream stream = new StratioStream(streamName, values, new ArrayList<StreamQuery>(),
+                new HashSet<StreamAction>(), true);
         streams.add(stream);
 
         Mockito.when(stratioStreamingApi.listStreams()).thenReturn(streams);
 
         CommandResult cr = shell.executeCommand("list");
-        System.out.println(cr.getResult());
         assertEquals(true, cr.isSuccess());
+        assertEquals(getListResultFromName("listWithOneStream"), cr.getResult());
+    }
+
+    @Test
+    public void listWithOneStreamOneQueryOneActionTest() throws StratioEngineStatusException,
+            StratioAPISecurityException, StratioEngineOperationException, IOException {
+        String streamName = "testStream";
+        List<ColumnNameTypeValue> values = new ArrayList<>();
+        values.add(new ColumnNameTypeValue("column1", ColumnType.STRING, null));
+        values.add(new ColumnNameTypeValue("column2", ColumnType.INTEGER, null));
+        values.add(new ColumnNameTypeValue("column3", ColumnType.BOOLEAN, null));
+
+        List<StreamQuery> querys = new ArrayList<>();
+        querys.add(new StreamQuery("queryIdTest", "query raw test string"));
+
+        Set<StreamAction> activeActions = new HashSet<>();
+        activeActions.add(StreamAction.INDEXED);
+
+        List<StratioStream> streams = new ArrayList<>();
+        StratioStream stream = new StratioStream(streamName, values, querys, activeActions, true);
+        streams.add(stream);
+
+        Mockito.when(stratioStreamingApi.listStreams()).thenReturn(streams);
+
+        CommandResult cr = shell.executeCommand("list");
+        assertEquals(true, cr.isSuccess());
+        assertEquals(getListResultFromName("listWithOneStreamOneQueryOneAction"), cr.getResult());
     }
 
     private String getListResultFromName(String filename) throws IOException {
