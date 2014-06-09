@@ -1,0 +1,4 @@
+  Stream name  User defined  Queries  Elements  Active actions
+  -----------  ------------  -------  --------  --------------
+  testStream   true          0        3         []
+

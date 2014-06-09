@@ -34,11 +34,13 @@ public class StreamListRenderer implements Renderer<List<StratioStream>> {
     private static final String USER_DEFINED = "User defined";
     private static final String QUERIES = "Queries";
     private static final String ELEMENTS = "Elements";
+    private static final String ACTIVE_ACTIONS = "Active actions";
 
     private static final String ID = "Id";
     private static final String QUERY_RAW = "Query raw";
 
-    private final static List<String> columns = Arrays.asList(STREAM_NAME, USER_DEFINED, QUERIES, ELEMENTS);
+    private final static List<String> columns = Arrays.asList(STREAM_NAME, USER_DEFINED, QUERIES, ELEMENTS,
+            ACTIVE_ACTIONS);
     private final static List<String> queryColumns = Arrays.asList(ID, QUERY_RAW);
 
     @Override
@@ -51,9 +53,11 @@ public class StreamListRenderer implements Renderer<List<StratioStream>> {
             row.put(USER_DEFINED, stratioStream.getUserDefined());
             row.put(QUERIES, stratioStream.getQueries().size());
             row.put(ELEMENTS, stratioStream.getColumns().size());
-            data.add(row);
+            row.put(ACTIVE_ACTIONS, stratioStream.getActiveActions().toString());
 
             queryTables.append(renderQueriesTable(stratioStream.getQueries(), stratioStream.getStreamName()));
+
+            data.add(row);
         }
 
         StringBuilder result = new StringBuilder();
