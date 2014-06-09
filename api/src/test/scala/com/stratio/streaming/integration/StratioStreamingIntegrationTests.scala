@@ -27,7 +27,7 @@ import scala.util.control.Breaks._
 import com.stratio.streaming.api.{StratioStreamingAPIConfig, StratioStreamingAPIFactory}
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants._
-import com.datastax.driver.core.Cluster
+import com.datastax.driver.core.{Session, Cluster}
 import com.datastax.driver.core.querybuilder.QueryBuilder
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.client.methods.{HttpGet, HttpDelete}
@@ -45,8 +45,8 @@ class StratioStreamingIntegrationTests
 
   var zookeeperCluster: String = _
   val retryPolicy = new RetryOneTime(500)
-  var zookeeperClient: CuratorFramework = _ //CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
-  var zookeeperConsumer: ZookeeperConsumer = _ //new ZookeeperConsumer(zookeeperClient)
+  var zookeeperClient: CuratorFramework = _
+  var zookeeperConsumer: ZookeeperConsumer = _
   var streamingAPI = StratioStreamingAPIFactory.create()
   val testStreamName = "unitTestsStream"
   val internalTestStreamName = "stratio_"
@@ -58,6 +58,8 @@ class StratioStreamingIntegrationTests
   val internalStreamName = STREAMING.STATS_NAMES.STATS_STREAMS(0)
   var mongoClient:MongoClient = _
   var mongoDataBase:DB = _
+  var cassandraCluster: Cluster = _
+  var cassandraSession: Session = _
 
   override def beforeAll(conf: ConfigMap) {
     if (configurationHasBeenDefinedThroughCommandLine(conf)) {
@@ -88,9 +90,18 @@ class StratioStreamingIntegrationTests
       streamingAPI.initialize()
     }
     zookeeperClient.start()
+    cassandraCluster = Cluster.builder()
+      .addContactPoint(cassandraHost)
+      .build()
+    cassandraSession = cassandraCluster.connect()
     mongoClient = new MongoClient(mongoHost)
     mongoDataBase = mongoClient.getDB(STREAMING_KEYSPACE_NAME)
     checkStatusAndCleanTheEngine()
+  }
+
+  override def afterAll() {
+    cassandraSession.close()
+    mongoClient.close()
   }
 
   def configurationHasBeenDefinedThroughCommandLine(conf: ConfigMap) = {
@@ -238,6 +249,34 @@ class StratioStreamingIntegrationTests
       theNumberOfQueriesOfTheStream(testStreamName) should be(1)
     }
 
+    it("should throw a StratioEngineOperationException when creating an existing query") {
+      val alarmsStream = "alarms2"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val thirdStreamColumn = new ColumnNameType("column3", ColumnType.BOOLEAN)
+      val fourthStreamColumn = new ColumnNameType("column4", ColumnType.DOUBLE)
+      val fifthStreamColumn = new ColumnNameType("column5", ColumnType.FLOAT)
+      val sixthStreamColumn = new ColumnNameType("column6", ColumnType.LONG)
+      val columnList = Seq(firstStreamColumn,
+        secondStreamColumn,
+        thirdStreamColumn,
+        fourthStreamColumn,
+        fifthStreamColumn,
+        sixthStreamColumn)
+      val theFirstQuery = s"from $testStreamName select column1, column2, column3, column4, column5, column6 insert into $alarmsStream for current-events"
+      try {
+        streamingAPI.createStream(alarmsStream, columnList)
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.addQuery(testStreamName, theFirstQuery)
+        Thread.sleep(2000)
+        intercept[StratioEngineOperationException] {
+          streamingAPI.addQuery(testStreamName, theFirstQuery)
+        }
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+    }
+
     it("should throw a StratioEngineOperationException when creating a wrong query") {
       val alarmsStream = "alarms"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
@@ -346,6 +385,29 @@ class StratioStreamingIntegrationTests
       } catch {
         case ssEx: StratioStreamingException => fail()
         case _ => assert(true)
+      } finally {
+        streamingAPI.stopListenStream(testStreamName)
+      }
+    }
+
+    it("should throw a StratioEngineOperationException when the listener already exists") {
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn, secondStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", new Integer(1))
+      val secondColumnValue = new ColumnNameValue("column2", "testValue")
+      val streamData = Seq(firstColumnValue, secondColumnValue)
+      try {
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.listenStream(testStreamName)
+        Thread.sleep(2000)
+        streamingAPI.insertData(testStreamName, streamData)
+        Thread.sleep(2000)
+        intercept [StratioEngineOperationException] {
+          streamingAPI.listenStream(testStreamName)
+        }
+      } catch {
+        case ssEx: StratioStreamingException => fail()
       } finally {
         streamingAPI.stopListenStream(testStreamName)
       }
@@ -478,7 +540,7 @@ class StratioStreamingIntegrationTests
       storedRows.size() should be(1)
     }
 
-    it("should adding rows to cassandra after altering a stream", Tag("cassandra3")) {
+    it("should adding rows to cassandra after altering a stream", Tag("cassandra")) {
       val cassandraStreamName = "cassandrastreamtabletest3"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
@@ -504,6 +566,26 @@ class StratioStreamingIntegrationTests
       cleanCassandraTable(cassandraStreamName)
       storedRows.size() should be(2)
     }
+
+    it("should throw a StratioEngineOperationException when the save2cassandra operation has been already defined", Tag("cassandra")) {
+      val cassandraStreamName = "cassandrastreamtabletest4"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue")
+      val streamData = Seq(firstColumnValue)
+      try {
+        streamingAPI.createStream(cassandraStreamName, columnList)
+        streamingAPI.saveToCassandra(cassandraStreamName)
+        streamingAPI.insertData(cassandraStreamName, streamData)
+        Thread.sleep(2000)
+        intercept[StratioEngineOperationException] {
+          streamingAPI.saveToCassandra(cassandraStreamName)
+        }
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+    }
+
   }
 
   describe("The save to mongodb operation") {
@@ -700,25 +782,15 @@ class StratioStreamingIntegrationTests
   }
 
   def cleanCassandraTable(streamName: String) = {
-    val cluster = Cluster.builder()
-      .addContactPoint(cassandraHost)
-      .build()
-    val session = cluster.connect()
     val truncateQuery = QueryBuilder.truncate(STREAMING_KEYSPACE_NAME, streamName)
-    session.execute(truncateQuery)
-    session.close()
+    cassandraSession.execute(truncateQuery)
   }
 
   def fetchStoredRowsFromCassandra(streamName: String) = {
-    val cluster = Cluster.builder()
-                    .addContactPoint(cassandraHost)
-                    .build()
-    val session = cluster.connect()
     val selectAllQuery = QueryBuilder.select()
                   .all()
                   .from(STREAMING_KEYSPACE_NAME, streamName)
-    val resultsFromCassandra = session.execute(selectAllQuery).all()
-    session.close()
+    val resultsFromCassandra = cassandraSession.execute(selectAllQuery).all()
     resultsFromCassandra
   }
 
