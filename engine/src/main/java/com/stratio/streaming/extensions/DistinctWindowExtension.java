@@ -73,14 +73,20 @@ public class DistinctWindowExtension extends WindowProcessor {
      * This method used to return the current state of the window, Used for persistence of data
      */
     protected Object[] currentState() {
-        return null;
+        return new Object[] { variable, constants, lastObjectHash };
     }
 
-    @Override
     /**
      * This method is used to restore from the persisted state
      */
+    @Override
+    @SuppressWarnings("unchecked")
     protected void restoreState(Object[] objects) {
+        if (objects != null && objects.length != 0) {
+            variable = (Variable) objects[0];
+            constants = (List<Variable>) objects[1];
+            lastObjectHash = (Map<String, Object>) objects[2];
+        }
     }
 
     @Override
@@ -122,5 +128,8 @@ public class DistinctWindowExtension extends WindowProcessor {
 
     @Override
     public void destroy() {
+        variable = null;
+        constants = null;
+        lastObjectHash = null;
     }
 }
