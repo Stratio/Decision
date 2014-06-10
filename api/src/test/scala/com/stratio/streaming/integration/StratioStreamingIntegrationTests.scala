@@ -33,6 +33,7 @@ import org.apache.http.client.methods.{HttpGet, HttpDelete}
 import org.apache.http.util.EntityUtils
 import com.mongodb._
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.commons.streams.StratioStream
 
 
 class StratioStreamingIntegrationTests
@@ -100,6 +101,7 @@ class StratioStreamingIntegrationTests
 
   override def afterAll() {
     cassandraSession.close()
+    mongoDataBase.dropDatabase()
     mongoClient.close()
   }
 
@@ -374,6 +376,25 @@ class StratioStreamingIntegrationTests
         streamingAPI.dropStream(STREAMING.STATS_NAMES.STATS_STREAMS(1))
       }
     }
+
+    it("should throw a StratioAPISecurityException when removing a stream automatically created after adding a query", Tag("wip")) {
+      val alarmsStream = "alarms3"
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
+      val columnList = Seq(firstStreamColumn)
+      val theFirstQuery = s"from $testStreamName select column1 insert into $alarmsStream for current-events"
+      try {
+        //It should also create the alarms stream
+        streamingAPI.createStream(testStreamName, columnList)
+        streamingAPI.addQuery(testStreamName, theFirstQuery)
+        Thread.sleep(2000)
+        streamingAPI.dropStream(alarmsStream)
+        intercept[StratioAPISecurityException] {
+          streamingAPI.dropStream(alarmsStream)
+        }
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      }
+    }
   }
 
   describe("The listen operation") {
@@ -520,11 +541,11 @@ class StratioStreamingIntegrationTests
       val fifthStreamColumn = new ColumnNameType("column5", ColumnType.DOUBLE)
       val sixthStreamColumn = new ColumnNameType("column6", ColumnType.LONG)
       val columnList = Seq(firstStreamColumn,
-        secondStreamColumn,
-        thirdStreamColumn,
-        fourthStreamColumn,
-        fifthStreamColumn,
-        sixthStreamColumn)
+          secondStreamColumn,
+          thirdStreamColumn,
+          fourthStreamColumn,
+          fifthStreamColumn,
+          sixthStreamColumn)
       val firstColumnValue = new ColumnNameValue("column1", "testValue")
       val secondColumnValue = new ColumnNameValue("column2", new java.lang.Boolean(true))
       val thirdColumnValue = new ColumnNameValue("column3", new java.lang.Float(2.0))
@@ -532,29 +553,30 @@ class StratioStreamingIntegrationTests
       val fifthColumnValue = new ColumnNameValue("column5", new java.lang.Double(5))
       val sixthColumnValue = new ColumnNameValue("column6", new java.lang.Long(600000))
       val streamData = Seq(firstColumnValue,
-        secondColumnValue,
-        thirdColumnValue,
-        fourthColumnValue,
-        fifthColumnValue,
-        sixthColumnValue)
+          secondColumnValue,
+          thirdColumnValue,
+          fourthColumnValue,
+          fifthColumnValue,
+          sixthColumnValue)
       try {
         streamingAPI.createStream(cassandraStreamName, columnList)
         streamingAPI.saveToCassandra(cassandraStreamName)
         streamingAPI.insertData(cassandraStreamName, streamData)
         Thread.sleep(2000)
+        val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
+        storedRows.size() should be(1)
+        val storedRow = storedRows.get(0)
+        storedRow.getString("column1") should be("testValue")
+        storedRow.getBool("column2") should be(java.lang.Boolean.TRUE)
+        storedRow.getFloat("column3") should be(2.0)
+        storedRow.getInt("column4") should be(4)
+        storedRow.getDouble("column5") should be(5)
+        storedRow.getDouble("column6") should be(600000)
       } catch {
         case ssEx: StratioStreamingException => fail()
+      } finally {
+        cleanCassandraTable(cassandraStreamName)
       }
-      val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
-      cleanCassandraTable(cassandraStreamName)
-      storedRows.size() should be(1)
-      val storedRow = storedRows.get(0)
-      storedRow.getString("column1") should be("testValue")
-      storedRow.getBool("column2") should be(java.lang.Boolean.TRUE)
-      storedRow.getFloat("column3") should be(2.0)
-      storedRow.getInt("column4") should be(4)
-      storedRow.getDouble("column5") should be(5)
-      storedRow.getDouble("column6") should be(600000)
     }
 
     it("should stop adding rows to cassandra", Tag("cassandra")) {
@@ -572,15 +594,16 @@ class StratioStreamingIntegrationTests
         Thread.sleep(2000)
         streamingAPI.insertData(cassandraStreamName, streamData)
         Thread.sleep(2000)
+        val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
+        storedRows.size() should be(1)
       } catch {
         case ssEx: StratioStreamingException => {
           println(ssEx.getMessage)
           fail()
         }
-      }
-      val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
-      cleanCassandraTable(cassandraStreamName)
-      storedRows.size() should be(1)
+        } finally {
+        cleanCassandraTable(cassandraStreamName)
+        }
     }
 
     it("should adding rows to cassandra after altering a stream", Tag("cassandra")) {
@@ -602,12 +625,13 @@ class StratioStreamingIntegrationTests
         Thread.sleep(3000)
         streamingAPI.insertData(cassandraStreamName, streamData2)
         Thread.sleep(3000)
+        val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
+        storedRows.size() should be(2)
       } catch {
         case ssEx: StratioStreamingException => fail()
+      } finally {
+        cleanCassandraTable(cassandraStreamName)
       }
-      val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
-      cleanCassandraTable(cassandraStreamName)
-      storedRows.size() should be(2)
     }
 
     it("should throw a StratioEngineOperationException when the save2cassandra operation has been already defined", Tag("cassandra")) {
@@ -626,15 +650,38 @@ class StratioStreamingIntegrationTests
         }
       } catch {
         case ssEx: StratioStreamingException => fail()
+      } finally {
+        cleanCassandraTable(cassandraStreamName)
       }
     }
 
+    it("should insert data when the save2cassandra operation is defined over an existing table", Tag("cassandra")) {
+      val cassandraStreamName = "cassandrastreamtabletest5"
+      cassandraSession.execute(
+        "CREATE TABLE IF NOT EXISTS " + STREAMING.STREAMING_KEYSPACE_NAME + "." + cassandraStreamName +
+          "(time_taken timeuuid PRIMARY KEY, column1 text) WITH compression = {'sstable_compression': ''}")
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue")
+      val streamData = Seq(firstColumnValue)
+      try {
+        streamingAPI.createStream(cassandraStreamName, columnList)
+        streamingAPI.saveToCassandra(cassandraStreamName)
+        streamingAPI.insertData(cassandraStreamName, streamData)
+        Thread.sleep(3000)
+        val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
+        storedRows.size() should be(1)
+      } catch {
+        case ssEx: StratioStreamingException => fail()
+      } finally {
+        cleanCassandraTable(cassandraStreamName)
+      }
+    }
   }
 
   describe("The save to mongodb operation") {
     it("should add a document to mongodb", Tag("mongodb")) {
       val mongoDBStreamName = "mongoDBTestStream1"
-      cleanMongoDBTable(mongoDBStreamName)
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.BOOLEAN)
       val thirdStreamColumn = new ColumnNameType("column3", ColumnType.FLOAT)
@@ -678,12 +725,10 @@ class StratioStreamingIntegrationTests
       storedDocument.get("column4") should be(4)
       storedDocument.get("column5") should be(5)
       storedDocument.get("column6") should be(600000)
-      cleanMongoDBTable(mongoDBStreamName)
     }
 
     it("should stop adding documents to mongodb", Tag("mongodb")) {
       val mongoDBStreamName = "mongoDBTestStream2"
-      cleanMongoDBTable(mongoDBStreamName)
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
       val firstColumnValue = new ColumnNameValue("column1", "testValue")
@@ -705,12 +750,10 @@ class StratioStreamingIntegrationTests
       }
       val storedDocuments = fetchStoredDocumentsFromMongo(mongoDBStreamName)
       storedDocuments.count should be(1)
-      cleanMongoDBTable(mongoDBStreamName)
     }
 
     it("should adding documents to mongodb after altering a stream", Tag("mongodb")) {
       val mongoDBStreamName = "mongoDBTestStream3"
-      cleanMongoDBTable(mongoDBStreamName)
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
@@ -738,12 +781,10 @@ class StratioStreamingIntegrationTests
       val element = cursor.next()
       element.get("column1") should be("testValue")
       element.get("column2") should be("testValue2")
-      cleanMongoDBTable(mongoDBStreamName)
     }
 
     it("should throw a StratioEngineOperation when the save2mongo operation has been already defined", Tag("mongodb")) {
       val mongoDBStreamName = "mongoDBTestStream4"
-      cleanMongoDBTable(mongoDBStreamName)
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn)
       val firstColumnValue = new ColumnNameValue("column1", "testValue")
@@ -758,8 +799,27 @@ class StratioStreamingIntegrationTests
         }
       } catch {
         case ssEx: StratioStreamingException => fail()
-      } finally {
-        cleanMongoDBTable(mongoDBStreamName)
+      }
+    }
+
+    it("should insert data when the save2cassandra operation is defined over an existing collection", Tag("mongodb")) {
+      val mongoDBStreamName = "mongoDBTestStream5"
+      val dbObject = new BasicDBObject("capped", true).append("size", 512)
+      mongoDataBase.createCollection(mongoDBStreamName, dbObject)
+      val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
+      val columnList = Seq(firstStreamColumn)
+      val firstColumnValue = new ColumnNameValue("column1", "testValue222222")
+      val streamData = Seq(firstColumnValue)
+      try {
+        streamingAPI.createStream(mongoDBStreamName, columnList)
+        streamingAPI.saveToMongo(mongoDBStreamName)
+        streamingAPI.insertData(mongoDBStreamName, streamData)
+        Thread.sleep(3000)
+        val storedDocuments = fetchStoredDocumentsFromMongo(mongoDBStreamName)
+        storedDocuments.count should be(1)
+      } catch {
+        case sEOE: StratioEngineOperationException => println(sEOE.getMessage)
+        case ssEx: StratioStreamingException => fail()
       }
     }
   }
@@ -782,7 +842,7 @@ class StratioStreamingIntegrationTests
         streamingAPI.stopIndexStream(testStreamName)
         streamingAPI.stopSaveToCassandra(testStreamName)
         Thread.sleep(3000)
-        val streamDisabledInfo = streamingAPI.listStreams().get(0)
+        val streamDisabledInfo: StratioStream = streamingAPI.listStreams().get(0)
         streamDisabledInfo.getActiveActions should not contain(StreamAction.LISTEN)
         streamDisabledInfo.getActiveActions should not contain(StreamAction.SAVE_TO_CASSANDRA)
         streamDisabledInfo.getActiveActions should not contain(StreamAction.INDEXED)
@@ -853,8 +913,7 @@ class StratioStreamingIntegrationTests
   }
 
   def cleanCassandraTable(streamName: String) = {
-    val truncateQuery = QueryBuilder.truncate(STREAMING_KEYSPACE_NAME, streamName)
-    cassandraSession.execute(truncateQuery)
+    cassandraSession.execute("DROP TABLE IF EXISTS "+ STREAMING_KEYSPACE_NAME +"."+streamName +";")
   }
 
   def fetchStoredRowsFromCassandra(streamName: String) = {
@@ -863,11 +922,6 @@ class StratioStreamingIntegrationTests
                   .from(STREAMING_KEYSPACE_NAME, streamName)
     val resultsFromCassandra = cassandraSession.execute(selectAllQuery).all()
     resultsFromCassandra
-  }
-
-  def cleanMongoDBTable(streamName: String) = {
-    val collection = mongoDataBase.getCollection(streamName)
-    collection.drop()
   }
 
   def fetchStoredDocumentsFromMongo(streamName: String) = {
