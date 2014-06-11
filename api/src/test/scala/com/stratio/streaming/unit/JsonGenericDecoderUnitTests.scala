@@ -24,7 +24,7 @@ class JsonGenericDecoderUnitTests
   with ShouldMatchers {
 
   describe("The json generic decoder") {
-    it("should decode a json into a specific class") {
+    it("should decode json to StratioStreamingMessage") {
       val jsonToBeParsed = """{"operation":"insert","streamName":"testStream","session_id":"1396942951802","request_id":"1396942953315","request":"","timestamp":1396942953315,"columns":[{"column":"field1","value":"testString"},{"column":"field2","value":200}],"userDefined":true}"""
       val jsonGenericDecoder = new JsonGenericDecoder
       val fieldsList = jsonGenericDecoder.fromBytes(jsonToBeParsed.getBytes())
@@ -34,7 +34,7 @@ class JsonGenericDecoderUnitTests
       fieldsList.getStreamName should be ("testStream")
     }
 
-    it("should throw a StratioAPIGenericException when the json to be parsed is a not-well formed json") {
+    it("should throw a StratioAPIGenericException when the json to be parsed is not-well formed") {
       val jsonToBeParsed = """{not well-formed json"""
       val jsonGenericDecoder = new JsonGenericDecoder
       intercept[StratioAPIGenericException] {

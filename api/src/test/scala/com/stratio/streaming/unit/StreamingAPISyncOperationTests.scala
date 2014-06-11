@@ -22,8 +22,12 @@ import org.scalatest.mock._
 import org.mockito.Matchers._
 import scala.collection.JavaConversions._
 import org.mockito.Mockito
-import scala.concurrent.Future
+import scala.concurrent._
 import com.stratio.streaming.commons.constants.REPLY_CODES._
+import com.stratio.streaming.kafka.KafkaProducer
+import com.stratio.streaming.api.StreamingAPISyncOperation
+import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import scala.Some
 import com.stratio.streaming.kafka.KafkaProducer
 import com.stratio.streaming.api.StreamingAPISyncOperation
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
@@ -114,7 +118,7 @@ with MockitoSugar {
       org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
       org.mockito.Mockito.when(zookeeperConsumerMock.readZNode(anyString())).thenReturn(Future.successful())
       org.mockito.Mockito.when(zookeeperConsumerMock.getZNodeData(anyString())).thenReturn(Some(engineResponse))
-      Then("we should not get a StratioAPIGenericException")
+      Then("we should get a StratioAPIGenericException")
       intercept[StratioAPIGenericException] {
         stratioStreamingAPISyncOperation.performSyncOperation(stratioStreamingMessage)
       }
@@ -128,8 +132,20 @@ with MockitoSugar {
       org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
       org.mockito.Mockito.when(zookeeperConsumerMock.readZNode(anyString())).thenReturn(Future.successful())
       org.mockito.Mockito.when(zookeeperConsumerMock.getZNodeData(anyString())).thenReturn(Some(engineResponse))
-      Then("we should not get a StratioAPIGenericException")
+      Then("we should get a StratioAPIGenericException")
       intercept[StratioAPIGenericException] {
+        stratioStreamingAPISyncOperation.performSyncOperation(stratioStreamingMessage)
+      }
+    }
+
+    it("should throw a StratioEngineOperationException when the ack time-out expired") {
+      Given("a time-out exception")
+      When("we perform the sync operation")
+      Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
+      org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
+      org.mockito.Mockito.when(zookeeperConsumerMock.readZNode(anyString())).thenReturn(Future.failed(new TimeoutException()))
+      Then("we should get a StratioEngineOperationException")
+      intercept[StratioEngineOperationException] {
         stratioStreamingAPISyncOperation.performSyncOperation(stratioStreamingMessage)
       }
     }

@@ -26,7 +26,8 @@ import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import scala.Some
 import scala.concurrent.Future
 import scala.collection.JavaConversions._
-import com.stratio.streaming.commons.exceptions.StratioAPIGenericException
+import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioAPIGenericException}
+import java.util.concurrent.TimeoutException
 
 class StreamingAPIListOperationTests extends FunSpec
 with GivenWhenThen
@@ -63,7 +64,6 @@ with MockitoSugar {
       }
     }
 
-
     it("should throw a StratioAPIGenericException exception when the engine returns a wrong list") {
       Given("a wrong streams list")
       val streamsList = """{"count":1,"blahblah":1402494388420}"""
@@ -74,6 +74,18 @@ with MockitoSugar {
       org.mockito.Mockito.when(zookeeperConsumerMock.getZNodeData(anyString())).thenReturn(Some(streamsList))
       Then("we should throw a StratioAPIGenericException")
       intercept[StratioAPIGenericException] {
+        stratioStreamingAPIListOperation.getListStreams(stratioStreamingMessage)
+      }
+    }
+
+    it("should throw a StratioEngineOperationException when the ack time-out expired") {
+      Given("a time-out exception")
+      When("we perform the sync operation")
+      Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
+      org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
+      org.mockito.Mockito.when(zookeeperConsumerMock.readZNode(anyString())).thenReturn(Future.failed(new TimeoutException()))
+      Then("we should get a StratioEngineOperationException")
+      intercept[StratioEngineOperationException] {
         stratioStreamingAPIListOperation.getListStreams(stratioStreamingMessage)
       }
     }
