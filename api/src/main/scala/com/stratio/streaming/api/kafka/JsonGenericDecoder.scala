@@ -18,9 +18,14 @@ package com.stratio.streaming.kafka
 import kafka.serializer.Decoder
 import com.google.gson.Gson
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
+import com.stratio.streaming.commons.exceptions.StratioAPIGenericException
 
 class JsonGenericDecoder extends Decoder[StratioStreamingMessage] {
     def fromBytes(bytes: Array[Byte]): StratioStreamingMessage = {
-      new Gson().fromJson(new String(bytes), classOf[StratioStreamingMessage])
+      try {
+        new Gson().fromJson(new String(bytes), classOf[StratioStreamingMessage])
+      } catch {
+          case _ => throw new StratioAPIGenericException("Streaming API error: unable to decode the engine message")
+      }
     }
 }

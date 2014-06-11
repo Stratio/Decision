@@ -17,11 +17,8 @@ package com.stratio.streaming.unit
 
 import org.scalatest._
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
-import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioStreamingException, StratioAPISecurityException}
-import com.stratio.streaming.api.StreamingAPISyncOperation
-import com.stratio.streaming.kafka.KafkaProducer
+import com.stratio.streaming.commons.exceptions.{StratioAPIGenericException, StratioEngineOperationException, StratioAPISecurityException}
 import org.scalatest.mock._
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import org.mockito.Matchers._
 import scala.collection.JavaConversions._
 import org.mockito.Mockito
@@ -39,7 +36,8 @@ with MockitoSugar {
   val kafkaProducerMock = mock[KafkaProducer]
   val zookeeperConsumerMock = mock[ZookeeperConsumer]
   val stratioStreamingAPISyncOperation = new StreamingAPISyncOperation(kafkaProducerMock, zookeeperConsumerMock, 2000)
-  val stratioStreamingMessage = new StratioStreamingMessage("theOperation",
+  val stratioStreamingMessage = new StratioStreamingMessage(
+    "theOperation",
     "theStreamName",
     "sessionId",
     "requestId",
@@ -50,8 +48,8 @@ with MockitoSugar {
     true)
 
   describe("The Streaming API Sync Operation") {
-    it("should throw no Exceptions when the engine returns a OK return code") {
-      Given("a OK engine response")
+    it("should throw no exceptions when the engine returns an OK return code") {
+      Given("an OK engine response")
       val engineResponse = s"""{"errorCode":$OK}"""
       When("we perform the sync operation")
       Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
@@ -104,6 +102,34 @@ with MockitoSugar {
       org.mockito.Mockito.when(zookeeperConsumerMock.getZNodeData(anyString())).thenReturn(Some(engineResponse))
       Then("we should get a StratioEngineOperationException")
       intercept[StratioEngineOperationException] {
+        stratioStreamingAPISyncOperation.performSyncOperation(stratioStreamingMessage)
+      }
+    }
+
+    it("should throw a StratioAPIGenericException when the response is a not well-formed json") {
+      Given("a not well-formed engine response")
+      val engineResponse = s"""{not well-formed json}"""
+      When("we perform the sync operation")
+      Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
+      org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
+      org.mockito.Mockito.when(zookeeperConsumerMock.readZNode(anyString())).thenReturn(Future.successful())
+      org.mockito.Mockito.when(zookeeperConsumerMock.getZNodeData(anyString())).thenReturn(Some(engineResponse))
+      Then("we should not get a StratioAPIGenericException")
+      intercept[StratioAPIGenericException] {
+        stratioStreamingAPISyncOperation.performSyncOperation(stratioStreamingMessage)
+      }
+    }
+
+    it("should throw a StratioAPIGenericException when the API is not able to parse de response") {
+      Given("an unknown engine response")
+      val engineResponse = s"""{"unknownField": "blah"}"""
+      When("we perform the sync operation")
+      Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
+      org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
+      org.mockito.Mockito.when(zookeeperConsumerMock.readZNode(anyString())).thenReturn(Future.successful())
+      org.mockito.Mockito.when(zookeeperConsumerMock.getZNodeData(anyString())).thenReturn(Some(engineResponse))
+      Then("we should not get a StratioAPIGenericException")
+      intercept[StratioAPIGenericException] {
         stratioStreamingAPISyncOperation.performSyncOperation(stratioStreamingMessage)
       }
     }

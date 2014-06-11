@@ -34,12 +34,9 @@ class KafkaConsumer(topic: String,
   props.put("group.id", groupId)
   props.put("zookeeper.connect", zookeeperConnect)
   props.put("auto.offset.reset", if(readFromStartOfStream) "smallest" else "largest")
-
   val config = new ConsumerConfig(props)
   val connector = Consumer.create(config)
-
   val filterSpec = new Whitelist(topic)
-
 
   val stream = connector.createMessageStreamsByFilter(filterSpec, 1, new StringDecoder(), new JsonGenericDecoder()).get(0)
 
