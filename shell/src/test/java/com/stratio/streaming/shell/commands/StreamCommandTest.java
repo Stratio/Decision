@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -59,7 +60,7 @@ public class StreamCommandTest {
     }
 
     @Test
-    public void listWith0StreamsTest() throws StratioEngineStatusException, IOException {
+    public void listWith0StreamsTest() throws StratioEngineStatusException, StratioAPIGenericException, IOException {
         Mockito.when(stratioStreamingApi.listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("list");
         assertEquals(true, cr.isSuccess());
@@ -67,7 +68,7 @@ public class StreamCommandTest {
     }
 
     @Test
-    public void listWithOneStreamTest() throws StratioEngineStatusException, StratioAPISecurityException,
+    public void listWithOneStreamTest() throws StratioEngineStatusException, StratioAPIGenericException,StratioAPISecurityException,
             StratioEngineOperationException, IOException {
         String streamName = "testStream";
         List<ColumnNameTypeValue> values = new ArrayList<>();
@@ -89,7 +90,7 @@ public class StreamCommandTest {
 
     @Test
     public void listWithOneStreamOneQueryOneActionTest() throws StratioEngineStatusException,
-            StratioAPISecurityException, StratioEngineOperationException, IOException {
+            StratioAPISecurityException, StratioAPIGenericException, StratioEngineOperationException, IOException {
         String streamName = "testStream";
         List<ColumnNameTypeValue> values = new ArrayList<>();
         values.add(new ColumnNameTypeValue("column1", ColumnType.STRING, null));
