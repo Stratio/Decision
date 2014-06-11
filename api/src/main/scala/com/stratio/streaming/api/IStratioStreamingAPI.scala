@@ -19,9 +19,10 @@ import _root_.kafka.consumer.KafkaStream
 import com.stratio.streaming.commons.streams.StratioStream
 import java.util.List
 import com.stratio.streaming.messaging.{ColumnNameValue, ColumnNameType}
-import com.stratio.streaming.commons.exceptions.{StratioEngineConnectionException, StratioAPISecurityException, StratioEngineStatusException, StratioEngineOperationException}
+import com.stratio.streaming.commons.exceptions._
 import com.stratio.streaming.dto.StratioQueryStream
 import com.stratio.streaming.commons.messages.{StratioStreamingMessage, ColumnNameTypeValue}
+import com.stratio.streaming.dto.StratioQueryStream
 
 trait IStratioStreamingAPI {
   /**
@@ -145,6 +146,7 @@ trait IStratioStreamingAPI {
    * @return a list with the streams
    */
   @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPIGenericException])
   def listStreams(): List[StratioStream]
 
   /**
