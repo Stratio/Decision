@@ -19,6 +19,7 @@ import org.scalatest._
 import com.stratio.streaming.utils.StreamsParser
 import scala.collection.JavaConversions._
 import com.stratio.streaming.commons.constants.ColumnType
+import com.stratio.streaming.commons.exceptions.StratioAPIGenericException
 
 class StreamsParserUnitTests
   extends FunSpec
@@ -39,6 +40,16 @@ class StreamsParserUnitTests
       val firstStreamfirstColumn = firstStreamColumns(0)
       firstStreamfirstColumn.getColumn should be ("operation")
       firstStreamfirstColumn.getType should be (ColumnType.STRING)
+    }
+
+    it("should throw a StratioAPIGenericException when it can not parse the json") {
+      Given("the json response")
+      val jsonResponse = """{"count":3,"timestamp":1396450032105}"""
+      When("we parse the json")
+      Then("it should throw a StratioAPIGenericException")
+      intercept[StratioAPIGenericException] {
+        StreamsParser.parse(jsonResponse)
+      }
     }
   }
 }

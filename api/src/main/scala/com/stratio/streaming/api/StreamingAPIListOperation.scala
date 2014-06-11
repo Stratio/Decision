@@ -23,6 +23,7 @@ import com.stratio.streaming.kafka.KafkaProducer
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.utils.StreamsParser
 import java.util.List
+import scala.collection.immutable
 
 class StreamingAPIListOperation(kafkaProducer: KafkaProducer,
                              zookeeperConsumer: ZookeeperConsumer,
