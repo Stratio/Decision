@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.shell.Bootstrap;
@@ -49,8 +49,8 @@ public class StreamCommandTest {
 
     private static IStratioStreamingAPI stratioStreamingApi;
 
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() {
         Bootstrap bootstrap = new Bootstrap(null,
                 new String[] { "classpath*:/META-INF/spring/spring-shell-plugin-test.xml" });
         shell = bootstrap.getJLineShellComponent();
