@@ -377,7 +377,7 @@ class StratioStreamingIntegrationTests
       }
     }
 
-    it("should throw a StratioAPISecurityException when removing a stream automatically created after adding a query", Tag("wip")) {
+    it("should throw a StratioEngineOperationException when removing a stream automatically created after adding a query") {
       val alarmsStream = "alarms3"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val columnList = Seq(firstStreamColumn)
@@ -388,7 +388,7 @@ class StratioStreamingIntegrationTests
         streamingAPI.addQuery(testStreamName, theFirstQuery)
         Thread.sleep(2000)
         streamingAPI.dropStream(alarmsStream)
-        intercept[StratioAPISecurityException] {
+        intercept[StratioEngineOperationException] {
           streamingAPI.dropStream(alarmsStream)
         }
       } catch {
