@@ -19,20 +19,26 @@ import com.google.gson.Gson
 import com.stratio.streaming.commons.messages.ListStreamsMessage
 import com.stratio.streaming.commons.streams.StratioStream
 import scala.collection.JavaConversions._
+import com.stratio.streaming.commons.exceptions.StratioAPIGenericException
 
 object StreamsParser {
   val theGsonParser = new Gson()
 
   def parse(json: String) = {
-    val listStreams = theGsonParser.fromJson(json, classOf[ListStreamsMessage]).getStreams.toList
-    val stratioStreams = listStreams.map(stream => {
-      new StratioStream(stream.getStreamName,
-        stream.getColumns,
-        stream.getQueries,
-        stream.getActiveActions,
-        stream.isUserDefined)}
-    )
-    stratioStreams
+    try {
+      val listStreams = theGsonParser.fromJson(json, classOf[ListStreamsMessage]).getStreams.toList
+      val stratioStreams = listStreams.map(stream => {
+        new StratioStream(stream.getStreamName,
+          stream.getColumns,
+          stream.getQueries,
+          stream.getActiveActions,
+          stream.isUserDefined)}
+      )
+      stratioStreams
+    } catch {
+        case _ => throw new StratioAPIGenericException("Streaming API error: unable to parse the json response")
+    }
+
   }
 
 }
