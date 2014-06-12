@@ -476,7 +476,7 @@ class StratioStreamingIntegrationTests
   describe("The index operation") {
     it("should index the stream to elasticsearch and stop indexing", Tag("index")) {
       cleanElasticSearchIndexes()
-      val indexedStreamName = "testindexedstream1"
+      val indexedStreamName = "ittestindexstream1"
       val indexedData = "indexedTestValue"
       val notIndexedData = "notIndexedTestValue"
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.STRING)
@@ -488,6 +488,7 @@ class StratioStreamingIntegrationTests
       try {
         streamingAPI.createStream(indexedStreamName, columnList)
         streamingAPI.indexStream(indexedStreamName)
+        Thread.sleep(5000)
         streamingAPI.insertData(indexedStreamName, streamDataIndexed1)
         Thread.sleep(10000)
         theStreamContainsTheData(indexedData) should be(true)
@@ -497,13 +498,16 @@ class StratioStreamingIntegrationTests
         Thread.sleep(10000)
         theStreamContainsTheData(notIndexedData) should be(false)
       } catch {
-        case ssEx: StratioStreamingException => fail()
+        case ssEx: StratioStreamingException => {
+          ssEx.printStackTrace()
+          fail()
+        }
       }
     }
 
     it("should throw a StratioEngineOperationException when the index operation has been already defined", Tag("index")) {
       cleanElasticSearchIndexes()
-      val indexedStreamName = "testindexedstream2"
+      val indexedStreamName = "ittestindexstream2"
       val indexedData1 = "testValue1"
       val indexedData2 = "testValue2"
       val indexedData3 = "testValue3"
