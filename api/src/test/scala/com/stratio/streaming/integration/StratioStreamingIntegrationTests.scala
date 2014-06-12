@@ -561,8 +561,9 @@ class StratioStreamingIntegrationTests
       try {
         streamingAPI.createStream(cassandraStreamName, columnList)
         streamingAPI.saveToCassandra(cassandraStreamName)
+        Thread.sleep(5000)
         streamingAPI.insertData(cassandraStreamName, streamData)
-        Thread.sleep(2000)
+        Thread.sleep(5000)
         val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
         storedRows.size() should be(1)
         val storedRow = storedRows.get(0)
@@ -588,12 +589,12 @@ class StratioStreamingIntegrationTests
       try {
         streamingAPI.createStream(cassandraStreamName, columnList)
         streamingAPI.saveToCassandra(cassandraStreamName)
-        Thread.sleep(2000)
+        Thread.sleep(5000)
         streamingAPI.insertData(cassandraStreamName, streamData)
         streamingAPI.stopSaveToCassandra(cassandraStreamName)
-        Thread.sleep(2000)
+        Thread.sleep(5000)
         streamingAPI.insertData(cassandraStreamName, streamData)
-        Thread.sleep(2000)
+        Thread.sleep(5000)
         val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
         storedRows.size() should be(1)
       } catch {
@@ -620,11 +621,11 @@ class StratioStreamingIntegrationTests
         streamingAPI.createStream(cassandraStreamName, columnList)
         streamingAPI.saveToCassandra(cassandraStreamName)
         streamingAPI.insertData(cassandraStreamName, streamData)
-        Thread.sleep(3000)
+        Thread.sleep(5000)
         streamingAPI.alterStream(cassandraStreamName, columnList2)
-        Thread.sleep(3000)
+        Thread.sleep(5000)
         streamingAPI.insertData(cassandraStreamName, streamData2)
-        Thread.sleep(3000)
+        Thread.sleep(5000)
         val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
         storedRows.size() should be(2)
       } catch {
@@ -643,8 +644,9 @@ class StratioStreamingIntegrationTests
       try {
         streamingAPI.createStream(cassandraStreamName, columnList)
         streamingAPI.saveToCassandra(cassandraStreamName)
+        Thread.sleep(5000)
         streamingAPI.insertData(cassandraStreamName, streamData)
-        Thread.sleep(2000)
+        Thread.sleep(5000)
         intercept[StratioEngineOperationException] {
           streamingAPI.saveToCassandra(cassandraStreamName)
         }
@@ -667,8 +669,9 @@ class StratioStreamingIntegrationTests
       try {
         streamingAPI.createStream(cassandraStreamName, columnList)
         streamingAPI.saveToCassandra(cassandraStreamName)
+        Thread.sleep(5000)
         streamingAPI.insertData(cassandraStreamName, streamData)
-        Thread.sleep(3000)
+        Thread.sleep(5000)
         val storedRows = fetchStoredRowsFromCassandra(cassandraStreamName)
         storedRows.size() should be(1)
       } catch {
