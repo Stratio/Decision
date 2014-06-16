@@ -26,6 +26,10 @@
 	<artifactId>streaming-engine</artifactId>
 	<properties>
 		<jar.mainclass>com.stratio.streaming.StreamingEngine</jar.mainclass>
+		<configurationDirectory>config</configurationDirectory>
+		<binFolder>bin</binFolder>
+		<repositoryName>lib</repositoryName>
+		<logPath>/var/log/stratio/</logPath>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -169,6 +173,12 @@
 		</repository>
 	</distributionManagement>
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/assembly</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -176,11 +186,14 @@
 				<version>1.8</version>
 				<configuration>
 					<configurationSourceDirectory>src/main/assembly/config</configurationSourceDirectory>
-					<configurationDirectory>config</configurationDirectory>
 					<copyConfigurationDirectory>true</copyConfigurationDirectory>
 					<includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
 					<assembleDirectory>target/appassembler</assembleDirectory>
-					<extraJvmArguments>-Xms512m -Xmx512m</extraJvmArguments>
+					<extraJvmArguments>-Xms2048m -Xmx2048m</extraJvmArguments>
+					<configurationDirectory>${configurationDirectory}</configurationDirectory>
+					<binFolder>${binFolder}</binFolder>
+					<repositoryName>${repositoryName}</repositoryName>
+					<filterConfigurationDirectory>true</filterConfigurationDirectory>
 					<programs>
 						<program>
 							<mainClass>${jar.mainclass}</mainClass>
@@ -217,4 +230,16 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>admin-binary-builder</id>
+			<properties>
+				<configurationDirectory>etc/sds/streaming</configurationDirectory>
+				<binFolder>opt/sds/streaming/bin</binFolder>
+				<repositoryName>opt/sds/streaming/lib</repositoryName>
+
+				<logPath>/var/log/sds/streaming/</logPath>
+			</properties>
+		</profile>
+	</profiles>
 </project>
