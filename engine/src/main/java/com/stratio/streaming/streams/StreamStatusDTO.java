@@ -34,7 +34,7 @@ public class StreamStatusDTO implements Serializable {
 
     private final Set<StreamAction> actionsEnabled;
 
-    private HashMap<String, String> addedQueries;
+    private HashMap<String, QueryDTO> addedQueries;
 
     /**
      * @param streamName
@@ -89,11 +89,11 @@ public class StreamStatusDTO implements Serializable {
         this.streamDefinition = streamDefinition;
     }
 
-    public HashMap<String, String> getAddedQueries() {
+    public HashMap<String, QueryDTO> getAddedQueries() {
         return addedQueries;
     }
 
-    public void setAddedQueries(HashMap<String, String> addedQueries) {
+    public void setAddedQueries(HashMap<String, QueryDTO> addedQueries) {
         this.addedQueries = addedQueries;
     }
 

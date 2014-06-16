@@ -56,6 +56,7 @@ import com.stratio.streaming.functions.messages.FilterMessagesByOperationFunctio
 import com.stratio.streaming.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.streaming.functions.requests.CollectRequestForStatsFunction;
 import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
+import com.stratio.streaming.streams.QueryDTO;
 import com.stratio.streaming.streams.StreamPersistence;
 import com.stratio.streaming.streams.StreamSharedStatus;
 import com.stratio.streaming.utils.SiddhiUtils;
@@ -380,7 +381,7 @@ public class StreamingEngine {
                         }
 
                         if (StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()) != null) {
-                            HashMap<String, String> attachedQueries = StreamSharedStatus.getStreamStatus(
+                            HashMap<String, QueryDTO> attachedQueries = StreamSharedStatus.getStreamStatus(
                                     streamMetaData.getStreamId(), getSiddhiManager()).getAddedQueries();
 
                             streamDefinition.append(" /// " + attachedQueries.size() + " attachedQueries: (");
