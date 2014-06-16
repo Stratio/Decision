@@ -246,8 +246,12 @@ public class StreamToCassandraCallback extends StreamCallback implements Message
 
     private void shutdownCallback() {
         if (running) {
-            cassandraSession.close();
-            cassandraCluster.close();
+            if (cassandraSession != null) {
+                cassandraSession.close();
+            }
+            if (cassandraCluster != null) {
+                cassandraCluster.close();
+            }
         }
     }
 
