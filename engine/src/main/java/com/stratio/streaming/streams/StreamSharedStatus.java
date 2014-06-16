@@ -93,20 +93,6 @@ public class StreamSharedStatus {
         return queryId;
     }
 
-    public static void changeListenerStreamStatus(Boolean enabled, String streamName, SiddhiManager siddhiManager) {
-
-        IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance()
-                .getMap(STREAMING.STREAM_STATUS_MAP);
-        StreamStatusDTO streamStatusDTO = (StreamStatusDTO) streamStatusMap.get(streamName);
-        if (enabled) {
-            streamStatusDTO.enableAction(StreamAction.LISTEN);
-        } else {
-            streamStatusDTO.disableAction(StreamAction.LISTEN);
-        }
-        streamStatusMap.put(streamStatusDTO.getStreamName(), streamStatusDTO);
-
-    }
-
     public static void removeStreamStatus(String streamName, SiddhiManager siddhiManager) {
 
         IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance()

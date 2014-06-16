@@ -210,7 +210,8 @@ public class StreamOperations {
 
         siddhiManager.addCallback(request.getStreamName(), streamCallBack);
 
-        StreamSharedStatus.changeListenerStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager);
+        StreamSharedStatus.changeActionStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager,
+                StreamAction.LISTEN);
     }
 
     public static void stopListenStream(StratioStreamingMessage request, SiddhiManager siddhiManager) {
@@ -218,8 +219,8 @@ public class StreamOperations {
         siddhiManager.getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_LISTEN_TOPIC)
                 .publish(request.getStreamName());
 
-        StreamSharedStatus.changeListenerStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager);
-
+        StreamSharedStatus.changeActionStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager,
+                StreamAction.LISTEN);
     }
 
     public static void save2cassandraStream(StratioStreamingMessage request, String cassandraCluster,
