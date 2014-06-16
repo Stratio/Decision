@@ -28,14 +28,14 @@
 	<fileSets>
 		<fileSet>
 			<directory>target/appassembler</directory>
-			<outputDirectory>streaming-${version}</outputDirectory>
+			<outputDirectory>${finalFolder}</outputDirectory>
 			<excludes>
 				<exclude>${binFolder}/**</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet>
 			<directory>target/appassembler/${binFolder}</directory>
-			<outputDirectory>streaming-${version}/${binFolder}</outputDirectory>
+			<outputDirectory>${finalFolder}/${binFolder}</outputDirectory>
 			<includes>
 				<include>*</include>
 			</includes>
@@ -44,7 +44,7 @@
 		</fileSet>
 		<fileSet>
 			<directory>src/main/resources</directory>
-			<outputDirectory>streaming-${version}</outputDirectory>
+			<outputDirectory>${finalFolder}</outputDirectory>
 			<excludes>
 				<exclude>*.properties</exclude>
 				<exclude>*.xml</exclude>
@@ -55,7 +55,7 @@
 	<files>
 		<file>
 			<source>target/appassembler/${configurationDirectory}/log4j.xml</source>
-			<outputDirectory>streaming-${version}/${configurationDirectory}</outputDirectory>
+			<outputDirectory>${finalFolder}/${configurationDirectory}</outputDirectory>
 		</file>
 	</files>
 </assembly>

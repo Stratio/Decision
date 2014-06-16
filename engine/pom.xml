@@ -29,6 +29,7 @@
 		<configurationDirectory>config</configurationDirectory>
 		<binFolder>bin</binFolder>
 		<repositoryName>lib</repositoryName>
+		<finalFolder>streaming-${version}</finalFolder>
 		<logPath>/var/log/stratio/</logPath>
 	</properties>
 	<dependencies>
@@ -237,6 +238,7 @@
 				<configurationDirectory>etc/sds/streaming</configurationDirectory>
 				<binFolder>opt/sds/streaming/bin</binFolder>
 				<repositoryName>opt/sds/streaming/lib</repositoryName>
+				<finalFolder></finalFolder>
 
 				<logPath>/var/log/sds/streaming/</logPath>
 			</properties>
