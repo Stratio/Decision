@@ -90,7 +90,7 @@ public class StreamOperations {
 
         // remove all queries
         if (StreamSharedStatus.getStreamStatus(request.getStreamName(), siddhiManager) != null) {
-            HashMap<String, String> attachedQueries = StreamSharedStatus.getStreamStatus(request.getStreamName(),
+            HashMap<String, QueryDTO> attachedQueries = StreamSharedStatus.getStreamStatus(request.getStreamName(),
                     siddhiManager).getAddedQueries();
 
             for (String queryId : attachedQueries.keySet()) {
@@ -175,10 +175,10 @@ public class StreamOperations {
                         siddhiManager);
 
                 if (streamStatus != null) {
-                    HashMap<String, String> attachedQueries = streamStatus.getAddedQueries();
+                    HashMap<String, QueryDTO> attachedQueries = streamStatus.getAddedQueries();
 
-                    for (Entry<String, String> entry : attachedQueries.entrySet()) {
-                        queries.add(new StreamQuery(entry.getKey(), entry.getValue()));
+                    for (Entry<String, QueryDTO> entry : attachedQueries.entrySet()) {
+                        queries.add(new StreamQuery(entry.getKey(), entry.getValue().getQueryRaw()));
                     }
 
                     isUserDefined = streamStatus.isUserDefined();

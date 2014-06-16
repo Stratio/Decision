@@ -33,8 +33,6 @@ public class QueryNotExistsValidation extends BaseSiddhiRequestValidation {
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
         if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSm()) != null) {
-            // TODO normalize query and create their hash to verify correctly if
-            // this query exists
             if (!StreamSharedStatus.getStreamStatus(request.getStreamName(), getSm()).getAddedQueries()
                     .containsKey(request.getRequest())) {
                 throw new RequestValidationException(REPLY_CODES.KO_QUERY_DOES_NOT_EXIST, String.format(

@@ -78,7 +78,7 @@ public class StreamSharedStatus {
         IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance()
                 .getMap(STREAMING.STREAM_STATUS_MAP);
         StreamStatusDTO streamStatusDTO = (StreamStatusDTO) streamStatusMap.get(streamName);
-        streamStatusDTO.getAddedQueries().put(queryId, query);
+        streamStatusDTO.getAddedQueries().put(queryId, new QueryDTO(query));
         streamStatusMap.put(streamStatusDTO.getStreamName(), streamStatusDTO);
 
     }
