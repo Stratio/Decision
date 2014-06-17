@@ -192,8 +192,6 @@ public class StreamingEngine {
         CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(
                 getSiddhiManager(), zkCluster, kafkaCluster);
         ListStreamsFunction listStreamsFunction = new ListStreamsFunction(getSiddhiManager(), zkCluster);
-        SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(
-                getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster, enableAuditing);
         SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
                 getSiddhiManager(), zkCluster, cassandraCluster);
 
@@ -339,6 +337,9 @@ public class StreamingEngine {
                     .union(list_requests).union(drop_requests);
 
             if (enableAuditing) {
+                SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(
+                        getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster);
+
                 // persist the RDDs to cassandra using STRATIO DEEP
                 allRequests.foreachRDD(saveRequestsToAuditLogFunction);
             }
@@ -411,9 +412,6 @@ public class StreamingEngine {
                 }
 
             });
-
-            // messages.print();
-
         }
 
         jssc.start();
