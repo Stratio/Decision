@@ -487,8 +487,9 @@ class StratioStreamingIntegrationTests
       val streamDataNotIndexed = Seq(columnDataNotIndexed)
       try {
         streamingAPI.createStream(indexedStreamName, columnList)
-        streamingAPI.indexStream(indexedStreamName)
         Thread.sleep(5000)
+        streamingAPI.indexStream(indexedStreamName)
+        Thread.sleep(10000)
         streamingAPI.insertData(indexedStreamName, streamDataIndexed1)
         Thread.sleep(10000)
         theStreamContainsTheData(indexedData) should be(true)
