@@ -81,7 +81,7 @@ public class StreamingEngine {
     private static SiddhiManager siddhiManager;
     private static String cassandraCluster;
     private static Boolean failOverEnabled;
-    private static JavaStreamingContext jssc;
+    private static JavaStreamingContext streamingBaseContext;
 
     /**
      * @param args
@@ -99,8 +99,8 @@ public class StreamingEngine {
                 logger.info("Shutting down Stratio Streaming..");
 
                 // shutdown spark
-                if (jssc != null) {
-                    jssc.stop();
+                if (streamingBaseContext != null) {
+                    streamingBaseContext.stop();
                 }
 
                 // shutdown siddhi
@@ -128,7 +128,7 @@ public class StreamingEngine {
                 // shutdown zookeeper
                 ZKUtils.shutdownZKUtils();
 
-                logger.info("Shutdown complete, bye�");
+                logger.info("Shutdown complete, bye.");
             }
         });
 
@@ -174,13 +174,9 @@ public class StreamingEngine {
                 String.valueOf(System.currentTimeMillis()).getBytes());
 
         // Create the context with a x seconds batch size
-        // jssc = new JavaStreamingContext(sparkMaster,
-        // StreamingEngine.class.getName(),
-        // new Duration(STREAMING.DURATION_MS), System.getenv("SPARK_HOME"),
-        // JavaStreamingContext.jarOfClass(StreamingEngine.class));
-        jssc = new JavaStreamingContext(config.getString("spark.host"), StreamingEngine.class.getName(), new Duration(
-                streamingBatchTime));
-        jssc.sparkContext().getConf().setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
+        streamingBaseContext = new JavaStreamingContext(config.getString("spark.host"),
+                StreamingEngine.class.getName(), new Duration(streamingBatchTime));
+        streamingBaseContext.sparkContext().getConf().setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
         CreateStreamFunction createStreamFunction = new CreateStreamFunction(getSiddhiManager(), zkCluster);
@@ -189,8 +185,6 @@ public class StreamingEngine {
         AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(getSiddhiManager(), zkCluster);
         ListenStreamFunction listenStreamFunction = new ListenStreamFunction(getSiddhiManager(), zkCluster,
                 kafkaCluster);
-        CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(
-                getSiddhiManager(), zkCluster, kafkaCluster);
         ListStreamsFunction listStreamsFunction = new ListStreamsFunction(getSiddhiManager(), zkCluster);
         SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
                 getSiddhiManager(), zkCluster, cassandraCluster);
@@ -214,8 +208,8 @@ public class StreamingEngine {
         }
 
         // Start the Kafka stream
-        JavaPairDStream<String, String> messages = KafkaUtils.createStream(jssc, zkCluster, BUS.STREAMING_GROUP_ID,
-                topicMap);
+        JavaPairDStream<String, String> messages = KafkaUtils.createStream(streamingBaseContext, zkCluster,
+                BUS.STREAMING_GROUP_ID, topicMap);
 
         // as we are using messages several times, the best option is to cache
         // it
@@ -341,11 +335,14 @@ public class StreamingEngine {
                         getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster);
 
                 // persist the RDDs to cassandra using STRATIO DEEP
-                allRequests.foreachRDD(saveRequestsToAuditLogFunction);
+                allRequests.window(new Duration(2000), new Duration(6000)).foreachRDD(saveRequestsToAuditLogFunction);
             }
 
             if (enableStats) {
-                allRequests.foreachRDD(collectRequestForStatsFunction);
+                CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(
+                        getSiddhiManager(), zkCluster, kafkaCluster);
+
+                allRequests.window(new Duration(2000), new Duration(6000)).foreachRDD(collectRequestForStatsFunction);
 
             }
         }
@@ -414,9 +411,9 @@ public class StreamingEngine {
             });
         }
 
-        jssc.start();
+        streamingBaseContext.start();
         logger.info("Stratio streaming started at {}", new Date());
-        jssc.awaitTermination();
+        streamingBaseContext.awaitTermination();
 
     }
 
