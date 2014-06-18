@@ -210,6 +210,9 @@ public class StreamOperations {
 
         siddhiManager.addCallback(request.getStreamName(), streamCallBack);
 
+        // TODO to avoid an error when a first event is sended to a non created
+        // topic, create the topic first (BUG KAFKA-1124)
+
         StreamSharedStatus.changeActionStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager,
                 StreamAction.LISTEN);
     }
@@ -218,6 +221,9 @@ public class StreamOperations {
 
         siddhiManager.getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_LISTEN_TOPIC)
                 .publish(request.getStreamName());
+
+        // TODO to avoid an error when a first event is sended to a non created
+        // topic, delete the topic first (BUG KAFKA-1124)
 
         StreamSharedStatus.changeActionStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager,
                 StreamAction.LISTEN);
