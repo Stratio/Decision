@@ -179,6 +179,10 @@
 				<directory>src/main/assembly</directory>
 				<filtering>true</filtering>
 			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
