@@ -15,10 +15,8 @@
  */
 package com.stratio.streaming.streams;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import me.prettyprint.cassandra.serializers.BytesArraySerializer;
@@ -110,8 +108,6 @@ public class Casandra2PersistenceStore implements PersistenceStore {
     @Override
     public PersistenceObject load(PersistenceManagementEvent persistenceManagementEvent, String nodeId) {
 
-        List<NodeSnapshot> list = new ArrayList<NodeSnapshot>();
-
         ColumnSlice<String, byte[]> cs;
 
         SliceQuery<String, String, byte[]> q = HFactory.createSliceQuery(keyspace, sser, sser, bser);
@@ -124,9 +120,7 @@ public class Casandra2PersistenceStore implements PersistenceStore {
         PersistenceObject persistenceObject = null;
         for (HColumn<String, byte[]> hc : cs.getColumns()) {
             persistenceObject = (PersistenceObject) ByteSerializer.BToO(hc.getValue());
-            // list.add(new NodeSnapshot(hc.getName(), hc.getValue()));
         }
-        // return list;
         return persistenceObject;
 
     }
