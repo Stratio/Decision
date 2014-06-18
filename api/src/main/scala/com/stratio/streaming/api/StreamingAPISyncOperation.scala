@@ -1,11 +1,11 @@
-/*
- * Copyright 2014 Stratio.
+/**
+ * Copyright (C) 2014 Stratio (http://stratio.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stratio.streaming.api
 
 import java.util.UUID
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
-import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineOperationException}
+import com.stratio.streaming.commons.exceptions.{StratioAPIGenericException, StratioAPISecurityException, StratioEngineOperationException}
 import com.stratio.streaming.kafka.KafkaProducer
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants.REPLY_CODES._
@@ -45,25 +44,45 @@ case class StreamingAPISyncOperation(
   }
 
   private def manageStreamingResponse(response: String, message: StratioStreamingMessage) = {
-    val responseDto = new Gson().fromJson(response, classOf[ActionCallbackDto])
-    val replyCode = responseDto.getErrorCode
-    val messageOperation = message.getOperation
-    val streamName = message.getStreamName
-    replyCode match {
-      case OK => log.info(s"StratioEngine Ack received for the operation $messageOperation on the $streamName stream")
-      case KO_STREAM_OPERATION_NOT_ALLOWED |
-          KO_STREAM_IS_NOT_USER_DEFINED => {
-        createLogError(replyCode, responseDto.getDescription)
-        throw new StratioAPISecurityException(responseDto.getDescription)
-      }
-      case _ => {
-        createLogError(replyCode, responseDto.getDescription)
-        throw new StratioEngineOperationException("StratioEngine error: "+responseDto.getDescription)
-      }
+    val responseDto = parseTheEngineResponse(response)
+    responseDto match {
+      case None => throw new StratioAPIGenericException("StratioEngine error: Unable to parse the engine response")
+      case Some(responseDto) =>
+        val replyCode = responseDto.getErrorCode
+        val replyDescription = responseDto.getDescription
+        replyCode match {
+          case OK => {
+            val messageOperation = message.getOperation
+            val streamName = message.getStreamName
+            log.info(s"StratioEngine Ack received for the operation $messageOperation on the $streamName stream")
+          }
+          case KO_STREAM_OPERATION_NOT_ALLOWED |
+               KO_STREAM_IS_NOT_USER_DEFINED => {
+            createLogError(replyCode, replyDescription)
+            throw new StratioAPISecurityException(replyDescription)
+          }
+          case _ => {
+            createLogError(replyCode, replyDescription)
+            throw new StratioEngineOperationException("StratioEngine error: "+replyDescription)
+          }
+        }
     }
+
   }
 
   private def createLogError(responseCode: Int, errorDescription: String) = {
     log.error(s"StratioAPI - [ACK_CODE,QUERY_STRING]: [$responseCode,$errorDescription]")
+  }
+
+  private def parseTheEngineResponse(response: String): Option[ActionCallbackDto] = {
+    try {
+      val parsedResponse = new Gson().fromJson(response, classOf[ActionCallbackDto])
+      parsedResponse.getErrorCode match {
+        case null => None
+        case _ => Some(parsedResponse)
+      }
+    } catch {
+      case _ => None
+    }
   }
 }

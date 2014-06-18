@@ -1,0 +1,3 @@
+  Stream name  User defined  Queries  Elements  Active actions
+  -----------  ------------  -------  --------  --------------
+

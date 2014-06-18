@@ -15,6 +15,7 @@
  */
 package com.stratio.streaming.streams;
 
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +90,7 @@ public class StreamOperations {
 
         // remove all queries
         if (StreamSharedStatus.getStreamStatus(request.getStreamName(), siddhiManager) != null) {
-            HashMap<String, String> attachedQueries = StreamSharedStatus.getStreamStatus(request.getStreamName(),
+            HashMap<String, QueryDTO> attachedQueries = StreamSharedStatus.getStreamStatus(request.getStreamName(),
                     siddhiManager).getAddedQueries();
 
             for (String queryId : attachedQueries.keySet()) {
@@ -174,10 +175,10 @@ public class StreamOperations {
                         siddhiManager);
 
                 if (streamStatus != null) {
-                    HashMap<String, String> attachedQueries = streamStatus.getAddedQueries();
+                    HashMap<String, QueryDTO> attachedQueries = streamStatus.getAddedQueries();
 
-                    for (Entry<String, String> entry : attachedQueries.entrySet()) {
-                        queries.add(new StreamQuery(entry.getKey(), entry.getValue()));
+                    for (Entry<String, QueryDTO> entry : attachedQueries.entrySet()) {
+                        queries.add(new StreamQuery(entry.getKey(), entry.getValue().getQueryRaw()));
                     }
 
                     isUserDefined = streamStatus.isUserDefined();
@@ -209,7 +210,8 @@ public class StreamOperations {
 
         siddhiManager.addCallback(request.getStreamName(), streamCallBack);
 
-        StreamSharedStatus.changeListenerStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager);
+        StreamSharedStatus.changeActionStreamStatus(Boolean.TRUE, request.getStreamName(), siddhiManager,
+                StreamAction.LISTEN);
     }
 
     public static void stopListenStream(StratioStreamingMessage request, SiddhiManager siddhiManager) {
@@ -217,8 +219,8 @@ public class StreamOperations {
         siddhiManager.getSiddhiContext().getHazelcastInstance().getTopic(STREAMING.INTERNAL_LISTEN_TOPIC)
                 .publish(request.getStreamName());
 
-        StreamSharedStatus.changeListenerStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager);
-
+        StreamSharedStatus.changeActionStreamStatus(Boolean.FALSE, request.getStreamName(), siddhiManager,
+                StreamAction.LISTEN);
     }
 
     public static void save2cassandraStream(StratioStreamingMessage request, String cassandraCluster,
@@ -270,11 +272,11 @@ public class StreamOperations {
                 StreamAction.INDEXED);
     }
 
-    public static void save2mongoStream(StratioStreamingMessage request, String mongoCluster,
-            SiddhiManager siddhiManager) {
+    public static void save2mongoStream(StratioStreamingMessage request, String mongoHost, int mongoPort,
+            String username, String password, SiddhiManager siddhiManager) throws UnknownHostException {
 
         StreamToMongoCallback mongoCallBack = new StreamToMongoCallback(siddhiManager.getStreamDefinition(request
-                .getStreamName()), mongoCluster);
+                .getStreamName()), mongoHost, mongoPort, username, password);
 
         ITopic<String> save2mongoTopic = siddhiManager.getSiddhiContext().getHazelcastInstance()
                 .getTopic(STREAMING.INTERNAL_SAVE2MONGO_TOPIC);

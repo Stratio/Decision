@@ -28,6 +28,7 @@ import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamExistsValidation;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
+import com.stratio.streaming.functions.validator.UserDefinedStreamValidation;
 import com.stratio.streaming.streams.StreamOperations;
 
 public class CreateStreamFunction extends ActionBaseFunction {
@@ -66,6 +67,7 @@ public class CreateStreamFunction extends ActionBaseFunction {
 
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new UserDefinedStreamValidation(getSiddhiManager()));
         validators.add(new StreamNotExistsValidation(getSiddhiManager()));
     }
 

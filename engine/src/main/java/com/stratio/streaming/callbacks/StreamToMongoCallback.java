@@ -15,7 +15,12 @@
  */
 package com.stratio.streaming.callbacks;
 
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +30,16 @@ import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-import com.datastax.driver.core.querybuilder.Insert;
 import com.google.common.collect.Lists;
 import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
+import com.mongodb.BasicDBObject;
+import com.mongodb.BulkWriteOperation;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.utils.SiddhiUtils;
@@ -38,19 +49,25 @@ public class StreamToMongoCallback extends StreamCallback implements MessageList
     private static Logger logger = LoggerFactory.getLogger(StreamToCassandraCallback.class);
 
     private StreamDefinition streamDefinition;
-    private String mongoNodesCluster;
+    private MongoClient mongoClient;
+    private DB streamingDb;
     private Boolean running;
 
-    public StreamToMongoCallback(StreamDefinition streamDefinition, String mongoNodesCluster) {
+    public StreamToMongoCallback(StreamDefinition streamDefinition, String mongoHost, int mongoPort, String username,
+            String password) throws UnknownHostException {
         this.streamDefinition = streamDefinition;
-        this.mongoNodesCluster = mongoNodesCluster;
         running = Boolean.TRUE;
-        init();
-        logger.debug("Starting listener for stream " + streamDefinition.getStreamId());
-    }
-
-    private void init() {
-
+        List<ServerAddress> adresses = Arrays.asList(new ServerAddress(mongoHost, mongoPort));
+        if (username != null && password != null) {
+            mongoClient = new MongoClient(adresses, Arrays.asList(MongoCredential.createPlainCredential(username,
+                    "$external", password.toCharArray())));
+        } else {
+            logger.warn(
+                    "MongoDB user or password are not defined. User: {}, Password: {}. trying annonimous connection.",
+                    username, password);
+            mongoClient = new MongoClient(adresses);
+        }
+        streamingDb = mongoClient.getDB(STREAMING.STREAMING_KEYSPACE_NAME);
     }
 
     @Override
@@ -69,7 +86,6 @@ public class StreamToMongoCallback extends StreamCallback implements MessageList
                         if (ie.getData().length >= streamDefinition.getAttributePosition(column.getName()) + 1) {
                             columns.add(new ColumnNameTypeValue(column.getName(), SiddhiUtils.encodeSiddhiType(column
                                     .getType()), ie.getData(streamDefinition.getAttributePosition(column.getName()))));
-
                         }
                     }
                     collected_events.add(new StratioStreamingMessage(streamDefinition.getStreamId(), ie.getTimeStamp(),
@@ -82,22 +98,33 @@ public class StreamToMongoCallback extends StreamCallback implements MessageList
     }
 
     private void persistEventsToMongo(List<StratioStreamingMessage> collected_events) {
-
-        List<Insert> statements = Lists.newArrayList();
-
+        long time = System.currentTimeMillis();
+        Map<String, BulkWriteOperation> elementsToInsert = new HashMap<String, BulkWriteOperation>();
         for (StratioStreamingMessage event : collected_events) {
-            // TODO
-        }
+            BasicDBObject object = new BasicDBObject("timestamp", time);
+            for (ColumnNameTypeValue columnNameTypeValue : event.getColumns()) {
+                object.append(columnNameTypeValue.getColumn(), columnNameTypeValue.getValue());
+            }
 
-        for (Insert statement : statements) {
-            // TODO
-        }
+            BulkWriteOperation bulkInsertOperation = elementsToInsert.get(event.getStreamName());
 
+            if (bulkInsertOperation == null) {
+                bulkInsertOperation = streamingDb.getCollection(event.getStreamName())
+                        .initializeUnorderedBulkOperation();
+
+                elementsToInsert.put(event.getStreamName(), bulkInsertOperation);
+                streamingDb.getCollection(event.getStreamName()).createIndex(new BasicDBObject("timestamp", -1));
+            }
+            bulkInsertOperation.insert(object);
+        }
+        for (Entry<String, BulkWriteOperation> stratioStreamingMessage : elementsToInsert.entrySet()) {
+            stratioStreamingMessage.getValue().execute();
+        }
     }
 
     private void shutdownCallback() {
         if (running) {
-            // TODO
+            mongoClient.close();
         }
     }
 

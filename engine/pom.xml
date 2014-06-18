@@ -26,6 +26,11 @@
 	<artifactId>streaming-engine</artifactId>
 	<properties>
 		<jar.mainclass>com.stratio.streaming.StreamingEngine</jar.mainclass>
+		<configurationDirectory>config</configurationDirectory>
+		<binFolder>bin</binFolder>
+		<repositoryName>lib</repositoryName>
+		<finalFolder>streaming-${version}</finalFolder>
+		<logPath>/var/log/stratio/</logPath>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -125,7 +130,6 @@
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>2.12.2</version>
 		</dependency>
 		<!-- LOGGING -->
 		<dependency>
@@ -143,6 +147,13 @@
 			<groupId>com.typesafe</groupId>
 			<artifactId>config</artifactId>
 			<version>1.2.1</version>
+		</dependency>
+		<!-- TESTING -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<repositories>
@@ -163,6 +174,12 @@
 		</repository>
 	</distributionManagement>
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/assembly</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -170,11 +187,14 @@
 				<version>1.8</version>
 				<configuration>
 					<configurationSourceDirectory>src/main/assembly/config</configurationSourceDirectory>
-					<configurationDirectory>config</configurationDirectory>
 					<copyConfigurationDirectory>true</copyConfigurationDirectory>
 					<includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
 					<assembleDirectory>target/appassembler</assembleDirectory>
-					<extraJvmArguments>-Xms512m -Xmx512m</extraJvmArguments>
+					<extraJvmArguments>-Xms2048m -Xmx2048m</extraJvmArguments>
+					<configurationDirectory>${configurationDirectory}</configurationDirectory>
+					<binFolder>${binFolder}</binFolder>
+					<repositoryName>${repositoryName}</repositoryName>
+					<filterConfigurationDirectory>true</filterConfigurationDirectory>
 					<programs>
 						<program>
 							<mainClass>${jar.mainclass}</mainClass>
@@ -211,4 +231,17 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>admin-binary-builder</id>
+			<properties>
+				<configurationDirectory>etc/sds/streaming</configurationDirectory>
+				<binFolder>opt/sds/streaming/bin</binFolder>
+				<repositoryName>opt/sds/streaming/lib</repositoryName>
+				<finalFolder></finalFolder>
+
+				<logPath>/var/log/sds/streaming/</logPath>
+			</properties>
+		</profile>
+	</profiles>
 </project>

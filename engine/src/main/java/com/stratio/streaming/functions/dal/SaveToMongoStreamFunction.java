@@ -15,20 +15,38 @@
  */
 package com.stratio.streaming.functions.dal;
 
+import java.net.UnknownHostException;
 import java.util.Set;
 
 import org.wso2.siddhi.core.SiddhiManager;
 
+import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
+import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.ActionBaseFunction;
+import com.stratio.streaming.functions.validator.ActionEnabledValidation;
 import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
+import com.stratio.streaming.streams.StreamOperations;
 
 public class SaveToMongoStreamFunction extends ActionBaseFunction {
 
-    public SaveToMongoStreamFunction(SiddhiManager siddhiManager, String zookeeperHost) {
+    private static final long serialVersionUID = -3553914914451458973L;
+
+    private final String mongoHost;
+    private final Integer mongoPort;
+    private final String username;
+    private final String password;
+
+    public SaveToMongoStreamFunction(SiddhiManager siddhiManager, String zookeeperHost, String mongoHost,
+            Integer mongoPort, String username, String password) {
         super(siddhiManager, zookeeperHost);
+        this.mongoHost = mongoHost;
+        this.mongoPort = mongoPort;
+        this.username = username;
+        this.password = password;
     }
 
     @Override
@@ -43,20 +61,30 @@ public class SaveToMongoStreamFunction extends ActionBaseFunction {
 
     @Override
     protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
-        return true;
+        try {
+            StreamOperations.save2mongoStream(message, mongoHost, mongoPort, username, password, getSiddhiManager());
+            return true;
+        } catch (UnknownHostException e) {
+            throw new RequestValidationException(REPLY_CODES.KO_GENERAL_ERROR, e);
+        }
     }
 
     @Override
     protected boolean stopAction(StratioStreamingMessage message) throws RequestValidationException {
+        StreamOperations.stopSave2mongoStream(message, getSiddhiManager());
         return true;
     }
 
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new ActionEnabledValidation(getSiddhiManager(), StreamAction.SAVE_TO_MONGO,
+                REPLY_CODES.KO_SAVE2MONGO_STREAM_ALREADY_ENABLED));
+        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
     }
 
 }

@@ -20,6 +20,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
+import com.stratio.streaming.streams.QueryDTO;
 import com.stratio.streaming.streams.StreamSharedStatus;
 
 public class QueryExistsValidation extends BaseSiddhiRequestValidation {
@@ -33,10 +34,8 @@ public class QueryExistsValidation extends BaseSiddhiRequestValidation {
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
         if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSm()) != null) {
-            // TODO normalize query and create their hash to verify correctly if
-            // this query exists
             if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSm()).getAddedQueries()
-                    .containsValue(request.getRequest())) {
+                    .containsValue(new QueryDTO(request.getRequest()))) {
                 throw new RequestValidationException(REPLY_CODES.KO_QUERY_ALREADY_EXISTS, String.format(
                         QUERY_ALREADY_EXISTS_MESSAGE, request.getStreamName()));
             }
