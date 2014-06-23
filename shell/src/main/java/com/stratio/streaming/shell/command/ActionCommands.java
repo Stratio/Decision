@@ -65,11 +65,37 @@ public class ActionCommands implements CommandMarker {
         }
     }
 
-    // TODO implement
     @CliCommand(value = "save cassandra stop", help = "stop save to cassandra action")
     public String saveCassandraStop(
             @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
-        throw new ShellException("Action not implemented yet!");
+        try {
+            stratioStreamingApi.stopSaveToCassandra(streamName);
+            return "Stream ".concat(streamName).concat(" de-attached from cassandra correctly");
+        } catch (StratioEngineStatusException e) {
+            throw new ShellException(e);
+        }
+    }
+
+    @CliCommand(value = "save mongo start", help = "start save to mongo action")
+    public String saveMongoStart(
+            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+        try {
+            stratioStreamingApi.saveToMongo(streamName);
+            return "Stream ".concat(streamName).concat(" attached to mongo correctly");
+        } catch (StratioEngineStatusException e) {
+            throw new ShellException(e);
+        }
+    }
+
+    @CliCommand(value = "save mongo stop", help = "stop save to mongo action")
+    public String saveMongoStop(
+            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+        try {
+            stratioStreamingApi.stopSaveToMongo(streamName);
+            return "Stream ".concat(streamName).concat(" de-attached from mongo correctly");
+        } catch (StratioEngineStatusException e) {
+            throw new ShellException(e);
+        }
     }
 
     @CliCommand(value = "listen start", help = "attach stream to kafka topic")
