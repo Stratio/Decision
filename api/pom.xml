@@ -275,6 +275,30 @@
 				</executions>
 			</plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+                            <repositoryId>sonatype-nexus-staging</repositoryId>
+                            <pomFile>pom.xml</pomFile>
+                            <files>
+                                <file>target/streaming-api-${project.version}.jar</file>
+                                <file>target/streaming-api-${project.version}-javadoc.jar</file>
+                                <file>target/streaming-api-${project.version}-sources.jar</file>
+                            </files>
+                        </configuration>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
 		</plugins>
 	</build>
 </project>
