@@ -120,7 +120,7 @@
 		<dependency>
 			<groupId>com.stratio.deep</groupId>
 			<artifactId>deep-core</artifactId>
-			<version>0.2.9</version>
+			<version>0.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
