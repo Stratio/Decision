@@ -26,7 +26,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Cluster.Builder;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.rdd.CassandraCellRDD;
 import com.stratio.streaming.commons.constants.STREAMING;
@@ -36,7 +36,7 @@ import com.stratio.streaming.functions.StratioStreamingBaseFunction;
 public class SaveRequestsToAuditLogFunction extends StratioStreamingBaseFunction {
 
     private static Logger logger = LoggerFactory.getLogger(SaveRequestsToAuditLogFunction.class);
-    private IDeepJobConfig<Cells> auditCassandraConfig;
+    private ICassandraDeepJobConfig<Cells> auditCassandraConfig;
     private static final String AUDITING_TABLE = "auditing_requests";
 
     /**
@@ -104,7 +104,6 @@ public class SaveRequestsToAuditLogFunction extends StratioStreamingBaseFunction
                             requestOperationNameCell, requestDataCell);
                 }
             });
-
             CassandraCellRDD.cql3SaveRDDToCassandra(outRDD.rdd(), auditCassandraConfig);
         }
 
