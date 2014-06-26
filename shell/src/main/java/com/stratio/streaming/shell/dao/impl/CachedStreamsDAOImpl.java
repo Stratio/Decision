@@ -17,6 +17,7 @@ package com.stratio.streaming.shell.dao.impl;
 
 import java.util.List;
 
+import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -38,13 +39,13 @@ public class CachedStreamsDAOImpl implements CachedStreamsDAO {
 
     @Cacheable(value = "streams")
     @Override
-    public List<StratioStream> listStreams() throws StratioEngineStatusException {
+    public List<StratioStream> listStreams() throws StratioEngineStatusException, StratioAPIGenericException {
         return stratioStreamingApi.listStreams();
     }
 
     @Override
     @CacheEvict(value = "streams", allEntries = true)
-    public List<StratioStream> listUncachedStreams() throws StratioEngineStatusException {
+    public List<StratioStream> listUncachedStreams() throws StratioEngineStatusException, StratioAPIGenericException {
         return stratioStreamingApi.listStreams();
     }
 

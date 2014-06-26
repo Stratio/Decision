@@ -1,27 +1,42 @@
-<!-- Copyright 2014 Stratio Licensed under the Apache License, Version 2.0 
-	(the "License"); you may not use this file except in compliance with the 
-	License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
-	Unless required by applicable law or agreed to in writing, software distributed 
-	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
-	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
-	the specific language governing permissions and limitations under the License. -->
+<!--
+
+    Copyright (C) 2014 Stratio (http://stratio.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.stratio.streaming</groupId>
 		<artifactId>stratio-streaming</artifactId>
-		<version>0.3.0-SNAPSHOT</version>
+		<version>0.3.1</version>
 	</parent>
 	<artifactId>streaming-engine</artifactId>
 	<properties>
 		<jar.mainclass>com.stratio.streaming.StreamingEngine</jar.mainclass>
+		<configurationDirectory>config</configurationDirectory>
+		<binFolder>bin</binFolder>
+		<repositoryName>lib</repositoryName>
+		<finalFolder>streaming-${version}</finalFolder>
+		<logPath>/var/log/stratio/</logPath>
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>me.prettyprint</groupId>
+			<groupId>org.hectorclient</groupId>
 			<artifactId>hector-core</artifactId>
-			<version>1.0-5</version>
+			<version>1.1-4</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -105,7 +120,7 @@
 		<dependency>
 			<groupId>com.stratio.deep</groupId>
 			<artifactId>deep-core</artifactId>
-			<version>0.2.9</version>
+			<version>0.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
@@ -115,7 +130,6 @@
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>2.12.2</version>
 		</dependency>
 		<!-- LOGGING -->
 		<dependency>
@@ -133,6 +147,13 @@
 			<groupId>com.typesafe</groupId>
 			<artifactId>config</artifactId>
 			<version>1.2.1</version>
+		</dependency>
+		<!-- TESTING -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<repositories>
@@ -153,6 +174,16 @@
 		</repository>
 	</distributionManagement>
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/assembly</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -160,11 +191,14 @@
 				<version>1.8</version>
 				<configuration>
 					<configurationSourceDirectory>src/main/assembly/config</configurationSourceDirectory>
-					<configurationDirectory>config</configurationDirectory>
 					<copyConfigurationDirectory>true</copyConfigurationDirectory>
 					<includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
 					<assembleDirectory>target/appassembler</assembleDirectory>
-					<extraJvmArguments>-Xms512m -Xmx512m</extraJvmArguments>
+					<extraJvmArguments>-Xms2048m -Xmx2048m</extraJvmArguments>
+					<configurationDirectory>${configurationDirectory}</configurationDirectory>
+					<binFolder>${binFolder}</binFolder>
+					<repositoryName>${repositoryName}</repositoryName>
+					<filterConfigurationDirectory>true</filterConfigurationDirectory>
 					<programs>
 						<program>
 							<mainClass>${jar.mainclass}</mainClass>
@@ -201,4 +235,17 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>admin-binary-builder</id>
+			<properties>
+				<configurationDirectory>etc/sds/streaming</configurationDirectory>
+				<binFolder>opt/sds/streaming/bin</binFolder>
+				<repositoryName>opt/sds/streaming/lib</repositoryName>
+				<finalFolder></finalFolder>
+
+				<logPath>/var/log/sds/streaming/</logPath>
+			</properties>
+		</profile>
+	</profiles>
 </project>

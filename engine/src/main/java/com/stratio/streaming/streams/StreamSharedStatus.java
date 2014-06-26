@@ -1,18 +1,18 @@
-/*******************************************************************************
- * Copyright 2014 Stratio
- * 
+/**
+ * Copyright (C) 2014 Stratio (http://stratio.com)
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- ******************************************************************************/
+ */
 package com.stratio.streaming.streams;
 
 import org.wso2.siddhi.core.SiddhiManager;
@@ -78,7 +78,7 @@ public class StreamSharedStatus {
         IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance()
                 .getMap(STREAMING.STREAM_STATUS_MAP);
         StreamStatusDTO streamStatusDTO = (StreamStatusDTO) streamStatusMap.get(streamName);
-        streamStatusDTO.getAddedQueries().put(queryId, query);
+        streamStatusDTO.getAddedQueries().put(queryId, new QueryDTO(query));
         streamStatusMap.put(streamStatusDTO.getStreamName(), streamStatusDTO);
 
     }
@@ -91,20 +91,6 @@ public class StreamSharedStatus {
         streamStatusDTO.getAddedQueries().remove(queryId);
         streamStatusMap.put(streamStatusDTO.getStreamName(), streamStatusDTO);
         return queryId;
-    }
-
-    public static void changeListenerStreamStatus(Boolean enabled, String streamName, SiddhiManager siddhiManager) {
-
-        IMap<Object, Object> streamStatusMap = siddhiManager.getSiddhiContext().getHazelcastInstance()
-                .getMap(STREAMING.STREAM_STATUS_MAP);
-        StreamStatusDTO streamStatusDTO = (StreamStatusDTO) streamStatusMap.get(streamName);
-        if (enabled) {
-            streamStatusDTO.enableAction(StreamAction.LISTEN);
-        } else {
-            streamStatusDTO.disableAction(StreamAction.LISTEN);
-        }
-        streamStatusMap.put(streamStatusDTO.getStreamName(), streamStatusDTO);
-
     }
 
     public static void removeStreamStatus(String streamName, SiddhiManager siddhiManager) {

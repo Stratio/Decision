@@ -1,18 +1,18 @@
-/*******************************************************************************
- * Copyright 2014 Stratio
- * 
+/**
+ * Copyright (C) 2014 Stratio (http://stratio.com)
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- ******************************************************************************/
+ */
 package com.stratio.streaming;
 
 import java.net.MalformedURLException;
@@ -46,6 +46,7 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.dal.IndexStreamFunction;
 import com.stratio.streaming.functions.dal.ListenStreamFunction;
 import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
+import com.stratio.streaming.functions.dal.SaveToMongoStreamFunction;
 import com.stratio.streaming.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.streaming.functions.ddl.AlterStreamFunction;
 import com.stratio.streaming.functions.ddl.CreateStreamFunction;
@@ -55,6 +56,7 @@ import com.stratio.streaming.functions.messages.FilterMessagesByOperationFunctio
 import com.stratio.streaming.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.streaming.functions.requests.CollectRequestForStatsFunction;
 import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
+import com.stratio.streaming.streams.QueryDTO;
 import com.stratio.streaming.streams.StreamPersistence;
 import com.stratio.streaming.streams.StreamSharedStatus;
 import com.stratio.streaming.utils.SiddhiUtils;
@@ -79,7 +81,7 @@ public class StreamingEngine {
     private static SiddhiManager siddhiManager;
     private static String cassandraCluster;
     private static Boolean failOverEnabled;
-    private static JavaStreamingContext jssc;
+    private static JavaStreamingContext streamingBaseContext;
 
     /**
      * @param args
@@ -91,13 +93,14 @@ public class StreamingEngine {
         Config config = loadConfig();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
             public void run() {
 
                 logger.info("Shutting down Stratio Streaming..");
 
                 // shutdown spark
-                if (jssc != null) {
-                    jssc.stop();
+                if (streamingBaseContext != null) {
+                    streamingBaseContext.stop();
                 }
 
                 // shutdown siddhi
@@ -125,7 +128,7 @@ public class StreamingEngine {
                 // shutdown zookeeper
                 ZKUtils.shutdownZKUtils();
 
-                logger.info("Shutdown complete, bye�");
+                logger.info("Shutdown complete, bye.");
             }
         });
 
@@ -158,7 +161,6 @@ public class StreamingEngine {
         failOverEnabled = config.getBoolean("failOverEnabled");
         String kafkaCluster = config.getString("kafka.host");
         String zkCluster = config.getString("zookeeper.host");
-        String elasticSearchUrl = config.getString("elasticsearch.host");
 
         boolean enableAuditing = config.getBoolean("auditEnabled");
         boolean enableStats = config.getBoolean("statsEnabled");
@@ -172,13 +174,9 @@ public class StreamingEngine {
                 String.valueOf(System.currentTimeMillis()).getBytes());
 
         // Create the context with a x seconds batch size
-        // jssc = new JavaStreamingContext(sparkMaster,
-        // StreamingEngine.class.getName(),
-        // new Duration(STREAMING.DURATION_MS), System.getenv("SPARK_HOME"),
-        // JavaStreamingContext.jarOfClass(StreamingEngine.class));
-        jssc = new JavaStreamingContext(config.getString("spark.host"), StreamingEngine.class.getName(), new Duration(
-                streamingBatchTime));
-        jssc.sparkContext().getConf().setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
+        streamingBaseContext = new JavaStreamingContext(config.getString("spark.host"),
+                StreamingEngine.class.getName(), new Duration(streamingBatchTime));
+        streamingBaseContext.sparkContext().getConf().setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
         CreateStreamFunction createStreamFunction = new CreateStreamFunction(getSiddhiManager(), zkCluster);
@@ -187,17 +185,9 @@ public class StreamingEngine {
         AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(getSiddhiManager(), zkCluster);
         ListenStreamFunction listenStreamFunction = new ListenStreamFunction(getSiddhiManager(), zkCluster,
                 kafkaCluster);
-        CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(
-                getSiddhiManager(), zkCluster, kafkaCluster);
         ListStreamsFunction listStreamsFunction = new ListStreamsFunction(getSiddhiManager(), zkCluster);
-        SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(
-                getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster, enableAuditing);
         SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
                 getSiddhiManager(), zkCluster, cassandraCluster);
-
-        HostAndPort elasticSearchConnectionData = HostAndPort.fromString(elasticSearchUrl);
-        IndexStreamFunction indexStreamFunction = new IndexStreamFunction(getSiddhiManager(), zkCluster,
-                elasticSearchConnectionData.getHostText(), elasticSearchConnectionData.getPortOrDefault(9300));
 
         Map<String, Integer> topicMap = new HashMap<String, Integer>();
         String[] topic_list = topics.split(",");
@@ -218,12 +208,52 @@ public class StreamingEngine {
         }
 
         // Start the Kafka stream
-        JavaPairDStream<String, String> messages = KafkaUtils.createStream(jssc, zkCluster, BUS.STREAMING_GROUP_ID,
-                topicMap);
+        JavaPairDStream<String, String> messages = KafkaUtils.createStream(streamingBaseContext, zkCluster,
+                BUS.STREAMING_GROUP_ID, topicMap);
 
         // as we are using messages several times, the best option is to cache
         // it
         messages.cache();
+
+        if (config.hasPath("elasticsearch")) {
+            HostAndPort elasticSearchConnectionData = HostAndPort.fromString(config.getString("elasticsearch.host"));
+            IndexStreamFunction indexStreamFunction = new IndexStreamFunction(getSiddhiManager(), zkCluster,
+                    elasticSearchConnectionData.getHostText(), elasticSearchConnectionData.getPortOrDefault(9300));
+
+            JavaDStream<StratioStreamingMessage> streamToIndexer_requests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.INDEX)).map(
+                    keepPayloadFromMessageFunction);
+
+            JavaDStream<StratioStreamingMessage> stopStreamToIndexer_requests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_INDEX)).map(
+                    keepPayloadFromMessageFunction);
+
+            streamToIndexer_requests.foreachRDD(indexStreamFunction);
+
+            stopStreamToIndexer_requests.foreachRDD(indexStreamFunction);
+        } else {
+            logger.warn("Elasticsearch configuration not found.");
+        }
+
+        if (config.hasPath("mongo")) {
+            SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(getSiddhiManager(),
+                    zkCluster, config.getString("mongo.host"), config.getInt("mongo.port"), (String) valueOrNull(
+                            config, "mongo.username"), (String) valueOrNull(config, "mongo.password"));
+
+            JavaDStream<StratioStreamingMessage> saveToMongo_requests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_MONGO)).map(
+                    keepPayloadFromMessageFunction);
+
+            JavaDStream<StratioStreamingMessage> stop_saveToMongo_requests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_MONGO)).map(
+                    keepPayloadFromMessageFunction);
+
+            saveToMongo_requests.foreachRDD(saveToMongoStreamFunction);
+
+            stop_saveToMongo_requests.foreach(saveToMongoStreamFunction);
+        } else {
+            logger.warn("Mongodb configuration not found.");
+        }
 
         // Create a DStream for each command, so we can treat all related
         // requests in the same way and also apply functions by command
@@ -263,14 +293,6 @@ public class StreamingEngine {
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> streamToIndexer_requests = messages.filter(
-                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.INDEX)).map(
-                keepPayloadFromMessageFunction);
-
-        JavaDStream<StratioStreamingMessage> stopStreamToIndexer_requests = messages.filter(
-                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_INDEX)).map(
-                keepPayloadFromMessageFunction);
-
         JavaDStream<StratioStreamingMessage> list_requests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.LIST)).map(
                 keepPayloadFromMessageFunction);
@@ -297,10 +319,6 @@ public class StreamingEngine {
 
         stop_saveToCassandra_requests.foreach(saveToCassandraStreamFunction);
 
-        streamToIndexer_requests.foreachRDD(indexStreamFunction);
-
-        stopStreamToIndexer_requests.foreachRDD(indexStreamFunction);
-
         list_requests.foreachRDD(listStreamsFunction);
 
         drop_requests.foreachRDD(createStreamFunction);
@@ -313,12 +331,18 @@ public class StreamingEngine {
                     .union(list_requests).union(drop_requests);
 
             if (enableAuditing) {
+                SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(
+                        getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster);
+
                 // persist the RDDs to cassandra using STRATIO DEEP
-                allRequests.foreachRDD(saveRequestsToAuditLogFunction);
+                allRequests.window(new Duration(2000), new Duration(6000)).foreachRDD(saveRequestsToAuditLogFunction);
             }
 
             if (enableStats) {
-                allRequests.foreachRDD(collectRequestForStatsFunction);
+                CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(
+                        getSiddhiManager(), zkCluster, kafkaCluster);
+
+                allRequests.window(new Duration(2000), new Duration(6000)).foreachRDD(collectRequestForStatsFunction);
 
             }
         }
@@ -355,7 +379,7 @@ public class StreamingEngine {
                         }
 
                         if (StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), getSiddhiManager()) != null) {
-                            HashMap<String, String> attachedQueries = StreamSharedStatus.getStreamStatus(
+                            HashMap<String, QueryDTO> attachedQueries = StreamSharedStatus.getStreamStatus(
                                     streamMetaData.getStreamId(), getSiddhiManager()).getAddedQueries();
 
                             streamDefinition.append(" /// " + attachedQueries.size() + " attachedQueries: (");
@@ -385,14 +409,11 @@ public class StreamingEngine {
                 }
 
             });
-
-            // messages.print();
-
         }
 
-        jssc.start();
+        streamingBaseContext.start();
         logger.info("Stratio streaming started at {}", new Date());
-        jssc.awaitTermination();
+        streamingBaseContext.awaitTermination();
 
     }
 
@@ -407,5 +428,14 @@ public class StreamingEngine {
     private static Config loadConfig() throws MalformedURLException {
         Config conf = ConfigFactory.load("config");
         return conf;
+    }
+
+    // TODO refactor
+    private static Object valueOrNull(Config config, String key) {
+        if (config.hasPath(key)) {
+            return config.getAnyRef(key);
+        } else {
+            return null;
+        }
     }
 }

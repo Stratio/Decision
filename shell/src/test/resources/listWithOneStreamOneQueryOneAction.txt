@@ -1,0 +1,10 @@
+  Stream name  User defined  Queries  Elements  Active actions
+  -----------  ------------  -------  --------  --------------
+  testStream   true          1        3         [INDEXED]
+
+Queries from stream testStream:
+
+  Id           Query raw
+  -----------  ---------------------
+  queryIdTest  query raw test string
+

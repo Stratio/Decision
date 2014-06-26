@@ -1,15 +1,39 @@
+<!--
+
+    Copyright (C) 2014 Stratio (http://stratio.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.stratio.streaming</groupId>
 	<artifactId>stratio-streaming</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>0.3.1</version>
 	<name>Stratio streaming parent</name>
 	<packaging>pom</packaging>
+	<description>Stratio Streaming is a real-time engine with Complex Event Processing capabilities with a built-in and powerful Streaming Query Language for doing on-demand operations on your streams.</description>
+	<url>http://www.stratio.com</url>
+	<scm>
+		<url>scm:git:git@github.com:Stratio/stratio-streaming.git</url>
+		<connection>scm:git:git@github.com/Stratio/stratio-streaming.git</connection>
+	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<cassandra.driver>2.0.2</cassandra.driver>
+		<mongo.driver>2.12.2</mongo.driver>
 		<kafka.driver>0.8.1.1</kafka.driver>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
@@ -20,35 +44,79 @@
 		<module>commons</module>
 		<module>shell</module>
 	</modules>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>com.mycila</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
-					<properties>
-						<owner>Stratio</owner>
-						<email>http://stratio.com</email>
-						<project.inceptionYear>2014</project.inceptionYear>
-					</properties>
-					<excludes>
-						<exclude>**/README</exclude>
-						<exclude>src/test/resources/**</exclude>
-						<exclude>src/main/resources/**</exclude>
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>format</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+	<profiles>
+		<profile>
+			<id>license</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.mycila</groupId>
+						<artifactId>license-maven-plugin</artifactId>
+						<version>2.6</version>
+						<configuration>
+							<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+							<properties>
+								<owner>Stratio</owner>
+								<email>http://stratio.com</email>
+								<project.inceptionYear>2014</project.inceptionYear>
+							</properties>
+							<excludes>
+								<exclude>**/README</exclude>
+								<exclude>src/test/resources/**</exclude>
+								<exclude>src/main/resources/**</exclude>
+							</excludes>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>format</goal>
+								</goals>
+								<phase>process-resources</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>build-parent</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.9.1</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+									<repositoryId>sonatype-nexus-staging</repositoryId>
+									<pomFile>pom.xml</pomFile>
+								</configuration>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<distributionManagement>
 		<repository>
 			<id>sonatype-nexus-staging</id>
@@ -99,6 +167,11 @@
 				<groupId>org.apache.kafka</groupId>
 				<artifactId>kafka_2.10</artifactId>
 				<version>${kafka.driver}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mongodb</groupId>
+				<artifactId>mongo-java-driver</artifactId>
+				<version>${mongo.driver}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
