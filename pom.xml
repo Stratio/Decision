@@ -15,17 +15,21 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.stratio.streaming</groupId>
 	<artifactId>stratio-streaming</artifactId>
-	<version>0.4.0-SNAPSHOT</version>
+	<version>0.3.4-SNAPSHOT</version>
 	<name>Stratio streaming parent</name>
 	<packaging>pom</packaging>
 	<description>Stratio Streaming is a real-time engine with Complex Event Processing capabilities with a built-in and powerful Streaming Query Language for doing on-demand operations on your streams.</description>
 	<url>http://www.stratio.com</url>
-
+	<modules>
+		<module>engine</module>
+		<module>api</module>
+		<module>commons</module>
+		<module>shell</module>
+	</modules>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -53,23 +57,24 @@
 
 	<profiles>
 		<profile>
-			<id>default</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<modules>
-				<module>engine</module>
-				<module>api</module>
-				<module>commons</module>
-				<module>shell</module>
-			</modules>
-		</profile>
-		<profile>
 			<id>release</id>
-			<modules>
-				<module>api</module>
-				<module>commons</module>
-			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 		<profile>
 			<id>build-parent</id>
