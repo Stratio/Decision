@@ -32,10 +32,14 @@
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
-
+	<issueManagement>
+		<system>GitHub</system>
+		<url>http://github.com/Stratio/stratio-streaming/issues</url>
+	</issueManagement>
 	<scm>
 		<url>scm:git:git@github.com:Stratio/stratio-streaming.git</url>
 		<connection>scm:git:git@github.com/Stratio/stratio-streaming.git</connection>
+		<developerConnection>scm:git:git@github.com/Stratio/stratio-streaming.git</developerConnection>
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
