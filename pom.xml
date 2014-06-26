@@ -64,18 +64,9 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.1</version>
 						<executions>
 							<execution>
-								<configuration>
-									<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-									<repositoryId>sonatype-nexus-staging</repositoryId>
-									<pomFile>pom.xml</pomFile>
-									<files>
-										<file>target/streaming-commons-${project.version}.jar</file>
-										<file>target/streaming-commons-${project.version}-javadoc.jar</file>
-										<file>target/streaming-commons-${project.version}-sources.jar</file>
-									</files>
-								</configuration>
 								<id>sign-artifacts</id>
 								<phase>verify</phase>
 								<goals>
