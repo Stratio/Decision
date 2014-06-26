@@ -212,15 +212,4 @@
 			</roles>
 		</developer>
 	</developers>
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<releaseProfiles>release</releaseProfiles>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>
