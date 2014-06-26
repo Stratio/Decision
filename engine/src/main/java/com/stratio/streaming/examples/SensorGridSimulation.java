@@ -175,7 +175,7 @@ public class SensorGridSimulation {
 
                 List<ColumnNameTypeValue> sensorData = Lists.newArrayList();
                 sensorData.add(new ColumnNameTypeValue("name", null, name));
-                sensorData.add(new ColumnNameTypeValue("index", null, "" + index));
+                sensorData.add(new ColumnNameTypeValue("ind", null, "" + index));
                 sensorData.add(new ColumnNameTypeValue("data", null, (random
                         .nextInt((dataRangeHigh - dataRangeLow) + 1) + dataRangeLow)));
 

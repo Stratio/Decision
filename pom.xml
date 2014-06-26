@@ -15,19 +15,35 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.stratio.streaming</groupId>
 	<artifactId>stratio-streaming</artifactId>
-	<version>0.3.1</version>
+	<version>0.3.4-SNAPSHOT</version>
 	<name>Stratio streaming parent</name>
 	<packaging>pom</packaging>
 	<description>Stratio Streaming is a real-time engine with Complex Event Processing capabilities with a built-in and powerful Streaming Query Language for doing on-demand operations on your streams.</description>
 	<url>http://www.stratio.com</url>
+	<modules>
+		<module>engine</module>
+		<module>api</module>
+		<module>commons</module>
+		<module>shell</module>
+	</modules>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<issueManagement>
+		<system>GitHub</system>
+		<url>http://github.com/Stratio/stratio-streaming/issues</url>
+	</issueManagement>
 	<scm>
-		<url>scm:git:git@github.com:Stratio/stratio-streaming.git</url>
-		<connection>scm:git:git@github.com/Stratio/stratio-streaming.git</connection>
+		<url>https://github.com/Stratio/stratio-streaming</url>
+		<connection>scm:git:git://github.com/Stratio/stratio-streaming.git</connection>
+		<developerConnection>scm:git:git@github.com:Stratio/stratio-streaming.git</developerConnection>
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,15 +54,30 @@
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
-	<modules>
-		<module>engine</module>
-		<module>api</module>
-		<module>commons</module>
-		<module>shell</module>
-	</modules>
+
 	<profiles>
 		<profile>
-			<id>license</id>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>build-parent</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -75,13 +106,6 @@
 							</execution>
 						</executions>
 					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>build-parent</id>
-			<build>
-				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
@@ -91,24 +115,6 @@
 								<id>attach-javadocs</id>
 								<goals>
 									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<executions>
-							<execution>
-								<configuration>
-									<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-									<repositoryId>sonatype-nexus-staging</repositoryId>
-									<pomFile>pom.xml</pomFile>
-								</configuration>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
 								</goals>
 							</execution>
 						</executions>
@@ -140,12 +146,6 @@
 			</releases>
 		</repository>
 	</repositories>
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
