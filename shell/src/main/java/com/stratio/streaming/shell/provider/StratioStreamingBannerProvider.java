@@ -47,6 +47,8 @@ public class StratioStreamingBannerProvider extends DefaultBannerProvider {
     @Value("${zookeeper.port}")
     private String zookeeperPort;
 
+    private String version = "0.3.4";
+
     @Autowired
     private IStratioStreamingAPI stratioStreamingAPI;
 
@@ -66,7 +68,7 @@ public class StratioStreamingBannerProvider extends DefaultBannerProvider {
 
     @Override
     public String getVersion() {
-        return "ALPHA";
+        return version;
     }
 
     @Override
@@ -76,7 +78,7 @@ public class StratioStreamingBannerProvider extends DefaultBannerProvider {
 
     @Override
     public String getProviderName() {
-        return "Init Banner Provider";
+        return "Stratio Streaming";
     }
 
 }
