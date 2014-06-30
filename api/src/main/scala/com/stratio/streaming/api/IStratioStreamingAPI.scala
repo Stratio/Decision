@@ -18,10 +18,10 @@ package com.stratio.streaming.api
 import _root_.kafka.consumer.KafkaStream
 import com.stratio.streaming.commons.streams.StratioStream
 import java.util.List
-import com.stratio.streaming.messaging.{ColumnNameValue, ColumnNameType}
+import com.stratio.streaming.api.messaging.{ ColumnNameValue, ColumnNameType }
 import com.stratio.streaming.commons.exceptions._
 import com.stratio.streaming.dto.StratioQueryStream
-import com.stratio.streaming.commons.messages.{StratioStreamingMessage, ColumnNameTypeValue}
+import com.stratio.streaming.commons.messages.{ StratioStreamingMessage, ColumnNameTypeValue }
 import com.stratio.streaming.dto.StratioQueryStream
 
 trait IStratioStreamingAPI {
@@ -36,7 +36,7 @@ trait IStratioStreamingAPI {
    * /**
    * Initializes the StratioStreamingAPI instance.
    * @return
-   */
+   * */
    * @param kafkaServer
    * @param kafkaPort
    * @param theZookeeperServer
@@ -45,9 +45,9 @@ trait IStratioStreamingAPI {
    */
   @throws(classOf[StratioEngineConnectionException])
   def initializeWithServerConfig(kafkaServer: String,
-                 kafkaPort: Int,
-                 theZookeeperServer: String,
-                 theZookeeperPort: Int): IStratioStreamingAPI
+    kafkaPort: Int,
+    theZookeeperServer: String,
+    theZookeeperPort: Int): IStratioStreamingAPI
 
   /**
    * Creates a new stream.
@@ -134,7 +134,7 @@ trait IStratioStreamingAPI {
 
   /**
    *  Gets a list of the queries from a given stream.
-    * @param stream
+   * @param stream
    * @throws com.stratio.streaming.commons.exceptions.StratioEngineOperationException
    * @return
    */

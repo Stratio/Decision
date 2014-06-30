@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.streaming.messaging
+package com.stratio.streaming.api.messaging
 
 import java.util.List
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue
 import scala.collection.JavaConversions._
 import MessageBuilder._
-
 
 case class MessageBuilderWithColumns(sessionId: String, operation: String) {
   def build(streamName: String, columns: List[ColumnNameType]) = {

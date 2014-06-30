@@ -17,16 +17,16 @@ package com.stratio.streaming.shell.dao.impl;
 
 import java.util.List;
 
-import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
 import com.stratio.streaming.api.IStratioStreamingAPI;
+import com.stratio.streaming.api.messaging.ColumnNameType;
+import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
 import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
 import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
 import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
 import com.stratio.streaming.commons.streams.StratioStream;
-import com.stratio.streaming.messaging.ColumnNameType;
 import com.stratio.streaming.shell.dao.CachedStreamsDAO;
 
 public class CachedStreamsDAOImpl implements CachedStreamsDAO {

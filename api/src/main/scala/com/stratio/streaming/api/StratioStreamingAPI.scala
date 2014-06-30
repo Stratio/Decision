@@ -16,31 +16,33 @@
 package com.stratio.streaming.api
 
 import org.apache.curator.retry.RetryOneTime
-import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
+import org.apache.curator.framework.{ CuratorFramework, CuratorFrameworkFactory }
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue
 import com.stratio.streaming.kafka.KafkaConsumer
 import com.stratio.streaming.commons.constants.BUS._
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION._
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION._
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.MANIPULATION._
-import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
+import org.apache.curator.framework.api.{ CuratorEvent, CuratorListener }
 import org.apache.curator.framework.api.CuratorEventType._
 import com.stratio.streaming.commons.constants.STREAMING._
-import com.stratio.streaming.commons.exceptions.{StratioEngineConnectionException, StratioEngineOperationException, StratioEngineStatusException}
+import com.stratio.streaming.commons.exceptions.{ StratioEngineConnectionException, StratioEngineOperationException, StratioEngineStatusException }
 import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import java.util.List
 import com.stratio.streaming.messaging._
-import com.stratio.streaming.messaging.MessageBuilder._
+import com.stratio.streaming.api.messaging.MessageBuilder._
 import scala.collection.JavaConversions._
 import com.stratio.streaming.messaging.InsertMessageBuilder
-import com.stratio.streaming.messaging.MessageBuilderWithColumns
+import com.stratio.streaming.api.messaging.MessageBuilderWithColumns
 import com.stratio.streaming.kafka.KafkaProducer
 import com.stratio.streaming.dto.StratioQueryStream
 import com.stratio.streaming.messaging.QueryMessageBuilder
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
-import com.stratio.streaming.commons.kafka.service.{TopicService, KafkaTopicService}
+import com.stratio.streaming.commons.kafka.service.{ TopicService, KafkaTopicService }
 import org.slf4j.LoggerFactory
+import com.stratio.streaming.api.messaging.ColumnNameValue
+import com.stratio.streaming.api.messaging.ColumnNameType
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
@@ -115,7 +117,6 @@ class StratioStreamingAPI
     syncOperation.performSyncOperation(stopListenStreamMessage)
   }
 
-
   private def shutdownKafkaConsumerAndRemoveStreamingListener(streamName: String) {
     val kafkaConsumer = streamingListeners.get(streamName)
     kafkaConsumer match {
@@ -179,7 +180,7 @@ class StratioStreamingAPI
     val stopSaveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(stopSaveToCassandraMessage)
   }
-  
+
   def indexStream(streamName: String) = {
     checkStreamingStatus()
     val operation = INDEX.toLowerCase
@@ -207,14 +208,14 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-        case ex: Exception => throw new StratioEngineConnectionException("Unable to connect to statio streaming")
+      case ex: Exception => throw new StratioEngineConnectionException("Unable to connect to statio streaming")
     }
   }
 
   def initializeWithServerConfig(kafkaServer: String,
-                 kafkaPort: Int,
-                 theZookeeperServer: String,
-                 theZookeeperPort: Int) = {
+    kafkaPort: Int,
+    theZookeeperServer: String,
+    theZookeeperPort: Int) = {
     try {
       brokerServer = kafkaServer
       brokerPort = kafkaPort
@@ -228,7 +229,7 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-        case _ => throw new StratioEngineConnectionException("Unable to connect to statio streaming")
+      case _ => throw new StratioEngineConnectionException("Unable to connect to statio streaming")
     }
   }
 
@@ -239,7 +240,7 @@ class StratioStreamingAPI
 }
 
 object StratioStreamingAPI
- extends StratioStreamingAPIConfig {
+  extends StratioStreamingAPIConfig {
   lazy val log = LoggerFactory.getLogger(getClass)
   val streamingTopicName = TOPICS
   val sessionId = "" + System.currentTimeMillis()
@@ -269,8 +270,7 @@ object StratioStreamingAPI
     if (!zookeeperConsumer.zNodeExists(ephemeralNodePath)) {
       log.warn("Ephemeral node does not exist")
       throw new StratioEngineStatusException("Stratio streaming is down")
-    }
-    else
+    } else
       streamingUpAndRunning = true
   }
 
