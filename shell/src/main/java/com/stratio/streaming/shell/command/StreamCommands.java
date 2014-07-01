@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.ShellException;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
@@ -39,6 +38,7 @@ import com.stratio.streaming.commons.streams.StratioStream;
 import com.stratio.streaming.shell.converter.wrapper.ColumnNameTypeList;
 import com.stratio.streaming.shell.converter.wrapper.ColumnNameValueList;
 import com.stratio.streaming.shell.dao.CachedStreamsDAO;
+import com.stratio.streaming.shell.exception.StreamingShellException;
 import com.stratio.streaming.shell.renderer.Renderer;
 
 @Component
@@ -59,7 +59,7 @@ public class StreamCommands implements CommandMarker {
             List<StratioStream> streams = cachedStreamsDAO.listUncachedStreams();
             return stratioStreamRenderer.render(streams);
         } catch (StratioStreamingException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -84,7 +84,7 @@ public class StreamCommands implements CommandMarker {
 
             return TableRenderer.renderMapDataAsTable(data, columns);
         } catch (StratioEngineOperationException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -97,7 +97,7 @@ public class StreamCommands implements CommandMarker {
             return "Stream ".concat(streamName).concat(" created correctly");
 
         } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -108,7 +108,7 @@ public class StreamCommands implements CommandMarker {
             cachedStreamsDAO.dropStream(streamName);
             return "Stream ".concat(streamName).concat(" dropped correctly");
         } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -121,7 +121,7 @@ public class StreamCommands implements CommandMarker {
             return "Stream ".concat(streamName).concat(" altered correctly");
 
         } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -133,7 +133,7 @@ public class StreamCommands implements CommandMarker {
             stratioStreamingApi.insertData(streamName, columns);
             return "Added an event to stream ".concat(streamName).concat(" correctly");
         } catch (StratioEngineStatusException | StratioAPISecurityException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 }
