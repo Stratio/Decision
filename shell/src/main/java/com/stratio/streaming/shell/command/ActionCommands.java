@@ -16,7 +16,6 @@
 package com.stratio.streaming.shell.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.ShellException;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
@@ -25,6 +24,7 @@ import org.springframework.stereotype.Component;
 import com.stratio.streaming.api.IStratioStreamingAPI;
 import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
 import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
+import com.stratio.streaming.shell.exception.StreamingShellException;
 
 @Component
 public class ActionCommands implements CommandMarker {
@@ -39,7 +39,7 @@ public class ActionCommands implements CommandMarker {
             stratioStreamingApi.indexStream(streamName);
             return "Stream ".concat(streamName).concat(" indexed correctly");
         } catch (StratioEngineStatusException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -50,7 +50,7 @@ public class ActionCommands implements CommandMarker {
             stratioStreamingApi.stopIndexStream(streamName);
             return "Stream ".concat(streamName).concat(" unindexed correctly");
         } catch (StratioEngineStatusException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -61,7 +61,7 @@ public class ActionCommands implements CommandMarker {
             stratioStreamingApi.saveToCassandra(streamName);
             return "Stream ".concat(streamName).concat(" attached to cassandra correctly");
         } catch (StratioEngineStatusException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -72,7 +72,7 @@ public class ActionCommands implements CommandMarker {
             stratioStreamingApi.stopSaveToCassandra(streamName);
             return "Stream ".concat(streamName).concat(" de-attached from cassandra correctly");
         } catch (StratioEngineStatusException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -83,7 +83,7 @@ public class ActionCommands implements CommandMarker {
             stratioStreamingApi.saveToMongo(streamName);
             return "Stream ".concat(streamName).concat(" attached to mongo correctly");
         } catch (StratioEngineStatusException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -94,7 +94,7 @@ public class ActionCommands implements CommandMarker {
             stratioStreamingApi.stopSaveToMongo(streamName);
             return "Stream ".concat(streamName).concat(" de-attached from mongo correctly");
         } catch (StratioEngineStatusException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -105,7 +105,7 @@ public class ActionCommands implements CommandMarker {
             stratioStreamingApi.listenStream(streamName);
             return "Stream ".concat(streamName).concat(" listened correctly");
         } catch (StratioEngineStatusException | StratioAPISecurityException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 
@@ -116,7 +116,7 @@ public class ActionCommands implements CommandMarker {
             stratioStreamingApi.stopListenStream(streamName);
             return "Stream ".concat(streamName).concat(" unlistened correctly");
         } catch (StratioEngineStatusException | StratioAPISecurityException e) {
-            throw new ShellException(e);
+            throw new StreamingShellException(e);
         }
     }
 

@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 
 import com.stratio.streaming.api.IStratioStreamingAPI;
 import com.stratio.streaming.api.messaging.ColumnNameType;
@@ -44,7 +45,7 @@ public class CachedStreamsDAOImpl implements CachedStreamsDAO {
     }
 
     @Override
-    @CacheEvict(value = "streams", allEntries = true)
+    @Caching(evict = @CacheEvict(value = "streams", allEntries = true, beforeInvocation = true), cacheable = @Cacheable(value = "streams"))
     public List<StratioStream> listUncachedStreams() throws StratioEngineStatusException, StratioAPIGenericException {
         return stratioStreamingApi.listStreams();
     }
