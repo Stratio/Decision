@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -43,6 +42,7 @@ import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.kafka.service.KafkaTopicService;
 import com.stratio.streaming.commons.kafka.service.TopicService;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import com.stratio.streaming.configuration.ConfigurationContext;
 import com.stratio.streaming.functions.dal.IndexStreamFunction;
 import com.stratio.streaming.functions.dal.ListenStreamFunction;
 import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
@@ -61,8 +61,6 @@ import com.stratio.streaming.streams.StreamPersistence;
 import com.stratio.streaming.streams.StreamSharedStatus;
 import com.stratio.streaming.utils.SiddhiUtils;
 import com.stratio.streaming.utils.ZKUtils;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 
 /**
  * @author dmorales
@@ -79,9 +77,9 @@ public class StreamingEngine {
 
     private static Logger logger = LoggerFactory.getLogger(StreamingEngine.class);
     private static SiddhiManager siddhiManager;
-    private static String cassandraCluster;
-    private static Boolean failOverEnabled;
     private static JavaStreamingContext streamingBaseContext;
+
+    private static ConfigurationContext cc;
 
     /**
      * @param args
@@ -89,9 +87,7 @@ public class StreamingEngine {
      * @throws Exception
      */
     public static void main(String[] args) throws MalformedURLException {
-
-        Config config = loadConfig();
-
+        cc = new ConfigurationContext();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -133,7 +129,7 @@ public class StreamingEngine {
         });
 
         try {
-            launchStratioStreamingEngine(config);
+            launchStratioStreamingEngine();
         } catch (Exception e) {
             logger.error("General error: " + e.getMessage() + " // " + e.getClass(), e);
         }
@@ -155,70 +151,63 @@ public class StreamingEngine {
      * @param topics
      * @throws Exception
      */
-    private static void launchStratioStreamingEngine(Config config) throws Exception {
+    private static void launchStratioStreamingEngine() throws Exception {
 
-        cassandraCluster = config.getString("cassandra.host");
-        failOverEnabled = config.getBoolean("failOverEnabled");
-        String kafkaCluster = config.getString("kafka.host");
-        String zkCluster = config.getString("zookeeper.host");
-
-        boolean enableAuditing = config.getBoolean("auditEnabled");
-        boolean enableStats = config.getBoolean("statsEnabled");
-        boolean printStreams = config.getBoolean("printStreams");
-
-        long streamingBatchTime = config.getDuration("spark.streamingBatchTime", TimeUnit.MILLISECONDS);
+        ConfigurationContext cc = new ConfigurationContext();
 
         String topics = BUS.TOPICS;
 
-        ZKUtils.getZKUtils(zkCluster).createEphemeralZNode(STREAMING.ZK_BASE_PATH + "/" + "engine",
+        ZKUtils.getZKUtils(cc.getZookeeperHostsQuorum()).createEphemeralZNode(STREAMING.ZK_BASE_PATH + "/" + "engine",
                 String.valueOf(System.currentTimeMillis()).getBytes());
 
         // Create the context with a x seconds batch size
-        streamingBaseContext = new JavaStreamingContext(config.getString("spark.host"),
-                StreamingEngine.class.getName(), new Duration(streamingBatchTime));
+        streamingBaseContext = new JavaStreamingContext(cc.getSparkHost(), StreamingEngine.class.getName(),
+                new Duration(cc.getStreamingBatchTime()));
         streamingBaseContext.sparkContext().getConf().setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
-        CreateStreamFunction createStreamFunction = new CreateStreamFunction(getSiddhiManager(), zkCluster);
-        AlterStreamFunction alterStreamFunction = new AlterStreamFunction(getSiddhiManager(), zkCluster);
-        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(getSiddhiManager(), zkCluster);
-        AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(getSiddhiManager(), zkCluster);
-        ListenStreamFunction listenStreamFunction = new ListenStreamFunction(getSiddhiManager(), zkCluster,
-                kafkaCluster);
-        ListStreamsFunction listStreamsFunction = new ListStreamsFunction(getSiddhiManager(), zkCluster);
+        CreateStreamFunction createStreamFunction = new CreateStreamFunction(getSiddhiManager(),
+                cc.getZookeeperHostsQuorum());
+        AlterStreamFunction alterStreamFunction = new AlterStreamFunction(getSiddhiManager(),
+                cc.getZookeeperHostsQuorum());
+        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(getSiddhiManager(),
+                cc.getZookeeperHostsQuorum());
+        AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(getSiddhiManager(),
+                cc.getZookeeperHostsQuorum());
+        ListenStreamFunction listenStreamFunction = new ListenStreamFunction(getSiddhiManager(),
+                cc.getZookeeperHostsQuorum(), cc.getKafkaHostsQuorum());
+        ListStreamsFunction listStreamsFunction = new ListStreamsFunction(getSiddhiManager(),
+                cc.getZookeeperHostsQuorum());
         SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
-                getSiddhiManager(), zkCluster, cassandraCluster);
+                getSiddhiManager(), cc.getZookeeperHostsQuorum(), cc.getCassandraHostsQuorum());
 
         Map<String, Integer> topicMap = new HashMap<String, Integer>();
         String[] topic_list = topics.split(",");
 
         // building the topic map, by using the num of partitions of each topic
-        HostAndPort kafkaConnectionData = HostAndPort.fromString(kafkaCluster);
-        TopicService topicService = new KafkaTopicService(zkCluster, kafkaConnectionData.getHostText(),
-                kafkaConnectionData.getPortOrDefault(9092), config.getInt("kafka.connectionTimeout"),
-                config.getInt("kafka.sessionTimeout"));
+        HostAndPort kafkaHostAndPort = HostAndPort.fromString(cc.getKafkaHosts().get(0));
+        TopicService topicService = new KafkaTopicService(cc.getZookeeperHostsQuorum(), kafkaHostAndPort.getHostText(),
+                kafkaHostAndPort.getPort(), cc.getKafkaConnectionTimeout(), cc.getKafkaSessionTimeout());
         for (String topic : topic_list) {
-            topicService.createTopicIfNotExist(topic, config.getInt("kafka.replicationFactor"),
-                    config.getInt("kafka.partitions"));
+            topicService.createTopicIfNotExist(topic, cc.getKafkaReplicationFactor(), cc.getKafkaPartitions());
             Integer partitions = topicService.getNumPartitionsForTopic(topic);
             if (partitions == 0) {
-                partitions = config.getInt("kafka.partitions");
+                partitions = cc.getKafkaPartitions();
             }
             topicMap.put(topic, partitions);
         }
 
         // Start the Kafka stream
-        JavaPairDStream<String, String> messages = KafkaUtils.createStream(streamingBaseContext, zkCluster,
-                BUS.STREAMING_GROUP_ID, topicMap);
+        JavaPairDStream<String, String> messages = KafkaUtils.createStream(streamingBaseContext,
+                cc.getZookeeperHostsQuorum(), BUS.STREAMING_GROUP_ID, topicMap);
 
         // as we are using messages several times, the best option is to cache
         // it
         messages.cache();
 
-        if (config.hasPath("elasticsearch")) {
-            HostAndPort elasticSearchConnectionData = HostAndPort.fromString(config.getString("elasticsearch.host"));
-            IndexStreamFunction indexStreamFunction = new IndexStreamFunction(getSiddhiManager(), zkCluster,
-                    elasticSearchConnectionData.getHostText(), elasticSearchConnectionData.getPortOrDefault(9300));
+        if (cc.getElasticSearchHost() != null) {
+            IndexStreamFunction indexStreamFunction = new IndexStreamFunction(getSiddhiManager(),
+                    cc.getZookeeperHostsQuorum(), cc.getElasticSearchHost(), cc.getElasticSearchPort());
 
             JavaDStream<StratioStreamingMessage> streamToIndexer_requests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.INDEX)).map(
@@ -235,10 +224,10 @@ public class StreamingEngine {
             logger.warn("Elasticsearch configuration not found.");
         }
 
-        if (config.hasPath("mongo")) {
+        if (cc.getMongoHost() != null) {
             SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(getSiddhiManager(),
-                    zkCluster, config.getString("mongo.host"), config.getInt("mongo.port"), (String) valueOrNull(
-                            config, "mongo.username"), (String) valueOrNull(config, "mongo.password"));
+                    cc.getZookeeperHostsQuorum(), cc.getMongoHost(), cc.getMongoPort(), cc.getMongoUsername(),
+                    cc.getMongoPassword());
 
             JavaDStream<StratioStreamingMessage> saveToMongo_requests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_MONGO)).map(
@@ -323,24 +312,25 @@ public class StreamingEngine {
 
         drop_requests.foreachRDD(createStreamFunction);
 
-        if (enableAuditing || enableStats) {
+        if (cc.isAuditEnabled() || cc.isStatsEnabled()) {
 
             JavaDStream<StratioStreamingMessage> allRequests = create_requests.union(alter_requests)
                     .union(insert_requests).union(add_query_requests).union(remove_query_requests)
                     .union(listen_requests).union(stop_listen_requests).union(saveToCassandra_requests)
                     .union(list_requests).union(drop_requests);
 
-            if (enableAuditing) {
+            if (cc.isAuditEnabled()) {
                 SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(
-                        getSiddhiManager(), zkCluster, kafkaCluster, cassandraCluster);
+                        getSiddhiManager(), cc.getZookeeperHostsQuorum(), cc.getKafkaHostsQuorum(),
+                        cc.getCassandraHostsQuorum());
 
                 // persist the RDDs to cassandra using STRATIO DEEP
                 allRequests.window(new Duration(2000), new Duration(6000)).foreachRDD(saveRequestsToAuditLogFunction);
             }
 
-            if (enableStats) {
+            if (cc.isStatsEnabled()) {
                 CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(
-                        getSiddhiManager(), zkCluster, kafkaCluster);
+                        getSiddhiManager(), cc.getZookeeperHostsQuorum(), cc.getKafkaHostsQuorum());
 
                 allRequests.window(new Duration(2000), new Duration(6000)).foreachRDD(collectRequestForStatsFunction);
 
@@ -349,7 +339,7 @@ public class StreamingEngine {
 
         StreamPersistence.saveStreamingEngineStatus(getSiddhiManager());
 
-        if (printStreams) {
+        if (cc.isPrintStreams()) {
 
             // DEBUG STRATIO STREAMING ENGINE //
             messages.count().foreach(new Function<JavaRDD<Long>, Void>() {
@@ -419,23 +409,10 @@ public class StreamingEngine {
 
     private static SiddhiManager getSiddhiManager() {
         if (siddhiManager == null) {
-            siddhiManager = SiddhiUtils.setupSiddhiManager(cassandraCluster, failOverEnabled);
+            siddhiManager = SiddhiUtils.setupSiddhiManager(cc.getCassandraHostsQuorum(), cc.isFailOverEnabled());
         }
 
         return siddhiManager;
     }
 
-    private static Config loadConfig() throws MalformedURLException {
-        Config conf = ConfigFactory.load("config");
-        return conf;
-    }
-
-    // TODO refactor
-    private static Object valueOrNull(Config config, String key) {
-        if (config.hasPath(key)) {
-            return config.getAnyRef(key);
-        } else {
-            return null;
-        }
-    }
 }
