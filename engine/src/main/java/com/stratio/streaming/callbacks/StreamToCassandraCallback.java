@@ -167,7 +167,7 @@ public class StreamToCassandraCallback extends StreamCallback implements Message
 
         if (running) {
 
-            List<StratioStreamingMessage> collected_events = Lists.newArrayList();
+            List<StratioStreamingMessage> collectedEvents = Lists.newArrayList();
 
             for (Event e : events) {
 
@@ -190,24 +190,24 @@ public class StreamToCassandraCallback extends StreamCallback implements Message
 
                     }
 
-                    collected_events.add(new StratioStreamingMessage(streamDefinition.getStreamId(), // value.streamName
+                    collectedEvents.add(new StratioStreamingMessage(streamDefinition.getStreamId(), // value.streamName
                             ie.getTimeStamp(), // value.timestamp
                             columns)); // value.columns
                 }
             }
 
-            persistEventsToCassandra(collected_events);
+            persistEventsToCassandra(collectedEvents);
         }
 
     }
 
-    private void persistEventsToCassandra(List<StratioStreamingMessage> collected_events) {
+    private void persistEventsToCassandra(List<StratioStreamingMessage> collectedEvents) {
 
         List<Insert> statements = Lists.newArrayList();
 
         HashMap<String, String> fieldsAndTypes = getStreamFieldsAndTypes();
 
-        for (StratioStreamingMessage event : collected_events) {
+        for (StratioStreamingMessage event : collectedEvents) {
 
             // check if current
             if (fieldsAndTypes.size() > (cassandraSession.getCluster().getMetadata()

@@ -182,13 +182,13 @@ public class StreamingEngine {
                 getSiddhiManager(), cc.getZookeeperHostsQuorum(), cc.getCassandraHostsQuorum());
 
         Map<String, Integer> topicMap = new HashMap<String, Integer>();
-        String[] topic_list = topics.split(",");
+        String[] topicList = topics.split(",");
 
         // building the topic map, by using the num of partitions of each topic
         HostAndPort kafkaHostAndPort = HostAndPort.fromString(cc.getKafkaHosts().get(0));
         TopicService topicService = new KafkaTopicService(cc.getZookeeperHostsQuorum(), kafkaHostAndPort.getHostText(),
                 kafkaHostAndPort.getPort(), cc.getKafkaConnectionTimeout(), cc.getKafkaSessionTimeout());
-        for (String topic : topic_list) {
+        for (String topic : topicList) {
             topicService.createTopicIfNotExist(topic, cc.getKafkaReplicationFactor(), cc.getKafkaPartitions());
             Integer partitions = topicService.getNumPartitionsForTopic(topic);
             if (partitions == 0) {
@@ -209,17 +209,17 @@ public class StreamingEngine {
             IndexStreamFunction indexStreamFunction = new IndexStreamFunction(getSiddhiManager(),
                     cc.getZookeeperHostsQuorum(), cc.getElasticSearchHost(), cc.getElasticSearchPort());
 
-            JavaDStream<StratioStreamingMessage> streamToIndexer_requests = messages.filter(
+            JavaDStream<StratioStreamingMessage> streamToIndexerRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.INDEX)).map(
                     keepPayloadFromMessageFunction);
 
-            JavaDStream<StratioStreamingMessage> stopStreamToIndexer_requests = messages.filter(
+            JavaDStream<StratioStreamingMessage> stopStreamToIndexerRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_INDEX)).map(
                     keepPayloadFromMessageFunction);
 
-            streamToIndexer_requests.foreachRDD(indexStreamFunction);
+            streamToIndexerRequests.foreachRDD(indexStreamFunction);
 
-            stopStreamToIndexer_requests.foreachRDD(indexStreamFunction);
+            stopStreamToIndexerRequests.foreachRDD(indexStreamFunction);
         } else {
             logger.warn("Elasticsearch configuration not found.");
         }
@@ -229,95 +229,95 @@ public class StreamingEngine {
                     cc.getZookeeperHostsQuorum(), cc.getMongoHost(), cc.getMongoPort(), cc.getMongoUsername(),
                     cc.getMongoPassword());
 
-            JavaDStream<StratioStreamingMessage> saveToMongo_requests = messages.filter(
+            JavaDStream<StratioStreamingMessage> saveToMongoRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_MONGO)).map(
                     keepPayloadFromMessageFunction);
 
-            JavaDStream<StratioStreamingMessage> stop_saveToMongo_requests = messages.filter(
+            JavaDStream<StratioStreamingMessage> stopSaveToMongoRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_MONGO)).map(
                     keepPayloadFromMessageFunction);
 
-            saveToMongo_requests.foreachRDD(saveToMongoStreamFunction);
+            saveToMongoRequests.foreachRDD(saveToMongoStreamFunction);
 
-            stop_saveToMongo_requests.foreach(saveToMongoStreamFunction);
+            stopSaveToMongoRequests.foreach(saveToMongoStreamFunction);
         } else {
             logger.warn("Mongodb configuration not found.");
         }
 
         // Create a DStream for each command, so we can treat all related
         // requests in the same way and also apply functions by command
-        JavaDStream<StratioStreamingMessage> create_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> createRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.CREATE)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> alter_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> alterRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.ALTER)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> insert_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> insertRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.INSERT)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> add_query_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> addQueryRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.ADD_QUERY)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> remove_query_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> removeQueryRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> listen_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> listenRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.LISTEN)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> stop_listen_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> stopListenRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_LISTEN)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> saveToCassandra_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> saveToCassandraRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> stop_saveToCassandra_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> stopSaveToCassandraRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> list_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> listRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.LIST)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> drop_requests = messages.filter(
+        JavaDStream<StratioStreamingMessage> dropRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.DEFINITION.DROP)).map(
                 keepPayloadFromMessageFunction);
 
-        create_requests.foreachRDD(createStreamFunction);
+        createRequests.foreachRDD(createStreamFunction);
 
-        alter_requests.foreachRDD(alterStreamFunction);
+        alterRequests.foreachRDD(alterStreamFunction);
 
-        insert_requests.foreachRDD(insertIntoStreamFunction);
+        insertRequests.foreachRDD(insertIntoStreamFunction);
 
-        add_query_requests.foreachRDD(addQueryToStreamFunction);
+        addQueryRequests.foreachRDD(addQueryToStreamFunction);
 
-        remove_query_requests.foreachRDD(addQueryToStreamFunction);
+        removeQueryRequests.foreachRDD(addQueryToStreamFunction);
 
-        listen_requests.foreachRDD(listenStreamFunction);
+        listenRequests.foreachRDD(listenStreamFunction);
 
-        stop_listen_requests.foreachRDD(listenStreamFunction);
+        stopListenRequests.foreachRDD(listenStreamFunction);
 
-        saveToCassandra_requests.foreachRDD(saveToCassandraStreamFunction);
+        saveToCassandraRequests.foreachRDD(saveToCassandraStreamFunction);
 
-        stop_saveToCassandra_requests.foreach(saveToCassandraStreamFunction);
+        stopSaveToCassandraRequests.foreach(saveToCassandraStreamFunction);
 
-        list_requests.foreachRDD(listStreamsFunction);
+        listRequests.foreachRDD(listStreamsFunction);
 
-        drop_requests.foreachRDD(createStreamFunction);
+        dropRequests.foreachRDD(createStreamFunction);
 
         if (cc.isAuditEnabled() || cc.isStatsEnabled()) {
 
-            JavaDStream<StratioStreamingMessage> allRequests = create_requests.union(alter_requests)
-                    .union(insert_requests).union(add_query_requests).union(remove_query_requests)
-                    .union(listen_requests).union(stop_listen_requests).union(saveToCassandra_requests)
-                    .union(list_requests).union(drop_requests);
+            JavaDStream<StratioStreamingMessage> allRequests = createRequests.union(alterRequests)
+                    .union(insertRequests).union(addQueryRequests).union(removeQueryRequests)
+                    .union(listenRequests).union(stopListenRequests).union(saveToCassandraRequests)
+                    .union(listRequests).union(dropRequests);
 
             if (cc.isAuditEnabled()) {
                 SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(

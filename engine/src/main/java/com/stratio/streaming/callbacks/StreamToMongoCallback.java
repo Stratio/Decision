@@ -75,7 +75,7 @@ public class StreamToMongoCallback extends StreamCallback implements MessageList
 
         if (running) {
 
-            List<StratioStreamingMessage> collected_events = Lists.newArrayList();
+            List<StratioStreamingMessage> collectedEvents = Lists.newArrayList();
 
             for (Event e : events) {
 
@@ -88,19 +88,19 @@ public class StreamToMongoCallback extends StreamCallback implements MessageList
                                     .getType()), ie.getData(streamDefinition.getAttributePosition(column.getName()))));
                         }
                     }
-                    collected_events.add(new StratioStreamingMessage(streamDefinition.getStreamId(), ie.getTimeStamp(),
+                    collectedEvents.add(new StratioStreamingMessage(streamDefinition.getStreamId(), ie.getTimeStamp(),
                             columns));
                 }
             }
-            persistEventsToMongo(collected_events);
+            persistEventsToMongo(collectedEvents);
         }
 
     }
 
-    private void persistEventsToMongo(List<StratioStreamingMessage> collected_events) {
+    private void persistEventsToMongo(List<StratioStreamingMessage> collectedEvents) {
         long time = System.currentTimeMillis();
         Map<String, BulkWriteOperation> elementsToInsert = new HashMap<String, BulkWriteOperation>();
-        for (StratioStreamingMessage event : collected_events) {
+        for (StratioStreamingMessage event : collectedEvents) {
             BasicDBObject object = new BasicDBObject("timestamp", time);
             for (ColumnNameTypeValue columnNameTypeValue : event.getColumns()) {
                 object.append(columnNameTypeValue.getColumn(), columnNameTypeValue.getValue());

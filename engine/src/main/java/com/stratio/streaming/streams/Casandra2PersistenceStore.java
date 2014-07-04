@@ -200,7 +200,7 @@ public class Casandra2PersistenceStore implements PersistenceStore {
         public NodeSnapshot(String nodeID, byte[] data) {
             super();
             this.nodeID = nodeID;
-            this.data = data;
+            this.data = data.clone();
         }
 
         @Override
