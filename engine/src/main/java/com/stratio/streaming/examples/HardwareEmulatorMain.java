@@ -124,7 +124,7 @@ public class HardwareEmulatorMain {
             Gson gson = new Gson();
 
             for (StratioStreamingMessage message : generateStratioStreamingMessages(values, name)) {
-                KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(BUS.TOPICS,
+                KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(BUS.TOPIC_DATA,
                         STREAM_OPERATIONS.MANIPULATION.INSERT, gson.toJson(message));
                 producer.send(busMessage);
             }

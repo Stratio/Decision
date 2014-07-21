@@ -242,7 +242,8 @@ class StratioStreamingAPI
 object StratioStreamingAPI
   extends StratioStreamingAPIConfig {
   lazy val log = LoggerFactory.getLogger(getClass)
-  val streamingTopicName = TOPICS
+  val streamingTopicName = TOPIC_REQUEST
+  val streamingDataTopicName = TOPIC_DATA
   val sessionId = "" + System.currentTimeMillis()
   var brokerServer = ""
   var brokerPort = 0
@@ -252,7 +253,8 @@ object StratioStreamingAPI
   lazy val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
   var streamingUpAndRunning = false
   val streamingListeners = scala.collection.mutable.Map[String, KafkaConsumer]()
-  lazy val kafkaProducer = new KafkaProducer(TOPICS, kafkaBroker)
+  lazy val kafkaProducer = new KafkaProducer(TOPIC_REQUEST, kafkaBroker)
+  lazy val kafkaDataProducer = new KafkaProducer(TOPIC_DATA, kafkaBroker)
   val retryPolicy = new RetryOneTime(500)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
   var topicService: TopicService = _
@@ -262,7 +264,7 @@ object StratioStreamingAPI
     ZookeeperConsumer(zookeeperClient)
   }
   lazy val syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
-  lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaProducer)
+  lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaDataProducer)
   lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
 
   def checkEphemeralNode() {

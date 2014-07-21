@@ -183,7 +183,7 @@ public class SensorGridSimulation {
                 message.setColumns(sensorData);
                 message.setRequest("dummy request");
 
-                KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(BUS.TOPICS,
+                KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(BUS.TOPIC_REQUEST,
                         STREAM_OPERATIONS.MANIPULATION.INSERT, gson.toJson(message));
                 producer.send(busMessage);
                 globalMessagesSent.getAndIncrement();

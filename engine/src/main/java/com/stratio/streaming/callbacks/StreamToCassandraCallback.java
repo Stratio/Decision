@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.cassandra.utils.UUIDGen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.event.Event;
@@ -35,7 +36,6 @@ import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.AlreadyExistsException;
 import com.datastax.driver.core.querybuilder.Insert;
-import com.datastax.driver.core.utils.UUIDs;
 import com.google.common.collect.Lists;
 import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
@@ -222,7 +222,7 @@ public class StreamToCassandraCallback extends StreamCallback implements Message
             String[] fields = new String[fieldsAndTypes.size() + 1];
 
             fields[0] = "time_taken";
-            values[0] = UUIDs.startOf(System.currentTimeMillis());
+            values[0] = UUIDGen.getTimeUUID();
 
             int i = 1;
             for (String field : fieldsAndTypes.keySet()) {
@@ -232,6 +232,7 @@ public class StreamToCassandraCallback extends StreamCallback implements Message
                 i++;
             }
 
+            // TODO refactor
             Insert hola = com.datastax.driver.core.querybuilder.QueryBuilder.insertInto(
                     STREAMING.STREAMING_KEYSPACE_NAME, streamDefinition.getStreamId()).values(fields, values);
             logger.debug("------------------->" + hola.getQueryString());

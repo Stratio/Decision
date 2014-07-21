@@ -80,13 +80,13 @@ public class ConfigurationContext {
         this.kafkaSessionTimeout = config.getInt(ConfigurationKeys.KAFKA_SESSION_TIMEOUT.getKey());
         this.kafkaConnectionTimeout = config.getInt(ConfigurationKeys.KAFKA_CONNECTION_TIMEOUT.getKey());
 
-        this.elasticSearchHost = (String) this.valueOrNull(ConfigurationKeys.ELASTICSEARCH_HOST.getKey(), config);
-        this.elasticSearchPort = (Integer) this.valueOrNull(ConfigurationKeys.ELASTICSEARCH_PORT.getKey(), config);
+        this.elasticSearchHost = (String) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_HOST.getKey(), config);
+        this.elasticSearchPort = (Integer) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_PORT.getKey(), config);
 
-        this.mongoHost = (String) this.valueOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
-        this.mongoPort = (Integer) this.valueOrNull(ConfigurationKeys.MONGO_PORT.getKey(), config);
-        this.mongoUsername = (String) this.valueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
-        this.mongoPassword = (String) this.valueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
+        this.mongoHost = (String) this.getValueOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
+        this.mongoPort = (Integer) this.getValueOrNull(ConfigurationKeys.MONGO_PORT.getKey(), config);
+        this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
+        this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
 
     }
 
@@ -178,7 +178,7 @@ public class ConfigurationContext {
         return mongoPassword;
     }
 
-    private Object valueOrNull(String key, Config config) {
+    private Object getValueOrNull(String key, Config config) {
         if (config.hasPath(key)) {
             return config.getAnyRef(key);
         } else {
