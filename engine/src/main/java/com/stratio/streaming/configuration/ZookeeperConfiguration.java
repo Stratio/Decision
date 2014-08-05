@@ -9,7 +9,6 @@ import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.utils.ZKUtils;
 
 @Configuration
-// TODO refactor
 public class ZookeeperConfiguration {
 
     @Autowired

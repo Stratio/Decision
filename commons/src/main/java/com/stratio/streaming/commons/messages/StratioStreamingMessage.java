@@ -24,10 +24,8 @@ import com.stratio.streaming.commons.constants.StreamAction;
 
 public class StratioStreamingMessage implements Serializable {
 
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = -3259551728685320551L;
+
     private String operation;
     private String streamName;
     private String session_id;
@@ -188,5 +186,4 @@ public class StratioStreamingMessage implements Serializable {
     public void setActiveActions(Set<StreamAction> activeActions) {
         this.activeActions = activeActions;
     }
-
 }

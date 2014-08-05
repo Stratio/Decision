@@ -13,10 +13,7 @@ import org.wso2.siddhi.core.config.SiddhiConfiguration;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.NetworkConfig;
-import com.hazelcast.instance.HazelcastInstanceFactory;
 import com.stratio.streaming.extensions.DistinctWindowExtension;
-import com.stratio.streaming.streams.Casandra2PersistenceStore;
-import com.stratio.streaming.streams.StreamPersistence;
 
 @Configuration
 // TODO refactor
@@ -48,15 +45,15 @@ public class StreamingSiddhiConfiguration {
         JoinConfig join = network.getJoin();
         join.getMulticastConfig().setEnabled(false);
 
-        siddhiManager.getSiddhiContext().setHazelcastInstance(HazelcastInstanceFactory.newHazelcastInstance(config));
-
-        if (configurationContext.isFailOverEnabled()) {
-
-            siddhiManager.setPersistStore(new Casandra2PersistenceStore(configurationContext.getCassandraHostsQuorum(),
-                    "", ""));
-
-            StreamPersistence.restoreLastRevision(siddhiManager);
-        }
+        // TODO enable failover
+        // if (configurationContext.isFailOverEnabled()) {
+        //
+        // siddhiManager.setPersistStore(new
+        // Casandra2PersistenceStore(configurationContext.getCassandraHostsQuorum(),
+        // "", ""));
+        //
+        // StreamPersistence.restoreLastRevision(siddhiManager);
+        // }
 
         return siddhiManager;
     }

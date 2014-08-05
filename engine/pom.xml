@@ -25,6 +25,8 @@
 	</parent>
 	<artifactId>streaming-engine</artifactId>
 	<properties>
+		<siddhi.version>2.0.0-wso2v4</siddhi.version>
+
 		<jar.mainclass>com.stratio.streaming.StreamingEngine</jar.mainclass>
 		<configurationDirectory>config</configurationDirectory>
 		<binFolder>bin</binFolder>
@@ -33,11 +35,6 @@
 		<logPath>/var/log/stratio/</logPath>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>org.hectorclient</groupId>
-			<artifactId>hector-core</artifactId>
-			<version>1.1-4</version>
-		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -86,17 +83,17 @@
 		<dependency>
 			<groupId>org.wso2.siddhi</groupId>
 			<artifactId>siddhi-core</artifactId>
-			<version>2.0.0-wso2v4</version>
+			<version>${siddhi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.wso2.siddhi</groupId>
 			<artifactId>siddhi-api</artifactId>
-			<version>2.0.0-wso2v4</version>
+			<version>${siddhi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.wso2.siddhi</groupId>
 			<artifactId>siddhi-query</artifactId>
-			<version>2.0.0-wso2v4</version>
+			<version>${siddhi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cassandra</groupId>
@@ -116,11 +113,6 @@
 		<dependency>
 			<groupId>com.stratio.streaming</groupId>
 			<artifactId>streaming-commons</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.stratio.deep</groupId>
-			<artifactId>deep-core</artifactId>
-			<version>0.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.elasticsearch</groupId>

@@ -29,7 +29,6 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.Attribute.Type;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
-import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
@@ -41,8 +40,6 @@ import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.extensions.DistinctWindowExtension;
-import com.stratio.streaming.streams.Casandra2PersistenceStore;
-import com.stratio.streaming.streams.StreamPersistence;
 
 public class SiddhiUtils {
 
@@ -54,7 +51,8 @@ public class SiddhiUtils {
 
     }
 
-    public static Type decodeSiddhiType(ColumnType originalType) throws SiddhiPraserException {
+    @Deprecated
+    public static Type decodeSiddhiType(ColumnType originalType) {
         switch (originalType) {
         case STRING:
             return Attribute.Type.STRING;
@@ -69,11 +67,11 @@ public class SiddhiUtils {
         case FLOAT:
             return Attribute.Type.FLOAT;
         default:
-            throw new SiddhiPraserException("Unsupported Column type: " + originalType);
+            throw new RuntimeException("Unsupported Column type: " + originalType);
         }
     }
 
-    public static ColumnType encodeSiddhiType(Type type) throws SiddhiPraserException {
+    public static ColumnType encodeSiddhiType(Type type) {
         switch (type) {
         case STRING:
             return ColumnType.STRING;
@@ -88,10 +86,11 @@ public class SiddhiUtils {
         case FLOAT:
             return ColumnType.FLOAT;
         default:
-            throw new SiddhiPraserException("Unsupported Column type: " + type);
+            throw new RuntimeException("Unsupported Column type: " + type);
         }
     }
 
+    @Deprecated
     public static String recoverStreamDefinition(StreamDefinition streamDefinition) {
 
         String attributesList = "";
@@ -104,17 +103,14 @@ public class SiddhiUtils {
                 + attributesList.substring(0, attributesList.length() - 1) + ")";
     }
 
+    @Deprecated
     public static StreamDefinition buildDefineStreamSiddhiQL(StratioStreamingMessage request) {
 
         StreamDefinition newStream = QueryFactory.createStreamDefinition().name(request.getStreamName());
 
         for (ColumnNameTypeValue column : request.getColumns()) {
             logger.info(column.getColumn() + "//" + SiddhiUtils.decodeSiddhiType(column.getType()));
-            try {
-                newStream.attribute(column.getColumn(), SiddhiUtils.decodeSiddhiType(column.getType()));
-            } catch (SiddhiPraserException e) {
-                logger.info(e.getMessage() + "//" + column.getColumn() + "//" + column.getType());
-            }
+            newStream.attribute(column.getColumn(), SiddhiUtils.decodeSiddhiType(column.getType()));
         }
 
         return newStream;
@@ -161,12 +157,13 @@ public class SiddhiUtils {
 
         siddhiManager.getSiddhiContext().setHazelcastInstance(HazelcastInstanceFactory.newHazelcastInstance(config));
 
-        if (failOverEnabled) {
-
-            siddhiManager.setPersistStore(new Casandra2PersistenceStore(cassandraCluster, "", ""));
-
-            StreamPersistence.restoreLastRevision(siddhiManager);
-        }
+        // if (failOverEnabled) {
+        //
+        // siddhiManager.setPersistStore(new
+        // Casandra2PersistenceStore(cassandraCluster, "", ""));
+        //
+        // StreamPersistence.restoreLastRevision(siddhiManager);
+        // }
 
         return siddhiManager;
     }
@@ -197,7 +194,7 @@ public class SiddhiUtils {
 
     }
 
-    private static Object decodeSiddhiValue(String originalValue, Attribute.Type type) throws SiddhiPraserException {
+    private static Object decodeSiddhiValue(String originalValue, Attribute.Type type) {
 
         switch (type) {
         case STRING:
@@ -213,12 +210,12 @@ public class SiddhiUtils {
         case FLOAT:
             return Float.valueOf(originalValue);
         default:
-            throw new SiddhiPraserException("Unsupported Column type: " + originalValue + "/" + type.toString());
+            throw new RuntimeException("Unsupported Column type: " + originalValue + "/" + type.toString());
         }
 
     }
 
-    private static Object decodeSiddhiValue(Double originalValue, Attribute.Type type) throws SiddhiPraserException {
+    private static Object decodeSiddhiValue(Double originalValue, Attribute.Type type) {
 
         switch (type) {
         case STRING:
@@ -232,7 +229,7 @@ public class SiddhiUtils {
         case FLOAT:
             return originalValue.floatValue();
         default:
-            throw new SiddhiPraserException("Unsupported Column type: " + originalValue + "/" + type.toString());
+            throw new RuntimeException("Unsupported Column type: " + originalValue + "/" + type.toString());
         }
 
     }

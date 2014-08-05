@@ -16,15 +16,16 @@
 package com.stratio.streaming.commons.constants;
 
 public enum ColumnType {
-    STRING("STRING"), BOOLEAN("BOOL"), DOUBLE("DOUBLE"), INTEGER("INT"), LONG("LONG"), FLOAT("FLOAT");
+    STRING(String.class), BOOLEAN(Boolean.class), DOUBLE(Double.class), INTEGER(Integer.class), LONG(Long.class), FLOAT(
+            Float.class);
 
-    private String value;
+    private Class<?> type;
 
-    private ColumnType(String value) {
-        this.value = value;
+    private ColumnType(Class<?> type) {
+        this.type = type;
     }
 
-    public String getValue() {
-        return value;
+    public Class<?> getType() {
+        return type;
     }
 }

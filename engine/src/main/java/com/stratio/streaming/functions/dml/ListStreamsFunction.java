@@ -18,8 +18,6 @@ package com.stratio.streaming.functions.dml;
 import java.util.List;
 import java.util.Set;
 
-import org.wso2.siddhi.core.SiddhiManager;
-
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ListStreamsMessage;
@@ -28,15 +26,15 @@ import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamAllowedValidation;
-import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.service.StreamOperationService;
 import com.stratio.streaming.utils.ZKUtils;
 
 public class ListStreamsFunction extends ActionBaseFunction {
 
     private static final long serialVersionUID = 3580834398296372380L;
 
-    public ListStreamsFunction(SiddhiManager siddhiManager, String zookeeperHost) {
-        super(siddhiManager, zookeeperHost);
+    public ListStreamsFunction(StreamOperationService streamOperationService, String zookeeperHost) {
+        super(streamOperationService, zookeeperHost);
     }
 
     @Override
@@ -51,7 +49,7 @@ public class ListStreamsFunction extends ActionBaseFunction {
 
     @Override
     protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
-        List<StratioStreamingMessage> existingStreams = StreamOperations.listStreams(message, getSiddhiManager());
+        List<StratioStreamingMessage> existingStreams = getStreamOperationService().listStreams();
         try {
             ZKUtils.getZKUtils(getZookeeperHost()).createZNodeJsonReply(message,
                     new ListStreamsMessage(existingStreams.size(), System.currentTimeMillis(), existingStreams));
@@ -73,6 +71,6 @@ public class ListStreamsFunction extends ActionBaseFunction {
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new StreamAllowedValidation(getSiddhiManager()));
+        validators.add(new StreamAllowedValidation());
     }
 }

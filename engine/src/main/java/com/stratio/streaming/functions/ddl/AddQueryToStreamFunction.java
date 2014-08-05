@@ -17,7 +17,6 @@ package com.stratio.streaming.functions.ddl;
 
 import java.util.Set;
 
-import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.DifferentDefinitionAlreadyExistException;
 import org.wso2.siddhi.query.api.exception.MalformedAttributeException;
 import org.wso2.siddhi.query.api.exception.SourceNotExistException;
@@ -32,14 +31,14 @@ import com.stratio.streaming.functions.validator.QueryExistsValidation;
 import com.stratio.streaming.functions.validator.QueryNotExistsValidation;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
-import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.service.StreamOperationService;
 
 public class AddQueryToStreamFunction extends ActionBaseFunction {
 
     private static final long serialVersionUID = -9194965881511759849L;
 
-    public AddQueryToStreamFunction(SiddhiManager siddhiManager, String zookeeperHost) {
-        super(siddhiManager, zookeeperHost);
+    public AddQueryToStreamFunction(StreamOperationService streamOperationService, String zookeeperHost) {
+        super(streamOperationService, zookeeperHost);
     }
 
     @Override
@@ -55,7 +54,7 @@ public class AddQueryToStreamFunction extends ActionBaseFunction {
     @Override
     protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
         try {
-            StreamOperations.addQueryToExistingStream(message, getSiddhiManager());
+            getStreamOperationService().addQuery(message.getStreamName(), message.getRequest());
         } catch (MalformedAttributeException e) {
             throw new RequestValidationException(REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST, e.getMessage());
         } catch (SourceNotExistException e) {
@@ -71,20 +70,20 @@ public class AddQueryToStreamFunction extends ActionBaseFunction {
 
     @Override
     protected boolean stopAction(StratioStreamingMessage message) {
-        StreamOperations.removeQueryFromExistingStream(message, getSiddhiManager());
+        getStreamOperationService().removeQuery(message.getRequest(), message.getStreamName());
         return true;
     }
 
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
-        validators.add(new QueryNotExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new QueryNotExistsValidation(getStreamOperationService()));
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new QueryExistsValidation(getSiddhiManager()));
-        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+        validators.add(new QueryExistsValidation(getStreamOperationService()));
+        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }
 
 }

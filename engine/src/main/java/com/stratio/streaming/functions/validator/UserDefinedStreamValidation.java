@@ -1,15 +1,14 @@
 package com.stratio.streaming.functions.validator;
 
-import org.wso2.siddhi.core.SiddhiManager;
-
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
+import com.stratio.streaming.service.StreamOperationService;
 
 public class UserDefinedStreamValidation extends BaseSiddhiRequestValidation {
 
-    public UserDefinedStreamValidation(SiddhiManager sm) {
-        super(sm);
+    public UserDefinedStreamValidation(StreamOperationService streamOperationService) {
+        super(streamOperationService);
     }
 
     private final static String INTERNAL_STREAM_DROP_NOT_ALLOWED = "Cannot delete the internal stream %s";

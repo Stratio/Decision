@@ -15,6 +15,7 @@
  */
 package com.stratio.streaming.commons.constants;
 
+@Deprecated
 public abstract class REPLY_CODES {
 
     public static final Integer OK = 1;

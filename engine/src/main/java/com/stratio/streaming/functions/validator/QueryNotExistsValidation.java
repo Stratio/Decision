@@ -15,29 +15,24 @@
  */
 package com.stratio.streaming.functions.validator;
 
-import org.wso2.siddhi.core.SiddhiManager;
-
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
-import com.stratio.streaming.streams.StreamSharedStatus;
+import com.stratio.streaming.service.StreamOperationService;
 
 public class QueryNotExistsValidation extends BaseSiddhiRequestValidation {
 
     private final static String QUERY_DOES_NOT_EXIST_MESSAGE = "Query %s in stream %s does not exists";
 
-    public QueryNotExistsValidation(SiddhiManager sm) {
-        super(sm);
+    public QueryNotExistsValidation(StreamOperationService streamOperationService) {
+        super(streamOperationService);
     }
 
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
-        if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSm()) != null) {
-            if (!StreamSharedStatus.getStreamStatus(request.getStreamName(), getSm()).getAddedQueries()
-                    .containsKey(request.getRequest())) {
-                throw new RequestValidationException(REPLY_CODES.KO_QUERY_DOES_NOT_EXIST, String.format(
-                        QUERY_DOES_NOT_EXIST_MESSAGE, request.getRequest(), request.getStreamName()));
-            }
+        if (!getStreamOperationService().queryExists(request.getStreamName(), request.getRequest())) {
+            throw new RequestValidationException(REPLY_CODES.KO_QUERY_DOES_NOT_EXIST, String.format(
+                    QUERY_DOES_NOT_EXIST_MESSAGE, request.getRequest(), request.getStreamName()));
         }
     }
 }

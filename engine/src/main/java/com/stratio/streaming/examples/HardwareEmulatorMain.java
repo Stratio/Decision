@@ -27,7 +27,7 @@ import kafka.producer.ProducerConfig;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.stratio.streaming.commons.constants.BUS;
+import com.stratio.streaming.commons.constants.InternalTopic;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
@@ -124,8 +124,9 @@ public class HardwareEmulatorMain {
             Gson gson = new Gson();
 
             for (StratioStreamingMessage message : generateStratioStreamingMessages(values, name)) {
-                KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(BUS.TOPIC_DATA,
-                        STREAM_OPERATIONS.MANIPULATION.INSERT, gson.toJson(message));
+                KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(
+                        InternalTopic.TOPIC_DATA.getTopicName(), STREAM_OPERATIONS.MANIPULATION.INSERT,
+                        gson.toJson(message));
                 producer.send(busMessage);
             }
 

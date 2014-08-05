@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
@@ -17,16 +15,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.query.api.definition.Attribute;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import com.stratio.streaming.StreamingEngine;
 import com.stratio.streaming.commons.constants.BUS;
-import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.commons.constants.InternalTopic;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import com.stratio.streaming.functions.FilterDataFunction;
+import com.stratio.streaming.functions.PairDataFunction;
+import com.stratio.streaming.functions.PrintStreamsFunction;
+import com.stratio.streaming.functions.SaveToCassandraActionExecutionFunction;
+import com.stratio.streaming.functions.SaveToElasticSearchActionExecutionFunction;
+import com.stratio.streaming.functions.SaveToMongoActionExecutionFunction;
+import com.stratio.streaming.functions.SendToKafkaActionExecutionFunction;
+import com.stratio.streaming.functions.SerializerFunction;
 import com.stratio.streaming.functions.dal.IndexStreamFunction;
 import com.stratio.streaming.functions.dal.ListenStreamFunction;
 import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
@@ -38,28 +41,27 @@ import com.stratio.streaming.functions.dml.InsertIntoStreamFunction;
 import com.stratio.streaming.functions.dml.ListStreamsFunction;
 import com.stratio.streaming.functions.messages.FilterMessagesByOperationFunction;
 import com.stratio.streaming.functions.messages.KeepPayloadFromMessageFunction;
-import com.stratio.streaming.functions.requests.CollectRequestForStatsFunction;
-import com.stratio.streaming.functions.requests.SaveRequestsToAuditLogFunction;
-import com.stratio.streaming.streams.QueryDTO;
-import com.stratio.streaming.streams.StreamPersistence;
-import com.stratio.streaming.streams.StreamSharedStatus;
+import com.stratio.streaming.serializer.impl.KafkaToJavaSerializer;
+import com.stratio.streaming.service.StreamOperationService;
 
 @Configuration
-@Import(StreamingSiddhiConfiguration.class)
+@Import(ServiceConfiguration.class)
 public class StreamingContextConfiguration {
 
-    private static Logger logger = LoggerFactory.getLogger(StreamingContextConfiguration.class);
+    private static Logger log = LoggerFactory.getLogger(StreamingContextConfiguration.class);
 
     @Autowired
     private ConfigurationContext configurationContext;
 
     @Autowired
-    private SiddhiManager siddhiManager;
+    private StreamOperationService streamOperationService;
+
+    @Autowired
+    private KafkaToJavaSerializer kafkaToJavaSerializer;
 
     private JavaStreamingContext create(String streamingContextName, int port) {
         SparkConf conf = new SparkConf();
         conf.set("spark.ui.port", String.valueOf(port));
-        conf.set("spark.tachyonStore.folderName", streamingContextName);
         conf.setAppName(streamingContextName);
         conf.setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
         conf.setMaster(configurationContext.getSparkHost());
@@ -76,21 +78,21 @@ public class StreamingContextConfiguration {
         JavaStreamingContext context = this.create("stratio-streaming-action", 4040);
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
-        CreateStreamFunction createStreamFunction = new CreateStreamFunction(siddhiManager,
+        CreateStreamFunction createStreamFunction = new CreateStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorum());
-        AlterStreamFunction alterStreamFunction = new AlterStreamFunction(siddhiManager,
+        AlterStreamFunction alterStreamFunction = new AlterStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorum());
-        AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(siddhiManager,
+        AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorum());
-        ListenStreamFunction listenStreamFunction = new ListenStreamFunction(siddhiManager,
-                configurationContext.getZookeeperHostsQuorum(), configurationContext.getKafkaHostsQuorum());
-        ListStreamsFunction listStreamsFunction = new ListStreamsFunction(siddhiManager,
+        ListenStreamFunction listenStreamFunction = new ListenStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorum());
-        SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(siddhiManager,
-                configurationContext.getZookeeperHostsQuorum(), configurationContext.getCassandraHostsQuorum());
+        ListStreamsFunction listStreamsFunction = new ListStreamsFunction(streamOperationService,
+                configurationContext.getZookeeperHostsQuorum());
+        SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
+                streamOperationService, configurationContext.getZookeeperHostsQuorum());
 
         Map<String, Integer> baseTopicMap = new HashMap<String, Integer>();
-        baseTopicMap.put(BUS.TOPIC_REQUEST, 1);
+        baseTopicMap.put(InternalTopic.TOPIC_REQUEST.getTopicName(), 1);
 
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), BUS.STREAMING_GROUP_ID, baseTopicMap);
@@ -98,9 +100,8 @@ public class StreamingContextConfiguration {
         messages.cache();
 
         if (configurationContext.getElasticSearchHost() != null) {
-            IndexStreamFunction indexStreamFunction = new IndexStreamFunction(siddhiManager,
-                    configurationContext.getZookeeperHostsQuorum(), configurationContext.getElasticSearchHost(),
-                    configurationContext.getElasticSearchPort());
+            IndexStreamFunction indexStreamFunction = new IndexStreamFunction(streamOperationService,
+                    configurationContext.getZookeeperHostsQuorum());
 
             JavaDStream<StratioStreamingMessage> streamToIndexerRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.INDEX)).map(
@@ -114,14 +115,12 @@ public class StreamingContextConfiguration {
 
             stopStreamToIndexerRequests.foreachRDD(indexStreamFunction);
         } else {
-            logger.warn("Elasticsearch configuration not found.");
+            log.warn("Elasticsearch configuration not found.");
         }
 
         if (configurationContext.getMongoHost() != null) {
-            SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(siddhiManager,
-                    configurationContext.getZookeeperHostsQuorum(), configurationContext.getMongoHost(),
-                    configurationContext.getMongoPort(), configurationContext.getMongoUsername(),
-                    configurationContext.getMongoPassword());
+            SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(streamOperationService,
+                    configurationContext.getZookeeperHostsQuorum());
 
             JavaDStream<StratioStreamingMessage> saveToMongoRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_MONGO)).map(
@@ -135,7 +134,7 @@ public class StreamingContextConfiguration {
 
             stopSaveToMongoRequests.foreachRDD(saveToMongoStreamFunction);
         } else {
-            logger.warn("Mongodb configuration not found.");
+            log.warn("Mongodb configuration not found.");
         }
 
         // Create a DStream for each command, so we can treat all related
@@ -197,87 +196,37 @@ public class StreamingContextConfiguration {
                     .union(addQueryRequests).union(removeQueryRequests).union(listenRequests).union(stopListenRequests)
                     .union(saveToCassandraRequests).union(listRequests).union(dropRequests);
 
-            if (configurationContext.isAuditEnabled()) {
-                SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction = new SaveRequestsToAuditLogFunction(
-                        siddhiManager, configurationContext.getZookeeperHostsQuorum(),
-                        configurationContext.getKafkaHostsQuorum(), configurationContext.getCassandraHostsQuorum());
+            // TODO enable audit functionality
+            // if (configurationContext.isAuditEnabled()) {
+            // SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction =
+            // new SaveRequestsToAuditLogFunction(
+            // configurationContext.getCassandraHostsQuorum());
+            //
+            // // persist the RDDs to cassandra using STRATIO DEEP
+            // allRequests.window(new Duration(2000), new
+            // Duration(6000)).foreachRDD(saveRequestsToAuditLogFunction);
+            // }
 
-                // persist the RDDs to cassandra using STRATIO DEEP
-                allRequests.window(new Duration(2000), new Duration(6000)).foreachRDD(saveRequestsToAuditLogFunction);
-            }
-
+            // TODO enable stats functionality
             if (configurationContext.isStatsEnabled()) {
-                CollectRequestForStatsFunction collectRequestForStatsFunction = new CollectRequestForStatsFunction(
-                        siddhiManager, configurationContext.getZookeeperHostsQuorum(),
-                        configurationContext.getKafkaHostsQuorum());
-
-                allRequests.window(new Duration(2000), new Duration(6000)).foreachRDD(collectRequestForStatsFunction);
-
+                // CollectRequestForStatsFunction collectRequestForStatsFunction
+                // =
+                // new CollectRequestForStatsFunction(
+                // siddhiManager,
+                // configurationContext.getZookeeperHostsQuorum(),
+                // configurationContext.getKafkaHostsQuorum());
+                //
+                // allRequests.window(new Duration(2000), new
+                // Duration(6000)).foreachRDD(collectRequestForStatsFunction);
+                //
             }
         }
 
-        StreamPersistence.saveStreamingEngineStatus(siddhiManager);
+        // TODO refactor this save to streaming engine status
+        // StreamPersistence.saveStreamingEngineStatus(siddhiManager);
 
         if (configurationContext.isPrintStreams()) {
-
-            // DEBUG STRATIO STREAMING ENGINE //
-            messages.count().foreach(new Function<JavaRDD<Long>, Void>() {
-
-                private static final long serialVersionUID = -2371501158355376325L;
-
-                @Override
-                public Void call(JavaRDD<Long> arg0) throws Exception {
-                    StringBuffer sb = new StringBuffer();
-                    sb.append("\n********************************************\n");
-                    sb.append("**            SIDDHI STREAMS              **\n");
-                    sb.append("** countSiddhi:");
-                    sb.append(siddhiManager.getStreamDefinitions().size());
-                    sb.append(" // countHazelcast: ");
-                    sb.append(siddhiManager.getSiddhiContext().getHazelcastInstance()
-                            .getMap(STREAMING.STREAM_STATUS_MAP).size());
-                    sb.append("     **\n");
-
-                    for (StreamDefinition streamMetaData : siddhiManager.getStreamDefinitions()) {
-
-                        StringBuffer streamDefinition = new StringBuffer();
-
-                        streamDefinition.append(streamMetaData.getStreamId());
-
-                        for (Attribute column : streamMetaData.getAttributeList()) {
-                            streamDefinition.append(" |" + column.getName() + "," + column.getType());
-                        }
-
-                        if (StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), siddhiManager) != null) {
-                            HashMap<String, QueryDTO> attachedQueries = StreamSharedStatus.getStreamStatus(
-                                    streamMetaData.getStreamId(), siddhiManager).getAddedQueries();
-
-                            streamDefinition.append(" /// " + attachedQueries.size() + " attachedQueries: (");
-
-                            for (String queryId : attachedQueries.keySet()) {
-                                streamDefinition.append(queryId + "/");
-                            }
-
-                            streamDefinition.append(" - userDefined:"
-                                    + StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), siddhiManager)
-                                            .isUserDefined() + "- ");
-                            streamDefinition.append(" - listenEnable:"
-                                    + StreamSharedStatus.getStreamStatus(streamMetaData.getStreamId(), siddhiManager)
-                                            .isActionEnabled(StreamAction.LISTEN) + "- ");
-                        }
-
-                        sb.append("** stream: ".concat(streamDefinition.toString()).concat("\n"));
-                    }
-
-                    sb.append("********************************************\n");
-
-                    logger.info(sb.toString());
-
-                    StreamPersistence.saveStreamingEngineStatus(siddhiManager);
-
-                    return null;
-                }
-
-            });
+            messages.count().foreach(new PrintStreamsFunction(streamOperationService));
         }
 
         return context;
@@ -291,7 +240,7 @@ public class StreamingContextConfiguration {
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
 
         Map<String, Integer> baseTopicMap = new HashMap<String, Integer>();
-        baseTopicMap.put(BUS.TOPIC_DATA, 1);
+        baseTopicMap.put(InternalTopic.TOPIC_DATA.getTopicName(), 1);
 
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), BUS.STREAMING_GROUP_ID, baseTopicMap);
@@ -302,7 +251,7 @@ public class StreamingContextConfiguration {
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.INSERT)).map(
                 keepPayloadFromMessageFunction);
 
-        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(siddhiManager,
+        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorum());
 
         insertRequests.foreachRDD(insertIntoStreamFunction);
@@ -311,10 +260,39 @@ public class StreamingContextConfiguration {
 
     }
 
-    // @Bean(name = "processContext", destroyMethod = "stop")
-    // TODO new context, not used yet
+    @Bean(name = "processContext", destroyMethod = "stop")
     public JavaStreamingContext processContext() {
-        return this.create("stratio-streaming-process", 4042);
-    }
+        JavaStreamingContext context = this.create("stratio-streaming-process", 4042);
 
+        Map<String, Integer> topicActionMap = new HashMap<String, Integer>();
+        topicActionMap.put(InternalTopic.TOPIC_ACTION.getTopicName(), 1);
+
+        JavaPairDStream<String, String> dataDstream = KafkaUtils.createStream(context,
+                configurationContext.getZookeeperHostsQuorum(), BUS.STREAMING_GROUP_ID, topicActionMap);
+
+        JavaDStream<StratioStreamingMessage> parsedDataDstream = dataDstream.map(new SerializerFunction());
+
+        JavaPairDStream<StreamAction, StratioStreamingMessage> pairedDataDstream = parsedDataDstream
+                .mapPartitionsToPair(new PairDataFunction());
+
+        JavaPairDStream<StreamAction, Iterable<StratioStreamingMessage>> groupedDataDstream = pairedDataDstream
+                .groupByKey();
+
+        groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
+                new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum()));
+
+        groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(
+                new SaveToMongoActionExecutionFunction(configurationContext.getMongoHost(), configurationContext
+                        .getMongoPort(), configurationContext.getMongoUsername(), configurationContext
+                        .getMongoPassword()));
+
+        groupedDataDstream.filter(new FilterDataFunction(StreamAction.INDEXED)).foreachRDD(
+                new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHost(),
+                        configurationContext.getElasticSearchPort()));
+
+        groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
+                new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));
+
+        return context;
+    }
 }
