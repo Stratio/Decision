@@ -15,7 +15,7 @@ public class UserDefinedStreamValidation extends BaseSiddhiRequestValidation {
 
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
-        if (!request.isUserDefined()) {
+        if (!getStreamOperationService().isUserDefined(request.getStreamName())) {
             throw new RequestValidationException(REPLY_CODES.KO_STREAM_OPERATION_NOT_ALLOWED, String.format(
                     INTERNAL_STREAM_DROP_NOT_ALLOWED, request.getStreamName()));
         }
