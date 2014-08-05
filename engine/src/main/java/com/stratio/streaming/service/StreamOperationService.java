@@ -1,10 +1,10 @@
 package com.stratio.streaming.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.QueryFactory;
@@ -13,8 +13,6 @@ import org.wso2.siddhi.query.api.definition.Attribute.Type;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.AttributeAlreadyExistException;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.StreamAction;
@@ -35,8 +33,6 @@ public class StreamOperationService {
 
     private final CallbackService callbackService;
 
-    private final static String VOID_STREAM_PREFIX = "VOID_";
-
     public StreamOperationService(SiddhiManager siddhiManager, StreamStatusDao streamStatusDao,
             CallbackService callbackService) {
         this.siddhiManager = siddhiManager;
@@ -55,6 +51,11 @@ public class StreamOperationService {
 
     public boolean streamExist(String streamName) {
         return streamStatusDao.get(streamName) != null ? true : false;
+    }
+
+    public boolean isUserDefined(String streamName) {
+        StreamStatusDTO streamStatus = streamStatusDao.get(streamName);
+        return streamStatus != null ? streamStatus.getUserDefined() : false;
     }
 
     public int enlargeStream(String streamName, List<ColumnNameTypeValue> columns) {
@@ -108,7 +109,16 @@ public class StreamOperationService {
         }
     }
 
-    public boolean queryExists(String streamName, String queryRaw) {
+    public boolean queryIdExists(String streamName, String queryId) {
+        StreamStatusDTO streamStatus = streamStatusDao.get(streamName);
+        if (streamStatus != null) {
+            return streamStatus.getAddedQueries().containsKey(queryId);
+        } else {
+            return false;
+        }
+    }
+
+    public boolean queryRawExists(String streamName, String queryRaw) {
         StreamStatusDTO streamStatus = streamStatusDao.get(streamName);
         if (streamStatus != null) {
             return streamStatus.getAddedQueries().containsValue(new QueryDTO(queryRaw));
@@ -121,7 +131,8 @@ public class StreamOperationService {
 
         if (streamStatusDao.getEnabledActions(streamName).size() == 0) {
             String actionQueryId = siddhiManager.addQuery(QueryFactory.createQuery()
-                    .from(QueryFactory.inputStream(streamName)).insertInto(VOID_STREAM_PREFIX.concat(streamName)));
+                    .from(QueryFactory.inputStream(streamName))
+                    .insertInto(STREAMING.STATS_NAMES.SINK_STREAM_PREFIX.concat(streamName)));
 
             streamStatusDao.setActionQuery(streamName, actionQueryId);
 
@@ -148,39 +159,41 @@ public class StreamOperationService {
         return streamStatusDao.getEnabledActions(streamName).contains(action);
     }
 
-    // TODO refactor
-    public List<StratioStreamingMessage> listStreams() {
-        List<StratioStreamingMessage> streams = Lists.newArrayList();
-        for (StreamDefinition streamMetaData : siddhiManager.getStreamDefinitions()) {
-            if (!Arrays.asList(STREAMING.STATS_NAMES.STATS_STREAMS).contains(streamMetaData.getStreamId())) {
-                List<ColumnNameTypeValue> columns = Lists.newArrayList();
-                List<StreamQuery> queries = Lists.newArrayList();
-                Set<StreamAction> actions = Sets.newHashSet();
-                boolean isUserDefined = false;
-                for (Attribute column : streamMetaData.getAttributeList()) {
-                    columns.add(new ColumnNameTypeValue(column.getName(),
-                            SiddhiUtils.encodeSiddhiType(column.getType()), null));
+    public List<StratioStreamingMessage> list() {
+        List<StratioStreamingMessage> result = new ArrayList<>();
+        for (StreamDefinition streamDefinition : siddhiManager.getStreamDefinitions()) {
+            if (suitableToList(streamDefinition.getStreamId())) {
+                StratioStreamingMessage message = new StratioStreamingMessage();
+                for (Attribute attribute : streamDefinition.getAttributeList()) {
+                    message.addColumn(new ColumnNameTypeValue(attribute.getName(), this.getStreamingType(attribute
+                            .getType()), null));
                 }
-                StreamStatusDTO streamStatus = streamStatusDao.get(streamMetaData.getStreamId());
+                StreamStatusDTO streamStatus = streamStatusDao.get(streamDefinition.getStreamId());
 
                 if (streamStatus != null) {
                     Map<String, QueryDTO> attachedQueries = streamStatus.getAddedQueries();
 
                     for (Entry<String, QueryDTO> entry : attachedQueries.entrySet()) {
-                        queries.add(new StreamQuery(entry.getKey(), entry.getValue().getQueryRaw()));
+                        message.addQuery(new StreamQuery(entry.getKey(), entry.getValue().getQueryRaw()));
                     }
-                    isUserDefined = streamStatus.getUserDefined();
-                    actions = streamStatusDao.getEnabledActions(streamMetaData.getStreamId());
+                    message.setUserDefined(streamStatus.getUserDefined());
+                    message.setActiveActions(streamStatusDao.getEnabledActions(streamDefinition.getStreamId()));
                 }
-                StratioStreamingMessage streamMessage = new StratioStreamingMessage(streamMetaData.getId(), columns,
-                        queries);
-                streamMessage.setUserDefined(isUserDefined);
-                streamMessage.setActiveActions(actions);
 
-                streams.add(streamMessage);
+                message.setStreamName(streamDefinition.getStreamId());
+
+                result.add(message);
             }
         }
-        return streams;
+
+        return result;
+    }
+
+    private boolean suitableToList(String streamName) {
+        boolean startWithSinkPrefix = streamName.startsWith(STREAMING.STATS_NAMES.SINK_STREAM_PREFIX);
+        boolean isAStatStream = Arrays.asList(STREAMING.STATS_NAMES.STATS_STREAMS).contains(streamName);
+
+        return !startWithSinkPrefix && !isAStatStream;
     }
 
     public void send(String streamName, List<ColumnNameTypeValue> columns) throws ServiceException {
@@ -210,6 +223,25 @@ public class StreamOperationService {
             return Attribute.Type.FLOAT;
         default:
             throw new RuntimeException("Unsupported Column type: " + originalType);
+        }
+    }
+
+    private ColumnType getStreamingType(Type type) {
+        switch (type) {
+        case STRING:
+            return ColumnType.STRING;
+        case BOOL:
+            return ColumnType.BOOLEAN;
+        case DOUBLE:
+            return ColumnType.DOUBLE;
+        case INT:
+            return ColumnType.INTEGER;
+        case LONG:
+            return ColumnType.LONG;
+        case FLOAT:
+            return ColumnType.FLOAT;
+        default:
+            throw new RuntimeException("Unsupported Column type: " + type);
         }
     }
 }

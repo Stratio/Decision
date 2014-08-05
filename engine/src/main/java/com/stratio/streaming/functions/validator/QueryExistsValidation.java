@@ -31,7 +31,7 @@ public class QueryExistsValidation extends BaseSiddhiRequestValidation {
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
 
-        if (getStreamOperationService().queryExists(request.getStreamName(), request.getRequest())) {
+        if (getStreamOperationService().queryRawExists(request.getStreamName(), request.getRequest())) {
             throw new RequestValidationException(REPLY_CODES.KO_QUERY_ALREADY_EXISTS, String.format(
                     QUERY_ALREADY_EXISTS_MESSAGE, request.getStreamName()));
         }

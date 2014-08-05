@@ -30,7 +30,7 @@ public class QueryNotExistsValidation extends BaseSiddhiRequestValidation {
 
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
-        if (!getStreamOperationService().queryExists(request.getStreamName(), request.getRequest())) {
+        if (!getStreamOperationService().queryIdExists(request.getStreamName(), request.getRequest())) {
             throw new RequestValidationException(REPLY_CODES.KO_QUERY_DOES_NOT_EXIST, String.format(
                     QUERY_DOES_NOT_EXIST_MESSAGE, request.getRequest(), request.getStreamName()));
         }

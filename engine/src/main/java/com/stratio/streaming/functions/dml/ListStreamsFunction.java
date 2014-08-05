@@ -49,7 +49,7 @@ public class ListStreamsFunction extends ActionBaseFunction {
 
     @Override
     protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
-        List<StratioStreamingMessage> existingStreams = getStreamOperationService().listStreams();
+        List<StratioStreamingMessage> existingStreams = getStreamOperationService().list();
         try {
             ZKUtils.getZKUtils(getZookeeperHost()).createZNodeJsonReply(message,
                     new ListStreamsMessage(existingStreams.size(), System.currentTimeMillis(), existingStreams));

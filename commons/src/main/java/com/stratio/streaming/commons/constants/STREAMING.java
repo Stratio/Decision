@@ -23,6 +23,7 @@ public interface STREAMING {
     public static final String STREAMING_KEYSPACE_NAME = "stratio_streaming";
 
     public interface STATS_NAMES {
+        public static final String SINK_STREAM_PREFIX = "VOID_";
         public static final String BASE = "stratio_stats_base";
         public static final String GLOBAL_STATS_BY_OPERATION = "stratio_stats_global_by_operation";
         public static final String[] STATS_STREAMS = new String[] { BASE, GLOBAL_STATS_BY_OPERATION };

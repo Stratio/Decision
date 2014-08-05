@@ -31,7 +31,7 @@ public class PrintStreamsFunction implements Function<JavaRDD<Long>, Void> {
     public Void call(JavaRDD<Long> arg0) throws Exception {
         StringBuilder sb = new StringBuilder();
 
-        List<StratioStreamingMessage> streams = streamOperationService.listStreams();
+        List<StratioStreamingMessage> streams = streamOperationService.list();
 
         sb.append(newLine).append("Shiddi Streams:").append(newLine);
         sb.append(tab).append("Total: ").append(streams.size()).append(newLine);

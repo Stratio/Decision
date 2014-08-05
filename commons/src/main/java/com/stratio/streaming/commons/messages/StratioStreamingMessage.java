@@ -16,6 +16,7 @@
 package com.stratio.streaming.commons.messages;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -33,12 +34,12 @@ public class StratioStreamingMessage implements Serializable {
     private String request;
     private Long timestamp;
     private List<ColumnNameTypeValue> columns;
-    private List<StreamQuery> queries;
+    private final List<StreamQuery> queries;
     private Set<StreamAction> activeActions;
     private Boolean userDefined;
 
     public StratioStreamingMessage() {
-
+        this.queries = new ArrayList<>();
     }
 
     /**
@@ -88,6 +89,7 @@ public class StratioStreamingMessage implements Serializable {
      * @param columns
      */
     public StratioStreamingMessage(String streamName, Long timestamp, List<ColumnNameTypeValue> columns) {
+        this.queries = new ArrayList<>();
         this.streamName = streamName;
         this.timestamp = timestamp;
         this.columns = columns;
@@ -101,9 +103,6 @@ public class StratioStreamingMessage implements Serializable {
     }
 
     public void addQuery(StreamQuery query) {
-        if (queries == null) {
-            queries = Lists.newArrayList();
-        }
         this.queries.add(query);
     }
 
@@ -173,10 +172,6 @@ public class StratioStreamingMessage implements Serializable {
 
     public List<StreamQuery> getQueries() {
         return queries;
-    }
-
-    public void setQueries(List<StreamQuery> queries) {
-        this.queries = queries;
     }
 
     public Set<StreamAction> getActiveActions() {
