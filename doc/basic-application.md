@@ -97,7 +97,7 @@ JavaExample.java file -> Run As -> Java Application.
 
 For the Java or Scala project, the result should be similar to the following:
 
-~~~~ {.code}
+~~~~ {code}
 Streams in the Stratio Streaming Engine: 3
 -- Stream Name: stratio_stats_base
 -- Stream Name: stratio_stats_global_by_operation
