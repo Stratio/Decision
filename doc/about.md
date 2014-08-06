@@ -110,7 +110,7 @@ Stratio Streaming is composed of three main elements:
 -   A publish-subscribe messaging system ([Apache Kafka](http://kafka.apache.org/)).
 -   A Streaming and CEP engine ([Apache Spark Streaming](http://spark.apache.org/) and [Siddhi CEP](http://siddhi.sourceforge.net/)).
 
-![Stratio Streaming Overview](http://www.openstratio.org/wp-content/uploads/2014/04/stratio_streaming_overview.png)
+![Stratio Streaming Overview](images/about-overview.png)
 
 Where to go from here
 =====================

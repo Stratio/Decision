@@ -38,8 +38,8 @@ Resources
 Here is a list of the resources that will be used in this tutorial. You can download them now or as 
 you go through the instructions. Links will be provided later as they will be needed.
 
--   [Java project example](http://docs.openstratio.org/resources/eclipse/streaming/StratioStreamingJavaProject.zip)
--   [Scala project example](http://docs.openstratio.org/resources/eclipse/streaming/StratioStreamingScalaProject.zip)
+-   [Java project example](resources/StratioStreamingJavaProject.zip)
+-   [Scala project example](resources/StratioStreamingScalaProject.zip)
 
 Creating the project
 ====================
@@ -50,11 +50,11 @@ Step 1: Create an empty project
 -   Launch Eclipse and in the menu choose File -> New -> Project
 -   In the “New project” window select “Project” under “General” and click “Next”:
 
-![Screenshot of the New Project window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/01-newProject.png)
+![Screenshot of the New Project window in Eclipse](images/basicapp-01-newProject.png)
 
 -   In the next window, enter a name for your project and click “Finish”:
 
-![Screenshot of the Project Name window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/02-projectName.png)
+![Screenshot of the Project Name window in Eclipse](images/basicapp-02-projectName.png)
 
 The newly created project now appears in the package explorer.
 
@@ -63,12 +63,12 @@ Step 2: Import the project skeleton
 
 Download the project skeleton of your choice and save it in a convenient location:
 
--   [Java project](http://docs.openstratio.org/resources/eclipse/streaming/StratioStreamingJavaProject.zip)
--   [Scala project](http://docs.openstratio.org/resources/eclipse/streaming/StratioStreamingScalaProject.zip)
+-   [Java project](resources/StratioStreamingJavaProject.zip)
+-   [Scala project](resources/StratioStreamingScalaProject.zip)
 
 In the menu, choose File -> Import. In the “Import” window, select “Archive file” in the section “General”, and click “Next”:
 
-![Screenshot of the Import window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/03-importWindow.png)
+![Screenshot of the Import window in Eclipse](images/basicapp-03-importWindow.png)
 
 In the next screen:
 
@@ -77,7 +77,7 @@ In the next screen:
 -   Check “Overwrite existing resources without warning”,
 -   and click “Finish”
 
-![Screenshot of the Importing from Archive file window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/04-importFromFile1.png)
+![Screenshot of the Importing from Archive file window in Eclipse](images/basicapp-04-importFromFile1.png)
 
 The structure of the project will be displayed in the package explorer. Give Maven some time to check 
 and download dependencies. The project should finally appear error-free.
