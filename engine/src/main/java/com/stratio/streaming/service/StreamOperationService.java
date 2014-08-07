@@ -11,7 +11,6 @@ import org.wso2.siddhi.query.api.QueryFactory;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.Attribute.Type;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
-import org.wso2.siddhi.query.api.exception.AttributeAlreadyExistException;
 
 import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.constants.STREAMING;
@@ -58,21 +57,16 @@ public class StreamOperationService {
         return streamStatus != null ? streamStatus.getUserDefined() : false;
     }
 
-    public int enlargeStream(String streamName, List<ColumnNameTypeValue> columns) {
+    public int enlargeStream(String streamName, List<ColumnNameTypeValue> columns) throws ServiceException {
         int addedColumns = 0;
         StreamDefinition streamMetaData = siddhiManager.getStreamDefinition(streamName);
-
         for (ColumnNameTypeValue columnNameTypeValue : columns) {
-            // Siddhi will throw an exception if you try to add a column that
-            // already exists,
-            // so we first try to find it in the stream
             if (!SiddhiUtils.columnAlreadyExistsInStream(columnNameTypeValue.getColumn(), streamMetaData)) {
-
                 addedColumns++;
                 streamMetaData.attribute(columnNameTypeValue.getColumn(), getSiddhiType(columnNameTypeValue.getType()));
-
             } else {
-                throw new AttributeAlreadyExistException(columnNameTypeValue.getColumn());
+                throw new ServiceException(String.format("Alter stream error, Column %s already exists.",
+                        columnNameTypeValue.getColumn()));
             }
         }
 

@@ -56,7 +56,7 @@ public class StreamOperationServiceTest {
     }
 
     @Test
-    public void enlargeStreamTest() {
+    public void enlargeStreamTest() throws ServiceException {
         createBaseStream();
 
         Assert.assertEquals(1, sm.getStreamDefinitions().size());

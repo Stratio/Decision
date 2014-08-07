@@ -59,7 +59,9 @@ public class CassandraTableOperationsService {
                         entry.getKey(), entry.getValue()));
             }
         }
-        session.execute(sb.toString());
+        if (!"".equals(sb.toString())) {
+            session.execute(sb.toString());
+        }
     }
 
     private HashMap<String, String> getStreamFieldsAndTypes(List<ColumnNameTypeValue> columns) {
