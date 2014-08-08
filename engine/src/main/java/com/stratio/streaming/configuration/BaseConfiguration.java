@@ -5,7 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({ StreamingContextConfiguration.class, ZookeeperConfiguration.class, KafkaConfiguration.class })
+@Import({ StreamingContextConfiguration.class, ZookeeperConfiguration.class, KafkaConfiguration.class,
+        MetricsConfiguration.class })
 public class BaseConfiguration {
 
     @Bean

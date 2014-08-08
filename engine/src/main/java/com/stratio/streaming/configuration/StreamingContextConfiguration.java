@@ -24,7 +24,6 @@ import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.FilterDataFunction;
 import com.stratio.streaming.functions.PairDataFunction;
-import com.stratio.streaming.functions.PrintStreamsFunction;
 import com.stratio.streaming.functions.SaveToCassandraActionExecutionFunction;
 import com.stratio.streaming.functions.SaveToElasticSearchActionExecutionFunction;
 import com.stratio.streaming.functions.SaveToMongoActionExecutionFunction;
@@ -73,7 +72,6 @@ public class StreamingContextConfiguration {
     }
 
     @Bean(name = "actionContext", destroyMethod = "stop")
-    // TODO refactor, please...
     public JavaStreamingContext actionContext() {
         JavaStreamingContext context = this.create("stratio-streaming-action", 4040);
 
@@ -225,15 +223,10 @@ public class StreamingContextConfiguration {
         // TODO refactor this save to streaming engine status
         // StreamPersistence.saveStreamingEngineStatus(siddhiManager);
 
-        if (configurationContext.isPrintStreams()) {
-            messages.count().foreach(new PrintStreamsFunction(streamOperationService));
-        }
-
         return context;
     }
 
     @Bean(name = "dataContext", destroyMethod = "stop")
-    // TODO refactor, please...
     public JavaStreamingContext dataContext() {
         JavaStreamingContext context = this.create("stratio-streaming-data", 4041);
 

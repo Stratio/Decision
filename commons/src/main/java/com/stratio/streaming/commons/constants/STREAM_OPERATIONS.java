@@ -15,7 +15,6 @@
  */
 package com.stratio.streaming.commons.constants;
 
-@Deprecated
 public interface STREAM_OPERATIONS {
     // DDL
     public interface DEFINITION {

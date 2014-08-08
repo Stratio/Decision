@@ -15,7 +15,8 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.stratio.streaming</groupId>
 	<artifactId>stratio-streaming</artifactId>
@@ -51,6 +52,7 @@
 		<cassandra.driver>2.0.2</cassandra.driver>
 		<mongo.driver>2.12.2</mongo.driver>
 		<kafka.driver>0.8.1.1</kafka.driver>
+		<metrics.version>3.0.1</metrics.version>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
@@ -172,6 +174,17 @@
 				<groupId>org.mongodb</groupId>
 				<artifactId>mongo-java-driver</artifactId>
 				<version>${mongo.driver}</version>
+			</dependency>
+			<!-- METRICS -->
+			<dependency>
+				<groupId>com.codahale.metrics</groupId>
+				<artifactId>metrics-core</artifactId>
+				<version>${metrics.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.ryantenney.metrics</groupId>
+				<artifactId>metrics-spring</artifactId>
+				<version>${metrics.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

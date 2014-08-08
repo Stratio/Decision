@@ -14,26 +14,21 @@ public class StreamingEngine {
     private static Logger log = LoggerFactory.getLogger(StreamingEngine.class);
 
     public static void main(String[] args) {
-        // try (AnnotationConfigApplicationContext
-        // annotationConfigApplicationContext = new
-        // AnnotationConfigApplicationContext(
-        // BaseConfiguration.class)) {
+        try (AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(
+                BaseConfiguration.class)) {
 
-        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(
-                BaseConfiguration.class);
+            annotationConfigApplicationContext.registerShutdownHook();
 
-        annotationConfigApplicationContext.registerShutdownHook();
+            Map<String, JavaStreamingContext> contexts = annotationConfigApplicationContext
+                    .getBeansOfType(JavaStreamingContext.class);
 
-        Map<String, JavaStreamingContext> contexts = annotationConfigApplicationContext
-                .getBeansOfType(JavaStreamingContext.class);
-
-        for (JavaStreamingContext context : contexts.values()) {
-            context.start();
-            log.info("Started context {}", context.sparkContext().appName());
+            for (JavaStreamingContext context : contexts.values()) {
+                context.start();
+                log.info("Started context {}", context.sparkContext().appName());
+            }
+            contexts.get("actionContext").awaitTermination();
+        } catch (Exception e) {
+            log.error("Fatal error", e);
         }
-        contexts.get("actionContext").awaitTermination();
-        // } catch (Exception e) {
-        // log.error("Fatal error", e);
-        // }
     }
 }

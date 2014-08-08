@@ -12,6 +12,8 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.Attribute.Type;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
+import com.codahale.metrics.annotation.Timed;
+import com.ryantenney.metrics.annotation.Counted;
 import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.constants.StreamAction;
@@ -39,6 +41,7 @@ public class StreamOperationService {
         this.callbackService = callbackService;
     }
 
+    @Counted(absolute = true, name = "streams.total.created", monotonic = true)
     public void createStream(String streamName, List<ColumnNameTypeValue> columns) {
         StreamDefinition newStream = QueryFactory.createStreamDefinition().name(streamName);
         for (ColumnNameTypeValue column : columns) {
@@ -57,6 +60,7 @@ public class StreamOperationService {
         return streamStatus != null ? streamStatus.getUserDefined() : false;
     }
 
+    @Counted(absolute = true, name = "streams.total.altered", monotonic = true)
     public int enlargeStream(String streamName, List<ColumnNameTypeValue> columns) throws ServiceException {
         int addedColumns = 0;
         StreamDefinition streamMetaData = siddhiManager.getStreamDefinition(streamName);
@@ -73,6 +77,7 @@ public class StreamOperationService {
         return addedColumns;
     }
 
+    @Counted(absolute = true, name = "streams.total.deleted", monotonic = true)
     public void dropStream(String streamName) {
 
         Map<String, QueryDTO> attachedQueries = streamStatusDao.get(streamName).getAddedQueries();
@@ -83,6 +88,7 @@ public class StreamOperationService {
         streamStatusDao.remove(streamName);
     }
 
+    @Counted(absolute = true, name = "queries.total.added", monotonic = true)
     public void addQuery(String streamName, String queryString) {
         String queryId = siddhiManager.addQuery(queryString);
         streamStatusDao.addQuery(streamName, queryId, queryString);
@@ -92,6 +98,7 @@ public class StreamOperationService {
         }
     }
 
+    @Counted(absolute = true, name = "queries.total.removed", monotonic = true)
     public void removeQuery(String queryId, String streamName) {
         siddhiManager.removeQuery(queryId);
         streamStatusDao.removeQuery(streamName, queryId);
@@ -153,6 +160,7 @@ public class StreamOperationService {
         return streamStatusDao.getEnabledActions(streamName).contains(action);
     }
 
+    @Counted(absolute = true, name = "streams.total.listed", monotonic = true)
     public List<StratioStreamingMessage> list() {
         List<StratioStreamingMessage> result = new ArrayList<>();
         for (StreamDefinition streamDefinition : siddhiManager.getStreamDefinitions()) {
@@ -190,6 +198,7 @@ public class StreamOperationService {
         return !startWithSinkPrefix && !isAStatStream;
     }
 
+    @Timed(absolute = true, name = "streams.send.time")
     public void send(String streamName, List<ColumnNameTypeValue> columns) throws ServiceException {
         try {
             siddhiManager.getInputHandler(streamName).send(

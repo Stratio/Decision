@@ -18,7 +18,7 @@ public class SendToKafkaActionExecutionFunction extends BaseActionExecutionFunct
     private static final long serialVersionUID = -1661238643911306344L;
 
     private Producer<String, String> producer;
-    private Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer;
+    private KafkaToJavaSerializer kafkaToJavaSerializer;
 
     private final String kafkaQuorum;
 
