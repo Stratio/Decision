@@ -36,11 +36,6 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>17.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.curator</groupId>
 			<artifactId>curator-recipes</artifactId>
 			<version>2.4.1</version>
@@ -94,11 +89,6 @@
 			<groupId>org.wso2.siddhi</groupId>
 			<artifactId>siddhi-query</artifactId>
 			<version>${siddhi.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cassandra</groupId>
-			<artifactId>cassandra-all</artifactId>
-			<version>2.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.datastax.cassandra</groupId>
@@ -160,6 +150,12 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- INJECTION -->
