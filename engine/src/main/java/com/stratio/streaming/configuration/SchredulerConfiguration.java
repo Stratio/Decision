@@ -32,8 +32,6 @@ public class SchredulerConfiguration {
         return taskScheduler;
     }
 
-    @Autowired
-    @Lazy
     public FailOverTask failOverTask() {
         return new FailOverTask(streamingFailoverService);
     }
