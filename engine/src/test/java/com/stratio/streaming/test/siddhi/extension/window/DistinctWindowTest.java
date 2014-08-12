@@ -17,7 +17,6 @@ package com.stratio.streaming.test.siddhi.extension.window;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,56 +128,6 @@ public class DistinctWindowTest {
 
         Thread.sleep(500);
         assertEquals(16, count.get());
-    }
-
-    @Test
-    public void retrieveWindowStateTest() throws InterruptedException {
-
-        String queryId = createStreamAndQueryTest();
-
-        sm.persist();
-
-        sm.removeQuery(queryId);
-
-        sm.removeStream("resultStream");
-        sm.removeStream("testStream");
-
-        sm = null;
-        assertNull(sm);
-
-        initSiddhi();
-        createStreamAndQueryTest();
-
-        sm.restoreLastRevision();
-
-        sm.addCallback("resultStream", new StreamCallback() {
-
-            @Override
-            public void receive(Event[] events) {
-                for (Event event : events) {
-                    if (event instanceof InEvent) {
-                        count.getAndIncrement();
-                    }
-                }
-            }
-        });
-
-        sm.getInputHandler("testStream").send(new Object[] { new String("KEY_B"), new Float(30), new Integer(40) });
-        sm.getInputHandler("testStream").send(new Object[] { new String("KEY_A"), new Float(30), new Integer(40) });
-
-        Thread.sleep(500);
-        assertEquals(1, count.get());
-    }
-
-    private String createStreamAndQueryTest() throws InterruptedException {
-        sm.defineStream("define stream testStream (c1 string, c2 float, c3 int);");
-        String queryId = sm
-                .addQuery("from testStream #window.stratio:distinct(c1) select c1, c2,c3 insert into resultStream;");
-
-        sm.getInputHandler("testStream").send(new Object[] { new String("KEY_A"), new Float(10), new Integer(20) });
-        sm.getInputHandler("testStream").send(new Object[] { new String("KEY_B"), new Float(30), new Integer(40) });
-
-        return queryId;
     }
 
     private void initSiddhi() {
