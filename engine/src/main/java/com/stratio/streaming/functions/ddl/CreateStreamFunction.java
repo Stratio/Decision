@@ -48,11 +48,10 @@ public class CreateStreamFunction extends ActionBaseFunction {
 
     @Override
     protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
-        // TODO catch specific exception when done
         try {
             getStreamOperationService().createStream(message.getStreamName(), message.getColumns());
         } catch (Exception e) {
-            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e.getMessage());
+            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e);
         }
         return true;
     }

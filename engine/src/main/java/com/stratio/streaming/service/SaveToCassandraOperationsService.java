@@ -29,13 +29,13 @@ import com.datastax.driver.core.exceptions.AlreadyExistsException;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 
-public class CassandraTableOperationsService {
+public class SaveToCassandraOperationsService {
 
-    private static final Logger log = LoggerFactory.getLogger(CassandraTableOperationsService.class);
+    private static final Logger log = LoggerFactory.getLogger(SaveToCassandraOperationsService.class);
 
     private final Session session;
 
-    public CassandraTableOperationsService(Session session) {
+    public SaveToCassandraOperationsService(Session session) {
         this.session = session;
     }
 
@@ -45,7 +45,7 @@ public class CassandraTableOperationsService {
                 keyspaceName));
     }
 
-    public void createTable(String streamName, List<ColumnNameTypeValue> columns, String timestampColumnName) {
+    public void createTable(String tableName, List<ColumnNameTypeValue> columns, String timestampColumnName) {
         StringBuilder sb = new StringBuilder();
 
         for (Entry<String, String> entry : getStreamFieldsAndTypes(columns).entrySet()) {
@@ -57,10 +57,10 @@ public class CassandraTableOperationsService {
         try {
             session.execute(String
                     .format("CREATE TABLE %s.%s (%s timeuuid, %s PRIMARY KEY (%s)) WITH compression = {'sstable_compression': ''}",
-                            STREAMING.STREAMING_KEYSPACE_NAME, streamName, timestampColumnName, sb.toString(),
+                            STREAMING.STREAMING_KEYSPACE_NAME, tableName, timestampColumnName, sb.toString(),
                             timestampColumnName));
         } catch (AlreadyExistsException e) {
-            log.info("Stream table {} already exists", streamName);
+            log.info("Stream table {} already exists", tableName);
         }
     }
 

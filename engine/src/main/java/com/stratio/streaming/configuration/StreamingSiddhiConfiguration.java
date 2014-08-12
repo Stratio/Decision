@@ -22,22 +22,27 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.SiddhiConfiguration;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.JoinConfig;
-import com.hazelcast.config.NetworkConfig;
 import com.stratio.streaming.extensions.DistinctWindowExtension;
+import com.stratio.streaming.service.StreamingFailoverService;
 
 @Configuration
-// TODO refactor
+// XXX refactor
+@Import(DaoConfiguration.class)
 public class StreamingSiddhiConfiguration {
 
     public static final String QUERY_PLAN_IDENTIFIER = "StratioStreamingCEP-Cluster";
 
     @Autowired
     private ConfigurationContext configurationContext;
+
+    @Autowired
+    @Lazy
+    private StreamingFailoverService cassandraPersistenceStoreDao;
 
     @Bean(destroyMethod = "shutdown")
     public SiddhiManager siddhiManager() {
@@ -53,22 +58,6 @@ public class StreamingSiddhiConfiguration {
 
         // Create Siddhi Manager
         SiddhiManager siddhiManager = new SiddhiManager(conf);
-
-        Config config = new Config();
-        config.setInstanceName("stratio-streaming-hazelcast-instance");
-        NetworkConfig network = config.getNetworkConfig();
-        JoinConfig join = network.getJoin();
-        join.getMulticastConfig().setEnabled(false);
-
-        // TODO enable failover
-        // if (configurationContext.isFailOverEnabled()) {
-        //
-        // siddhiManager.setPersistStore(new
-        // Casandra2PersistenceStore(configurationContext.getCassandraHostsQuorum(),
-        // "", ""));
-        //
-        // StreamPersistence.restoreLastRevision(siddhiManager);
-        // }
 
         return siddhiManager;
     }

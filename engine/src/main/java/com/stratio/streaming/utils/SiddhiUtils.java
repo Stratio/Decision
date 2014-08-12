@@ -54,7 +54,7 @@ public class SiddhiUtils {
 
             // if attribute does not exist, a AttributeNotExistException
             // exception will be thrown
-            // TODO change this. create a conversor engine to treat data types.
+            // XXX change this. create a conversor engine to treat data types.
             if (column.getValue() instanceof String) {
                 orderedValues[streamMetaData.getAttributePosition(column.getColumn())] = decodeSiddhiValue(
                         (String) column.getValue(), streamMetaData.getAttributeType(column.getColumn()));
@@ -111,7 +111,6 @@ public class SiddhiUtils {
 
     }
 
-    // TODO move to StreamingCommons
     public static Boolean isStreamAllowedForThisOperation(String streamName, String operation) {
 
         switch (operation.toUpperCase()) {

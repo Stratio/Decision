@@ -235,9 +235,6 @@ public class StreamingContextConfiguration {
             }
         }
 
-        // TODO refactor this save to streaming engine status
-        // StreamPersistence.saveStreamingEngineStatus(siddhiManager);
-
         return context;
     }
 

@@ -32,7 +32,7 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.service.CassandraTableOperationsService;
+import com.stratio.streaming.service.SaveToCassandraOperationsService;
 
 public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionFunction {
 
@@ -44,7 +44,7 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
     private HashMap<String, Integer> tablenames = new HashMap<>();
 
-    private CassandraTableOperationsService cassandraTableOperationsService;
+    private SaveToCassandraOperationsService cassandraTableOperationsService;
 
     public SaveToCassandraActionExecutionFunction(String cassandraQuorum) {
         this.cassandraQuorum = cassandraQuorum;
@@ -78,9 +78,9 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
         getSession().execute(batch);
     }
 
-    private CassandraTableOperationsService getCassandraTableOperationsService() {
+    private SaveToCassandraOperationsService getCassandraTableOperationsService() {
         if (cassandraTableOperationsService == null) {
-            cassandraTableOperationsService = new CassandraTableOperationsService(getSession());
+            cassandraTableOperationsService = new SaveToCassandraOperationsService(getSession());
         }
 
         return cassandraTableOperationsService;

@@ -54,7 +54,7 @@ public class ListStreamsFunction extends ActionBaseFunction {
             ZKUtils.getZKUtils(getZookeeperHost()).createZNodeJsonReply(message,
                     new ListStreamsMessage(existingStreams.size(), System.currentTimeMillis(), existingStreams));
         } catch (Exception e) {
-            throw new RequestValidationException(REPLY_CODES.KO_GENERAL_ERROR, e.getMessage());
+            throw new RequestValidationException(REPLY_CODES.KO_GENERAL_ERROR, e);
         }
         return false;
     }

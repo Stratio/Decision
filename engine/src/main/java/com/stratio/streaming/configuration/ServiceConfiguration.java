@@ -21,11 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.dao.StreamStatusDao;
+import com.stratio.streaming.dao.StreamingFailoverDao;
 import com.stratio.streaming.factory.GsonFactory;
 import com.stratio.streaming.serializer.Serializer;
 import com.stratio.streaming.serializer.impl.JavaToSiddhiSerializer;
@@ -34,6 +36,7 @@ import com.stratio.streaming.service.CallbackService;
 import com.stratio.streaming.service.StreamMetadataService;
 import com.stratio.streaming.service.StreamOperationService;
 import com.stratio.streaming.service.StreamStatusMetricService;
+import com.stratio.streaming.service.StreamingFailoverService;
 
 @Configuration
 @Import({ DaoConfiguration.class, StreamingSiddhiConfiguration.class })
@@ -44,6 +47,9 @@ public class ServiceConfiguration {
 
     @Autowired
     private StreamStatusDao streamStatusDao;
+
+    @Autowired
+    private StreamingFailoverDao streamingFailoverDao;
 
     @Autowired
     private Producer<String, String> producer;
@@ -76,5 +82,11 @@ public class ServiceConfiguration {
     @Bean
     public StreamStatusMetricService streamStatusMetricService() {
         return new StreamStatusMetricService(streamStatusDao);
+    }
+
+    @Bean
+    @Lazy
+    public StreamingFailoverService cassandraPersistenceStoreDao() {
+        return new StreamingFailoverService(streamStatusDao, streamMetadataService(), streamingFailoverDao);
     }
 }

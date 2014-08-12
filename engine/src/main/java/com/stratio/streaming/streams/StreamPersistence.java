@@ -28,7 +28,6 @@
 //    private static Logger logger = LoggerFactory.getLogger(StreamPersistence.class);
 //
 //    private StreamPersistence() {
-//        // TODO Auto-generated constructor stub
 //    }
 //
 //    public static String saveStreamingEngineStatus(SiddhiManager siddhiManager) {

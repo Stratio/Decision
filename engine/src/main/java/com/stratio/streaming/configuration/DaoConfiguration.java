@@ -15,13 +15,27 @@
  */
 package com.stratio.streaming.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
+import com.datastax.driver.core.Session;
 import com.stratio.streaming.dao.StreamStatusDao;
+import com.stratio.streaming.dao.StreamingFailoverDao;
+import com.stratio.streaming.factory.GsonFactory;
 
 @Configuration
 public class DaoConfiguration {
+
+    @Autowired
+    @Lazy
+    private Session session;
+
+    @Bean
+    public StreamingFailoverDao streamingFailoverDao() {
+        return new StreamingFailoverDao(session, GsonFactory.getInstance());
+    }
 
     @Bean
     public StreamStatusDao streamStatusDao() {

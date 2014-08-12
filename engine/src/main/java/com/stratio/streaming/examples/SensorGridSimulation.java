@@ -58,7 +58,6 @@ public class SensorGridSimulation {
     public static final long streamSessionId = System.currentTimeMillis();
 
     public SensorGridSimulation() {
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -69,7 +68,6 @@ public class SensorGridSimulation {
         try {
             mySelf.launchSensorStreaming(args);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

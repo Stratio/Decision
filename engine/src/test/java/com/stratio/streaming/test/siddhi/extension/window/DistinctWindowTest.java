@@ -15,13 +15,11 @@
  */
 package com.stratio.streaming.test.siddhi.extension.window;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,10 +29,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.SiddhiConfiguration;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.event.in.InEvent;
-import org.wso2.siddhi.core.persistence.PersistenceObject;
-import org.wso2.siddhi.core.persistence.PersistenceStore;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.query.api.expression.Variable;
 
 import com.stratio.streaming.extensions.DistinctWindowExtension;
 
@@ -44,11 +39,8 @@ public class DistinctWindowTest {
 
     private AtomicInteger count;
 
-    private PersistenceStore persistenceStore;
-
     @Before
     public void setUp() {
-        persistenceStore = new InMemoryPersistenceStoreTestImpl();
         count = new AtomicInteger(0);
         initSiddhi();
     }
@@ -139,24 +131,6 @@ public class DistinctWindowTest {
         assertEquals(16, count.get());
     }
 
-    @SuppressWarnings("unchecked")
-    @Test
-    public void saveWindowStateTest() throws InterruptedException {
-        sm.defineStream("define stream testStream (c1 string, c2 float, c3 int);");
-        sm.addQuery("from testStream #window.stratio:distinct(c1) select c1, c2,c3 insert into resultStream;");
-
-        sm.getInputHandler("testStream").send(new Object[] { new String("KEY_A"), new Float(10), new Integer(20) });
-        sm.getInputHandler("testStream").send(new Object[] { new String("KEY_B"), new Float(30), new Integer(40) });
-
-        String revision = sm.persist();
-        PersistenceObject po = ((InMemoryPersistenceStoreTestImpl) sm.getSiddhiContext().getPersistenceService()
-                .getPersistenceStore()).getPersistenceMap(revision);
-
-        assertEquals("c1", ((Variable) po.getData()[0]).getAttributeName());
-        assertArrayEquals(new ArrayList<Variable>().toArray(), ((ArrayList<Variable>) po.getData()[1]).toArray());
-        assertNotNull("KEY_B", ((HashMap<String, Object>) po.getData()[2]).get(""));
-    }
-
     @Test
     public void retrieveWindowStateTest() throws InterruptedException {
 
@@ -214,6 +188,5 @@ public class DistinctWindowTest {
         extensions.add(DistinctWindowExtension.class);
         config.setSiddhiExtensions(extensions);
         sm = new SiddhiManager(config);
-        sm.setPersistStore(persistenceStore);
     }
 }

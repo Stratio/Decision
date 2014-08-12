@@ -32,6 +32,8 @@ public class ConfigurationContext {
     private final List<String> zookeeperHosts;
 
     private final boolean failOverEnabled;
+    private final long failOverPeriod;
+
     private final boolean auditEnabled;
     private final boolean statsEnabled;
     private final boolean printStreams;
@@ -56,9 +58,9 @@ public class ConfigurationContext {
 
     public enum ConfigurationKeys {
         CASSANDRA_HOSTS("cassandra.hosts"), KAFKA_HOSTS("kafka.hosts"), ZOOKEEPER_HOSTS("zookeeper.hosts"), FAILOVER_ENABLED(
-                "failOverEnabled"), AUDIT_ENABLED("auditEnabled"), STATS_ENABLED("statsEnabled"), PRINT_STREAMS(
-                "printStreams"), STREAMING_BATCH_TIME("spark.streamingBatchTime"), SPARK_HOST("spark.host"), KAFKA_REPLICATION_FACTOR(
-                "kafka.replicationFactor"), KAFKA_PARTITIONS("kafka.partitions"), KAFKA_SESSION_TIMEOUT(
+                "failover.enabled"), FAILOVER_PERIOD("failover.period"), AUDIT_ENABLED("auditEnabled"), STATS_ENABLED(
+                "statsEnabled"), PRINT_STREAMS("printStreams"), STREAMING_BATCH_TIME("spark.streamingBatchTime"), SPARK_HOST(
+                "spark.host"), KAFKA_REPLICATION_FACTOR("kafka.replicationFactor"), KAFKA_PARTITIONS("kafka.partitions"), KAFKA_SESSION_TIMEOUT(
                 "kafka.sessionTimeout"), KAFKA_CONNECTION_TIMEOUT("kafka.connectionTimeout"), ELASTICSEARCH_HOST(
                 "elasticsearch.host"), ELASTICSEARCH_PORT("elasticsearch.port"), MONGO_HOST("mongo.host"), MONGO_PORT(
                 "mongo.port"), MONGO_USER("mongo.user"), MONGO_PASSWORD("mongo.password");
@@ -84,6 +86,7 @@ public class ConfigurationContext {
         this.sparkHost = config.getString(ConfigurationKeys.SPARK_HOST.getKey());
 
         this.failOverEnabled = config.getBoolean(ConfigurationKeys.FAILOVER_ENABLED.getKey());
+        this.failOverPeriod = config.getDuration(ConfigurationKeys.FAILOVER_PERIOD.getKey(), TimeUnit.MILLISECONDS);
         this.auditEnabled = config.getBoolean(ConfigurationKeys.AUDIT_ENABLED.getKey());
         this.statsEnabled = config.getBoolean(ConfigurationKeys.STATS_ENABLED.getKey());
         this.printStreams = config.getBoolean(ConfigurationKeys.PRINT_STREAMS.getKey());
@@ -131,6 +134,10 @@ public class ConfigurationContext {
 
     public boolean isFailOverEnabled() {
         return failOverEnabled;
+    }
+
+    public long getFailOverPeriod() {
+        return failOverPeriod;
     }
 
     public boolean isAuditEnabled() {

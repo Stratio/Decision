@@ -68,15 +68,15 @@ public class StreamStatusDao {
         return streamStatuses;
     }
 
-    public StreamStatusDTO addQuery(String streamName, String queryId, String queryRaw) {
+    public void putAll(Map<String, StreamStatusDTO> streamStatuses) {
+        this.streamStatuses.putAll(streamStatuses);
+    }
 
+    public StreamStatusDTO addQuery(String streamName, String queryId, String queryRaw) {
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
         if (streamStatus != null) {
             streamStatus.getAddedQueries().put(queryId, new QueryDTO(queryRaw));
-        } else {
-            // TODO throw exception
         }
-
         return streamStatus;
     }
 
@@ -84,8 +84,6 @@ public class StreamStatusDao {
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
         if (streamStatus != null) {
             streamStatus.getAddedQueries().remove(queryId);
-        } else {
-            // TODO throw exception
         }
     }
 

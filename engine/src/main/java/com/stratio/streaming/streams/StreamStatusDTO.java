@@ -36,7 +36,6 @@ public class StreamStatusDTO implements Serializable {
     private final Map<String, QueryDTO> addedQueries;
 
     public StreamStatusDTO(String streamName, Boolean userDefined) {
-        super();
         this.streamName = streamName;
         this.userDefined = userDefined;
         this.actionsEnabled = new HashSet<>();

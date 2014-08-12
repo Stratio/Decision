@@ -108,7 +108,7 @@ public class StreamOperationService {
         String queryId = siddhiManager.addQuery(queryString);
         streamStatusDao.addQuery(streamName, queryId, queryString);
         for (StreamDefinition streamDefinition : siddhiManager.getStreamDefinitions()) {
-            // TODO refactor to obtain exactly siddhi inferred streams.
+            // XXX refactor to obtain exactly siddhi inferred streams.
             streamStatusDao.createInferredStream(streamDefinition.getStreamId());
         }
     }

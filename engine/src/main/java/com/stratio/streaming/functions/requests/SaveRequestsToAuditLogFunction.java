@@ -68,7 +68,6 @@
 //            Cluster cCluster = cBuilder.build();
 //            Session cassandraSession = cCluster.connect();
 //
-//            // TODO
 //            // if
 //            // (cassandraSession.getCluster().getMetadata().getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME)
 //            // == null) {
@@ -93,7 +92,6 @@
 //    @Override
 //    public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
 //
-//        // TODO when siddhi RDD is ready
 //
 //        if (rdd.count() > 0 && auditCassandraConfig != null) {
 //

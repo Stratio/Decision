@@ -51,7 +51,7 @@ public class InsertIntoStreamFunction extends ActionBaseFunction {
         try {
             getStreamOperationService().send(message.getStreamName(), message.getColumns());
         } catch (ServiceException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST, e.getMessage());
+            throw new RequestValidationException(REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST, e);
         }
         return false;
     }

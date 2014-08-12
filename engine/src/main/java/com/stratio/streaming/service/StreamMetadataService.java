@@ -33,4 +33,12 @@ public class StreamMetadataService {
     public Attribute getAttribute(String streamName, int columnOrder) {
         return siddhiManager.getStreamDefinition(streamName).getAttributeList().get(columnOrder);
     }
+
+    public byte[] getSnapshot() {
+        return siddhiManager.snapshot();
+    }
+
+    public void setSnapshot(byte[] snapshot) {
+        siddhiManager.restore(snapshot);
+    }
 }
