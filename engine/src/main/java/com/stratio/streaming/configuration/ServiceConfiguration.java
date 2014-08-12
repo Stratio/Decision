@@ -49,6 +49,7 @@ public class ServiceConfiguration {
     private StreamStatusDao streamStatusDao;
 
     @Autowired
+    @Lazy
     private StreamingFailoverDao streamingFailoverDao;
 
     @Autowired
@@ -86,7 +87,7 @@ public class ServiceConfiguration {
 
     @Bean
     @Lazy
-    public StreamingFailoverService cassandraPersistenceStoreDao() {
+    public StreamingFailoverService streamingFailoverService() {
         return new StreamingFailoverService(streamStatusDao, streamMetadataService(), streamingFailoverDao);
     }
 }

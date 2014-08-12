@@ -39,12 +39,14 @@ public class ConfigurationContext {
     private final boolean printStreams;
 
     private final long streamingBatchTime;
+    private final long internalStreamingBatchTime;
     private final int kafkaReplicationFactor;
     private final int kafkaPartitions;
     private final int kafkaSessionTimeout;
     private final int kafkaConnectionTimeout;
 
     private final String sparkHost;
+    private final String internalSparkHost;
 
     /** OPTIONAL PROPERTIES **/
 
@@ -59,8 +61,9 @@ public class ConfigurationContext {
     public enum ConfigurationKeys {
         CASSANDRA_HOSTS("cassandra.hosts"), KAFKA_HOSTS("kafka.hosts"), ZOOKEEPER_HOSTS("zookeeper.hosts"), FAILOVER_ENABLED(
                 "failover.enabled"), FAILOVER_PERIOD("failover.period"), AUDIT_ENABLED("auditEnabled"), STATS_ENABLED(
-                "statsEnabled"), PRINT_STREAMS("printStreams"), STREAMING_BATCH_TIME("spark.streamingBatchTime"), SPARK_HOST(
-                "spark.host"), KAFKA_REPLICATION_FACTOR("kafka.replicationFactor"), KAFKA_PARTITIONS("kafka.partitions"), KAFKA_SESSION_TIMEOUT(
+                "statsEnabled"), PRINT_STREAMS("printStreams"), STREAMING_BATCH_TIME("spark.streamingBatchTime"), INTERNAL_STREAMING_BATCH_TIME(
+                "spark.internalStreamingBatchTime"), SPARK_HOST("spark.host"), INTERNAL_SPARK_HOST("spark.internalHost"), KAFKA_REPLICATION_FACTOR(
+                "kafka.replicationFactor"), KAFKA_PARTITIONS("kafka.partitions"), KAFKA_SESSION_TIMEOUT(
                 "kafka.sessionTimeout"), KAFKA_CONNECTION_TIMEOUT("kafka.connectionTimeout"), ELASTICSEARCH_HOST(
                 "elasticsearch.host"), ELASTICSEARCH_PORT("elasticsearch.port"), MONGO_HOST("mongo.host"), MONGO_PORT(
                 "mongo.port"), MONGO_USER("mongo.user"), MONGO_PASSWORD("mongo.password");
@@ -84,6 +87,7 @@ public class ConfigurationContext {
         this.kafkaHosts = config.getStringList(ConfigurationKeys.KAFKA_HOSTS.getKey());
         this.zookeeperHosts = config.getStringList(ConfigurationKeys.ZOOKEEPER_HOSTS.getKey());
         this.sparkHost = config.getString(ConfigurationKeys.SPARK_HOST.getKey());
+        this.internalSparkHost = config.getString(ConfigurationKeys.INTERNAL_SPARK_HOST.getKey());
 
         this.failOverEnabled = config.getBoolean(ConfigurationKeys.FAILOVER_ENABLED.getKey());
         this.failOverPeriod = config.getDuration(ConfigurationKeys.FAILOVER_PERIOD.getKey(), TimeUnit.MILLISECONDS);
@@ -92,6 +96,8 @@ public class ConfigurationContext {
         this.printStreams = config.getBoolean(ConfigurationKeys.PRINT_STREAMS.getKey());
 
         this.streamingBatchTime = config.getDuration(ConfigurationKeys.STREAMING_BATCH_TIME.getKey(),
+                TimeUnit.MILLISECONDS);
+        this.internalStreamingBatchTime = config.getDuration(ConfigurationKeys.INTERNAL_STREAMING_BATCH_TIME.getKey(),
                 TimeUnit.MILLISECONDS);
         this.kafkaReplicationFactor = config.getInt(ConfigurationKeys.KAFKA_REPLICATION_FACTOR.getKey());
         this.kafkaPartitions = config.getInt(ConfigurationKeys.KAFKA_PARTITIONS.getKey());
@@ -198,6 +204,14 @@ public class ConfigurationContext {
 
     public String getMongoPassword() {
         return mongoPassword;
+    }
+
+    public long getInternalStreamingBatchTime() {
+        return internalStreamingBatchTime;
+    }
+
+    public String getInternalSparkHost() {
+        return internalSparkHost;
     }
 
     private Object getValueOrNull(String key, Config config) {

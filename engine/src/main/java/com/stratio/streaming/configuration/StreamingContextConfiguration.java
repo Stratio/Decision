@@ -73,22 +73,22 @@ public class StreamingContextConfiguration {
     @Autowired
     private KafkaToJavaSerializer kafkaToJavaSerializer;
 
-    private JavaStreamingContext create(String streamingContextName, int port) {
+    private JavaStreamingContext create(String streamingContextName, int port, long streamingBatchTime, String sparkHost) {
         SparkConf conf = new SparkConf();
         conf.set("spark.ui.port", String.valueOf(port));
         conf.setAppName(streamingContextName);
         conf.setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
-        conf.setMaster(configurationContext.getSparkHost());
+        conf.setMaster(sparkHost);
 
-        JavaStreamingContext streamingContext = new JavaStreamingContext(conf, new Duration(
-                configurationContext.getStreamingBatchTime()));
+        JavaStreamingContext streamingContext = new JavaStreamingContext(conf, new Duration(streamingBatchTime));
 
         return streamingContext;
     }
 
     @Bean(name = "actionContext", destroyMethod = "stop")
     public JavaStreamingContext actionContext() {
-        JavaStreamingContext context = this.create("stratio-streaming-action", 4040);
+        JavaStreamingContext context = this.create("stratio-streaming-action", 4040,
+                configurationContext.getInternalStreamingBatchTime(), configurationContext.getInternalSparkHost());
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
         CreateStreamFunction createStreamFunction = new CreateStreamFunction(streamOperationService,
@@ -240,7 +240,8 @@ public class StreamingContextConfiguration {
 
     @Bean(name = "dataContext", destroyMethod = "stop")
     public JavaStreamingContext dataContext() {
-        JavaStreamingContext context = this.create("stratio-streaming-data", 4041);
+        JavaStreamingContext context = this.create("stratio-streaming-data", 4041,
+                configurationContext.getInternalStreamingBatchTime(), configurationContext.getInternalSparkHost());
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
 
@@ -267,7 +268,8 @@ public class StreamingContextConfiguration {
 
     @Bean(name = "processContext", destroyMethod = "stop")
     public JavaStreamingContext processContext() {
-        JavaStreamingContext context = this.create("stratio-streaming-process", 4042);
+        JavaStreamingContext context = this.create("stratio-streaming-process", 4042,
+                configurationContext.getStreamingBatchTime(), configurationContext.getSparkHost());
 
         Map<String, Integer> topicActionMap = new HashMap<String, Integer>();
         topicActionMap.put(InternalTopic.TOPIC_ACTION.getTopicName(), 1);

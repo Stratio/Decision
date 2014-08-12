@@ -33,6 +33,7 @@ public class DaoConfiguration {
     private Session session;
 
     @Bean
+    @Lazy
     public StreamingFailoverDao streamingFailoverDao() {
         return new StreamingFailoverDao(session, GsonFactory.getInstance());
     }

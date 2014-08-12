@@ -22,27 +22,18 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.SiddhiConfiguration;
 
 import com.stratio.streaming.extensions.DistinctWindowExtension;
-import com.stratio.streaming.service.StreamingFailoverService;
 
 @Configuration
-// XXX refactor
-@Import(DaoConfiguration.class)
 public class StreamingSiddhiConfiguration {
 
     public static final String QUERY_PLAN_IDENTIFIER = "StratioStreamingCEP-Cluster";
 
     @Autowired
     private ConfigurationContext configurationContext;
-
-    @Autowired
-    @Lazy
-    private StreamingFailoverService cassandraPersistenceStoreDao;
 
     @Bean(destroyMethod = "shutdown")
     public SiddhiManager siddhiManager() {

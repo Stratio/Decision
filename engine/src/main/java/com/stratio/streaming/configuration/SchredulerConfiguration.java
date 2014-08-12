@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -18,6 +19,7 @@ public class SchredulerConfiguration {
     private ConfigurationContext configurationContext;
 
     @Autowired
+    @Lazy
     private StreamingFailoverService streamingFailoverService;
 
     @Bean
@@ -30,6 +32,8 @@ public class SchredulerConfiguration {
         return taskScheduler;
     }
 
+    @Autowired
+    @Lazy
     public FailOverTask failOverTask() {
         return new FailOverTask(streamingFailoverService);
     }
