@@ -407,6 +407,8 @@ class StratioStreamingIntegrationTests
         val streams = streamingAPI.listenStream(testStreamName)
         Thread.sleep(2000)
         streamingAPI.insertData(testStreamName, streamData)
+        Thread.sleep(2000)
+        streamingAPI.insertData(testStreamName, streamData)
         for (stream <- streams) {
           val firstColumn = stream.message.getColumns.get(0)
           firstColumn.getColumn should be("column1")
