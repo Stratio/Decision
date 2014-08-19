@@ -125,7 +125,7 @@ class StratioStreamingAPI
     val operation = LISTEN.toLowerCase
     val listenStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(listenStreamMessage)
-    val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster)
+    val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster, readFromStartOfStream = false)
     streamingListeners.put(streamName, kafkaConsumer)
     kafkaConsumer.stream
   }
