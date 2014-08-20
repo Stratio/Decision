@@ -23,8 +23,8 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
-import com.google.gson.Gson;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import com.stratio.streaming.factory.GsonFactory;
 import com.stratio.streaming.serializer.Serializer;
 import com.stratio.streaming.serializer.impl.KafkaToJavaSerializer;
 
@@ -53,7 +53,7 @@ public class SendToKafkaActionExecutionFunction extends BaseActionExecutionFunct
 
     private Serializer<String, StratioStreamingMessage> getSerializer() {
         if (kafkaToJavaSerializer == null) {
-            kafkaToJavaSerializer = new KafkaToJavaSerializer(new Gson());
+            kafkaToJavaSerializer = new KafkaToJavaSerializer(GsonFactory.getInstance());
         }
         return kafkaToJavaSerializer;
     }
