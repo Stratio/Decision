@@ -395,7 +395,7 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The listen operation") {
-    it("should return the stream flow") {
+    ignore("should return the stream flow") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
@@ -405,8 +405,6 @@ class StratioStreamingIntegrationTests
       try {
         streamingAPI.createStream(testStreamName, columnList)
         val streams = streamingAPI.listenStream(testStreamName)
-        Thread.sleep(2000)
-        streamingAPI.insertData(testStreamName, streamData)
         Thread.sleep(2000)
         streamingAPI.insertData(testStreamName, streamData)
         for (stream <- streams) {
