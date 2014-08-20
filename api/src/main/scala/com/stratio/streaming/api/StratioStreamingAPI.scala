@@ -15,34 +15,55 @@
  */
 package com.stratio.streaming.api
 
-import org.apache.curator.retry.RetryOneTime
-import org.apache.curator.framework.{ CuratorFramework, CuratorFrameworkFactory }
-import com.stratio.streaming.commons.messages.ColumnNameTypeValue
-import com.stratio.streaming.kafka.KafkaConsumer
-import com.stratio.streaming.commons.constants.BUS._
-import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION._
-import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION._
-import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.MANIPULATION._
-import org.apache.curator.framework.api.{ CuratorEvent, CuratorListener }
-import org.apache.curator.framework.api.CuratorEventType._
-import com.stratio.streaming.commons.constants.STREAMING._
-import com.stratio.streaming.commons.exceptions.{ StratioEngineConnectionException, StratioEngineOperationException, StratioEngineStatusException }
-import com.stratio.streaming.commons.streams.StratioStream
-import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import java.util.List
-import com.stratio.streaming.messaging._
-import com.stratio.streaming.api.messaging.MessageBuilder._
-import scala.collection.JavaConversions._
-import com.stratio.streaming.messaging.InsertMessageBuilder
-import com.stratio.streaming.api.messaging.MessageBuilderWithColumns
-import com.stratio.streaming.kafka.KafkaProducer
-import com.stratio.streaming.dto.StratioQueryStream
-import com.stratio.streaming.messaging.QueryMessageBuilder
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
-import com.stratio.streaming.commons.kafka.service.{ TopicService, KafkaTopicService }
+
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.bufferAsJavaList
+
+import org.apache.curator.framework.CuratorFramework
+import org.apache.curator.framework.CuratorFrameworkFactory
+import org.apache.curator.framework.api.CuratorEvent
+import org.apache.curator.framework.api.CuratorEventType.WATCHED
+import org.apache.curator.framework.api.CuratorListener
+import org.apache.curator.retry.RetryOneTime
 import org.slf4j.LoggerFactory
-import com.stratio.streaming.api.messaging.ColumnNameValue
+
 import com.stratio.streaming.api.messaging.ColumnNameType
+import com.stratio.streaming.api.messaging.ColumnNameValue
+import com.stratio.streaming.api.messaging.MessageBuilder.builder
+import com.stratio.streaming.api.messaging.MessageBuilderWithColumns
+import com.stratio.streaming.commons.constants.InternalTopic
+import com.stratio.streaming.commons.constants.STREAMING.ZK_EPHEMERAL_NODE_PATH
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.INDEX
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.LISTEN
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.SAVETO_MONGO
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.STOP_INDEX
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.STOP_LISTEN
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.STOP_SAVETO_MONGO
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION.ADD_QUERY
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION.ALTER
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION.DROP
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.MANIPULATION.LIST
+import com.stratio.streaming.commons.exceptions.StratioEngineConnectionException
+import com.stratio.streaming.commons.exceptions.StratioEngineOperationException
+import com.stratio.streaming.commons.exceptions.StratioEngineStatusException
+import com.stratio.streaming.commons.kafka.service.KafkaTopicService
+import com.stratio.streaming.commons.kafka.service.TopicService
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue
+import com.stratio.streaming.commons.streams.StratioStream
+import com.stratio.streaming.dto.StratioQueryStream
+import com.stratio.streaming.kafka.KafkaConsumer
+import com.stratio.streaming.kafka.KafkaProducer
+import com.stratio.streaming.messaging.InsertMessageBuilder
+import com.stratio.streaming.messaging.QueryMessageBuilder
+import com.stratio.streaming.messaging.StreamMessageBuilder
+import com.stratio.streaming.zookeeper.ZookeeperConsumer
+
+import StratioStreamingAPI.config
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
@@ -104,7 +125,7 @@ class StratioStreamingAPI
     val operation = LISTEN.toLowerCase
     val listenStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(listenStreamMessage)
-    val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster)
+    val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster, readFromStartOfStream = false)
     streamingListeners.put(streamName, kafkaConsumer)
     kafkaConsumer.stream
   }
@@ -242,7 +263,8 @@ class StratioStreamingAPI
 object StratioStreamingAPI
   extends StratioStreamingAPIConfig {
   lazy val log = LoggerFactory.getLogger(getClass)
-  val streamingTopicName = TOPICS
+  val streamingTopicName = InternalTopic.TOPIC_REQUEST.getTopicName();
+  val streamingDataTopicName = InternalTopic.TOPIC_DATA.getTopicName();
   val sessionId = "" + System.currentTimeMillis()
   var brokerServer = ""
   var brokerPort = 0
@@ -252,7 +274,8 @@ object StratioStreamingAPI
   lazy val zookeeperCluster = s"$zookeeperServer:$zookeeperPort"
   var streamingUpAndRunning = false
   val streamingListeners = scala.collection.mutable.Map[String, KafkaConsumer]()
-  lazy val kafkaProducer = new KafkaProducer(TOPICS, kafkaBroker)
+  lazy val kafkaProducer = new KafkaProducer(InternalTopic.TOPIC_REQUEST.getTopicName(), kafkaBroker)
+  lazy val kafkaDataProducer = new KafkaProducer(InternalTopic.TOPIC_DATA.getTopicName(), kafkaBroker)
   val retryPolicy = new RetryOneTime(500)
   lazy val zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
   var topicService: TopicService = _
@@ -262,7 +285,7 @@ object StratioStreamingAPI
     ZookeeperConsumer(zookeeperClient)
   }
   lazy val syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
-  lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaProducer)
+  lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaDataProducer)
   lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
 
   def checkEphemeralNode() {
@@ -282,6 +305,7 @@ object StratioStreamingAPI
   def initializeTopic() {
     topicService = new KafkaTopicService(zookeeperCluster, brokerServer, brokerPort, 10000, 10000)
     topicService.createTopicIfNotExist(streamingTopicName, 1, 1)
+    topicService.createTopicIfNotExist(streamingDataTopicName, 1, 1);
   }
 
   def checkStreamingStatus() {

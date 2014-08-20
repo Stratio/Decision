@@ -15,27 +15,24 @@
  */
 package com.stratio.streaming.functions.validator;
 
-import org.wso2.siddhi.core.SiddhiManager;
-
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
+import com.stratio.streaming.service.StreamOperationService;
 
 public class StreamExistsValidation extends BaseSiddhiRequestValidation {
 
     private final static String STREAM_ALREADY_EXISTS_MESSAGE = "Stream %s already exists";
 
-    public StreamExistsValidation(SiddhiManager sm) {
-        super(sm);
+    public StreamExistsValidation(StreamOperationService streamOperationService) {
+        super(streamOperationService);
     }
 
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
-        if (request.getStreamName() != null && !"".equals(request.getStreamName())) {
-            if (getSm().getStreamDefinition(request.getStreamName()) != null) {
-                throw new RequestValidationException(REPLY_CODES.KO_STREAM_ALREADY_EXISTS, String.format(
-                        STREAM_ALREADY_EXISTS_MESSAGE, request.getStreamName()));
-            }
+        if (getStreamOperationService().streamExist(request.getStreamName())) {
+            throw new RequestValidationException(REPLY_CODES.KO_STREAM_ALREADY_EXISTS, String.format(
+                    STREAM_ALREADY_EXISTS_MESSAGE, request.getStreamName()));
         }
     }
 }

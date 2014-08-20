@@ -66,7 +66,7 @@ public class StreamCommands implements CommandMarker {
     @CliCommand(value = "columns", help = "list all streams querys into engine")
     public String listQuerys(
             @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
-        // TODO create new renderer to render this table
+        // XXX create new renderer to render this table
         try {
 
             List<ColumnNameTypeValue> columnsValues = stratioStreamingApi.columnsFromStream(streamName);

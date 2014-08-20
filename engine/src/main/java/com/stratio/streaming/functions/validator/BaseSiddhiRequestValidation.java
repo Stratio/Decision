@@ -15,19 +15,18 @@
  */
 package com.stratio.streaming.functions.validator;
 
-import org.wso2.siddhi.core.SiddhiManager;
+import com.stratio.streaming.service.StreamOperationService;
 
 public abstract class BaseSiddhiRequestValidation implements RequestValidation {
 
-    private final SiddhiManager sm;
+    private final StreamOperationService streamOperationService;
 
-    public BaseSiddhiRequestValidation(SiddhiManager sm) {
-        super();
-        this.sm = sm;
+    public BaseSiddhiRequestValidation(StreamOperationService streamOperationService) {
+        this.streamOperationService = streamOperationService;
     }
 
-    public SiddhiManager getSm() {
-        return sm;
+    public StreamOperationService getStreamOperationService() {
+        return streamOperationService;
     }
 
 }

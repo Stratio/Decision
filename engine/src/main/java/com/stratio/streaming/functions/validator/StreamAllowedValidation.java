@@ -15,20 +15,14 @@
  */
 package com.stratio.streaming.functions.validator;
 
-import org.wso2.siddhi.core.SiddhiManager;
-
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.utils.SiddhiUtils;
 
-public class StreamAllowedValidation extends BaseSiddhiRequestValidation {
+public class StreamAllowedValidation implements RequestValidation {
 
     private final static String STREAM_OPERATION_NOT_ALLOWED = "Operation %s not allowed in stream %s";
-
-    public StreamAllowedValidation(SiddhiManager sm) {
-        super(sm);
-    }
 
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {

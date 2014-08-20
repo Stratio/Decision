@@ -17,25 +17,24 @@ package com.stratio.streaming.functions.ddl;
 
 import java.util.Set;
 
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.query.api.exception.AttributeAlreadyExistException;
-import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
+import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
+import com.stratio.streaming.exception.ServiceException;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
-import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.service.StreamOperationService;
 
 public class AlterStreamFunction extends ActionBaseFunction {
 
     private static final long serialVersionUID = -4776676321715167213L;
 
-    public AlterStreamFunction(SiddhiManager siddhiManager, String zookeeperHost) {
-        super(siddhiManager, zookeeperHost);
+    public AlterStreamFunction(StreamOperationService streamOperationService, String zookeeperHost) {
+        super(streamOperationService, zookeeperHost);
     }
 
     @Override
@@ -51,12 +50,12 @@ public class AlterStreamFunction extends ActionBaseFunction {
     @Override
     protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
         try {
-            int addedColumns = StreamOperations.enlargeStream(message, getSiddhiManager());
+            int addedColumns = getStreamOperationService().enlargeStream(message.getStreamName(), message.getColumns());
             log.debug("Added {} columns to stream {}", addedColumns, message.getStreamName());
-        } catch (SiddhiPraserException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e.getMessage());
-        } catch (AttributeAlreadyExistException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_COLUMN_ALREADY_EXISTS, e.getMessage());
+        } catch (SiddhiParserException e) {
+            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e);
+        } catch (ServiceException e) {
+            throw new RequestValidationException(REPLY_CODES.KO_COLUMN_ALREADY_EXISTS, e);
         }
         return true;
     }
@@ -73,6 +72,6 @@ public class AlterStreamFunction extends ActionBaseFunction {
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }
 }

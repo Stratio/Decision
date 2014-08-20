@@ -22,7 +22,6 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.SiddhiManager;
 
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.dto.ActionCallbackDto;
@@ -30,6 +29,7 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamAllowedValidation;
+import com.stratio.streaming.service.StreamOperationService;
 import com.stratio.streaming.utils.ZKUtils;
 
 public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStreamingMessage>, Void> {
@@ -40,17 +40,17 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
 
     private final Set<RequestValidation> stopValidators;
     private final Set<RequestValidation> startValidators;
-    private final transient SiddhiManager siddhiManager;
+    private final transient StreamOperationService streamOperationService;
     private final String zookeeperHost;
 
-    public ActionBaseFunction(SiddhiManager siddhiManager, String zookeeperHost) {
+    public ActionBaseFunction(StreamOperationService streamOperationService, String zookeeperHost) {
         this.stopValidators = new LinkedHashSet<>();
         this.startValidators = new LinkedHashSet<>();
-        this.siddhiManager = siddhiManager;
+        this.streamOperationService = streamOperationService;
         this.zookeeperHost = zookeeperHost;
 
-        startValidators.add(new StreamAllowedValidation(getSiddhiManager()));
-        stopValidators.add(new StreamAllowedValidation(getSiddhiManager()));
+        startValidators.add(new StreamAllowedValidation());
+        stopValidators.add(new StreamAllowedValidation());
 
         addStartRequestsValidations(startValidators);
         addStopRequestsValidations(stopValidators);
@@ -107,8 +107,8 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
         ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
     }
 
-    public SiddhiManager getSiddhiManager() {
-        return siddhiManager;
+    public StreamOperationService getStreamOperationService() {
+        return streamOperationService;
     }
 
     public String getZookeeperHost() {

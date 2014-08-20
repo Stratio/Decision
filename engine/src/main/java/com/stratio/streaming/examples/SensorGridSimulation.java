@@ -35,7 +35,7 @@ import scala.Tuple2;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.stratio.streaming.commons.constants.BUS;
+import com.stratio.streaming.commons.constants.InternalTopic;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
@@ -58,7 +58,6 @@ public class SensorGridSimulation {
     public static final long streamSessionId = System.currentTimeMillis();
 
     public SensorGridSimulation() {
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -69,7 +68,6 @@ public class SensorGridSimulation {
         try {
             mySelf.launchSensorStreaming(args);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -183,8 +181,9 @@ public class SensorGridSimulation {
                 message.setColumns(sensorData);
                 message.setRequest("dummy request");
 
-                KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(BUS.TOPICS,
-                        STREAM_OPERATIONS.MANIPULATION.INSERT, gson.toJson(message));
+                KeyedMessage<String, String> busMessage = new KeyedMessage<String, String>(
+                        InternalTopic.TOPIC_DATA.getTopicName(), STREAM_OPERATIONS.MANIPULATION.INSERT,
+                        gson.toJson(message));
                 producer.send(busMessage);
                 globalMessagesSent.getAndIncrement();
 

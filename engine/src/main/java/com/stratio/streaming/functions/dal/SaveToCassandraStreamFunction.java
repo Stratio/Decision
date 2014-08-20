@@ -17,8 +17,6 @@ package com.stratio.streaming.functions.dal;
 
 import java.util.Set;
 
-import org.wso2.siddhi.core.SiddhiManager;
-
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.constants.StreamAction;
@@ -27,17 +25,14 @@ import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.ActionEnabledValidation;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
-import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.service.StreamOperationService;
 
 public class SaveToCassandraStreamFunction extends ActionBaseFunction {
 
     private static final long serialVersionUID = 6928586284081343386L;
 
-    private final String cassandraCluster;
-
-    public SaveToCassandraStreamFunction(SiddhiManager siddhiManager, String zookeeperHost, String cassandraCluster) {
-        super(siddhiManager, zookeeperHost);
-        this.cassandraCluster = cassandraCluster;
+    public SaveToCassandraStreamFunction(StreamOperationService streamOperationService, String zookeeperHost) {
+        super(streamOperationService, zookeeperHost);
     }
 
     @Override
@@ -52,25 +47,25 @@ public class SaveToCassandraStreamFunction extends ActionBaseFunction {
 
     @Override
     protected boolean startAction(StratioStreamingMessage message) {
-        StreamOperations.save2cassandraStream(message, cassandraCluster, getSiddhiManager());
+        getStreamOperationService().enableAction(message.getStreamName(), StreamAction.SAVE_TO_CASSANDRA);
         return true;
     }
 
     @Override
     protected boolean stopAction(StratioStreamingMessage message) {
-        StreamOperations.stopSave2cassandraStream(message, getSiddhiManager());
+        getStreamOperationService().disableAction(message.getStreamName(), StreamAction.SAVE_TO_CASSANDRA);
         return true;
     }
 
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new ActionEnabledValidation(getSiddhiManager(), StreamAction.SAVE_TO_CASSANDRA,
+        validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.SAVE_TO_CASSANDRA,
                 REPLY_CODES.KO_SAVE2CASSANDRA_STREAM_ALREADY_ENABLED));
-        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }
 }
