@@ -451,7 +451,7 @@ class StratioStreamingIntegrationTests
   }
 
   describe("The stop listen operation") {
-    it("should stop the stream flow") {
+    ignore("should stop the stream flow") {
       val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
       val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
       val columnList = Seq(firstStreamColumn, secondStreamColumn)
