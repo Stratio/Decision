@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.streaming.zookeeper
+package com.stratio.streaming.api.zookeeper
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import ExecutionContext.Implicits.global
 import org.apache.curator.framework.CuratorFramework
 import scala.Predef._
@@ -28,7 +28,7 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
   def readZNode(fullPath: String) = {
     Future {
       var nodeExists = zNodeExists(fullPath)
-      while(!nodeExists) {
+      while (!nodeExists) {
         nodeExists = zNodeExists(fullPath)
       }
     }
@@ -60,7 +60,7 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
       Some(zNodeExists)
     } catch {
       case _ => {
-        log.warn("Unable to check zNode: "+zNodeName)
+        log.warn("Unable to check zNode: " + zNodeName)
         None
       }
     }

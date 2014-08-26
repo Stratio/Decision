@@ -61,7 +61,7 @@ import com.stratio.streaming.kafka.KafkaProducer
 import com.stratio.streaming.messaging.InsertMessageBuilder
 import com.stratio.streaming.messaging.QueryMessageBuilder
 import com.stratio.streaming.messaging.StreamMessageBuilder
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
 
 import StratioStreamingAPI.config
 

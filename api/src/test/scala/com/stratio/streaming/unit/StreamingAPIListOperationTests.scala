@@ -22,17 +22,17 @@ import org.mockito.Mockito
 import org.mockito.Matchers._
 import com.stratio.streaming.kafka.KafkaProducer
 import com.stratio.streaming.api.StreamingAPIListOperation
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
 import scala.Some
 import scala.concurrent.Future
 import scala.collection.JavaConversions._
-import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioAPIGenericException}
+import com.stratio.streaming.commons.exceptions.{ StratioEngineOperationException, StratioAPIGenericException }
 import java.util.concurrent.TimeoutException
 
 class StreamingAPIListOperationTests extends FunSpec
-with GivenWhenThen
-with ShouldMatchers
-with MockitoSugar {
+  with GivenWhenThen
+  with ShouldMatchers
+  with MockitoSugar {
   val kafkaProducerMock = mock[KafkaProducer]
   val zookeeperConsumerMock = mock[ZookeeperConsumer]
   val stratioStreamingAPIListOperation = new StreamingAPIListOperation(kafkaProducerMock, zookeeperConsumerMock, 2000)

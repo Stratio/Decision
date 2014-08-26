@@ -32,7 +32,7 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.client.methods.{ HttpGet, HttpDelete }
 import org.apache.http.util.EntityUtils
 import com.mongodb._
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.streams.StratioStream
 
 class StratioStreamingIntegrationTests

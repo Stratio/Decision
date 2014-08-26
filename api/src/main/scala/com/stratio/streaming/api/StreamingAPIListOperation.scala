@@ -20,14 +20,14 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import scala.collection.JavaConversions._
 import java.util.UUID
 import com.stratio.streaming.kafka.KafkaProducer
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.utils.StreamsParser
 import java.util.List
 import scala.collection.immutable
 
 class StreamingAPIListOperation(kafkaProducer: KafkaProducer,
-                             zookeeperConsumer: ZookeeperConsumer,
-                                 ackTimeOutInMs: Int)
+  zookeeperConsumer: ZookeeperConsumer,
+  ackTimeOutInMs: Int)
   extends StreamingAPIOperation {
 
   def getListStreams(message: StratioStreamingMessage): List[StratioStream] = {
