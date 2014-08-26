@@ -24,8 +24,8 @@ import org.springframework.shell.core.Converter;
 import org.springframework.shell.core.MethodTarget;
 import org.springframework.stereotype.Component;
 
+import com.stratio.streaming.api.messaging.ColumnNameType;
 import com.stratio.streaming.commons.constants.ColumnType;
-import com.stratio.streaming.messaging.ColumnNameType;
 import com.stratio.streaming.shell.converter.wrapper.ColumnNameTypeList;
 
 @Component

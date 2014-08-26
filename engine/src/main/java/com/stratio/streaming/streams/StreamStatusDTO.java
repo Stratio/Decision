@@ -18,59 +18,28 @@ package com.stratio.streaming.streams;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.stratio.streaming.commons.constants.StreamAction;
 
 public class StreamStatusDTO implements Serializable {
 
-    /**
-	 * 
-	 */
-    private static final long serialVersionUID = -8455557383950387810L;
+    private static final long serialVersionUID = -714024710449331531L;
+
     private String streamName;
     private String streamDefinition;
+    private String actionQueryId;
+
     private Boolean userDefined;
-
     private final Set<StreamAction> actionsEnabled;
+    private final Map<String, QueryDTO> addedQueries;
 
-    private HashMap<String, QueryDTO> addedQueries;
-
-    /**
-     * @param streamName
-     * @param listen_enabled
-     * @param saveToCassandra_enabled
-     */
     public StreamStatusDTO(String streamName, Boolean userDefined) {
-        super();
         this.streamName = streamName;
         this.userDefined = userDefined;
         this.actionsEnabled = new HashSet<>();
         this.addedQueries = new HashMap<>();
-    }
-
-    public void enableAction(StreamAction action) {
-        actionsEnabled.add(action);
-    }
-
-    public void disableAction(StreamAction action) {
-        actionsEnabled.remove(action);
-    }
-
-    public boolean isActionEnabled(StreamAction action) {
-        return actionsEnabled.contains(action);
-    }
-
-    public Set<StreamAction> getActionsEnabled() {
-        return actionsEnabled;
-    }
-
-    public Boolean isUserDefined() {
-        return userDefined;
-    }
-
-    public void setUserDefined(Boolean userDefined) {
-        this.userDefined = userDefined;
     }
 
     public String getStreamName() {
@@ -89,12 +58,28 @@ public class StreamStatusDTO implements Serializable {
         this.streamDefinition = streamDefinition;
     }
 
-    public HashMap<String, QueryDTO> getAddedQueries() {
-        return addedQueries;
+    public Boolean getUserDefined() {
+        return userDefined;
     }
 
-    public void setAddedQueries(HashMap<String, QueryDTO> addedQueries) {
-        this.addedQueries = addedQueries;
+    public void setUserDefined(Boolean userDefined) {
+        this.userDefined = userDefined;
+    }
+
+    public String getActionQueryId() {
+        return actionQueryId;
+    }
+
+    public void setActionQueryId(String actionQueryId) {
+        this.actionQueryId = actionQueryId;
+    }
+
+    public Set<StreamAction> getActionsEnabled() {
+        return actionsEnabled;
+    }
+
+    public Map<String, QueryDTO> getAddedQueries() {
+        return addedQueries;
     }
 
 }

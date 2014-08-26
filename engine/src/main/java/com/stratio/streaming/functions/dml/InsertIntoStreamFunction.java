@@ -17,25 +17,23 @@ package com.stratio.streaming.functions.dml;
 
 import java.util.Set;
 
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.query.api.exception.AttributeNotExistException;
-
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.dto.ActionCallbackDto;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
+import com.stratio.streaming.exception.ServiceException;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
-import com.stratio.streaming.utils.SiddhiUtils;
+import com.stratio.streaming.service.StreamOperationService;
 
 public class InsertIntoStreamFunction extends ActionBaseFunction {
 
     private static final long serialVersionUID = -2545263418772827277L;
 
-    public InsertIntoStreamFunction(SiddhiManager siddhiManager, String zookeeperHost) {
-        super(siddhiManager, zookeeperHost);
+    public InsertIntoStreamFunction(StreamOperationService streamOperationService, String zookeeperHost) {
+        super(streamOperationService, zookeeperHost);
     }
 
     @Override
@@ -51,20 +49,16 @@ public class InsertIntoStreamFunction extends ActionBaseFunction {
     @Override
     protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
         try {
-            getSiddhiManager().getInputHandler(message.getStreamName()).send(
-                    SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(message.getStreamName()),
-                            message.getColumns()));
-        } catch (AttributeNotExistException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST, e.getMessage());
-        } catch (InterruptedException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_GENERAL_ERROR, e.getMessage());
+            getStreamOperationService().send(message.getStreamName(), message.getColumns());
+        } catch (ServiceException e) {
+            throw new RequestValidationException(REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST, e);
         }
         return false;
     }
 
     @Override
     protected void ackStreamingOperation(StratioStreamingMessage message, ActionCallbackDto reply) throws Exception {
-        log.debug("Overriding zookeeper inser action.Data: {}", reply);
+        log.debug("Overriding zookeeper insert action.Data: {}", reply);
     }
 
     @Override
@@ -79,6 +73,6 @@ public class InsertIntoStreamFunction extends ActionBaseFunction {
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }
 }

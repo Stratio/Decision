@@ -41,14 +41,12 @@ public class KafkaTopicService implements TopicService {
     private final ZkClient zkClient;
     private final SimpleConsumer simpleConsumer;
 
-    // TODO send ZkClient and SimpleConsumer in the constructor
     private final static int CONSUMER_TIMEOUT = 100000;
     private final static int CONSUMER_BUFFER_SIZE = 64 * 1024;
     private final static String CONSUMER_CLIENT_ID = "leaderLookup";
 
     public KafkaTopicService(String zokeeperCluster, String broker, int brokerPort, int connectionTimeout,
             int sessionTimeout) {
-        // TODO send ZkClient and SimpleConsumer in the constructor
         this.zkClient = new ZkClient(zokeeperCluster, sessionTimeout, connectionTimeout, new ZkStringSerializer());
         this.simpleConsumer = new SimpleConsumer(broker, brokerPort, CONSUMER_TIMEOUT, CONSUMER_BUFFER_SIZE,
                 CONSUMER_CLIENT_ID);

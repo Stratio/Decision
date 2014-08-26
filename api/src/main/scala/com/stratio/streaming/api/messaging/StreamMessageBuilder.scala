@@ -15,7 +15,7 @@
  */
 package com.stratio.streaming.messaging
 
-import com.stratio.streaming.messaging.MessageBuilder._
+import com.stratio.streaming.api.messaging.MessageBuilder._
 
 case class StreamMessageBuilder(sessionId: String) {
   def build(streamName: String, operation: String) = {

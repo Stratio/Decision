@@ -20,7 +20,7 @@
 	<parent>
 		<groupId>com.stratio.streaming</groupId>
 		<artifactId>stratio-streaming</artifactId>
-		<version>0.3.3</version>
+		<version>0.4.0</version>
 	</parent>
 	<artifactId>streaming-shell</artifactId>
 	<packaging>jar</packaging>
@@ -80,7 +80,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>appassembler-maven-plugin</artifactId>
-				<version>1.8</version>
+				<version>1.8.1</version>
 				<configuration>
 					<configurationDirectory>config</configurationDirectory>
 					<copyConfigurationDirectory>true</copyConfigurationDirectory>

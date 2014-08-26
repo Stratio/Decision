@@ -15,11 +15,11 @@
  */
 package com.stratio.streaming.unit
 
-import org.scalatest.{BeforeAndAfterAll, GivenWhenThen, ShouldMatchers, FunSpec}
+import org.scalatest.{ BeforeAndAfterAll, GivenWhenThen, ShouldMatchers, FunSpec }
 import scala.concurrent._
 import scala.concurrent.duration._
 import java.util.UUID
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
 import org.apache.curator.retry.RetryOneTime
 import com.netflix.curator.test.TestingServer
 import org.apache.curator.framework.CuratorFrameworkFactory
@@ -39,7 +39,6 @@ class ZookeeperConsumerUnitTests
   lazy val zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
   val operation = "theOperation"
   val operationFullPath = s"/stratio/streaming/$operation"
-
 
   override def beforeAll() {
     createZookeeperFullPath()
@@ -64,7 +63,7 @@ class ZookeeperConsumerUnitTests
       When("I do not create the znode within the timeout")
       And("I call the readZNode method")
       Then("the TimeOutException should be thrown")
-      intercept [TimeoutException] {
+      intercept[TimeoutException] {
         Await.result(zookeeperConsumer.readZNode(fullPath), 1 seconds)
       }
     }
@@ -77,8 +76,8 @@ class ZookeeperConsumerUnitTests
       When("i fetch the value")
       val data = zookeeperConsumer.getZNodeData(fullPath)
       Then("i should get the data")
-      data.isDefined should be (true)
-      data.get should be ("someData")
+      data.isDefined should be(true)
+      data.get should be("someData")
     }
 
     it("should return None when the zNode does not exist") {
@@ -88,7 +87,7 @@ class ZookeeperConsumerUnitTests
       When("i fetch the value")
       val data = zookeeperConsumer.getZNodeData(fullPath)
       Then("i should get None")
-      data.isDefined should be (false)
+      data.isDefined should be(false)
     }
 
     it("should remove a zNode") {
@@ -114,7 +113,7 @@ class ZookeeperConsumerUnitTests
   }
 
   private def theNodeExists(path: String): Boolean = {
-    zookeeperClient.checkExists().forPath(path)!=null
+    zookeeperClient.checkExists().forPath(path) != null
   }
 
   def createZookeeperFullPath() {

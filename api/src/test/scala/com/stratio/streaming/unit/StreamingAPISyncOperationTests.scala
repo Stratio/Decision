@@ -15,28 +15,31 @@
  */
 package com.stratio.streaming.unit
 
-import org.scalatest._
-import com.stratio.streaming.commons.messages.StratioStreamingMessage
-import com.stratio.streaming.commons.exceptions.{StratioAPIGenericException, StratioEngineOperationException, StratioAPISecurityException}
-import org.scalatest.mock._
-import org.mockito.Matchers._
-import scala.collection.JavaConversions._
+import scala.collection.JavaConversions.seqAsJavaList
+import scala.concurrent.Future
+import scala.concurrent.TimeoutException
+import org.mockito.Matchers.anyString
 import org.mockito.Mockito
-import scala.concurrent._
-import com.stratio.streaming.commons.constants.REPLY_CODES._
-import com.stratio.streaming.kafka.KafkaProducer
+import org.scalatest.FunSpec
+import org.scalatest.GivenWhenThen
+import org.scalatest.ShouldMatchers
+import org.scalatest.mock.MockitoSugar
 import com.stratio.streaming.api.StreamingAPISyncOperation
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
-import scala.Some
+import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.commons.constants.REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST
+import com.stratio.streaming.commons.constants.REPLY_CODES.KO_STREAM_IS_NOT_USER_DEFINED
+import com.stratio.streaming.commons.constants.REPLY_CODES.KO_STREAM_OPERATION_NOT_ALLOWED
+import com.stratio.streaming.commons.constants.REPLY_CODES.OK
+import com.stratio.streaming.commons.exceptions.StratioAPIGenericException
+import com.stratio.streaming.commons.exceptions.StratioAPISecurityException
+import com.stratio.streaming.commons.exceptions.StratioEngineOperationException
+import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.streaming.kafka.KafkaProducer
-import com.stratio.streaming.api.StreamingAPISyncOperation
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
-import scala.Some
 
 class StreamingAPISyncOperationTests extends FunSpec
-with GivenWhenThen
-with ShouldMatchers
-with MockitoSugar {
+  with GivenWhenThen
+  with ShouldMatchers
+  with MockitoSugar {
   val kafkaProducerMock = mock[KafkaProducer]
   val zookeeperConsumerMock = mock[ZookeeperConsumer]
   val stratioStreamingAPISyncOperation = new StreamingAPISyncOperation(kafkaProducerMock, zookeeperConsumerMock, 2000)
@@ -83,17 +86,17 @@ with MockitoSugar {
     }
 
     it("should throw a StratioAPISecurityException when the engine returns a KO_STREAM_IS_NOT_USER_DEFINED return code") {
-        Given("a KO_STREAM_IS_NOT_USER_DEFINED engine response")
-        val engineResponse = s"""{"errorCode":$KO_STREAM_IS_NOT_USER_DEFINED}"""
-        When("we perform the sync operation")
-        Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
-        org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
-        org.mockito.Mockito.when(zookeeperConsumerMock.readZNode(anyString())).thenReturn(Future.successful())
-        org.mockito.Mockito.when(zookeeperConsumerMock.getZNodeData(anyString())).thenReturn(Some(engineResponse))
-        Then("we should get a StratioAPISecurityException")
-        intercept[StratioAPISecurityException] {
-          stratioStreamingAPISyncOperation.performSyncOperation(stratioStreamingMessage)
-        }
+      Given("a KO_STREAM_IS_NOT_USER_DEFINED engine response")
+      val engineResponse = s"""{"errorCode":$KO_STREAM_IS_NOT_USER_DEFINED}"""
+      When("we perform the sync operation")
+      Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
+      org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
+      org.mockito.Mockito.when(zookeeperConsumerMock.readZNode(anyString())).thenReturn(Future.successful())
+      org.mockito.Mockito.when(zookeeperConsumerMock.getZNodeData(anyString())).thenReturn(Some(engineResponse))
+      Then("we should get a StratioAPISecurityException")
+      intercept[StratioAPISecurityException] {
+        stratioStreamingAPISyncOperation.performSyncOperation(stratioStreamingMessage)
+      }
     }
 
     it("should throw a StratioEngineOperationException when the engine returns an ERROR return code") {

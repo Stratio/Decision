@@ -17,12 +17,12 @@ package com.stratio.streaming.shell.dao;
 
 import java.util.List;
 
+import com.stratio.streaming.api.messaging.ColumnNameType;
 import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
 import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
 import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
 import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
 import com.stratio.streaming.commons.streams.StratioStream;
-import com.stratio.streaming.messaging.ColumnNameType;
 
 public interface CachedStreamsDAO {
 

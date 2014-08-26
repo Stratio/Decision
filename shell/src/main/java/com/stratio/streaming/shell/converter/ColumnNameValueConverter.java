@@ -23,7 +23,7 @@ import org.springframework.shell.core.Converter;
 import org.springframework.shell.core.MethodTarget;
 import org.springframework.stereotype.Component;
 
-import com.stratio.streaming.messaging.ColumnNameValue;
+import com.stratio.streaming.api.messaging.ColumnNameValue;
 import com.stratio.streaming.shell.converter.wrapper.ColumnNameValueList;
 
 @Component

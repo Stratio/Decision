@@ -80,26 +80,6 @@ public class ZKUtils {
         client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, data);
     }
 
-    // public void createZNodeACK(StratioStreamingMessage request,
-    // ActionCallbackDto reply) throws Exception {
-    //
-    // String path = STREAMING.ZK_BASE_PATH + "/" +
-    // request.getOperation().toLowerCase() + "/"
-    // + request.getRequest_id();
-    //
-    // if (client.checkExists().forPath(path) != null) {
-    // client.delete().deletingChildrenIfNeeded().forPath(path);
-    // }
-    //
-    // client.create().creatingParentsIfNeeded().forPath(path,
-    // reply.toString().getBytes());
-    //
-    // logger.info("**** ZKUTILS " + request.getOperation() + "//" +
-    // request.getRequest_id() + "//" + reply + "//"
-    // + path);
-    //
-    // }
-
     public void createZNodeJsonReply(StratioStreamingMessage request, Object reply) throws Exception {
 
         String path = STREAMING.ZK_BASE_PATH + "/" + request.getOperation().toLowerCase() + "/"

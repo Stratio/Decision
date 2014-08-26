@@ -17,9 +17,9 @@ package com.stratio.streaming.api
 
 import java.util.UUID
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
-import com.stratio.streaming.commons.exceptions.{StratioAPIGenericException, StratioAPISecurityException, StratioEngineOperationException}
+import com.stratio.streaming.commons.exceptions.{ StratioAPIGenericException, StratioAPISecurityException, StratioEngineOperationException }
 import com.stratio.streaming.kafka.KafkaProducer
-import com.stratio.streaming.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants.REPLY_CODES._
 import com.google.gson.Gson
 import com.stratio.streaming.commons.dto.ActionCallbackDto
@@ -57,13 +57,13 @@ case class StreamingAPISyncOperation(
             log.info(s"StratioEngine Ack received for the operation $messageOperation on the $streamName stream")
           }
           case KO_STREAM_OPERATION_NOT_ALLOWED |
-               KO_STREAM_IS_NOT_USER_DEFINED => {
+            KO_STREAM_IS_NOT_USER_DEFINED => {
             createLogError(replyCode, replyDescription)
             throw new StratioAPISecurityException(replyDescription)
           }
           case _ => {
             createLogError(replyCode, replyDescription)
-            throw new StratioEngineOperationException("StratioEngine error: "+replyDescription)
+            throw new StratioEngineOperationException("StratioEngine error: " + replyDescription)
           }
         }
     }

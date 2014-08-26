@@ -17,9 +17,6 @@ package com.stratio.streaming.functions.ddl;
 
 import java.util.Set;
 
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.query.compiler.exception.SiddhiPraserException;
-
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
@@ -29,14 +26,14 @@ import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamExistsValidation;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
 import com.stratio.streaming.functions.validator.UserDefinedStreamValidation;
-import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.service.StreamOperationService;
 
 public class CreateStreamFunction extends ActionBaseFunction {
 
     private static final long serialVersionUID = -3888212615838168602L;
 
-    public CreateStreamFunction(SiddhiManager siddhiManager, String zookeeperHost) {
-        super(siddhiManager, zookeeperHost);
+    public CreateStreamFunction(StreamOperationService streamOperationService, String zookeeperHost) {
+        super(streamOperationService, zookeeperHost);
     }
 
     @Override
@@ -52,28 +49,28 @@ public class CreateStreamFunction extends ActionBaseFunction {
     @Override
     protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
         try {
-            StreamOperations.createStream(message, getSiddhiManager());
-        } catch (SiddhiPraserException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e.getMessage());
+            getStreamOperationService().createStream(message.getStreamName(), message.getColumns());
+        } catch (Exception e) {
+            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e);
         }
         return true;
     }
 
     @Override
     protected boolean stopAction(StratioStreamingMessage message) throws RequestValidationException {
-        StreamOperations.dropStream(message, getSiddhiManager());
+        getStreamOperationService().dropStream(message.getStreamName());
         return true;
     }
 
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new UserDefinedStreamValidation(getSiddhiManager()));
-        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new UserDefinedStreamValidation(getStreamOperationService()));
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new StreamExistsValidation(getSiddhiManager()));
+        validators.add(new StreamExistsValidation(getStreamOperationService()));
     }
 
 }

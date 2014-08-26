@@ -15,30 +15,25 @@
  */
 package com.stratio.streaming.functions.validator;
 
-import org.wso2.siddhi.core.SiddhiManager;
-
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
-import com.stratio.streaming.streams.QueryDTO;
-import com.stratio.streaming.streams.StreamSharedStatus;
+import com.stratio.streaming.service.StreamOperationService;
 
 public class QueryExistsValidation extends BaseSiddhiRequestValidation {
 
     private final static String QUERY_ALREADY_EXISTS_MESSAGE = "Query in stream %s already exists";
 
-    public QueryExistsValidation(SiddhiManager sm) {
-        super(sm);
+    public QueryExistsValidation(StreamOperationService streamOperationService) {
+        super(streamOperationService);
     }
 
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
-        if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSm()) != null) {
-            if (StreamSharedStatus.getStreamStatus(request.getStreamName(), getSm()).getAddedQueries()
-                    .containsValue(new QueryDTO(request.getRequest()))) {
-                throw new RequestValidationException(REPLY_CODES.KO_QUERY_ALREADY_EXISTS, String.format(
-                        QUERY_ALREADY_EXISTS_MESSAGE, request.getStreamName()));
-            }
+
+        if (getStreamOperationService().queryRawExists(request.getStreamName(), request.getRequest())) {
+            throw new RequestValidationException(REPLY_CODES.KO_QUERY_ALREADY_EXISTS, String.format(
+                    QUERY_ALREADY_EXISTS_MESSAGE, request.getStreamName()));
         }
     }
 }

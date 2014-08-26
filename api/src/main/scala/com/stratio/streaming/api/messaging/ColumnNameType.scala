@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.streaming.messaging
+package com.stratio.streaming.api.messaging
 
 import com.stratio.streaming.commons.constants.ColumnType
-
 
 class ColumnNameType(var columnName: String, var columnType: ColumnType)

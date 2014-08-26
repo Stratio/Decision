@@ -17,8 +17,6 @@ package com.stratio.streaming.functions.dal;
 
 import java.util.Set;
 
-import org.wso2.siddhi.core.SiddhiManager;
-
 import com.stratio.streaming.commons.constants.REPLY_CODES;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.constants.StreamAction;
@@ -27,16 +25,13 @@ import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.ActionEnabledValidation;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
-import com.stratio.streaming.streams.StreamOperations;
+import com.stratio.streaming.service.StreamOperationService;
 
 public class ListenStreamFunction extends ActionBaseFunction {
     private static final long serialVersionUID = 4566359991793310850L;
 
-    private final String kafkaCluster;
-
-    public ListenStreamFunction(SiddhiManager siddhiManager, String zookeeperHost, String kafkaCluster) {
-        super(siddhiManager, zookeeperHost);
-        this.kafkaCluster = kafkaCluster;
+    public ListenStreamFunction(StreamOperationService streamOperationService, String zookeeperHost) {
+        super(streamOperationService, zookeeperHost);
     }
 
     @Override
@@ -51,25 +46,25 @@ public class ListenStreamFunction extends ActionBaseFunction {
 
     @Override
     protected boolean startAction(StratioStreamingMessage message) {
-        StreamOperations.listenStream(message, kafkaCluster, getSiddhiManager());
+        getStreamOperationService().enableAction(message.getStreamName(), StreamAction.LISTEN);
         return true;
     }
 
     @Override
     protected boolean stopAction(StratioStreamingMessage message) {
-        StreamOperations.stopListenStream(message, getSiddhiManager());
+        getStreamOperationService().disableAction(message.getStreamName(), StreamAction.LISTEN);
         return true;
     }
 
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new ActionEnabledValidation(getSiddhiManager(), StreamAction.LISTEN,
+        validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.LISTEN,
                 REPLY_CODES.KO_LISTENER_ALREADY_EXISTS));
-        validators.add(new StreamNotExistsValidation(getSiddhiManager()));
+        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }
 }

@@ -53,7 +53,7 @@ public class StreamConverter implements Converter<String> {
                 targetType, existingData, optionContext, target);
         boolean completedValues = false;
         try {
-            List<StratioStream> streams = cachedStreamsDAO.listUncachedStreams();
+            List<StratioStream> streams = cachedStreamsDAO.listStreams();
             log.info("Listed {} streams", streams.size());
             for (int i = 0; i < streams.size(); i++) {
                 if (existingData.equals("") || streams.get(i).getStreamName().startsWith(existingData)) {

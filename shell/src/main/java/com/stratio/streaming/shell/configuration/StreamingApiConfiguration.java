@@ -48,7 +48,7 @@ public class StreamingApiConfiguration {
             return StratioStreamingAPIFactory.create().initializeWithServerConfig(kafkaHost, kafkaPort, zookeeperHost,
                     zookeeperPort);
         } catch (StratioEngineConnectionException e) {
-            throw new RuntimeException("Problem creating streming api", e);
+            throw new RuntimeException("Problem creating streaming api", e);
         }
     }
 }

@@ -73,8 +73,6 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
             selectedFields.add(new ColumnNameTypeValue("operation", null, request.getOperation().toUpperCase()));
             selectedFields.add(new ColumnNameTypeValue("streamName", null, request.getStreamName()));
             selectedFields.add(new ColumnNameTypeValue("count", null, Integer.valueOf(1)));
-            // selectedFields.add(new ColumnNameTypeValue("index", null,
-            // getIndexForOperation(request.getOperation())));
 
             getStatsBaseStream().send(
                     SiddhiUtils.getOrderedValues(getSiddhiManager().getStreamDefinition(STREAMING.STATS_NAMES.BASE),
@@ -93,11 +91,6 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
             getSiddhiManager().addQuery(STATS_QUERIES.REQUEST_THROUGHPUT);
 
             sendResetValuesForAllOperations(getSiddhiManager().getInputHandler(STREAMING.STATS_NAMES.BASE));
-
-            // StratioStreamingMessage message = new StratioStreamingMessage();
-            // message.setStreamName(STATS_QUERIES.GLOBAL_STATS_BY_OPERATION);
-            // StreamOperations.listenStream(message, getKafkaCluster(),
-            // getSiddhiManager());
 
         }
 
@@ -147,35 +140,8 @@ public class CollectRequestForStatsFunction extends StratioStreamingBaseFunction
         selectedFields.add(new ColumnNameTypeValue("operation", null, operation));
         selectedFields.add(new ColumnNameTypeValue("streamName", null, "resetStats"));
         selectedFields.add(new ColumnNameTypeValue("count", null, Integer.valueOf(0)));
-        // selectedFields.add(new ColumnNameTypeValue("index", null,
-        // getIndexForOperation(operation)));
 
         return selectedFields;
-    }
-
-    private Integer getIndexForOperation(String operation) {
-
-        switch (operation.toUpperCase()) {
-        case STREAM_OPERATIONS.ACTION.LISTEN:
-            return Integer.valueOf(53828);
-        case STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA:
-            return Integer.valueOf(53829);
-        case STREAM_OPERATIONS.DEFINITION.ADD_QUERY:
-            return Integer.valueOf(53831);
-        case STREAM_OPERATIONS.DEFINITION.ALTER:
-            return Integer.valueOf(53832);
-        case STREAM_OPERATIONS.DEFINITION.CREATE:
-            return Integer.valueOf(53833);
-        case STREAM_OPERATIONS.DEFINITION.DROP:
-            return Integer.valueOf(53834);
-        case STREAM_OPERATIONS.MANIPULATION.INSERT:
-            return Integer.valueOf(53835);
-        case STREAM_OPERATIONS.MANIPULATION.LIST:
-            return Integer.valueOf(53836);
-        default:
-            return Integer.valueOf(0);
-        }
-
     }
 
 }

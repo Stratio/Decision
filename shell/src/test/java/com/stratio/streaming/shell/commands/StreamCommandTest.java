@@ -17,26 +17,20 @@ package com.stratio.streaming.shell.commands;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.shell.Bootstrap;
 import org.springframework.shell.core.CommandResult;
-import org.springframework.shell.core.JLineShellComponent;
-import org.springframework.util.FileCopyUtils;
 
-import com.stratio.streaming.api.IStratioStreamingAPI;
 import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.constants.StreamAction;
+import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
 import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
 import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
 import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
@@ -44,19 +38,11 @@ import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StreamQuery;
 import com.stratio.streaming.commons.streams.StratioStream;
 
-public class StreamCommandTest {
-
-    private static JLineShellComponent shell;
-
-    private static IStratioStreamingAPI stratioStreamingApi;
+public class StreamCommandTest extends BaseShellTest {
 
     @Before
     public void setUp() {
-        Bootstrap bootstrap = new Bootstrap(null,
-                new String[] { "classpath*:/META-INF/spring/spring-shell-plugin-test.xml" });
-        shell = bootstrap.getJLineShellComponent();
-
-        stratioStreamingApi = bootstrap.getApplicationContext().getBean(IStratioStreamingAPI.class);
+        init();
     }
 
     @Test
@@ -68,8 +54,8 @@ public class StreamCommandTest {
     }
 
     @Test
-    public void listWithOneStreamTest() throws StratioEngineStatusException, StratioAPIGenericException,StratioAPISecurityException,
-            StratioEngineOperationException, IOException {
+    public void listWithOneStreamTest() throws StratioEngineStatusException, StratioAPIGenericException,
+            StratioAPISecurityException, StratioEngineOperationException, IOException {
         String streamName = "testStream";
         List<ColumnNameTypeValue> values = new ArrayList<>();
         values.add(new ColumnNameTypeValue("column1", ColumnType.STRING, null));
@@ -112,11 +98,5 @@ public class StreamCommandTest {
         CommandResult cr = shell.executeCommand("list");
         assertEquals(true, cr.isSuccess());
         assertEquals(getListResultFromName("listWithOneStreamOneQueryOneAction"), cr.getResult());
-    }
-
-    private String getListResultFromName(String filename) throws IOException {
-        String content = FileCopyUtils.copyToString(new BufferedReader(new InputStreamReader(this.getClass()
-                .getResourceAsStream("/".concat(filename).concat(".txt")))));
-        return content;
     }
 }

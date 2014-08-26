@@ -17,7 +17,7 @@ package com.stratio.streaming.shell.converter.wrapper;
 
 import java.util.ArrayList;
 
-import com.stratio.streaming.messaging.ColumnNameValue;
+import com.stratio.streaming.api.messaging.ColumnNameValue;
 
 public class ColumnNameValueList extends ArrayList<ColumnNameValue> {
 

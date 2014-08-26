@@ -39,4 +39,13 @@ public class RequestValidationException extends Exception {
     public int getCode() {
         return code;
     }
+
+    @Override
+    public String getMessage() {
+        if (super.getMessage() == null) {
+            return this.getCause().getMessage();
+        } else {
+            return super.getMessage();
+        }
+    }
 }
