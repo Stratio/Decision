@@ -24,6 +24,8 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.ActionEnabledValidation;
 import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamColumnsByRegularExpressionValidator;
+import com.stratio.streaming.functions.validator.StreamNameByRegularExpressionValidator;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
 import com.stratio.streaming.service.StreamOperationService;
 
@@ -67,5 +69,9 @@ public class SaveToCassandraStreamFunction extends ActionBaseFunction {
         validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.SAVE_TO_CASSANDRA,
                 ReplyCode.KO_ACTION_ALREADY_ENABLED.getCode()));
         validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new StreamNameByRegularExpressionValidator("^[A-Z,a-z][\\w,_,0-9]*",
+                StreamAction.SAVE_TO_CASSANDRA));
+        validators.add(new StreamColumnsByRegularExpressionValidator("^[A-Z,a-z][\\w,_,0-9]*",
+                StreamAction.SAVE_TO_CASSANDRA));
     }
 }
