@@ -18,7 +18,7 @@ package com.stratio.streaming.functions.dml;
 import java.util.List;
 import java.util.Set;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.ReplyCode;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ListStreamsMessage;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
@@ -54,7 +54,7 @@ public class ListStreamsFunction extends ActionBaseFunction {
             ZKUtils.getZKUtils(getZookeeperHost()).createZNodeJsonReply(message,
                     new ListStreamsMessage(existingStreams.size(), System.currentTimeMillis(), existingStreams));
         } catch (Exception e) {
-            throw new RequestValidationException(REPLY_CODES.KO_GENERAL_ERROR, e);
+            throw new RequestValidationException(ReplyCode.KO_GENERAL_ERROR.getCode(), e);
         }
         return false;
     }

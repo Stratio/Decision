@@ -22,7 +22,7 @@ import org.wso2.siddhi.query.api.exception.MalformedAttributeException;
 import org.wso2.siddhi.query.api.exception.SourceNotExistException;
 import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.ReplyCode;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
@@ -57,13 +57,14 @@ public class AddQueryToStreamFunction extends ActionBaseFunction {
         try {
             getStreamOperationService().addQuery(message.getStreamName(), message.getRequest());
         } catch (MalformedAttributeException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST, e);
+            throw new RequestValidationException(ReplyCode.KO_COLUMN_DOES_NOT_EXIST.getCode(), e);
         } catch (SourceNotExistException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_SOURCE_STREAM_DOES_NOT_EXIST, e);
+            throw new RequestValidationException(ReplyCode.KO_SOURCE_STREAM_DOES_NOT_EXIST.getCode(), e);
         } catch (SiddhiParserException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e);
+            throw new RequestValidationException(ReplyCode.KO_PARSER_ERROR.getCode(), e);
         } catch (DifferentDefinitionAlreadyExistException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_OUTPUTSTREAM_EXISTS_AND_DEFINITION_IS_DIFFERENT, e);
+            throw new RequestValidationException(
+                    ReplyCode.KO_OUTPUTSTREAM_EXISTS_AND_DEFINITION_IS_DIFFERENT.getCode(), e);
         }
         return true;
     }

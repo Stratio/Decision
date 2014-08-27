@@ -17,7 +17,7 @@ package com.stratio.streaming.functions.dal;
 
 import java.util.Set;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.ReplyCode;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
@@ -65,7 +65,7 @@ public class SaveToMongoStreamFunction extends ActionBaseFunction {
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.SAVE_TO_MONGO,
-                REPLY_CODES.KO_SAVE2MONGO_STREAM_ALREADY_ENABLED));
+                ReplyCode.KO_ACTION_ALREADY_ENABLED.getCode()));
         validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }
 

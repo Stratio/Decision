@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.ReplyCode;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
@@ -53,9 +53,9 @@ public class AlterStreamFunction extends ActionBaseFunction {
             int addedColumns = getStreamOperationService().enlargeStream(message.getStreamName(), message.getColumns());
             log.debug("Added {} columns to stream {}", addedColumns, message.getStreamName());
         } catch (SiddhiParserException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e);
+            throw new RequestValidationException(ReplyCode.KO_PARSER_ERROR.getCode(), e);
         } catch (ServiceException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_COLUMN_ALREADY_EXISTS, e);
+            throw new RequestValidationException(ReplyCode.KO_COLUMN_ALREADY_EXISTS.getCode(), e);
         }
         return true;
     }

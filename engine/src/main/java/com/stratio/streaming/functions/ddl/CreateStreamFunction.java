@@ -17,7 +17,7 @@ package com.stratio.streaming.functions.ddl;
 
 import java.util.Set;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.ReplyCode;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
@@ -51,7 +51,7 @@ public class CreateStreamFunction extends ActionBaseFunction {
         try {
             getStreamOperationService().createStream(message.getStreamName(), message.getColumns());
         } catch (Exception e) {
-            throw new RequestValidationException(REPLY_CODES.KO_PARSER_ERROR, e);
+            throw new RequestValidationException(ReplyCode.KO_PARSER_ERROR.getCode(), e);
         }
         return true;
     }

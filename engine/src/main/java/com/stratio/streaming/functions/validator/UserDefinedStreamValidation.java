@@ -15,7 +15,7 @@
  */
 package com.stratio.streaming.functions.validator;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.ReplyCode;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.service.StreamOperationService;
@@ -31,7 +31,7 @@ public class UserDefinedStreamValidation extends BaseSiddhiRequestValidation {
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
         if (!getStreamOperationService().isUserDefined(request.getStreamName())) {
-            throw new RequestValidationException(REPLY_CODES.KO_STREAM_OPERATION_NOT_ALLOWED, String.format(
+            throw new RequestValidationException(ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), String.format(
                     INTERNAL_STREAM_DROP_NOT_ALLOWED, request.getStreamName()));
         }
 
