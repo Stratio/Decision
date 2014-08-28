@@ -20,7 +20,7 @@ public abstract class BaseRegularExpressionValidatorTest {
 
     @Before
     public void before() {
-        this.setUp(getRegularExpression());
+        this.setUp();
     }
 
     @Test
@@ -50,15 +50,13 @@ public abstract class BaseRegularExpressionValidatorTest {
         Assert.assertTrue(getBadStrings().length <= count.get());
     }
 
-    public abstract void setUp(String regularExpression);
+    public abstract void setUp();
 
     public abstract void test(StratioStreamingMessage message) throws RequestValidationException;
 
     public abstract String[] getGoodStrings();
 
     public abstract String[] getBadStrings();
-
-    public abstract String getRegularExpression();
 
     private List<StratioStreamingMessage> getGoodMessages() {
         return getMessages(getGoodStrings());

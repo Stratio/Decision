@@ -8,7 +8,7 @@ public class StreamNameByRegularExpressionValidator extends BaseRegularExpressio
 
     private final StreamAction streamAction;
 
-    public StreamNameByRegularExpressionValidator(String regularExpression, StreamAction streamAction) {
+    protected StreamNameByRegularExpressionValidator(String regularExpression, StreamAction streamAction) {
         super(regularExpression);
         this.streamAction = streamAction;
     }

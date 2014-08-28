@@ -9,7 +9,7 @@ public class StreamColumnsByRegularExpressionValidator extends BaseRegularExpres
 
     private final StreamAction streamAction;
 
-    public StreamColumnsByRegularExpressionValidator(String regularExpression, StreamAction streamAction) {
+    protected StreamColumnsByRegularExpressionValidator(String regularExpression, StreamAction streamAction) {
         super(regularExpression);
         this.streamAction = streamAction;
     }
