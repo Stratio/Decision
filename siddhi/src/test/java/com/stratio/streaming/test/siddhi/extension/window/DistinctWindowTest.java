@@ -30,7 +30,7 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.event.in.InEvent;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 
-import com.stratio.streaming.extensions.DistinctWindowExtension;
+import com.stratio.streaming.siddhi.extension.DistinctWindowExtension;
 
 public class DistinctWindowTest {
 

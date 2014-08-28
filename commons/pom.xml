@@ -24,7 +24,7 @@
 	</parent>
 	<artifactId>streaming-commons</artifactId>
 	<packaging>jar</packaging>
-	<name>streaming-commons</name>
+	<name>Streaming commons</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
