@@ -23,7 +23,6 @@ import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.ActionEnabledValidation;
-import com.stratio.streaming.functions.validator.CassandraStreamColumnValidator;
 import com.stratio.streaming.functions.validator.CassandraStreamNameValidator;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
@@ -70,6 +69,5 @@ public class SaveToCassandraStreamFunction extends ActionBaseFunction {
                 ReplyCode.KO_ACTION_ALREADY_ENABLED.getCode()));
         validators.add(new StreamNotExistsValidation(getStreamOperationService()));
         validators.add(new CassandraStreamNameValidator());
-        validators.add(new CassandraStreamColumnValidator());
     }
 }
