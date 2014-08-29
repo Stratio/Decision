@@ -26,6 +26,9 @@ import org.slf4j.LoggerFactory;
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.AlreadyExistsException;
+import com.datastax.driver.core.querybuilder.Insert;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.utils.UUIDs;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 
@@ -42,14 +45,14 @@ public class SaveToCassandraOperationsService {
     public void createKeyspace(String keyspaceName) {
         session.execute(String.format(
                 "CREATE KEYSPACE %s WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1}",
-                keyspaceName));
+                addQuotes(keyspaceName)));
     }
 
     public void createTable(String tableName, List<ColumnNameTypeValue> columns, String timestampColumnName) {
         StringBuilder sb = new StringBuilder();
 
         for (Entry<String, String> entry : getStreamFieldsAndTypes(columns).entrySet()) {
-            sb.append(entry.getKey());
+            sb.append(addQuotes(entry.getKey()));
             sb.append(" ");
             sb.append(entry.getValue());
             sb.append(",");
@@ -57,11 +60,20 @@ public class SaveToCassandraOperationsService {
         try {
             session.execute(String
                     .format("CREATE TABLE %s.%s (%s timeuuid, %s PRIMARY KEY (%s)) WITH compression = {'sstable_compression': ''}",
-                            STREAMING.STREAMING_KEYSPACE_NAME, tableName, timestampColumnName, sb.toString(),
-                            timestampColumnName));
+                            STREAMING.STREAMING_KEYSPACE_NAME, addQuotes(tableName), addQuotes(timestampColumnName),
+                            sb.toString(), addQuotes(timestampColumnName)));
         } catch (AlreadyExistsException e) {
             log.info("Stream table {} already exists", tableName);
         }
+    }
+
+    public Insert createInsertStatement(String streamName, List<ColumnNameTypeValue> columns, String timestampColumnName) {
+        Insert insert = QueryBuilder.insertInto(addQuotes(STREAMING.STREAMING_KEYSPACE_NAME), addQuotes(streamName));
+        for (ColumnNameTypeValue column : columns) {
+            insert.value(addQuotes(column.getColumn()), column.getValue());
+        }
+        insert.value(addQuotes(timestampColumnName), UUIDs.timeBased());
+        return insert;
     }
 
     public void alterTable(String streamName, Set<String> oldColumnNames, List<ColumnNameTypeValue> columns) {
@@ -70,13 +82,17 @@ public class SaveToCassandraOperationsService {
 
         for (Entry<String, String> entry : getStreamFieldsAndTypes(columns).entrySet()) {
             if (!oldColumnNames.contains(entry.getKey())) {
-                sb.append(String.format("ALTER TABLE %s.%s ADD %s %s;", STREAMING.STREAMING_KEYSPACE_NAME, streamName,
-                        entry.getKey(), entry.getValue()));
+                sb.append(String.format("ALTER TABLE %s.%s ADD %s %s;", STREAMING.STREAMING_KEYSPACE_NAME,
+                        addQuotes(streamName), addQuotes(entry.getKey()), entry.getValue()));
             }
         }
         if (!"".equals(sb.toString())) {
             session.execute(sb.toString());
         }
+    }
+
+    private String addQuotes(String source) {
+        return "\"".concat(source).concat("\"");
     }
 
     private HashMap<String, String> getStreamFieldsAndTypes(List<ColumnNameTypeValue> columns) {

@@ -286,7 +286,7 @@ public class StreamingContextConfiguration {
                 .groupByKey();
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
-                new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum()));
+                new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(), 9142));
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(
                 new SaveToMongoActionExecutionFunction(configurationContext.getMongoHost(), configurationContext
