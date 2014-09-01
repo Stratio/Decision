@@ -29,6 +29,7 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamAllowedValidation;
+import com.stratio.streaming.functions.validator.StreamNameNotNullValidation;
 import com.stratio.streaming.service.StreamOperationService;
 import com.stratio.streaming.utils.ZKUtils;
 
@@ -49,7 +50,10 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
         this.streamOperationService = streamOperationService;
         this.zookeeperHost = zookeeperHost;
 
+        startValidators.add(new StreamNameNotNullValidation());
         startValidators.add(new StreamAllowedValidation());
+
+        stopValidators.add(new StreamNameNotNullValidation());
         stopValidators.add(new StreamAllowedValidation());
 
         addStartRequestsValidations(startValidators);
