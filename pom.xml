@@ -59,6 +59,23 @@
 		<maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.1.201405082137</version>
+				<executions>
+					<execution>
+						<id>pre-test</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>					
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 	<profiles>
 		<profile>
 			<id>release</id>
