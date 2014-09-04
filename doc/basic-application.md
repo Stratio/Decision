@@ -97,12 +97,12 @@ JavaExample.java file -> Run As -> Java Application.
 
 For the Java or Scala project, the result should be similar to the following:
 
-~~~~ {code}
+```shell-session
 Streams in the Stratio Streaming Engine: 3
 -- Stream Name: stratio_stats_base
 -- Stream Name: stratio_stats_global_by_operation
 -- Stream Name: testStream
-~~~~
+```
 
 Congratulations! You successfully completed this tutorial.
 
