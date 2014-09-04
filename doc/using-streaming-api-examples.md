@@ -28,14 +28,14 @@ Creating and initializing the API
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 val stratioStreamingAPI = StratioStreamingAPIFactory.create().initialize
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 IStratioStreamingAPI stratioStreamingAPI = StratioStreamingAPIFactory.create().initialize();
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -44,14 +44,14 @@ Creating and initializing the API with server configuration
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 val stratioStreamingAPI = StratioStreamingAPIFactory.create().initializeWithServerConfig("stratio.node.com", 9092, "stratio.node.com", 2181)
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 IStratioStreamingAPI stratioStreamingAPI = StratioStreamingAPIFactory.create().initializeWithServerConfig("stratio.node.com", 9092, "stratio.node.com", 2181);
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -60,7 +60,7 @@ Creating a new stream
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 val firstStreamColumn = new ColumnNameType("column1", ColumnType.INTEGER)
 val secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING)
 val streamName = "testStream"
@@ -70,10 +70,10 @@ try {
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 ColumnNameType firstStreamColumn= new ColumnNameType("column1", ColumnType.INTEGER);
 ColumnNameType secondStreamColumn = new ColumnNameType("column2", ColumnType.STRING);
 String streamName = "testStream";
@@ -83,7 +83,7 @@ try {
 } catch (StratioStreamingException e) {
      e.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -92,7 +92,7 @@ Adding columns to an existing stream
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 val newStreamColumn = new ColumnNameType("column3", ColumnType.DOUBLE)
 val streamName = "testStream"
 val columnList = Seq(newStreamColumn)
@@ -101,10 +101,10 @@ try {
 } catch {
       case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 ColumnNameType thirdStreamColumn= new ColumnNameType("column3", ColumnType.DOUBLE);
 String streamName = "testStream";
 List columnList = Arrays.asList(thirdStreamColumn);
@@ -113,7 +113,7 @@ try {
 } catch (StratioStreamingException e) {
     e.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -122,7 +122,7 @@ Inserting data into a stream
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 val streamName = "testStream"
 val firstColumnValue = new ColumnNameValue("column1", new Integer(1))
 val secondColumnValue = new ColumnNameValue("column2", "testValue")
@@ -133,10 +133,10 @@ try {
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 String streamName = "testStream";
 ColumnNameValue firstColumnValue = new ColumnNameValue("column1", new Integer(1));
 ColumnNameValue secondColumnValue = new ColumnNameValue("column2", "testValue");
@@ -147,7 +147,7 @@ try {
 } catch(StratioStreamingException ssEx) {
     ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -156,7 +156,7 @@ Adding queries to streams
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 val query = "from testStream select column1, column2, column3 insert into alarms for current-events"
 val streamName = "testStream"
 try {
@@ -164,10 +164,10 @@ try {
 } catch {
   case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 String streamName = "testStream";
 String query = "from testStream select column1, column2, column3 insert into alarms for current-events";
 try {
@@ -175,7 +175,7 @@ try {
 } catch(StratioStreamingException ssEx) {
    ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -184,24 +184,24 @@ Removing an existing stream
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 val streamName = "testStream"
 try {
     stratioStreamingAPI.dropStream(streamName)
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 String streamName = "testStream";
 try {
    stratioStreamingAPI.dropStream(streamName);
 } catch(StratioStreamingException ssEx) {
     ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -210,7 +210,7 @@ Removing an existing query from a stream
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 val streamName = "testStream"
 val queryId = "alarms-657c1720-1869-4406-b42a-96b2b8f740b3"
 try {
@@ -218,10 +218,10 @@ try {
 } catch {
   case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 String streamName = "testStream";
 String queryId = "alarms-f6bd870f-2cbb-4691-ba2c-ef4392e70a1b";
 try {
@@ -229,7 +229,7 @@ try {
 } catch(StratioStreamingException ssEx) {
     ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -238,7 +238,7 @@ Listening to streams
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 try {
   val streams = stratioStreamingAPI.listenStream("testStream")
   for(stream  {
@@ -250,10 +250,10 @@ try {
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 try {
   KafkaStream<String, StratioStreamingMessage> streams = stratioStreamingAPI.listenStream("testStream");
   for (MessageAndMetadata stream: streams) {
@@ -267,7 +267,7 @@ try {
 } catch(StratioStreamingException ssEx) {
     ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -276,22 +276,22 @@ Stop listening to streams
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 try {
     stratioStreamingAPI.stopListenStream("testStream")
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 try {
    stratioStreamingAPI.stopListenStream("testStream");
 } catch(StratioStreamingException ssEx) {
    ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -300,22 +300,22 @@ Save the stream to Cassandra
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 try {
     stratioStreamingAPI.saveToCassandra("testStream")
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 try {
    stratioStreamingAPI.saveToCassandra("testStream");
 } catch(StratioStreamingException ssEx) {
    ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -324,22 +324,22 @@ Stop saving the stream to Cassandra
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 try {
     stratioStreamingAPI.stopSaveToCassandra("testStream")
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 try {
    stratioStreamingAPI.stopSaveToCassandra("testStream");
 } catch(StratioStreamingException ssEx) {
    ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -348,22 +348,22 @@ Save the stream to MongoDB
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 try {
     stratioStreamingAPI.saveToMongo("testStream")
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 try {
    stratioStreamingAPI.saveToMongo("testStream");
 } catch(StratioStreamingException ssEx) {
    ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -372,22 +372,22 @@ Stop saving the stream to MongoDB
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 try {
     stratioStreamingAPI.stopSaveToMongo("testStream")
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 try {
    stratioStreamingAPI.stopSaveToMongo("testStream");
 } catch(StratioStreamingException ssEx) {
    ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -396,22 +396,22 @@ Index the stream to Elasticsearch
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 try {
     stratioStreamingAPI.indexStream("testStream")
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 try {
    stratioStreamingAPI.indexStream("testStream");
 } catch(StratioStreamingException ssEx) {
    ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -420,22 +420,22 @@ Stop indexing the stream to Elasticsearch
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 try {
     stratioStreamingAPI.stopIndexStream("testStream")
 } catch {
    case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
 }
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 try {
    stratioStreamingAPI.stopIndexStream("testStream");
 } catch(StratioStreamingException ssEx) {
    ssEx.printStackTrace();
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -444,7 +444,7 @@ Getting the list of all the streams and their queries
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 import scala.collection.JavaConversions._
 
 val listOfStreams = stratioStreamingAPI.listStreams().toList
@@ -456,10 +456,10 @@ listOfStreams.foreach(stream => {
        println("Query: "+query.getQuery))
    }
 })
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 List<StratioStream> streamsList = stratioStreamingAPI.listStreams();
 System.out.println("Number of streams: " + streamsList.size());
 for (StratioStream stream: streamsList) {
@@ -469,6 +469,6 @@ for (StratioStream stream: streamsList) {
         System.out.println("Query: "+query.getQuery());
       }
 }
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
