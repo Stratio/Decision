@@ -113,7 +113,18 @@ update-rc.d stratio-streaming defaults
 
 service stratio-streaming start
 
-echo -e '\e[1;34mStratio streaming started!'
+echo -e '\e[1;34mStratio streaming started.'
+
+echo -e '\e[1;34mInstalling Streaming shell...'
+
+wget 'https://s3.amazonaws.com/stratioorg/streaming-shell-0.4.0-app.tar.gz'
+tar -xzf streaming-shell-0.4.0-app.tar.gz
+chown -R vagrant:vagrant streaming-shell-0.4.0
+sudo -H -u vagrant bash -c 'mv -f streaming-shell-0.4.0 ~'
+sudo -H -u vagrant bash -c 'mv -f streaming-shell-0.4.0 shell'
+ln -s /home/vagrant/shell/bin/shell /usr/local/bin/streaming-shell
+
+echo -e '\e[1;34mStreaming Shell installed.'
 
 SCRIPT
 
