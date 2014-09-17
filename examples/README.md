@@ -17,10 +17,12 @@ To get an operating virtual machine with stratio streaming distribution up and r
 * For more options, type **vagrant**.
 * This virtual machine executes:
       + Stratio Streaming
+      + Stratio Streaming Shell
       + Apache Kafka
       + Apache Zookeeper
       + Stratio Cassandra
 * By default the machine ip is: 10.10.10.10
+* To validate that all is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, all is working ok.
 
 ## License
 
