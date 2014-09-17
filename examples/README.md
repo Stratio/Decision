@@ -20,7 +20,6 @@ To get an operating virtual machine with stratio streaming distribution up and r
       + Apache Kafka
       + Apache Zookeeper
       + Stratio Cassandra
-      + Mongo db
 * By default the machine ip is: 10.10.10.10
 
 ## License
