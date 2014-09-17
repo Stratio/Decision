@@ -10,7 +10,9 @@ In this module you can browse different code examples using the Stratio Streamin
 To get an operating virtual machine with stratio streaming distribution up and running, we use [Vagrant](https://www.vagrantup.com/).
 
 * Download and install Vagrant from here: https://www.vagrantup.com/downloads.html
+* If you not have been VirtualBox already installed we need install them: https://www.virtualbox.org/wiki/Downloads
 * Download [this Vagrantfile](https://raw.githubusercontent.com/Stratio/stratio-streaming/develop/examples/Vagrantfile).
+* If you are in a windows machine, we will install [Cygwin](https://cygwin.com/install.html)
 * Copy the Vagrantfile into any system folder with exactly the same name, **Vagrantfile**.
 * Inside this directory, execute **vagrant up**. The first time it executes, it must take a while.
 * When the initialization script finish, you can access to the virtual machine typing **vagrant ssh**.
@@ -22,6 +24,8 @@ To get an operating virtual machine with stratio streaming distribution up and r
       + Apache Kafka
       + Apache Zookeeper
       + Stratio Cassandra
+      + Elasticsearch
+      + Mongodb
 * By default the machine ip is: 10.10.10.10
 * To validate that everything is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, everything is working ok.
 
