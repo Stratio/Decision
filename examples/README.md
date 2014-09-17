@@ -11,8 +11,8 @@ To get an operating virtual machine with stratio streaming distribution up and r
 
 * Download and install Vagrant from here: https://www.vagrantup.com/downloads.html
 * Download [this Vagrantfile](https://raw.githubusercontent.com/Stratio/stratio-streaming/develop/examples/Vagrantfile).
-* Copy the Vagrantfile into any system folder.
-* Execute **vagrant up**. The first time it executes, it must take a while.
+* Copy the Vagrantfile into any system folder with exactly the same name, **Vagrantfile**.
+* Inside this directory, execute **vagrant up**. The first time it executes, it must take a while.
 * When the initialization script finish, you can access to the virtual machine typing **vagrant ssh**.
 * To shutdown the virtual machine, use **vagrant halt**.
 * For more options, type **vagrant**.
