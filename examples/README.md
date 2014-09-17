@@ -2,7 +2,7 @@
 
 ## Synopsis
 
-In this module you can browse different code examples using the stratio streaming platform. You also can obtain a **VagrantFile** used to provisioning a virtual machine to execute the examples.
+In this module you can browse different code examples using the Stratio Streaming platform. You also can obtain a **Vagrantfile** used to provisioning a virtual machine to execute the examples.
 
 ## Installation
 
@@ -10,7 +10,8 @@ In this module you can browse different code examples using the stratio streamin
 To get an operating virtual machine with stratio streaming distribution up and running, we use [Vagrant](https://www.vagrantup.com/).
 
 * Download and install Vagrant from here: https://www.vagrantup.com/downloads.html
-* Copy the VagrantFile into any system folder.
+* Download [this Vagrantfile](https://raw.githubusercontent.com/Stratio/stratio-streaming/develop/examples/Vagrantfile).
+* Copy the Vagrantfile into any system folder.
 * Execute **vagrant up**. The first time it executes, it must take a while.
 * When the initialization script finish, you can access to the virtual machine typing **vagrant ssh**.
 * To shutdown the virtual machine, use **vagrant halt**.
@@ -22,7 +23,7 @@ To get an operating virtual machine with stratio streaming distribution up and r
       + Apache Zookeeper
       + Stratio Cassandra
 * By default the machine ip is: 10.10.10.10
-* To validate that all is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, all is working ok.
+* To validate that everything is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, everything is working ok.
 
 ## License
 
