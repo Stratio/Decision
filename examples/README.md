@@ -25,6 +25,7 @@ To get an operating virtual machine with stratio streaming distribution up and r
       + Apache Zookeeper
       + Stratio Cassandra
       + Elasticsearch
+      + Kibana
       + Mongodb
 * By default the machine ip is: 10.10.10.10
 * To validate that everything is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, everything is working ok.
