@@ -2,7 +2,7 @@
 
 ## Synopsis
 
-In this module you can browse different code examples usin the stratio streaming platform. You also can obtain a **VagrantFile** used to provisioning a virtual machine to execute the examples.
+In this module you can browse different code examples using the stratio streaming platform. You also can obtain a **VagrantFile** used to provisioning a virtual machine to execute the examples.
 
 ## Installation
 
