@@ -30,6 +30,12 @@ To get an operating virtual machine with stratio streaming distribution up and r
 * By default the machine ip is: 10.10.10.10
 * To validate that everything is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, everything is working ok.
 
+#### Examples
+There are some examples to generate example data.
+* To build a binary with the examples execute **_mvn clean package_** in root project.
+* Go to **_examples_** module, into the target folder.
+* Uncompress file **_stratio-examples-0.5.0-SNAPSHOT-app.tar.gz_**.
+
 ## License
 
 Copyright (C) 2014 Stratio (http://stratio.com)
