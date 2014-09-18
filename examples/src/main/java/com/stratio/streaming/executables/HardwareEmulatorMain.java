@@ -31,6 +31,7 @@ import com.stratio.streaming.commons.constants.InternalTopic;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import com.stratio.streaming.generator.ValuesGenerator;
 
 public class HardwareEmulatorMain {
 
@@ -44,7 +45,8 @@ public class HardwareEmulatorMain {
             multiplicator = Integer.valueOf(args[0]);
             producer = new Producer<String, String>(createProducerConfig(args[1]));
         } else {
-            throw new RuntimeException("Parameters are incorrect!");
+            throw new RuntimeException(
+                    "Usage: \n param 1 - data multiplier (default = 1) \n param 2 - kafka broker list");
         }
 
         System.out.println("CPU VALUES");

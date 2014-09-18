@@ -53,6 +53,11 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.stratio.streaming</groupId>
 			<artifactId>streaming-commons</artifactId>
 		</dependency>
@@ -62,4 +67,57 @@
 			<version>2.2.4</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>1.8.1</version>
+				<configuration>
+					<assembleDirectory>target/appassembler</assembleDirectory>
+					<extraJvmArguments>-Xms64m -Xmx64m</extraJvmArguments>
+					<programs>
+						<program>
+							<mainClass>com.stratio.streaming.executables.DataFlowFromCsvMain</mainClass>
+							<name>data-from-csv</name>
+						</program>
+						<program>
+							<mainClass>com.stratio.streaming.executables.HardwareEmulatorMain</mainClass>
+							<name>hardware-emulator</name>
+						</program>
+						<program>
+							<mainClass>com.stratio.streaming.executables.SensorGridSimulation</mainClass>
+							<name>sensor-grid-simulation</name>
+						</program>
+					</programs>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>assemble</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
