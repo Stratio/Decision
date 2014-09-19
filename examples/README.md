@@ -31,7 +31,7 @@ To get an operating virtual machine with stratio streaming distribution up and r
 * To validate that everything is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, everything is working ok.
 
 #### FAQs
-##### **I am in the same directory that I copy the Vagrant file but I have this error:** __
+##### **I am in the same directory that I copy the Vagrant file but I have this error:**
 ```Batchfile
       A Vagrant environment or target machine is required to run this
       command. Run `vagrant init` to create a new Vagrant environment. Or,
