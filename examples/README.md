@@ -33,7 +33,7 @@ Mongodb | 2.6.4 | mongod | service mongod start
 
 * By default the machine ip is: 10.10.10.10
 * To validate that everything is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, everything is working ok.
-```Batchfile
+```
    _____ _                            _                _____ _          _ _ 
   / ____| |                          (_)              / ____| |        | | |
  | (___ | |_ _ __ ___  __ _ _ __ ___  _ _ __   __ _  | (___ | |__   ___| | |
