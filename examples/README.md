@@ -33,6 +33,16 @@ Mongodb | 2.6.4 | mongod | service mongod start
 
 * By default the machine ip is: 10.10.10.10
 * To validate that everything is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, everything is working ok.
+```Batchfile
+   _____ _                            _                _____ _          _ _ 
+  / ____| |                          (_)              / ____| |        | | |
+ | (___ | |_ _ __ ___  __ _ _ __ ___  _ _ __   __ _  | (___ | |__   ___| | |
+  \___ \| __| '__/ _ \/ _` | '_ ` _ \| | '_ \ / _` |  \___ \| '_ \ / _ \ | |
+  ____) | |_| | |  __/ (_| | | | | | | | | | | (_| |  ____) | | | |  __/ | |
+ |_____/ \__|_|  \___|\__,_|_| |_| |_|_|_| |_|\__, | |_____/|_| |_|\___|_|_|
+                                               __/ |                        
+                                              |___/                         
+```
 
 #### FAQs
 ##### **I am in the same directory that I copy the Vagrant file but I have this error:**
