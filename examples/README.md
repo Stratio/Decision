@@ -39,7 +39,7 @@ To get an operating virtual machine with stratio streaming distribution up and r
       this command on. A final option is to change to a directory with a
       Vagrantfile and to try again.
 ```
-      Make sure your file name is **Vagrantfile** instead of _**Vagrantfile.txt**_ or _**VagrantFile**_.
+Make sure your file name is **Vagrantfile** instead of _**Vagrantfile.txt**_ or _**VagrantFile**_.
 
 ### Examples
 There are some examples to generate example data.
