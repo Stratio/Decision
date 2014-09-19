@@ -31,8 +31,8 @@ To get an operating virtual machine with stratio streaming distribution up and r
 * To validate that everything is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, everything is working ok.
 
 #### FAQs
-* **I am in the same directory that I copy the Vagrant file but I have this error:**
-```
+##### **I am in the same directory that I copy the Vagrant file but I have this error:** __
+```Batchfile
       A Vagrant environment or target machine is required to run this
       command. Run `vagrant init` to create a new Vagrant environment. Or,
       get an ID of a target machine from `vagrant global-status` to run
@@ -40,6 +40,16 @@ To get an operating virtual machine with stratio streaming distribution up and r
       Vagrantfile and to try again.
 ```
 Make sure your file name is **Vagrantfile** instead of _**Vagrantfile.txt**_ or _**VagrantFile**_.
+______________________________________________________
+##### **When I execute vagrant ssh I have this error:**
+```Batchfile
+      `ssh` executable not found in any directories in the %PATH% variable. Is an
+      SSH client installed? Try installing Cygwin, MinGW or Git, all of which
+      contain an SSH client. Or use your favorite SSH client with the following
+      authentication information shown below:
+```
+We need to install [Cygwin](https://cygwin.com/install.html) or [Git for Windows](http://git-scm.com/download/win). 
+______________________________________________________
 
 ### Examples
 There are some examples to generate example data.
