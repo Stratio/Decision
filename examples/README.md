@@ -19,14 +19,18 @@ To get an operating virtual machine with stratio streaming distribution up and r
 * To shutdown the virtual machine, use **vagrant halt**.
 * For more options, type **vagrant**.
 * This virtual machine executes:
-      + Stratio Streaming
-      + Stratio Streaming Shell
-      + Apache Kafka
-      + Apache Zookeeper
-      + Stratio Cassandra
-      + Elasticsearch
-      + Kibana
-      + Mongodb
+
+Name | Version | Service name | Other
+------------ | ------------- | ------------- | -------------
+Stratio Streaming | 0.4.0 | stratio-streaming | service stratio-streaming start
+Stratio Streaming shell | 0.4.0 | - | init command: streaming-shell
+Apache Kafka | 0.8.1.1 | kafka | service kafka start
+Apache zookeeper | 3.3.3 | zookeeper | service zookeeper start
+Stratio cassandra | 2.0.91-SNAPSHOT | cassandra | service cassandra start
+Elasticsearch | 1.1.1 | elasticsearch | service elasticsearch start
+Kibana | 3.1.0 | - | service apache2 start
+Mongodb | 2.6.4 | mongod | service mongod start
+
 * By default the machine ip is: 10.10.10.10
 * To validate that everything is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, everything is working ok.
 
