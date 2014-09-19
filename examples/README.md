@@ -6,7 +6,7 @@ In this module you can browse different code examples using the Stratio Streamin
 
 ## Installation
 
-#### Vagrant
+### Vagrant
 To get an operating virtual machine with stratio streaming distribution up and running, we use [Vagrant](https://www.vagrantup.com/).
 
 * Download and install Vagrant from here: https://www.vagrantup.com/downloads.html
@@ -30,7 +30,18 @@ To get an operating virtual machine with stratio streaming distribution up and r
 * By default the machine ip is: 10.10.10.10
 * To validate that everything is working, run **vagrant ssh**. Then, run **streaming-shell**. If you can see the streaming shell logo, everything is working ok.
 
-#### Examples
+#### FAQs
+* **I am in the same directory that I copy the Vagrant file but I have this error:**
+```
+      A Vagrant environment or target machine is required to run this
+      command. Run `vagrant init` to create a new Vagrant environment. Or,
+      get an ID of a target machine from `vagrant global-status` to run
+      this command on. A final option is to change to a directory with a
+      Vagrantfile and to try again.
+```
+      Make sure your file name is **Vagrantfile** instead of _**Vagrantfile.txt**_ or _**VagrantFile**_.
+
+### Examples
 There are some examples to generate example data.
 * To build a binary with the examples execute **_mvn clean package_** in root project.
 * Go to **_examples_** module, into the target folder.
