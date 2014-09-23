@@ -64,7 +64,7 @@ public class DataFlowFromCsvMain {
                 } else {
                     StratioStreamingMessage message = new StratioStreamingMessage();
 
-                    message.setOperation(STREAM_OPERATIONS.MANIPULATION.INSERT);
+                    message.setOperation(STREAM_OPERATIONS.MANIPULATION.INSERT.toLowerCase());
                     message.setStreamName(args[1]);
                     message.setTimestamp(System.currentTimeMillis());
                     message.setSession_id(String.valueOf(System.currentTimeMillis()));
@@ -88,7 +88,8 @@ public class DataFlowFromCsvMain {
 
                     String json = gson.toJson(message);
                     log.info("Sending data: {}", json);
-                    producer.send(new KeyedMessage<String, String>(InternalTopic.TOPIC_DATA.getTopicName(), json));
+                    producer.send(new KeyedMessage<String, String>(InternalTopic.TOPIC_DATA.getTopicName(),
+                            STREAM_OPERATIONS.MANIPULATION.INSERT, json));
 
                     log.info("Sleeping {} ms...", args[2]);
                     Thread.sleep(Long.valueOf(args[2]));
