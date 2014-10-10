@@ -13,4 +13,4 @@ Streaming modules:
 - [Api](api/README.md)
 - [Shell](shell/README.md)
 - [Examples](examples/README.md)
-- [Documentation](doc/README.md)
+- [Documentation](doc/about.md)
