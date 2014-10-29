@@ -68,11 +68,6 @@
 			</releases>
 		</repository>
 	</repositories>
-	<distributionManagement>
-		<repository>
-			<id>none</id>
-		</repository>
-	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
