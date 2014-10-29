@@ -24,6 +24,7 @@
 		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>streaming-siddhi</artifactId>
+	<packaging>jar</packaging>
 	<name>Streamng Siddhi extensions</name>
 	<properties>
 		<siddhi.version>2.1.0-wso2v1</siddhi.version>
