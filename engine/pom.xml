@@ -100,7 +100,7 @@
 			<artifactId>mongo-java-driver</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.stratio.streaming.siddhi</groupId>
+			<groupId>com.stratio.streaming</groupId>
 			<artifactId>streaming-siddhi</artifactId>
 		</dependency>
 		<!-- METRICS -->

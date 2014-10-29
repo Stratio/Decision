@@ -180,7 +180,7 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.stratio.streaming.siddhi</groupId>
+				<groupId>com.stratio.streaming</groupId>
 				<artifactId>streaming-siddhi</artifactId>
 				<version>${project.version}</version>
 			</dependency>
