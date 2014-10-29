@@ -26,7 +26,7 @@
 	<name>Streaming engine</name>
 	<artifactId>streaming-engine</artifactId>
 	<properties>
-		<spark.version>1.1.0</spark.version>
+		<spark.version>1.0.2</spark.version>
 
 		<jar.mainclass>com.stratio.streaming.StreamingEngine</jar.mainclass>
 		<configurationDirectory>config</configurationDirectory>
