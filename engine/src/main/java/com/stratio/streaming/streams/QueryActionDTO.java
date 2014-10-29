@@ -31,6 +31,15 @@ public class QueryActionDTO {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((actionQueryId == null) ? 0 : actionQueryId.hashCode());
+        result = prime * result + ((streamAction == null) ? 0 : streamAction.hashCode());
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return streamAction.equals(obj);
     }

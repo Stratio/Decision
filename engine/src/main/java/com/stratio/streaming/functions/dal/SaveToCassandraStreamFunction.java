@@ -17,12 +17,13 @@ package com.stratio.streaming.functions.dal;
 
 import java.util.Set;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.ReplyCode;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.ActionEnabledValidation;
+import com.stratio.streaming.functions.validator.CassandraStreamNameValidator;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
 import com.stratio.streaming.service.StreamOperationService;
@@ -65,7 +66,8 @@ public class SaveToCassandraStreamFunction extends ActionBaseFunction {
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.SAVE_TO_CASSANDRA,
-                REPLY_CODES.KO_SAVE2CASSANDRA_STREAM_ALREADY_ENABLED));
+                ReplyCode.KO_ACTION_ALREADY_ENABLED.getCode()));
         validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new CassandraStreamNameValidator());
     }
 }

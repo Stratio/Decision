@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.streaming.StreamingEngine;
 import com.stratio.streaming.commons.constants.BUS;
 import com.stratio.streaming.commons.constants.InternalTopic;
@@ -286,7 +287,8 @@ public class StreamingContextConfiguration {
                 .groupByKey();
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
-                new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum()));
+                new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
+                        ProtocolOptions.DEFAULT_PORT));
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(
                 new SaveToMongoActionExecutionFunction(configurationContext.getMongoHost(), configurationContext

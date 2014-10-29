@@ -15,7 +15,7 @@
  */
 package com.stratio.streaming.functions.validator;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.ReplyCode;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.service.StreamOperationService;
@@ -32,7 +32,7 @@ public class StreamNotExistsValidation extends BaseSiddhiRequestValidation {
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
         if (request.getStreamName() != null && !"".equals(request.getStreamName())) {
             if (!getStreamOperationService().streamExist(request.getStreamName())) {
-                throw new RequestValidationException(REPLY_CODES.KO_STREAM_DOES_NOT_EXIST, String.format(
+                throw new RequestValidationException(ReplyCode.KO_STREAM_DOES_NOT_EXIST.getCode(), String.format(
                         STREAM_DOES_NOT_EXIST_MESSAGE, request.getStreamName()));
             }
         }

@@ -19,7 +19,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.stratio.streaming</groupId>
 	<artifactId>stratio-streaming</artifactId>
-	<version>0.4.0</version>
+	<version>0.5.0</version>
 	<name>Stratio streaming parent</name>
 	<packaging>pom</packaging>
 	<description>Stratio Streaming is a real-time engine with Complex Event Processing capabilities with a built-in and powerful Streaming Query Language for doing on-demand operations on your streams.</description>
@@ -29,6 +29,8 @@
 		<module>api</module>
 		<module>commons</module>
 		<module>shell</module>
+		<module>siddhi</module>
+		<module>examples</module>
 	</modules>
 	<licenses>
 		<license>
@@ -48,14 +50,31 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<cassandra.driver>2.0.2</cassandra.driver>
-		<mongo.driver>2.12.2</mongo.driver>
+		<cassandra.driver>2.1.0</cassandra.driver>
+		<mongo.driver>2.12.4</mongo.driver>
 		<kafka.driver>0.8.1.1</kafka.driver>
 		<metrics.version>3.0.1</metrics.version>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.1.201405082137</version>
+				<executions>
+					<execution>
+						<id>pre-test</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>					
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 	<profiles>
 		<profile>
 			<id>release</id>
@@ -160,6 +179,11 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.stratio.streaming</groupId>
+				<artifactId>streaming-siddhi</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.datastax.cassandra</groupId>
 				<artifactId>cassandra-driver-core</artifactId>
 				<version>${cassandra.driver}</version>
@@ -184,6 +208,18 @@
 				<groupId>com.ryantenney.metrics</groupId>
 				<artifactId>metrics-spring</artifactId>
 				<version>${metrics.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>1.9.5</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.11</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -30,7 +30,7 @@ public class CassandraPersistenceStoreModel implements Serializable {
 
     public CassandraPersistenceStoreModel(Map<String, StreamStatusDTO> streamStatuses, byte[] siddhiSnapshot) {
         this.streamStatuses = streamStatuses;
-        this.siddhiSnapshot = siddhiSnapshot;
+        this.siddhiSnapshot = siddhiSnapshot.clone();
     }
 
     public Map<String, StreamStatusDTO> getStreamStatuses() {

@@ -18,18 +18,17 @@ package com.stratio.streaming.unit
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.concurrent.Future
 import scala.concurrent.TimeoutException
+
 import org.mockito.Matchers.anyString
 import org.mockito.Mockito
 import org.scalatest.FunSpec
 import org.scalatest.GivenWhenThen
 import org.scalatest.ShouldMatchers
 import org.scalatest.mock.MockitoSugar
+
 import com.stratio.streaming.api.StreamingAPISyncOperation
 import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
-import com.stratio.streaming.commons.constants.REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST
-import com.stratio.streaming.commons.constants.REPLY_CODES.KO_STREAM_IS_NOT_USER_DEFINED
-import com.stratio.streaming.commons.constants.REPLY_CODES.KO_STREAM_OPERATION_NOT_ALLOWED
-import com.stratio.streaming.commons.constants.REPLY_CODES.OK
+import com.stratio.streaming.commons.constants.ReplyCode._
 import com.stratio.streaming.commons.exceptions.StratioAPIGenericException
 import com.stratio.streaming.commons.exceptions.StratioAPISecurityException
 import com.stratio.streaming.commons.exceptions.StratioEngineOperationException
@@ -57,7 +56,8 @@ class StreamingAPISyncOperationTests extends FunSpec
   describe("The Streaming API Sync Operation") {
     it("should throw no exceptions when the engine returns an OK return code") {
       Given("an OK engine response")
-      val engineResponse = s"""{"errorCode":$OK}"""
+      val errorCode = OK.getCode();
+      val engineResponse = s"""{"errorCode":$errorCode}"""
       When("we perform the sync operation")
       Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
       org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
@@ -73,7 +73,8 @@ class StreamingAPISyncOperationTests extends FunSpec
 
     it("should throw a StratioAPISecurityException when the engine returns a KO_STREAM_OPERATION_NOT_ALLOWED return code") {
       Given("a KO_STREAM_OPERATION_NOT_ALLOWED engine response")
-      val engineResponse = s"""{"errorCode":$KO_STREAM_OPERATION_NOT_ALLOWED}"""
+      val errorCode = KO_STREAM_OPERATION_NOT_ALLOWED.getCode();
+      val engineResponse = s"""{"errorCode":$errorCode}"""
       When("we perform the sync operation")
       Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
       org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
@@ -87,7 +88,8 @@ class StreamingAPISyncOperationTests extends FunSpec
 
     it("should throw a StratioAPISecurityException when the engine returns a KO_STREAM_IS_NOT_USER_DEFINED return code") {
       Given("a KO_STREAM_IS_NOT_USER_DEFINED engine response")
-      val engineResponse = s"""{"errorCode":$KO_STREAM_IS_NOT_USER_DEFINED}"""
+      val errorCode = KO_STREAM_IS_NOT_USER_DEFINED.getCode();
+      val engineResponse = s"""{"errorCode":$errorCode}"""
       When("we perform the sync operation")
       Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
       org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
@@ -101,7 +103,8 @@ class StreamingAPISyncOperationTests extends FunSpec
 
     it("should throw a StratioEngineOperationException when the engine returns an ERROR return code") {
       Given("a KO_STREAM_IS_NOT_USER_DEFINED engine response")
-      val engineResponse = s"""{"errorCode":$KO_COLUMN_DOES_NOT_EXIST}"""
+      val errorCode = KO_COLUMN_DOES_NOT_EXIST.getCode();
+      val engineResponse = s"""{"errorCode":$errorCode}"""
       When("we perform the sync operation")
       Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
       org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)

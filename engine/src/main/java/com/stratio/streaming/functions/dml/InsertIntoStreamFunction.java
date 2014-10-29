@@ -17,7 +17,7 @@ package com.stratio.streaming.functions.dml;
 
 import java.util.Set;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.ReplyCode;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.dto.ActionCallbackDto;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
@@ -51,7 +51,7 @@ public class InsertIntoStreamFunction extends ActionBaseFunction {
         try {
             getStreamOperationService().send(message.getStreamName(), message.getColumns());
         } catch (ServiceException e) {
-            throw new RequestValidationException(REPLY_CODES.KO_COLUMN_DOES_NOT_EXIST, e);
+            throw new RequestValidationException(ReplyCode.KO_COLUMN_DOES_NOT_EXIST.getCode(), e);
         }
         return false;
     }

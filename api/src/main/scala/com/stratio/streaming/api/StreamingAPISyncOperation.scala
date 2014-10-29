@@ -20,9 +20,9 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.streaming.commons.exceptions.{ StratioAPIGenericException, StratioAPISecurityException, StratioEngineOperationException }
 import com.stratio.streaming.kafka.KafkaProducer
 import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
-import com.stratio.streaming.commons.constants.REPLY_CODES._
 import com.google.gson.Gson
 import com.stratio.streaming.commons.dto.ActionCallbackDto
+import com.stratio.streaming.commons.constants.ReplyCode._
 
 case class StreamingAPISyncOperation(
   kafkaProducer: KafkaProducer,
@@ -51,13 +51,13 @@ case class StreamingAPISyncOperation(
         val replyCode = responseDto.getErrorCode
         val replyDescription = responseDto.getDescription
         replyCode match {
-          case OK => {
+          case s if s == OK.getCode() => {
             val messageOperation = message.getOperation
             val streamName = message.getStreamName
             log.info(s"StratioEngine Ack received for the operation $messageOperation on the $streamName stream")
           }
-          case KO_STREAM_OPERATION_NOT_ALLOWED |
-            KO_STREAM_IS_NOT_USER_DEFINED => {
+          case s if s == KO_STREAM_OPERATION_NOT_ALLOWED.getCode() |
+            s == KO_STREAM_IS_NOT_USER_DEFINED.getCode() => {
             createLogError(replyCode, replyDescription)
             throw new StratioAPISecurityException(replyDescription)
           }

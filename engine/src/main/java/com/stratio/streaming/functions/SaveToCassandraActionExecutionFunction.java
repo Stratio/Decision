@@ -26,9 +26,6 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ColumnMetadata;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TableMetadata;
-import com.datastax.driver.core.querybuilder.Insert;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.utils.UUIDs;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
@@ -41,13 +38,15 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
     private Session cassandraSession;
 
     private final String cassandraQuorum;
+    private final int cassandraPort;
 
     private HashMap<String, Integer> tablenames = new HashMap<>();
 
     private SaveToCassandraOperationsService cassandraTableOperationsService;
 
-    public SaveToCassandraActionExecutionFunction(String cassandraQuorum) {
+    public SaveToCassandraActionExecutionFunction(String cassandraQuorum, int cassandraPort) {
         this.cassandraQuorum = cassandraQuorum;
+        this.cassandraPort = cassandraPort;
     }
 
     @Override
@@ -55,24 +54,19 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
         BatchStatement batch = new BatchStatement();
         for (StratioStreamingMessage stratioStreamingMessage : messages) {
             Set<String> columns = getColumnSet(stratioStreamingMessage.getColumns());
-            if (tablenames.get(stratioStreamingMessage.getStreamName().toLowerCase()) == null) {
+            if (tablenames.get(stratioStreamingMessage.getStreamName()) == null) {
                 getCassandraTableOperationsService().createTable(stratioStreamingMessage.getStreamName(),
                         stratioStreamingMessage.getColumns(), TIMESTAMP_FIELD);
                 refreshTablenames();
             }
-            if (tablenames.get(stratioStreamingMessage.getStreamName().toLowerCase()) != columns.hashCode()) {
+            if (tablenames.get(stratioStreamingMessage.getStreamName()) != columns.hashCode()) {
                 getCassandraTableOperationsService().alterTable(stratioStreamingMessage.getStreamName(), columns,
                         stratioStreamingMessage.getColumns());
                 refreshTablenames();
             }
 
-            Insert insert = QueryBuilder.insertInto(STREAMING.STREAMING_KEYSPACE_NAME,
-                    stratioStreamingMessage.getStreamName());
-            for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
-                insert.value(column.getColumn(), column.getValue());
-            }
-            insert.value(TIMESTAMP_FIELD, UUIDs.timeBased());
-            batch.add(insert);
+            batch.add(getCassandraTableOperationsService().createInsertStatement(
+                    stratioStreamingMessage.getStreamName(), stratioStreamingMessage.getColumns(), TIMESTAMP_FIELD));
         }
 
         getSession().execute(batch);
@@ -88,7 +82,8 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
     private Session getSession() {
         if (cassandraSession == null) {
-            cassandraSession = Cluster.builder().addContactPoints(cassandraQuorum.split(",")).build().connect();
+            cassandraSession = Cluster.builder().addContactPoints(cassandraQuorum.split(",")).withPort(cassandraPort)
+                    .build().connect();
             if (cassandraSession.getCluster().getMetadata().getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME) == null) {
                 getCassandraTableOperationsService().createKeyspace(STREAMING.STREAMING_KEYSPACE_NAME);
             }
@@ -104,7 +99,7 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
         for (TableMetadata tableMetadata : tableMetadatas) {
             Set<String> columns = new HashSet<>();
             for (ColumnMetadata columnMetadata : tableMetadata.getColumns()) {
-                columns.add(columnMetadata.getName().toLowerCase());
+                columns.add(columnMetadata.getName());
             }
             tablenames.put(tableMetadata.getName(), columns.hashCode());
         }
@@ -113,9 +108,9 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
     private Set<String> getColumnSet(List<ColumnNameTypeValue> columns) {
         Set<String> columnsSet = new HashSet<>();
         for (ColumnNameTypeValue column : columns) {
-            columnsSet.add(column.getColumn().toLowerCase());
+            columnsSet.add(column.getColumn());
         }
-        columnsSet.add(TIMESTAMP_FIELD.toLowerCase());
+        columnsSet.add(TIMESTAMP_FIELD);
 
         return columnsSet;
     }

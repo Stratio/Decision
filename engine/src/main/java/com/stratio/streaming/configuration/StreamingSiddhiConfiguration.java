@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.SiddhiConfiguration;
 
-import com.stratio.streaming.extensions.DistinctWindowExtension;
+import com.stratio.streaming.siddhi.extension.DistinctWindowExtension;
 
 @Configuration
 public class StreamingSiddhiConfiguration {

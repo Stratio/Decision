@@ -23,12 +23,13 @@ import org.apache.spark.api.java.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.stratio.streaming.commons.constants.REPLY_CODES;
+import com.stratio.streaming.commons.constants.ReplyCode;
 import com.stratio.streaming.commons.dto.ActionCallbackDto;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.validator.RequestValidation;
 import com.stratio.streaming.functions.validator.StreamAllowedValidation;
+import com.stratio.streaming.functions.validator.StreamNameNotNullValidation;
 import com.stratio.streaming.service.StreamOperationService;
 import com.stratio.streaming.utils.ZKUtils;
 
@@ -49,7 +50,10 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
         this.streamOperationService = streamOperationService;
         this.zookeeperHost = zookeeperHost;
 
+        startValidators.add(new StreamNameNotNullValidation());
         startValidators.add(new StreamAllowedValidation());
+
+        stopValidators.add(new StreamNameNotNullValidation());
         stopValidators.add(new StreamAllowedValidation());
 
         addStartRequestsValidations(startValidators);
@@ -75,7 +79,7 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
                 }
 
                 if (defaultResponse) {
-                    ackStreamingOperation(message, new ActionCallbackDto(REPLY_CODES.OK));
+                    ackStreamingOperation(message, new ActionCallbackDto(ReplyCode.OK.getCode()));
                 }
 
             } catch (RequestValidationException e) {
@@ -83,7 +87,8 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
                 ackStreamingOperation(message, new ActionCallbackDto(e.getCode(), e.getMessage()));
             } catch (Exception e) {
                 log.error("Fatal validation error", e);
-                ackStreamingOperation(message, new ActionCallbackDto(REPLY_CODES.KO_GENERAL_ERROR, e.getMessage()));
+                ackStreamingOperation(message,
+                        new ActionCallbackDto(ReplyCode.KO_GENERAL_ERROR.getCode(), e.getMessage()));
             }
         }
         return null;
