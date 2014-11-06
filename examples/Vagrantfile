@@ -106,15 +106,15 @@ mv -f kibana-3.1.0 /var/www/html
 mv /var/www/html/kibana-3.1.0 /var/www/html/kibana
 
 echo -e '\e[1;34mDownloading stratio streaming...'
-wget 'https://s3.amazonaws.com/stratioorg/streaming-engine-0.5.0-app.tar.gz'
+wget 'https://s3.amazonaws.com/stratioorg/streaming-engine-0.4.0-app.tar.gz'
 
 echo -e '\e[1;34mUncompressing stratio streaming...'
-tar -xzf streaming-engine-0.5.0-app.tar.gz
+tar -xzf streaming-engine-0.4.0-app.tar.gz
 
 echo -e '\e[1;34mAdding privileges to vagrant user...'
-chown -R vagrant:vagrant streaming-0.5.0
-sudo -H -u vagrant bash -c 'mv -f streaming-0.5.0 ~'
-sudo -H -u vagrant bash -c 'mv -f streaming-0.5.0 streaming'
+chown -R vagrant:vagrant streaming-0.4.0
+sudo -H -u vagrant bash -c 'mv -f streaming-0.4.0 ~'
+sudo -H -u vagrant bash -c 'mv -f streaming-0.4.0 streaming'
 
 echo -e '\e[1;34mCreating stratio streaming log folder...'
 mkdir -p /var/log/stratio
@@ -130,12 +130,12 @@ service stratio-streaming start
 echo -e '\e[1;34mStratio streaming started.'
 
 echo -e '\e[1;34mDownloading Streaming shell...'
-wget 'https://s3.amazonaws.com/stratioorg/streaming-shell-0.5.0-app.tar.gz'
+wget 'https://s3.amazonaws.com/stratioorg/streaming-shell-0.4.0-app.tar.gz'
 echo -e '\e[1;34mUncompressing Streaming shell...'
-tar -xzf streaming-shell-0.5.0-app.tar.gz
-chown -R vagrant:vagrant streaming-shell-0.5.0
-sudo -H -u vagrant bash -c 'mv -f streaming-shell-0.5.0 ~'
-sudo -H -u vagrant bash -c 'mv -f streaming-shell-0.5.0 shell'
+tar -xzf streaming-shell-0.4.0-app.tar.gz
+chown -R vagrant:vagrant streaming-shell-0.4.0
+sudo -H -u vagrant bash -c 'mv -f streaming-shell-0.4.0 ~'
+sudo -H -u vagrant bash -c 'mv -f streaming-shell-0.4.0 shell'
 echo -e '\e[1;34mCreating shortcut streaming-sell...'
 ln -s /home/vagrant/shell/bin/shell /usr/local/bin/streaming-shell
 echo -e '\e[1;34mStreaming Shell installed.'
