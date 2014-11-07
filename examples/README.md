@@ -22,8 +22,8 @@ To get an operating virtual machine with stratio streaming distribution up and r
 
 Name | Version | Service name | Other
 ------------ | ------------- | ------------- | -------------
-Stratio Streaming | 0.4.0 | stratio-streaming | service stratio-streaming start
-Stratio Streaming shell | 0.4.0 | - | init command: streaming-shell
+Stratio Streaming | 0.5.0 | stratio-streaming | service stratio-streaming start
+Stratio Streaming shell | 0.5.0 | - | init command: streaming-shell
 Apache Kafka | 0.8.1.1 | kafka | service kafka start
 Apache zookeeper | 3.3.3 | zookeeper | service zookeeper start
 Stratio cassandra | 2.0.91-SNAPSHOT | cassandra | service cassandra start
@@ -69,7 +69,7 @@ ______________________________________________________
 There are some examples to generate example data.
 * To build a binary with the examples execute **_mvn clean package_** in root project.
 * Go to **_examples_** module, into the target folder.
-* Uncompress file **_stratio-examples-0.5.0-SNAPSHOT-app.tar.gz_**.
+* Uncompress file **_stratio-examples-0.5.0-app.tar.gz_**.
 
 ## License
 
