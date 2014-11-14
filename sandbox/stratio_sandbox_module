@@ -1,13 +1,11 @@
 #!/bin/sh
 
-echo "Lorem Ipsum"
+echo 'Lorem Ipsum'
 
-STRATIO_ENV=$1
-STRATIO_MODULE_VERSION=$2
 
 
 #######################################
 ## SERVICES
 #######################################
 
-echo -e '\e[1;34mInstalling services...'
+echo 'Lorem Ipsum'
