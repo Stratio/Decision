@@ -1,3 +1,4 @@
+#!/bin/sh
 
 STRATIO_ENV=$1
 STRATIO_MODULE_VERSION=$2
