@@ -3,10 +3,6 @@
 STRATIO_ENV=$1
 STRATIO_MODULE_VERSION=$2
 
-echo "--------------------------"
-echo $STRATIO_ENV
-echo $STRATIO_MODULE_VERSION
-echo "--------------------------"
 
 #######################################
 ## SERVICES
@@ -15,6 +11,11 @@ echo "--------------------------"
 echo -e '\e[1;34mInstalling services...'
 
 apt-get install apache2 stratio-streaming stratio-streaming-shell -q -y --force-yes
+
+update-rc.d elasticsearch defaults
+update-rc.d mongod defaults
+update-rc.d kafka defaults
+update-rc.d zookeeper defaults
 update-rc.d streaming defaults
 
 
