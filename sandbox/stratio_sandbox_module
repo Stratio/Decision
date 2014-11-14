@@ -72,7 +72,7 @@ echo -e '\e[1;34m                                                               
 echo -e ''
 echo -e ''
 echo -e '\e[1;33m--------------------'
-echo -e '\e[1;33mCongrat, your Stratio Streaming Sandbox is ready'
+echo -e '\e[1;33mCongrat, your Stratio Streaming Sandbox is ready '
 echo -e '\e[1;33m--------------------'
 echo -e '\e[1;33mDocumentation available at:'
 echo -e '\e[1;33mhttp://www.openstratio.com'
