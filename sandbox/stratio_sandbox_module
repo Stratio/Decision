@@ -1,12 +1,14 @@
 #!/bin/sh
+#
+# Provisioning script for Stratio Sandbox.
+# More info at https://github.com/Stratio/sandbox
+#
+#
 
-STRATIO_ENV=$1
-STRATIO_MODULE_VERSION=$2
 
-
-#######################################
-## SERVICES
-#######################################
+##############
+## SERVICES ##
+##############
 
 echo -e 'Installing services...'
 
@@ -27,14 +29,13 @@ service mongod start
 service streaming start
 
 
-#######################################
-## KIBANA
-#######################################
-
+############
+## KIBANA ##
+############
 
 if [ ! -d "/var/www/html/kibana" ]; then
     echo -e 'Downloading kibana...'
-	wget  'https://download.elasticsearch.org/kibana/kibana/kibana-3.1.0.tar.gz' -P /home/vagrant/downloads
+	wget -q 'https://download.elasticsearch.org/kibana/kibana/kibana-3.1.0.tar.gz' -P /home/vagrant/downloads
 	
 	echo -e 'Uncompressing kibana...'
 	tar -xzf /home/vagrant/downloads/kibana-3.1.0.tar.gz -C /var/www/html
@@ -42,38 +43,35 @@ if [ ! -d "/var/www/html/kibana" ]; then
 fi
 
 
-####################
-## STRATIO STREAMING EXAMPLES
-####################
+################################
+## STRATIO STREAMING EXAMPLES ##
+################################
 
 DOWNLOAD_EXAMPLES_URL="https://s3.amazonaws.com/stratioorg/streaming-examples-${STRATIO_MODULE_VERSION}-app.tar.gz"
-
 
 if [ ! -d "/opt/sds/streaming-examples" ]; then
 
 	echo -e 'Building Stratio Streaming Examples...'
 	mkdir /opt/sds/streaming-examples	
-	wget $DOWNLOAD_EXAMPLES_URL -P /home/vagrant/downloads
+	wget -q $DOWNLOAD_EXAMPLES_URL -P /home/vagrant/downloads
 	tar -xzf /home/vagrant/downloads/streaming-examples-$STRATIO_MODULE_VERSION-app.tar.gz -C /home/vagrant/downloads
 	cp -fr /home/vagrant/downloads/streaming-examples-$STRATIO_MODULE_VERSION/* /opt/sds/streaming-examples
 fi
 
 
+#######################
+## KIBANA DASHBOARDS ##
+#######################
 
-
-###################
-## KIBANA DASHBOARDS
-###################
 cp -f /opt/sds/streaming-examples/dashboards/*.json /var/www/html/kibana/app/dashboards
 chmod -R 777 /var/www/html/kibana/app/dashboards
 
 
+#####################
+## WELCOME MESSAGE ##
+#####################
 
-
-###################
-## WELLCOME MESSAGE
-###################
-
+cat <<EOF >/home/vagrant/.motd
 echo -e '\033[1;34m --------------------------------------------------------------- \033[0m'
 echo -e '\033[1;34m             ______                        _       				\033[0m'
 echo -e '\033[1;34m            / _____) _                 _  (_)      				\033[0m'
@@ -90,7 +88,7 @@ echo -e '\033[1;34m      _____) )| |_| |   | ____/ ___ | | | | | | | ( (_| |		\0
 echo -e '\033[1;34m     (______/  \__)_|   |_____)_____|_|_|_|_|_| |_|\___ |		\033[0m'
 echo -e '\033[1;34m                                                  (_____|		\033[0m'
 echo -e '\033[1;34m --------------------------------------------------------------- \033[0m'
-echo -e '\033[1;33m  Congrat, your Stratio Streaming Sandbox is ready				\033[0m'
+echo -e '\033[1;33m  Congrats, your Stratio Streaming Sandbox is ready				\033[0m'
 echo -e '\033[1;33m  -------------------------------------------------------------- \033[0m'
 echo -e '\033[1;33m  Documentation available at:									\033[0m'
 echo -e '\033[1;33m  http://www.openstratio.com										\033[0m'
@@ -103,5 +101,9 @@ echo -e '\033[1;33m  Zookeeper port: 2181											\033[0m'
 echo -e '\033[1;33m  -------------------------------------------------------------- \033[0m'
 echo -e '\033[1;33m  Contact us if you need support at contact@stratio.com			\033[0m'
 echo -e '\033[1;33m  --------------------------------------------------------------	\033[0m'
+EOF
+chown vagrant:vagrant /home/vagrant/.motd
+echo 'source ~/.motd' >> /home/vagrant/.bashrc
+source /home/vagrant/.motd
 echo -e '\033[1;33m  Type vagrant ssh to enter the Stratio Streaming sandbox.		\033[0m'
 echo -e '\033[1;34m  -------------------------------------------------------------- \033[0m'
