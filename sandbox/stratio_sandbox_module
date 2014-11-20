@@ -51,6 +51,8 @@ fi
 
 DOWNLOAD_EXAMPLES_URL="https://s3.amazonaws.com/stratioorg/streaming-examples-${STRATIO_MODULE_VERSION}-app.tar.gz"
 
+echo $DOWNLOAD_EXAMPLES_URL
+
 if [ ! -d "/opt/sds/streaming-examples" ]; then
 
 	echo -e 'Building Stratio Streaming Examples...'
@@ -73,38 +75,4 @@ chmod -R 777 /var/www/html/kibana/app/dashboards
 ## WELCOME MESSAGE ##
 #####################
 
-cat <<EOF >/home/vagrant/.motd
-echo -e '\033[1;34m --------------------------------------------------------------- \033[0m'
-echo -e '\033[1;34m             ______                        _       				\033[0m'
-echo -e '\033[1;34m            / _____) _                 _  (_)      				\033[0m'
-echo -e '\033[1;34m           ( (____ _| |_  ____ _____ _| |_ _  ___  				\033[0m'
-echo -e '\033[1;34m            \____ (_   _)/ ___|____ (_   _) |/ _ \ 				\033[0m'
-echo -e '\033[1;34m            _____) )| |_| |   / ___ | | |_| | |_| |				\033[0m'
-echo -e '\033[1;34m           (______/  \__)_|   \_____|  \__)_|\___/ 				\033[0m'
-echo -e '\033[1;34m                                                   				\033[0m'
-echo -e '\033[1;34m       ______                              _             		\033[0m'
-echo -e '\033[1;34m      / _____) _                          (_)            		\033[0m'
-echo -e '\033[1;34m     ( (____ _| |_  ____ _____ _____ ____  _ ____   ____ 		\033[0m'
-echo -e '\033[1;34m      \____ (_   _)/ ___) ___ (____ |    \| |  _ \ / _  |		\033[0m'
-echo -e '\033[1;34m      _____) )| |_| |   | ____/ ___ | | | | | | | ( (_| |		\033[0m'
-echo -e '\033[1;34m     (______/  \__)_|   |_____)_____|_|_|_|_|_| |_|\___ |		\033[0m'
-echo -e '\033[1;34m                                                  (_____|		\033[0m'
-echo -e '\033[1;34m --------------------------------------------------------------- \033[0m'
-echo -e '\033[1;33m  Congrats, your Stratio Streaming Sandbox is ready				\033[0m'
-echo -e '\033[1;33m  -------------------------------------------------------------- \033[0m'
-echo -e '\033[1;33m  Documentation available at:									\033[0m'
-echo -e '\033[1;33m  http://www.openstratio.com										\033[0m'
-echo -e '\033[1;33m  -------------------------------------------------------------- \033[0m'
-echo -e '\033[1;33m  Default hostname: streaming-cep-engine.stratio.com  			\033[0m'
-echo -e '\033[1;33m  Kibana url: http://machine_ip/kibana							\033[0m'
-echo -e '\033[1;33m  Kafka port: 9092												\033[0m'
-echo -e '\033[1;33m  Zookeeper port: 2181											\033[0m'
-echo -e '\033[1;33m  -------------------------------------------------------------- \033[0m'
-echo -e '\033[1;33m  Contact us if you need support at contact@stratio.com			\033[0m'
-echo -e '\033[1;33m  --------------------------------------------------------------	\033[0m'
-EOF
-chown vagrant:vagrant /home/vagrant/.motd
-echo 'source ~/.motd' >> /home/vagrant/.bashrc
-source /home/vagrant/.motd
-echo -e '\033[1;33m  Type vagrant ssh to enter the Stratio Streaming sandbox.		\033[0m'
-echo -e '\033[1;34m  -------------------------------------------------------------- \033[0m'
+
