@@ -10,23 +10,25 @@
 ## SERVICES ##
 ##############
 
-echo -e 'Installing services...'
+echo -e 'Installing Stratio Streaming services...'
 
-apt-get install apache2 stratio-streaming stratio-streaming-shell -q -y --force-yes
+yum -y -q --nogpgcheck install httpd stratio-streaming stratio-streaming-shell
 
-update-rc.d elasticsearch defaults
-update-rc.d mongod defaults
-update-rc.d kafka defaults
-update-rc.d zookeeper defaults
-update-rc.d streaming defaults
+chkconfig zookeeper on
+chkconfig kafka on
+chkconfig cassandra on
+chkconfig elasticsearch on
 
-
-service kafka start
 service zookeeper start
+sleep 10
+service kafka start
 service cassandra start
-service elasticsearch start
 service mongod start
+service elasticsearch start
+sleep 10
 service streaming start
+
+
 
 
 ############
@@ -93,9 +95,8 @@ echo -e '\033[1;33m  -----------------------------------------------------------
 echo -e '\033[1;33m  Documentation available at:									\033[0m'
 echo -e '\033[1;33m  http://www.openstratio.com										\033[0m'
 echo -e '\033[1;33m  -------------------------------------------------------------- \033[0m'
-echo -e '\033[1;33m  Default ip: 10.10.10.10										\033[0m'
-echo -e '\033[1;33m  Default hostname: stratio-streaming							\033[0m'
-echo -e '\033[1;33m  Kibana url: http://10.10.10.10/kibana							\033[0m'
+echo -e '\033[1;33m  Default hostname: streaming-cep-engine.stratio.com  			\033[0m'
+echo -e '\033[1;33m  Kibana url: http://machine_ip/kibana							\033[0m'
 echo -e '\033[1;33m  Kafka port: 9092												\033[0m'
 echo -e '\033[1;33m  Zookeeper port: 2181											\033[0m'
 echo -e '\033[1;33m  -------------------------------------------------------------- \033[0m'
