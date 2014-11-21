@@ -27,6 +27,13 @@ service mongod start
 service elasticsearch start
 sleep 10
 service streaming start
+service httpd start
+
+
+#### CONFIG ElasticSearch ####
+sed -i 's/#http.enabled: false/http.enabled: true/g' etc/sds/elasticsearch/elasticsearch.yml
+sed -i 's/#network.host: 192.168.0.1/network.host: 127.0.0.1/g' etc/sds/elasticsearch/elasticsearch.yml
+sed -i 's/#http.port: 9200/http.port: 9200/g' /etc/sds/elasticsearch/elasticsearch.yml
 
 
 
