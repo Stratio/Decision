@@ -30,14 +30,6 @@ service streaming start
 service httpd start
 
 
-#### CONFIG ElasticSearch ####
-sed -i 's/#network.host: 192.168.0.1/network.host: `ip -4 addr show dev eth1 | grep inet | sed -e "s/^.*inet \\(.*\\)\\/.*$/\\1/g"`/g' /etc/sds/elasticsearch/elasticsearch.yml
-sed -i 's/#http.port: 9200/http.port: 9200/g' /etc/sds/elasticsearch/elasticsearch.yml
-sed -i 's/discovery.zen.minimum_master_nodes: 2/discovery.zen.minimum_master_nodes: 1/g' /etc/sds/elasticsearch/elasticsearch.yml
-sed -i 's/gateway.recover_after_nodes: 2/gateway.recover_after_nodes: 1/g' /etc/sds/elasticsearch/elasticsearch.yml
-sed -i 's/gateway.recover_after_master_nodes: 2/gateway.recover_after_master_nodes: 2/g' /etc/sds/elasticsearch/elasticsearch.yml
-
-
 
 
 ############
