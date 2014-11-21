@@ -19,15 +19,15 @@ chkconfig kafka on
 chkconfig cassandra on
 chkconfig elasticsearch on
 
-service zookeeper start
+service zookeeper restart
 sleep 10
-service kafka start
-service cassandra start
-service mongod start
-service elasticsearch start
+service kafka restart
+service cassandra restart
+service mongod restart
+service elasticsearch restart
 sleep 10
-service streaming start
-service httpd start
+service streaming restart
+service httpd restart
 
 
 
