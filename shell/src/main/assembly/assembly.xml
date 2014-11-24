@@ -45,6 +45,7 @@
 			<excludes>
 				<exclude>*.properties</exclude>
 				<exclude>*.xml</exclude>
+				<exclude>*.txt</exclude>
 			</excludes>
 		</fileSet>
 	</fileSets>
