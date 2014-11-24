@@ -15,7 +15,16 @@
  */
 package com.stratio.streaming.shell.commands;
 
-import static org.junit.Assert.assertEquals;
+import com.stratio.streaming.commons.constants.ColumnType;
+import com.stratio.streaming.commons.constants.StreamAction;
+import com.stratio.streaming.commons.exceptions.*;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.messages.StreamQuery;
+import com.stratio.streaming.commons.streams.StratioStream;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.shell.core.CommandResult;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,20 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.shell.core.CommandResult;
-
-import com.stratio.streaming.commons.constants.ColumnType;
-import com.stratio.streaming.commons.constants.StreamAction;
-import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
-import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
-import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
-import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
-import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
-import com.stratio.streaming.commons.messages.StreamQuery;
-import com.stratio.streaming.commons.streams.StratioStream;
+import static org.junit.Assert.assertEquals;
 
 public class StreamCommandTest extends BaseShellTest {
 
@@ -46,8 +42,8 @@ public class StreamCommandTest extends BaseShellTest {
     }
 
     @Test
-    public void listWith0StreamsTest() throws StratioEngineStatusException, StratioAPIGenericException, IOException {
-        Mockito.when(stratioStreamingApi.listStreams()).thenReturn(new ArrayList<StratioStream>());
+    public void listWith0StreamsTest() throws StratioEngineStatusException, StratioAPIGenericException, IOException, StratioEngineConnectionException {
+        Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("list");
         assertEquals(true, cr.isSuccess());
         assertEquals(getListResultFromName("listWithNoStreams"), cr.getResult());
@@ -55,7 +51,7 @@ public class StreamCommandTest extends BaseShellTest {
 
     @Test
     public void listWithOneStreamTest() throws StratioEngineStatusException, StratioAPIGenericException,
-            StratioAPISecurityException, StratioEngineOperationException, IOException {
+            StratioAPISecurityException, StratioEngineOperationException, IOException, StratioEngineConnectionException {
         String streamName = "testStream";
         List<ColumnNameTypeValue> values = new ArrayList<>();
         values.add(new ColumnNameTypeValue("column1", ColumnType.STRING, null));
@@ -67,7 +63,7 @@ public class StreamCommandTest extends BaseShellTest {
                 new HashSet<StreamAction>(), true);
         streams.add(stream);
 
-        Mockito.when(stratioStreamingApi.listStreams()).thenReturn(streams);
+        Mockito.when(ssaw.api().listStreams()).thenReturn(streams);
 
         CommandResult cr = shell.executeCommand("list");
         assertEquals(true, cr.isSuccess());
@@ -76,7 +72,7 @@ public class StreamCommandTest extends BaseShellTest {
 
     @Test
     public void listWithOneStreamOneQueryOneActionTest() throws StratioEngineStatusException,
-            StratioAPISecurityException, StratioAPIGenericException, StratioEngineOperationException, IOException {
+            StratioAPISecurityException, StratioAPIGenericException, StratioEngineOperationException, IOException, StratioEngineConnectionException {
         String streamName = "testStream";
         List<ColumnNameTypeValue> values = new ArrayList<>();
         values.add(new ColumnNameTypeValue("column1", ColumnType.STRING, null));
@@ -93,7 +89,7 @@ public class StreamCommandTest extends BaseShellTest {
         StratioStream stream = new StratioStream(streamName, values, querys, activeActions, true);
         streams.add(stream);
 
-        Mockito.when(stratioStreamingApi.listStreams()).thenReturn(streams);
+        Mockito.when(ssaw.api().listStreams()).thenReturn(streams);
 
         CommandResult cr = shell.executeCommand("list");
         assertEquals(true, cr.isSuccess());
