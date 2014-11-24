@@ -52,7 +52,6 @@ public class StratioStreamingBannerProvider extends DefaultBannerProvider {
         sb.append("    - Kafka: " + kafkaHost + ":" + kafkaPort + OsUtils.LINE_SEPARATOR);
         sb.append("    - Zookeeper: " + zookeeperHost + ":" + zookeeperPort + OsUtils.LINE_SEPARATOR);
         sb.append(OsUtils.LINE_SEPARATOR);
-        sb.append("Type \"help\" to see all available commands.");
         return sb.toString();
     }
 
@@ -63,7 +62,7 @@ public class StratioStreamingBannerProvider extends DefaultBannerProvider {
 
     @Override
     public String getWelcomeMessage() {
-        return "Welcome to Stratio Streaming Shell";
+        return "Type \"help\" to see all available commands.";
     }
 
     @Override
