@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,13 @@
  */
 package com.stratio.streaming.api
 
-import _root_.kafka.consumer.KafkaStream
-import com.stratio.streaming.commons.streams.StratioStream
 import java.util.List
-import com.stratio.streaming.api.messaging.{ ColumnNameValue, ColumnNameType }
+
+import _root_.kafka.consumer.KafkaStream
+import com.stratio.streaming.api.messaging.{ColumnNameType, ColumnNameValue}
 import com.stratio.streaming.commons.exceptions._
-import com.stratio.streaming.dto.StratioQueryStream
-import com.stratio.streaming.commons.messages.{ StratioStreamingMessage, ColumnNameTypeValue }
+import com.stratio.streaming.commons.messages.{ColumnNameTypeValue, StratioStreamingMessage}
+import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.dto.StratioQueryStream
 
 trait IStratioStreamingAPI {
@@ -29,6 +29,7 @@ trait IStratioStreamingAPI {
    * Initializes the StratioStreamingAPI instance.
    * @return
    */
+  @Deprecated
   @throws(classOf[StratioEngineConnectionException])
   def initialize(): IStratioStreamingAPI
 
@@ -36,18 +37,42 @@ trait IStratioStreamingAPI {
    * /**
    * Initializes the StratioStreamingAPI instance.
    * @return
-   * */
+   **/
    * @param kafkaServer
    * @param kafkaPort
    * @param theZookeeperServer
    * @param theZookeeperPort
    * @return
    */
+  @Deprecated
   @throws(classOf[StratioEngineConnectionException])
   def initializeWithServerConfig(kafkaServer: String,
-    kafkaPort: Int,
-    theZookeeperServer: String,
-    theZookeeperPort: Int): IStratioStreamingAPI
+                                 kafkaPort: Int,
+                                 theZookeeperServer: String,
+                                 theZookeeperPort: Int): IStratioStreamingAPI
+
+  /**
+   * Create a new instance of IStratioStreamingAPI, but streaming engine is not called.
+   * To call to streaming engine, use init() method.
+   * @param kafkaQuorum Format: host1:port1,host2:port2
+   * @param zookeeperQuorum Format: host1:port1,host2:port2
+   * @return
+   */
+  def withServerConfig(kafkaQuorum: String, zookeeperQuorum: String): IStratioStreamingAPI
+
+  /**
+   * When server configuration is added, call this method to try to connect
+   * to streaming engine async.
+   * @throws com.stratio.streaming.commons.exceptions.StratioEngineConnectionException
+   * @return
+   */
+  @throws(classOf[StratioEngineConnectionException])
+  def init(): IStratioStreamingAPI;
+
+  /**
+   * Close all connections to streaming engine.
+   */
+  def close
 
   /**
    * Creates a new stream.
@@ -133,7 +158,7 @@ trait IStratioStreamingAPI {
   def columnsFromStream(stream: String): List[ColumnNameTypeValue]
 
   /**
-   *  Gets a list of the queries from a given stream.
+   * Gets a list of the queries from a given stream.
    * @param stream
    * @throws com.stratio.streaming.commons.exceptions.StratioEngineOperationException
    * @return
