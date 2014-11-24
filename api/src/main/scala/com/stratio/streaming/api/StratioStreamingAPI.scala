@@ -262,6 +262,8 @@ class StratioStreamingAPI
     }
   }
 
+  override def isInit(): Boolean = streamingUpAndRunning
+
   def defineAcknowledgeTimeOut(timeOutInMs: Int) = {
     ackTimeOut = timeOutInMs
     this

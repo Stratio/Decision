@@ -75,167 +75,174 @@ trait IStratioStreamingAPI {
                         zookeeperHost: String,
                         zookeeperPort: Int): IStratioStreamingAPI
 
-    /**
-     * When server configuration is added, call this method to try to connect
-     * to streaming engine async.
-     * @throws com.stratio.streaming.commons.exceptions.StratioEngineConnectionException
-     * @return
-     */
-    @throws(classOf[StratioEngineConnectionException])
-    def init(): IStratioStreamingAPI;
+  /**
+   * When server configuration is added, call this method to try to connect
+   * to streaming engine async.
+   * @throws com.stratio.streaming.commons.exceptions.StratioEngineConnectionException
+   * @return
+   */
+  @throws(classOf[StratioEngineConnectionException])
+  def init(): IStratioStreamingAPI;
 
-    /**
-     * Close all connections to streaming engine.
-     */
-    def close
 
-    /**
-     * Creates a new stream.
-     * @param streamName
-     * @param columns
-     */
-    @throws(classOf[StratioEngineStatusException])
-    @throws(classOf[StratioAPISecurityException])
-    @throws(classOf[StratioEngineOperationException])
-    def createStream(streamName: String, columns: List[ColumnNameType])
+  /**
+   * Get if api is initialized correctly
+   * @return
+   */
+  def isInit(): Boolean
 
-    /**
-     * Adds columns to a stream.
-     * @param streamName
-     * @param columns
-     */
-    @throws(classOf[StratioEngineStatusException])
-    @throws(classOf[StratioAPISecurityException])
-    @throws(classOf[StratioEngineOperationException])
-    def alterStream(streamName: String, columns: List[ColumnNameType])
+  /**
+   * Close all connections to streaming engine.
+   */
+  def close
 
-    /**
-     * Inserts new data into a stream.
-     * @param streamName
-     * @param data
-     */
-    @throws(classOf[StratioEngineStatusException])
-    @throws(classOf[StratioAPISecurityException])
-    def insertData(streamName: String, data: List[ColumnNameValue])
+  /**
+   * Creates a new stream.
+   * @param streamName
+   * @param columns
+   */
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPISecurityException])
+  @throws(classOf[StratioEngineOperationException])
+  def createStream(streamName: String, columns: List[ColumnNameType])
 
-    /**
-     * Adds a query to a stream.
-     * @param streamName
-     * @param query
-     * @return the query Id
-     */
-    @throws(classOf[StratioEngineStatusException])
-    @throws(classOf[StratioAPISecurityException])
-    @throws(classOf[StratioEngineOperationException])
-    def addQuery(streamName: String, query: String): String
+  /**
+   * Adds columns to a stream.
+   * @param streamName
+   * @param columns
+   */
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPISecurityException])
+  @throws(classOf[StratioEngineOperationException])
+  def alterStream(streamName: String, columns: List[ColumnNameType])
 
-    /**
-     * Removes a query from a stream.
-     * @param streamName
-     * @param queryId
-     */
-    @throws(classOf[StratioEngineStatusException])
-    @throws(classOf[StratioEngineOperationException])
-    def removeQuery(streamName: String, queryId: String)
+  /**
+   * Inserts new data into a stream.
+   * @param streamName
+   * @param data
+   */
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPISecurityException])
+  def insertData(streamName: String, data: List[ColumnNameValue])
 
-    /**
-     * Removes a stream
-     * @param streamName
-     */
-    @throws(classOf[StratioEngineStatusException])
-    @throws(classOf[StratioAPISecurityException])
-    @throws(classOf[StratioEngineOperationException])
-    def dropStream(streamName: String)
+  /**
+   * Adds a query to a stream.
+   * @param streamName
+   * @param query
+   * @return the query Id
+   */
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPISecurityException])
+  @throws(classOf[StratioEngineOperationException])
+  def addQuery(streamName: String, query: String): String
 
-    /**
-     * Starts listening to a stream.
-     * @param streamName
-     */
-    @throws(classOf[StratioEngineStatusException])
-    @throws(classOf[StratioAPISecurityException])
-    def listenStream(streamName: String): KafkaStream[String, StratioStreamingMessage]
+  /**
+   * Removes a query from a stream.
+   * @param streamName
+   * @param queryId
+   */
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioEngineOperationException])
+  def removeQuery(streamName: String, queryId: String)
 
-    /**
-     * Stops listening to a stream.
-     * @param streamName
-     */
-    @throws(classOf[StratioEngineStatusException])
-    @throws(classOf[StratioAPISecurityException])
-    def stopListenStream(streamName: String)
+  /**
+   * Removes a stream
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPISecurityException])
+  @throws(classOf[StratioEngineOperationException])
+  def dropStream(streamName: String)
 
-    /**
-     * Gets a list of the columns from a given stream.
-     * @param stream
-     * @throws com.stratio.streaming.commons.exceptions.StratioEngineOperationException
-     * @return
-     */
-    @throws(classOf[StratioEngineOperationException])
-    def columnsFromStream(stream: String): List[ColumnNameTypeValue]
+  /**
+   * Starts listening to a stream.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPISecurityException])
+  def listenStream(streamName: String): KafkaStream[String, StratioStreamingMessage]
 
-    /**
-     * Gets a list of the queries from a given stream.
-     * @param stream
-     * @throws com.stratio.streaming.commons.exceptions.StratioEngineOperationException
-     * @return
-     */
-    @throws(classOf[StratioEngineOperationException])
-    def queriesFromStream(stream: String): List[StratioQueryStream]
+  /**
+   * Stops listening to a stream.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPISecurityException])
+  def stopListenStream(streamName: String)
 
-    /**
-     * Gets a list of all the stream that currently exists.
-     * @return a list with the streams
-     */
-    @throws(classOf[StratioEngineStatusException])
-    @throws(classOf[StratioAPIGenericException])
-    def listStreams(): List[StratioStream]
+  /**
+   * Gets a list of the columns from a given stream.
+   * @param stream
+   * @throws com.stratio.streaming.commons.exceptions.StratioEngineOperationException
+   * @return
+   */
+  @throws(classOf[StratioEngineOperationException])
+  def columnsFromStream(stream: String): List[ColumnNameTypeValue]
 
-    /**
-     * Indexes the stream to the elasticsearch instance.
-     */
-    @throws(classOf[StratioEngineStatusException])
-    def indexStream(stream: String)
+  /**
+   * Gets a list of the queries from a given stream.
+   * @param stream
+   * @throws com.stratio.streaming.commons.exceptions.StratioEngineOperationException
+   * @return
+   */
+  @throws(classOf[StratioEngineOperationException])
+  def queriesFromStream(stream: String): List[StratioQueryStream]
 
-    /**
-     * Stops indexing the stream.
-     */
-    @throws(classOf[StratioEngineStatusException])
-    def stopIndexStream(stream: String)
+  /**
+   * Gets a list of all the stream that currently exists.
+   * @return a list with the streams
+   */
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPIGenericException])
+  def listStreams(): List[StratioStream]
 
-    /**
-     * Saves the stream to cassandra DB.
-     * @param streamName
-     */
-    @throws(classOf[StratioEngineStatusException])
-    def saveToCassandra(streamName: String)
+  /**
+   * Indexes the stream to the elasticsearch instance.
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def indexStream(stream: String)
 
-    /**
-     * Stops saving the stream to cassandra DB.
-     * @param streamName
-     */
-    @throws(classOf[StratioEngineStatusException])
-    def stopSaveToCassandra(streamName: String)
+  /**
+   * Stops indexing the stream.
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def stopIndexStream(stream: String)
 
-    /**
-     * Saves the stream to MongoDB.
-     * @param streamName
-     */
-    @throws(classOf[StratioEngineStatusException])
-    def saveToMongo(streamName: String)
+  /**
+   * Saves the stream to cassandra DB.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def saveToCassandra(streamName: String)
 
-    /**
-     * Stops saving the stream to MongoDB.
-     * @param streamName
-     */
-    @throws(classOf[StratioEngineStatusException])
-    def stopSaveToMongo(streamName: String)
+  /**
+   * Stops saving the stream to cassandra DB.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def stopSaveToCassandra(streamName: String)
 
-    /**
-     * Allows the client to define the time that the API
-     * will wait for the engine responses.
-     *
-     * @param timeOutInMs
-     * @throws com.stratio.streaming.commons.exceptions.StratioEngineStatusException
-     */
-    @throws(classOf[StratioEngineStatusException])
-    def defineAcknowledgeTimeOut(timeOutInMs: Int): IStratioStreamingAPI
-  }
+  /**
+   * Saves the stream to MongoDB.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def saveToMongo(streamName: String)
+
+  /**
+   * Stops saving the stream to MongoDB.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def stopSaveToMongo(streamName: String)
+
+  /**
+   * Allows the client to define the time that the API
+   * will wait for the engine responses.
+   *
+   * @param timeOutInMs
+   * @throws com.stratio.streaming.commons.exceptions.StratioEngineStatusException
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def defineAcknowledgeTimeOut(timeOutInMs: Int): IStratioStreamingAPI
+}
