@@ -19,6 +19,12 @@ chkconfig kafka on
 chkconfig cassandra on
 chkconfig elasticsearch on
 
+
+if ! grep -R "string" "filepath"; then
+    echo "index.analysis.analyzer.default.type: keyword" >> /etc/sds/elasticsearch/elasticsearch.yml
+fi
+
+
 service zookeeper restart
 sleep 10
 service kafka restart
