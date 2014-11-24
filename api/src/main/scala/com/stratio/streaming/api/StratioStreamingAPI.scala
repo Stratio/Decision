@@ -239,6 +239,16 @@ class StratioStreamingAPI
     this
   }
 
+  override def withServerConfig(kafkaHost: String,
+                                kafkaPort: Int,
+                                zookeeperHost: String,
+                                zookeeperPort: Int): IStratioStreamingAPI = {
+
+    kafkaCluster = s"$kafkaHost:$kafkaPort"
+    zookeeperServer = s"$zookeeperHost:$zookeeperPort"
+    this
+  }
+
   override def init(): IStratioStreamingAPI = {
     try {
       log.info("Establishing connection with the engine...")
