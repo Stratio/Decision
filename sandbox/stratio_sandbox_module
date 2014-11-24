@@ -20,7 +20,7 @@ chkconfig cassandra on
 chkconfig elasticsearch on
 
 
-if ! grep -R "string" "filepath"; then
+if ! grep -R "analyzer.default.type" "/etc/sds/elasticsearch/elasticsearch.yml"; then
     echo "index.analysis.analyzer.default.type: keyword" >> /etc/sds/elasticsearch/elasticsearch.yml
 fi
 
