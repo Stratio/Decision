@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# Provisioning script for Stratio Sandbox.
+# More info at https://github.com/Stratio/sandbox
+#
+#
+
+
+##############
+## SERVICES ##
+##############
+
+echo -e 'Installing Stratio Streaming services...'
+
+yum -y -q --nogpgcheck install httpd stratio-streaming stratio-streaming-shell
+
+chkconfig zookeeper on
+chkconfig kafka on
+chkconfig cassandra on
+chkconfig elasticsearch on
+
+service zookeeper restart
+sleep 10
+service kafka restart
+service cassandra restart
+service mongod restart
+service elasticsearch restart
+sleep 10
+service streaming restart
+service httpd restart
+
+
+
+
+############
+## KIBANA ##
+############
+
+if [ ! -d "/var/www/html/kibana" ]; then
+    echo -e 'Downloading kibana...'
+	wget -q 'https://download.elasticsearch.org/kibana/kibana/kibana-3.1.0.tar.gz' -P /home/vagrant/downloads
+	
+	echo -e 'Uncompressing kibana...'
+	tar -xzf /home/vagrant/downloads/kibana-3.1.0.tar.gz -C /var/www/html
+	mv /var/www/html/kibana-3.1.0 /var/www/html/kibana
+fi
+
+
+################################
+## STRATIO STREAMING EXAMPLES ##
+################################
+
+DOWNLOAD_EXAMPLES_URL="https://s3.amazonaws.com/stratioorg/streaming-examples-${STRATIO_MODULE_VERSION}-app.tar.gz"
+
+echo $DOWNLOAD_EXAMPLES_URL
+
+if [ ! -d "/opt/sds/streaming-examples" ]; then
+
+	echo -e 'Building Stratio Streaming Examples...'
+	mkdir /opt/sds/streaming-examples	
+	wget -q $DOWNLOAD_EXAMPLES_URL -P /home/vagrant/downloads
+	tar -xzf /home/vagrant/downloads/streaming-examples-$STRATIO_MODULE_VERSION-app.tar.gz -C /home/vagrant/downloads
+	cp -fr /home/vagrant/downloads/streaming-examples-$STRATIO_MODULE_VERSION/* /opt/sds/streaming-examples
+fi
+
+
+#######################
+## KIBANA DASHBOARDS ##
+#######################
+
+cp -f /opt/sds/streaming-examples/dashboards/*.json /var/www/html/kibana/app/dashboards
+chmod -R 777 /var/www/html/kibana/app/dashboards
+
+
+#####################
+## WELCOME MESSAGE ##
+#####################
+
+

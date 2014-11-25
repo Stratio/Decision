@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import com.stratio.streaming.commons.exceptions.StratioEngineConnectionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -51,7 +52,7 @@ public class CacheStreamsTest extends BaseShellTest {
     }
 
     @Test
-    public void listOneElementCached() throws StratioEngineStatusException, StratioAPIGenericException {
+    public void listOneElementCached() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException {
         String streamName = "testStream";
         List<ColumnNameTypeValue> values = new ArrayList<>();
         values.add(new ColumnNameTypeValue("column1", ColumnType.STRING, null));
@@ -63,7 +64,7 @@ public class CacheStreamsTest extends BaseShellTest {
                 new HashSet<StreamAction>(), true);
         streams.add(stream);
 
-        Mockito.when(stratioStreamingApi.listStreams()).thenReturn(streams);
+        Mockito.when(ssaw.api().listStreams()).thenReturn(streams);
 
         cachedStreamsDAO.listStreams();
 
@@ -74,7 +75,7 @@ public class CacheStreamsTest extends BaseShellTest {
     }
 
     @Test
-    public void listOneElementCachedAndRefreshed() throws StratioEngineStatusException, StratioAPIGenericException {
+    public void listOneElementCachedAndRefreshed() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException {
         String streamName = "testStream";
         List<ColumnNameTypeValue> values = new ArrayList<>();
         values.add(new ColumnNameTypeValue("column1", ColumnType.STRING, null));
@@ -86,7 +87,7 @@ public class CacheStreamsTest extends BaseShellTest {
                 new HashSet<StreamAction>(), true);
         streams.add(stream);
 
-        Mockito.when(stratioStreamingApi.listStreams()).thenReturn(streams);
+        Mockito.when(ssaw.api().listStreams()).thenReturn(streams);
 
         cachedStreamsDAO.listStreams();
 

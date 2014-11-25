@@ -15,31 +15,35 @@
  */
 package com.stratio.streaming.shell.commands;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
+import com.stratio.streaming.api.IStratioStreamingAPI;
+import com.stratio.streaming.shell.wrapper.StratioStreamingApiWrapper;
+import org.mockito.Mockito;
 import org.springframework.context.ApplicationContext;
 import org.springframework.shell.Bootstrap;
 import org.springframework.shell.core.JLineShellComponent;
 import org.springframework.util.FileCopyUtils;
 
-import com.stratio.streaming.api.IStratioStreamingAPI;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class BaseShellTest {
 
     public static JLineShellComponent shell;
 
-    public static IStratioStreamingAPI stratioStreamingApi;
+    public static StratioStreamingApiWrapper ssaw;
 
     protected static ApplicationContext applicationContext;
 
     public void init() {
         Bootstrap bootstrap = new Bootstrap(null,
-                new String[] { "classpath*:/META-INF/spring/spring-shell-plugin-test.xml" });
+                new String[]{"classpath*:/META-INF/spring/spring-shell-plugin-test.xml"});
         shell = bootstrap.getJLineShellComponent();
         applicationContext = bootstrap.getApplicationContext();
-        stratioStreamingApi = applicationContext.getBean(IStratioStreamingAPI.class);
+        ssaw = applicationContext.getBean(StratioStreamingApiWrapper.class);
+
+        IStratioStreamingAPI stratioStreamingAPI = applicationContext.getBean(IStratioStreamingAPI.class);
+        Mockito.when(stratioStreamingAPI.isInit()).thenReturn(true);
     }
 
     public String getListResultFromName(String filename) throws IOException {

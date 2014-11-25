@@ -15,44 +15,44 @@
  */
 package com.stratio.streaming.shell.command;
 
+import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
+import com.stratio.streaming.commons.exceptions.StratioEngineConnectionException;
+import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
+import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
+import com.stratio.streaming.shell.exception.StreamingShellException;
+import com.stratio.streaming.shell.wrapper.StratioStreamingApiWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
-import com.stratio.streaming.api.IStratioStreamingAPI;
-import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
-import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
-import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
-import com.stratio.streaming.shell.exception.StreamingShellException;
-
 @Component
 public class QueryCommands implements CommandMarker {
     @Autowired
-    private IStratioStreamingAPI stratioStreamingApi;
+    private StratioStreamingApiWrapper ssaw;
 
     @CliCommand(value = "add query", help = "create new query")
     public String create(
-            @CliOption(key = { "stream" }, help = "Stream to attach query", mandatory = true, optionContext = "stream") final String streamName,
-            @CliOption(key = { "definition" }, help = "CEP query definition", mandatory = true) final String query) {
+            @CliOption(key = {"stream"}, help = "Stream to attach query", mandatory = true, optionContext = "stream") final String streamName,
+            @CliOption(key = {"definition"}, help = "CEP query definition", mandatory = true) final String query) {
         try {
-            String queryId = stratioStreamingApi.addQuery(streamName, query);
+            String queryId = ssaw.api().addQuery(streamName, query);
             return "Query ".concat(streamName).concat(" created correctly with id ".concat(queryId));
 
-        } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException e) {
+        } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException | StratioEngineConnectionException e) {
             throw new StreamingShellException(e);
         }
     }
 
     @CliCommand(value = "remove query", help = "remove an existing query")
     public String drop(
-            @CliOption(key = { "stream" }, help = "Stream to deattach query", mandatory = true, optionContext = "stream") final String streamName,
-            @CliOption(key = { "id" }, help = "query id", mandatory = true) final String queryId) {
+            @CliOption(key = {"stream"}, help = "Stream to deattach query", mandatory = true, optionContext = "stream") final String streamName,
+            @CliOption(key = {"id"}, help = "query id", mandatory = true) final String queryId) {
         try {
-            stratioStreamingApi.removeQuery(streamName, queryId);
+            ssaw.api().removeQuery(streamName, queryId);
             return "Query ".concat(streamName).concat(" dropped correctly with id ".concat(queryId));
-        } catch (StratioEngineStatusException | StratioEngineOperationException e) {
+        } catch (StratioEngineStatusException | StratioEngineOperationException | StratioEngineConnectionException e) {
             throw new StreamingShellException(e);
         }
     }

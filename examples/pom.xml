@@ -26,7 +26,7 @@
 		<jacoco.skip>true</jacoco.skip>
 	</properties>
 	<groupId>com.stratio.streaming.examples</groupId>
-	<artifactId>stratio-examples</artifactId>
+	<artifactId>streaming-examples</artifactId>
 	<name>Stratio streaming examples</name>
 	<description>Stratio streaming examples and executables.</description>
 	<dependencies>

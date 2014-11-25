@@ -15,107 +15,107 @@
  */
 package com.stratio.streaming.shell.command;
 
+import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
+import com.stratio.streaming.commons.exceptions.StratioEngineConnectionException;
+import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
+import com.stratio.streaming.shell.exception.StreamingShellException;
+import com.stratio.streaming.shell.wrapper.StratioStreamingApiWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
-import com.stratio.streaming.api.IStratioStreamingAPI;
-import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
-import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
-import com.stratio.streaming.shell.exception.StreamingShellException;
-
 @Component
 public class ActionCommands implements CommandMarker {
 
     @Autowired
-    private IStratioStreamingAPI stratioStreamingApi;
+    private StratioStreamingApiWrapper ssaw;
 
     @CliCommand(value = "index start", help = "index stream events")
     public String indexStart(
-            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
-            stratioStreamingApi.indexStream(streamName);
+            ssaw.api().indexStream(streamName);
             return "Stream ".concat(streamName).concat(" indexed correctly");
-        } catch (StratioEngineStatusException e) {
+        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
             throw new StreamingShellException(e);
         }
     }
 
     @CliCommand(value = "index stop", help = "stop index stream events")
     public String indexStop(
-            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
-            stratioStreamingApi.stopIndexStream(streamName);
+            ssaw.api().stopIndexStream(streamName);
             return "Stream ".concat(streamName).concat(" unindexed correctly");
-        } catch (StratioEngineStatusException e) {
+        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
             throw new StreamingShellException(e);
         }
     }
 
     @CliCommand(value = "save cassandra start", help = "start save to cassandra action")
     public String saveCassandraStart(
-            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
-            stratioStreamingApi.saveToCassandra(streamName);
+            ssaw.api().saveToCassandra(streamName);
             return "Stream ".concat(streamName).concat(" attached to cassandra correctly");
-        } catch (StratioEngineStatusException e) {
+        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
             throw new StreamingShellException(e);
         }
     }
 
     @CliCommand(value = "save cassandra stop", help = "stop save to cassandra action")
     public String saveCassandraStop(
-            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
-            stratioStreamingApi.stopSaveToCassandra(streamName);
+            ssaw.api().stopSaveToCassandra(streamName);
             return "Stream ".concat(streamName).concat(" de-attached from cassandra correctly");
-        } catch (StratioEngineStatusException e) {
+        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
             throw new StreamingShellException(e);
         }
     }
 
     @CliCommand(value = "save mongo start", help = "start save to mongo action")
     public String saveMongoStart(
-            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
-            stratioStreamingApi.saveToMongo(streamName);
+            ssaw.api().saveToMongo(streamName);
             return "Stream ".concat(streamName).concat(" attached to mongo correctly");
-        } catch (StratioEngineStatusException e) {
+        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
             throw new StreamingShellException(e);
         }
     }
 
     @CliCommand(value = "save mongo stop", help = "stop save to mongo action")
     public String saveMongoStop(
-            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
-            stratioStreamingApi.stopSaveToMongo(streamName);
+            ssaw.api().stopSaveToMongo(streamName);
             return "Stream ".concat(streamName).concat(" de-attached from mongo correctly");
-        } catch (StratioEngineStatusException e) {
+        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
             throw new StreamingShellException(e);
         }
     }
 
     @CliCommand(value = "listen start", help = "attach stream to kafka topic")
     public String listenStart(
-            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
-            stratioStreamingApi.listenStream(streamName);
+            ssaw.api().listenStream(streamName);
             return "Stream ".concat(streamName).concat(" listened correctly");
-        } catch (StratioEngineStatusException | StratioAPISecurityException e) {
+        } catch (StratioEngineStatusException | StratioEngineConnectionException | StratioAPISecurityException e) {
             throw new StreamingShellException(e);
         }
     }
 
     @CliCommand(value = "listen stop", help = "de-attach stream to kafka topic")
     public String listenStop(
-            @CliOption(key = { "stream" }, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
-            stratioStreamingApi.stopListenStream(streamName);
+            ssaw.api().stopListenStream(streamName);
             return "Stream ".concat(streamName).concat(" unlistened correctly");
-        } catch (StratioEngineStatusException | StratioAPISecurityException e) {
+        } catch (StratioEngineStatusException | StratioEngineConnectionException | StratioAPISecurityException e) {
             throw new StreamingShellException(e);
         }
     }
