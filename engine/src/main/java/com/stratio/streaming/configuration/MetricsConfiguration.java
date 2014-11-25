@@ -15,28 +15,32 @@
  */
 package com.stratio.streaming.configuration;
 
-import java.util.concurrent.TimeUnit;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.ryantenney.metrics.spring.config.annotation.EnableMetrics;
 import com.ryantenney.metrics.spring.config.annotation.MetricsConfigurerAdapter;
 import com.stratio.streaming.dao.StreamStatusDao;
+import com.stratio.streaming.metrics.SiddhiStreamReporter;
 import com.stratio.streaming.service.StreamStatusMetricService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.wso2.siddhi.core.SiddhiManager;
+
+import java.util.concurrent.TimeUnit;
 
 @Configuration
-@Import(DaoConfiguration.class)
+@Import({DaoConfiguration.class, StreamingSiddhiConfiguration.class})
 @EnableMetrics
 public class MetricsConfiguration extends MetricsConfigurerAdapter {
 
     @Autowired
     private StreamStatusDao streamStatusDao;
+
+    @Autowired
+    private SiddhiManager siddhiManager;
 
     @Autowired
     private ConfigurationContext configurationContext;
@@ -45,6 +49,9 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter {
     public void configureReporters(MetricRegistry metricRegistry) {
         if (configurationContext.isPrintStreams()) {
             ConsoleReporter.forRegistry(metricRegistry).build().start(5, TimeUnit.SECONDS);
+        }
+        if (configurationContext.isStatsEnabled()) {
+            SiddhiStreamReporter.forRegistry(metricRegistry, siddhiManager).build().start(5, TimeUnit.SECONDS);
         }
         JmxReporter.forRegistry(metricRegistry).build().start();
     }
