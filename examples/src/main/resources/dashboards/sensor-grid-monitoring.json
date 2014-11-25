@@ -4,7 +4,7 @@
     "query": {
       "list": {
         "0": {
-          "query": "name:CPU",
+          "query": "name:\"cpu\"",
           "alias": "CPU",
           "color": "#508642",
           "id": 0,
@@ -15,7 +15,7 @@
         "1": {
           "id": 1,
           "type": "lucene",
-          "query": "name:\"Memory\"",
+          "query": "name:\"memory\"",
           "alias": "Memory",
           "color": "#BF1B00",
           "pin": true,
@@ -28,7 +28,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "name:\"Disk Usage\""
+          "query": "name:\"disk usage\""
         },
         "3": {
           "id": 3,
@@ -37,7 +37,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "name:\"Memory Swap\""
+          "query": "name:\"memory swap\""
         },
         "4": {
           "id": 4,
@@ -46,7 +46,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "name:Threads"
+          "query": "name:\"threads\""
         },
         "5": {
           "id": 5,
@@ -55,7 +55,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "name:\"Running Processes\""
+          "query": "name:\"running processes\""
         }
       },
       "ids": [
@@ -72,7 +72,7 @@
         "0": {
           "type": "time",
           "field": "@timestamp",
-          "from": "now-5m",
+          "from": "now-15m",
           "to": "now",
           "mandate": "must",
           "active": true,
@@ -128,7 +128,7 @@
           "mode": "mean",
           "time_field": "@timestamp",
           "value_field": "data",
-          "interval": "30s",
+          "interval": "1m",
           "spyable": false,
           "queries": {
             "mode": "all",
@@ -255,7 +255,7 @@
           },
           "auto_int": true,
           "resolution": 100,
-          "interval": "1s",
+          "interval": "10s",
           "intervals": [
             "auto",
             "1s",
@@ -318,7 +318,7 @@
           "counter_pos": "below",
           "spyable": true,
           "queries": {
-            "mode": "all",
+            "mode": "pinned",
             "ids": [
               0,
               1,
@@ -463,23 +463,23 @@
       "query": "*",
       "pinned": true,
       "history": [
-        "name:Running Processes",
+        "name:\"Running Processes\"",
         "name:Threads",
         "name:\"Memory Swap\"",
-        "name:Disk Usage",
+        "name:\"Disk Usage\"",
         "name:\"Memory\"",
+        "name:\"CPU\"",
+        "name:Running Processes",
+        "name:Disk Usage",
         "name:CPU",
-        "name:Humidity",
-        "name:Pressure",
-        "name:anemometer",
-        "name:carbon"
+        "name:Humidity"
       ],
       "remember": 10
     },
     {
       "type": "filtering",
       "collapse": true,
-      "notice": false,
+      "notice": true,
       "enable": true
     }
   ],
