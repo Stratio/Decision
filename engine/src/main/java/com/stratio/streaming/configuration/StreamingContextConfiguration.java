@@ -15,22 +15,6 @@
  */
 package com.stratio.streaming.configuration;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.spark.SparkConf;
-import org.apache.spark.streaming.Duration;
-import org.apache.spark.streaming.api.java.JavaDStream;
-import org.apache.spark.streaming.api.java.JavaPairDStream;
-import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.kafka.KafkaUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-
 import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.streaming.StreamingEngine;
 import com.stratio.streaming.commons.constants.BUS;
@@ -38,13 +22,7 @@ import com.stratio.streaming.commons.constants.InternalTopic;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.functions.FilterDataFunction;
-import com.stratio.streaming.functions.PairDataFunction;
-import com.stratio.streaming.functions.SaveToCassandraActionExecutionFunction;
-import com.stratio.streaming.functions.SaveToElasticSearchActionExecutionFunction;
-import com.stratio.streaming.functions.SaveToMongoActionExecutionFunction;
-import com.stratio.streaming.functions.SendToKafkaActionExecutionFunction;
-import com.stratio.streaming.functions.SerializerFunction;
+import com.stratio.streaming.functions.*;
 import com.stratio.streaming.functions.dal.IndexStreamFunction;
 import com.stratio.streaming.functions.dal.ListenStreamFunction;
 import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
@@ -58,6 +36,21 @@ import com.stratio.streaming.functions.messages.FilterMessagesByOperationFunctio
 import com.stratio.streaming.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.streaming.serializer.impl.KafkaToJavaSerializer;
 import com.stratio.streaming.service.StreamOperationService;
+import org.apache.spark.SparkConf;
+import org.apache.spark.streaming.Duration;
+import org.apache.spark.streaming.api.java.JavaDStream;
+import org.apache.spark.streaming.api.java.JavaPairDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.kafka.KafkaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @Import(ServiceConfiguration.class)
@@ -113,7 +106,7 @@ public class StreamingContextConfiguration {
 
         messages.cache();
 
-        if (configurationContext.getElasticSearchHost() != null) {
+        if (configurationContext.getElasticSearchHosts() != null) {
             IndexStreamFunction indexStreamFunction = new IndexStreamFunction(streamOperationService,
                     configurationContext.getZookeeperHostsQuorum());
 
@@ -132,7 +125,7 @@ public class StreamingContextConfiguration {
             log.warn("Elasticsearch configuration not found.");
         }
 
-        if (configurationContext.getMongoHost() != null) {
+        if (configurationContext.getMongoHosts() != null) {
             SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(streamOperationService,
                     configurationContext.getZookeeperHostsQuorum());
 
@@ -220,20 +213,6 @@ public class StreamingContextConfiguration {
             // allRequests.window(new Duration(2000), new
             // Duration(6000)).foreachRDD(saveRequestsToAuditLogFunction);
             // }
-
-            // TODO enable stats functionality
-            if (configurationContext.isStatsEnabled()) {
-                // CollectRequestForStatsFunction collectRequestForStatsFunction
-                // =
-                // new CollectRequestForStatsFunction(
-                // siddhiManager,
-                // configurationContext.getZookeeperHostsQuorum(),
-                // configurationContext.getKafkaHostsQuorum());
-                //
-                // allRequests.window(new Duration(2000), new
-                // Duration(6000)).foreachRDD(collectRequestForStatsFunction);
-                //
-            }
         }
 
         return context;
@@ -291,13 +270,13 @@ public class StreamingContextConfiguration {
                         ProtocolOptions.DEFAULT_PORT));
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(
-                new SaveToMongoActionExecutionFunction(configurationContext.getMongoHost(), configurationContext
-                        .getMongoPort(), configurationContext.getMongoUsername(), configurationContext
+                new SaveToMongoActionExecutionFunction(configurationContext.getMongoHosts(),
+                        configurationContext.getMongoUsername(), configurationContext
                         .getMongoPassword()));
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.INDEXED)).foreachRDD(
-                new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHost(),
-                        configurationContext.getElasticSearchPort()));
+                new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHosts(),
+                        configurationContext.getElasticSearchClusterName()));
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
                 new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));

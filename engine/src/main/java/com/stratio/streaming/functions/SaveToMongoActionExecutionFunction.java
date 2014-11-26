@@ -15,25 +15,16 @@
  */
 package com.stratio.streaming.functions;
 
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.BulkWriteOperation;
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
+import com.mongodb.*;
 import com.stratio.streaming.commons.constants.STREAMING;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.UnknownHostException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunction {
 
@@ -44,14 +35,12 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
     private MongoClient mongoClient;
     private DB streamingDb;
 
-    private final String mongoHost;
-    private final int mongoPort;
+    private final List<String> mongoHosts;
     private final String username;
     private final String password;
 
-    public SaveToMongoActionExecutionFunction(String mongoHost, int mongoPort, String username, String password) {
-        this.mongoHost = mongoHost;
-        this.mongoPort = mongoPort;
+    public SaveToMongoActionExecutionFunction(List<String> mongoHosts, String username, String password) {
+        this.mongoHosts = mongoHosts;
         this.username = username;
         this.password = password;
     }
@@ -85,15 +74,24 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
 
     private MongoClient getMongoClient() throws UnknownHostException {
         if (mongoClient == null) {
-            List<ServerAddress> adresses = Arrays.asList(new ServerAddress(mongoHost, mongoPort));
+            List<ServerAddress> serverAddresses = new ArrayList();
+            for (String mongoHost : mongoHosts) {
+                String[] elements = mongoHost.split(":");
+                if (elements.length < 2) {
+                    //no port
+                    serverAddresses.add(new ServerAddress(elements[0]));
+                } else {
+                    serverAddresses.add(new ServerAddress(elements[0], Integer.parseInt(elements[1])));
+                }
+            }
             if (username != null && password != null) {
-                mongoClient = new MongoClient(adresses, Arrays.asList(MongoCredential.createPlainCredential(username,
+                mongoClient = new MongoClient(serverAddresses, Arrays.asList(MongoCredential.createPlainCredential(username,
                         "$external", password.toCharArray())));
             } else {
                 log.warn(
-                        "MongoDB user or password are not defined. User: [{}], Password: [{}]. trying annonimous connection.",
+                        "MongoDB user or password are not defined. User: [{}], Password: [{}]. trying anonymous connection.",
                         username, password);
-                mongoClient = new MongoClient(adresses);
+                mongoClient = new MongoClient(serverAddresses);
             }
         }
         return mongoClient;
