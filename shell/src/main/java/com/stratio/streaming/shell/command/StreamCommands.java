@@ -88,7 +88,7 @@ public class StreamCommands implements CommandMarker {
             cachedStreamsDAO.newStream(streamName, columns);
             return "Stream ".concat(streamName).concat(" created correctly");
 
-        } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException e) {
+        } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException | StratioEngineConnectionException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -99,7 +99,7 @@ public class StreamCommands implements CommandMarker {
         try {
             cachedStreamsDAO.dropStream(streamName);
             return "Stream ".concat(streamName).concat(" dropped correctly");
-        } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException e) {
+        } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException | StratioEngineConnectionException e) {
             throw new StreamingShellException(e);
         }
     }

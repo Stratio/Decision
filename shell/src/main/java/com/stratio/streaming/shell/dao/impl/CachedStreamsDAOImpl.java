@@ -17,50 +17,48 @@ package com.stratio.streaming.shell.dao.impl;
 
 import java.util.List;
 
+import com.stratio.streaming.commons.exceptions.*;
+import com.stratio.streaming.shell.wrapper.StratioStreamingApiWrapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 
 import com.stratio.streaming.api.IStratioStreamingAPI;
 import com.stratio.streaming.api.messaging.ColumnNameType;
-import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
-import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
-import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
-import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
 import com.stratio.streaming.commons.streams.StratioStream;
 import com.stratio.streaming.shell.dao.CachedStreamsDAO;
 
 public class CachedStreamsDAOImpl implements CachedStreamsDAO {
 
-    private final IStratioStreamingAPI stratioStreamingApi;
+    private final StratioStreamingApiWrapper ssaw;
 
-    public CachedStreamsDAOImpl(IStratioStreamingAPI stratioStreamingApi) {
-        this.stratioStreamingApi = stratioStreamingApi;
+    public CachedStreamsDAOImpl(StratioStreamingApiWrapper ssaw) {
+        this.ssaw = ssaw;
     }
 
     @Cacheable(value = "streams")
     @Override
-    public List<StratioStream> listStreams() throws StratioEngineStatusException, StratioAPIGenericException {
-        return stratioStreamingApi.listStreams();
+    public List<StratioStream> listStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException {
+        return ssaw.api().listStreams();
     }
 
     @Override
     @Caching(evict = @CacheEvict(value = "streams", allEntries = true, beforeInvocation = true), cacheable = @Cacheable(value = "streams"))
-    public List<StratioStream> listUncachedStreams() throws StratioEngineStatusException, StratioAPIGenericException {
-        return stratioStreamingApi.listStreams();
+    public List<StratioStream> listUncachedStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException {
+        return ssaw.api().listStreams();
     }
 
     @CacheEvict(value = "streams", allEntries = true)
     @Override
     public void newStream(String name, List<ColumnNameType> columns) throws StratioEngineStatusException,
-            StratioAPISecurityException, StratioEngineOperationException {
-        stratioStreamingApi.createStream(name, columns);
+            StratioAPISecurityException, StratioEngineOperationException, StratioEngineConnectionException {
+        ssaw.api().createStream(name, columns);
     }
 
     @CacheEvict(value = "streams", allEntries = true)
     @Override
     public void dropStream(String name) throws StratioEngineStatusException, StratioAPISecurityException,
-            StratioEngineOperationException {
-        stratioStreamingApi.dropStream(name);
+            StratioEngineOperationException, StratioEngineConnectionException {
+        ssaw.api().dropStream(name);
     }
 }
