@@ -16,103 +16,94 @@
 package com.stratio.streaming.metrics;
 
 import com.codahale.metrics.*;
-import com.google.common.collect.ImmutableMap;
+import com.codahale.metrics.Timer;
+import com.stratio.streaming.commons.constants.ColumnType;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.exception.ServiceException;
+import com.stratio.streaming.service.StreamOperationServiceWithoutMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.query.api.QueryFactory;
-import org.wso2.siddhi.query.api.definition.Attribute;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class SiddhiStreamReporter extends ScheduledReporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SiddhiStreamReporter.class);
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private static final String GAUGE_STREAM_NAME = "streaming-gauge-metrics";
-    private static final Map<String, Attribute.Type> GAUGE_PROPERTIES =
-            ImmutableMap.<String, Attribute.Type>builder().
-                    put("name", Attribute.Type.STRING).
-                    put("timestamp", Attribute.Type.DOUBLE).
-                    put("value", Attribute.Type.STRING).
-                    build();
+    private static final Set<Map.Entry<String, ColumnType>> GAUGE_PROPERTIES = new LinkedHashSet<Map.Entry<String, ColumnType>>() {{
+        add(new AbstractMap.SimpleEntry<>("name", ColumnType.STRING));
+        add(new AbstractMap.SimpleEntry<>("timestamp", ColumnType.DOUBLE));
+        add(new AbstractMap.SimpleEntry<>("value", ColumnType.STRING));
+    }};
     private static final String COUNTER_STREAM_NAME = "streaming-counter-metrics";
-    private static final Map<String, Attribute.Type> COUNTER_PROPERTIES =
-            ImmutableMap.<String, Attribute.Type>builder().
-                    put("name", Attribute.Type.STRING).
-                    put("timestamp", Attribute.Type.DOUBLE).
-                    put("count", Attribute.Type.DOUBLE).
-                    build();
+    private static final Set<Map.Entry<String, ColumnType>> COUNTER_PROPERTIES = new LinkedHashSet<Map.Entry<String, ColumnType>>() {{
+        add(new AbstractMap.SimpleEntry<>("name", ColumnType.STRING));
+        add(new AbstractMap.SimpleEntry<>("timestamp", ColumnType.DOUBLE));
+        add(new AbstractMap.SimpleEntry<>("count", ColumnType.DOUBLE));
+    }};
     private static final String HISTOGRAM_STREAM_NAME = "streaming-histogram-metrics";
-    private static final Map<String, Attribute.Type> HISTOGRAM_PROPERTIES =
-            ImmutableMap.<String, Attribute.Type>builder().
-                    put("name", Attribute.Type.STRING).
-                    put("timestamp", Attribute.Type.DOUBLE).
-                    put("count", Attribute.Type.DOUBLE).
-                    put("max", Attribute.Type.DOUBLE).
-                    put("mean", Attribute.Type.FLOAT).
-                    put("min", Attribute.Type.DOUBLE).
-                    put("stddev", Attribute.Type.FLOAT).
-                    put("p50", Attribute.Type.FLOAT).
-                    put("p75", Attribute.Type.FLOAT).
-                    put("p95", Attribute.Type.FLOAT).
-                    put("p98", Attribute.Type.FLOAT).
-                    put("p99", Attribute.Type.FLOAT).
-                    put("p999", Attribute.Type.FLOAT).
-                    build();
+    private static final Set<Map.Entry<String, ColumnType>> HISTOGRAM_PROPERTIES = new LinkedHashSet<Map.Entry<String, ColumnType>>() {{
+        add(new AbstractMap.SimpleEntry<>("name", ColumnType.STRING));
+        add(new AbstractMap.SimpleEntry<>("timestamp", ColumnType.DOUBLE));
+        add(new AbstractMap.SimpleEntry<>("count", ColumnType.DOUBLE));
+        add(new AbstractMap.SimpleEntry<>("max", ColumnType.DOUBLE));
+        add(new AbstractMap.SimpleEntry<>("mean", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("min", ColumnType.DOUBLE));
+        add(new AbstractMap.SimpleEntry<>("stddev", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p50", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p75", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p95", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p98", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p99", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p999", ColumnType.FLOAT));
+    }};
     private static final String METER_STREAM_NAME = "streaming-meter-metrics";
-    private static final Map<String, Attribute.Type> METER_PROPERTIES =
-            ImmutableMap.<String, Attribute.Type>builder().
-                    put("name", Attribute.Type.STRING).
-                    put("timestamp", Attribute.Type.DOUBLE).
-                    put("count", Attribute.Type.DOUBLE).
-                    put("mean_rate", Attribute.Type.FLOAT).
-                    put("m1_rate", Attribute.Type.FLOAT).
-                    put("m5_rate", Attribute.Type.FLOAT).
-                    put("m15_rate", Attribute.Type.FLOAT).
-                    put("rate_unit", Attribute.Type.STRING).
-                    build();
+    private static final Set<Map.Entry<String, ColumnType>> METER_PROPERTIES = new LinkedHashSet<Map.Entry<String, ColumnType>>() {{
+        add(new AbstractMap.SimpleEntry<>("name", ColumnType.STRING));
+        add(new AbstractMap.SimpleEntry<>("timestamp", ColumnType.DOUBLE));
+        add(new AbstractMap.SimpleEntry<>("count", ColumnType.DOUBLE));
+        add(new AbstractMap.SimpleEntry<>("mean_rate", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("m1_rate", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("m5_rate", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("m15_rate", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("rate_unit", ColumnType.STRING));
+    }};
     private static final String TIMER_STREAM_NAME = "streaming-timer-metrics";
-    private static final Map<String, Attribute.Type> TIMER_PROPERTIES =
-            ImmutableMap.<String, Attribute.Type>builder().
-                    put("name", Attribute.Type.STRING).
-                    put("timestamp", Attribute.Type.DOUBLE).
-                    put("count", Attribute.Type.DOUBLE).
-                    put("max", Attribute.Type.FLOAT).
-                    put("mean", Attribute.Type.FLOAT).
-                    put("min", Attribute.Type.FLOAT).
-                    put("stddev", Attribute.Type.FLOAT).
-                    put("p50", Attribute.Type.FLOAT).
-                    put("p75", Attribute.Type.FLOAT).
-                    put("p95", Attribute.Type.FLOAT).
-                    put("p98", Attribute.Type.FLOAT).
-                    put("p99", Attribute.Type.FLOAT).
-                    put("p999", Attribute.Type.FLOAT).
-                    put("mean_rate", Attribute.Type.FLOAT).
-                    put("m1_rate", Attribute.Type.FLOAT).
-                    put("m5_rate", Attribute.Type.FLOAT).
-                    put("m15_rate", Attribute.Type.FLOAT).
-                    put("rate_unit", Attribute.Type.STRING).
-                    put("duration_unit", Attribute.Type.STRING).
-                    build();
+    private static final Set<Map.Entry<String, ColumnType>> TIMER_PROPERTIES = new LinkedHashSet<Map.Entry<String, ColumnType>>() {{
+        add(new AbstractMap.SimpleEntry<>("name", ColumnType.STRING));
+        add(new AbstractMap.SimpleEntry<>("timestamp", ColumnType.DOUBLE));
+        add(new AbstractMap.SimpleEntry<>("count", ColumnType.DOUBLE));
+        add(new AbstractMap.SimpleEntry<>("max", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("mean", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("min", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("stddev", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p50", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p75", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p95", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p98", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p99", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("p999", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("mean_rate", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("m1_rate", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("m5_rate", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("m15_rate", ColumnType.FLOAT));
+        add(new AbstractMap.SimpleEntry<>("rate_unit", ColumnType.STRING));
+        add(new AbstractMap.SimpleEntry<>("duration_unit", ColumnType.STRING));
+    }};
 
-
-    private final SiddhiManager siddhiManager;
+    private final StreamOperationServiceWithoutMetrics streamOperationService;
     private final Clock clock;
 
     private SiddhiStreamReporter(MetricRegistry registry,
-                                 SiddhiManager siddhiManager,
+                                 StreamOperationServiceWithoutMetrics streamOperationService,
                                  TimeUnit rateUnit,
                                  TimeUnit durationUnit,
                                  Clock clock,
                                  MetricFilter filter) {
         super(registry, "siddhi-reporter", filter, rateUnit, durationUnit);
-        this.siddhiManager = siddhiManager;
+        this.streamOperationService = streamOperationService;
         this.clock = clock;
 
         // Create metric streams
@@ -154,8 +145,8 @@ public class SiddhiStreamReporter extends ScheduledReporter {
 
     private void reportTimer(long timestamp, String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
-
         report(TIMER_STREAM_NAME,
+                TIMER_PROPERTIES,
                 name,
                 timestamp,
                 timer.getCount(),
@@ -179,6 +170,7 @@ public class SiddhiStreamReporter extends ScheduledReporter {
 
     private void reportMeter(long timestamp, String name, Meter meter) {
         report(METER_STREAM_NAME,
+                METER_PROPERTIES,
                 name,
                 timestamp,
                 meter.getCount(),
@@ -191,8 +183,8 @@ public class SiddhiStreamReporter extends ScheduledReporter {
 
     private void reportHistogram(long timestamp, String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
-
         report(HISTOGRAM_STREAM_NAME,
+                HISTOGRAM_PROPERTIES,
                 name,
                 timestamp,
                 histogram.getCount(),
@@ -209,45 +201,52 @@ public class SiddhiStreamReporter extends ScheduledReporter {
     }
 
     private void reportCounter(long timestamp, String name, Counter counter) {
-        report(COUNTER_STREAM_NAME, name, timestamp, counter.getCount());
+        report(COUNTER_STREAM_NAME, COUNTER_PROPERTIES, name, timestamp, counter.getCount());
     }
 
     private void reportGauge(long timestamp, String name, Gauge gauge) {
-        report(GAUGE_STREAM_NAME, name, timestamp, gauge.getValue());
+        report(GAUGE_STREAM_NAME, GAUGE_PROPERTIES, name, timestamp, gauge.getValue().toString());
     }
 
-    private void report(String streamName, Object... orderedValues) {
+
+    private void report(String streamName, Set<Map.Entry<String, ColumnType>> properties, Object... values) {
         try {
-            siddhiManager.getInputHandler(streamName).send(orderedValues);
-        } catch (InterruptedException e) {
+            List<ColumnNameTypeValue> columns = new ArrayList<>();
+            int i = 0;
+            for (Map.Entry<String, ColumnType> entry : properties) {
+                columns.add(new ColumnNameTypeValue(entry.getKey(), entry.getValue(), values[i]));
+                i++;
+            }
+            streamOperationService.send(streamName, columns);
+        } catch (ServiceException e) {
             LOGGER.error("Metric event not sended to stream {}", streamName, e);
+        } catch (Exception e) {
+            LOGGER.error("FATAL ERROR", e);
         }
     }
 
-    private void createStream(String name, Map<String, Attribute.Type> attributes) {
-        StreamDefinition stream = QueryFactory.createStreamDefinition().name(name);
-
-        for (Map.Entry<String, Attribute.Type> attribute : attributes.entrySet()) {
-            stream.attribute(attribute.getKey(), attribute.getValue());
+    private void createStream(String name, Set<Map.Entry<String, ColumnType>> attributes) {
+        List<ColumnNameTypeValue> columns = new ArrayList<>();
+        for (Map.Entry<String, ColumnType> attribute : attributes) {
+            columns.add(new ColumnNameTypeValue(attribute.getKey(), attribute.getValue(), null));
         }
-        siddhiManager.defineStream(stream);
+        streamOperationService.createStream(name, columns);
     }
 
-
-    public static Builder forRegistry(MetricRegistry registry, SiddhiManager siddhiManager) {
-        return new Builder(registry, siddhiManager);
+    public static Builder forRegistry(MetricRegistry registry, StreamOperationServiceWithoutMetrics streamOperationService) {
+        return new Builder(registry, streamOperationService);
     }
 
     public static class Builder {
-        private final SiddhiManager siddhiManager;
+        private final StreamOperationServiceWithoutMetrics streamOperationService;
         private final MetricRegistry registry;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private Clock clock;
         private MetricFilter filter;
 
-        private Builder(MetricRegistry registry, SiddhiManager siddhiManager) {
-            this.siddhiManager = siddhiManager;
+        private Builder(MetricRegistry registry, StreamOperationServiceWithoutMetrics streamOperationService) {
+            this.streamOperationService = streamOperationService;
             this.registry = registry;
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
@@ -276,7 +275,7 @@ public class SiddhiStreamReporter extends ScheduledReporter {
         }
 
         public SiddhiStreamReporter build() {
-            return new SiddhiStreamReporter(registry, siddhiManager,
+            return new SiddhiStreamReporter(registry, streamOperationService,
                     rateUnit,
                     durationUnit,
                     clock,
