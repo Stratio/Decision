@@ -38,6 +38,15 @@ public class StreamOperationServiceWithoutMetrics {
         this.callbackService = callbackService;
     }
 
+    public void createInternalStream(String streamName, List<ColumnNameTypeValue> columns) {
+        StreamDefinition newStream = QueryFactory.createStreamDefinition().name(streamName);
+        for (ColumnNameTypeValue column : columns) {
+            newStream.attribute(column.getColumn(), getSiddhiType(column.getType()));
+        }
+        siddhiManager.defineStream(newStream);
+        streamStatusDao.createInferredStream(streamName);
+    }
+
     public void createStream(String streamName, List<ColumnNameTypeValue> columns) {
         StreamDefinition newStream = QueryFactory.createStreamDefinition().name(streamName);
         for (ColumnNameTypeValue column : columns) {

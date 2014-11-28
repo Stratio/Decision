@@ -230,7 +230,7 @@ public class SiddhiStreamReporter extends ScheduledReporter {
         for (Map.Entry<String, ColumnType> attribute : attributes) {
             columns.add(new ColumnNameTypeValue(attribute.getKey(), attribute.getValue(), null));
         }
-        streamOperationService.createStream(name, columns);
+        streamOperationService.createInternalStream(name, columns);
     }
 
     public static Builder forRegistry(MetricRegistry registry, StreamOperationServiceWithoutMetrics streamOperationService) {
