@@ -15,7 +15,7 @@
  */
 package com.stratio.streaming.shell.command;
 
-import com.stratio.streaming.commons.exceptions.*;
+import com.stratio.streaming.commons.exceptions.StratioStreamingException;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.streams.StratioStream;
 import com.stratio.streaming.shell.converter.wrapper.ColumnNameTypeList;
@@ -75,7 +75,7 @@ public class StreamCommands implements CommandMarker {
             }
 
             return TableRenderer.renderMapDataAsTable(data, columns);
-        } catch (StratioEngineOperationException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -88,7 +88,7 @@ public class StreamCommands implements CommandMarker {
             cachedStreamsDAO.newStream(streamName, columns);
             return "Stream ".concat(streamName).concat(" created correctly");
 
-        } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -99,7 +99,7 @@ public class StreamCommands implements CommandMarker {
         try {
             cachedStreamsDAO.dropStream(streamName);
             return "Stream ".concat(streamName).concat(" dropped correctly");
-        } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -112,7 +112,7 @@ public class StreamCommands implements CommandMarker {
             ssaw.api().alterStream(streamName, columns);
             return "Stream ".concat(streamName).concat(" altered correctly");
 
-        } catch (StratioEngineStatusException | StratioEngineConnectionException | StratioAPISecurityException | StratioEngineOperationException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -124,7 +124,7 @@ public class StreamCommands implements CommandMarker {
         try {
             ssaw.api().insertData(streamName, columns);
             return "Added an event to stream ".concat(streamName).concat(" correctly");
-        } catch (StratioEngineStatusException | StratioEngineConnectionException | StratioAPISecurityException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }

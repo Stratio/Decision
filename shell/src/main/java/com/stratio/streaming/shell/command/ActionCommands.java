@@ -15,9 +15,7 @@
  */
 package com.stratio.streaming.shell.command;
 
-import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
-import com.stratio.streaming.commons.exceptions.StratioEngineConnectionException;
-import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
+import com.stratio.streaming.commons.exceptions.StratioStreamingException;
 import com.stratio.streaming.shell.exception.StreamingShellException;
 import com.stratio.streaming.shell.wrapper.StratioStreamingApiWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +36,7 @@ public class ActionCommands implements CommandMarker {
         try {
             ssaw.api().indexStream(streamName);
             return "Stream ".concat(streamName).concat(" indexed correctly");
-        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -49,7 +47,7 @@ public class ActionCommands implements CommandMarker {
         try {
             ssaw.api().stopIndexStream(streamName);
             return "Stream ".concat(streamName).concat(" unindexed correctly");
-        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -60,7 +58,7 @@ public class ActionCommands implements CommandMarker {
         try {
             ssaw.api().saveToCassandra(streamName);
             return "Stream ".concat(streamName).concat(" attached to cassandra correctly");
-        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -71,7 +69,7 @@ public class ActionCommands implements CommandMarker {
         try {
             ssaw.api().stopSaveToCassandra(streamName);
             return "Stream ".concat(streamName).concat(" de-attached from cassandra correctly");
-        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -82,7 +80,7 @@ public class ActionCommands implements CommandMarker {
         try {
             ssaw.api().saveToMongo(streamName);
             return "Stream ".concat(streamName).concat(" attached to mongo correctly");
-        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -93,7 +91,7 @@ public class ActionCommands implements CommandMarker {
         try {
             ssaw.api().stopSaveToMongo(streamName);
             return "Stream ".concat(streamName).concat(" de-attached from mongo correctly");
-        } catch (StratioEngineStatusException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -104,7 +102,7 @@ public class ActionCommands implements CommandMarker {
         try {
             ssaw.api().listenStream(streamName);
             return "Stream ".concat(streamName).concat(" listened correctly");
-        } catch (StratioEngineStatusException | StratioEngineConnectionException | StratioAPISecurityException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -115,7 +113,7 @@ public class ActionCommands implements CommandMarker {
         try {
             ssaw.api().stopListenStream(streamName);
             return "Stream ".concat(streamName).concat(" unlistened correctly");
-        } catch (StratioEngineStatusException | StratioEngineConnectionException | StratioAPISecurityException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }

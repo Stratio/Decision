@@ -15,10 +15,7 @@
  */
 package com.stratio.streaming.shell.command;
 
-import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
-import com.stratio.streaming.commons.exceptions.StratioEngineConnectionException;
-import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
-import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
+import com.stratio.streaming.commons.exceptions.StratioStreamingException;
 import com.stratio.streaming.shell.exception.StreamingShellException;
 import com.stratio.streaming.shell.wrapper.StratioStreamingApiWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +37,7 @@ public class QueryCommands implements CommandMarker {
             String queryId = ssaw.api().addQuery(streamName, query);
             return "Query ".concat(streamName).concat(" created correctly with id ".concat(queryId));
 
-        } catch (StratioEngineStatusException | StratioAPISecurityException | StratioEngineOperationException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
@@ -52,7 +49,7 @@ public class QueryCommands implements CommandMarker {
         try {
             ssaw.api().removeQuery(streamName, queryId);
             return "Query ".concat(streamName).concat(" dropped correctly with id ".concat(queryId));
-        } catch (StratioEngineStatusException | StratioEngineOperationException | StratioEngineConnectionException e) {
+        } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
