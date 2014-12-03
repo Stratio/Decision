@@ -5,7 +5,6 @@
 #
 #
 
-
 ##############
 ## SERVICES ##
 ##############
@@ -19,24 +18,17 @@ chkconfig kafka on
 chkconfig cassandra on
 chkconfig elasticsearch on
 
-
 if ! grep -R "analyzer.default.type" "/etc/sds/elasticsearch/elasticsearch.yml"; then
     echo "index.analysis.analyzer.default.type: keyword" >> /etc/sds/elasticsearch/elasticsearch.yml
 fi
 
-
 service zookeeper restart
-sleep 10
 service kafka restart
 service cassandra restart
 service mongod restart
 service elasticsearch restart
-sleep 10
 service streaming restart
 service httpd restart
-
-
-
 
 ############
 ## KIBANA ##
@@ -51,7 +43,6 @@ if [ ! -d "/var/www/html/kibana" ]; then
 	mv /var/www/html/kibana-3.1.0 /var/www/html/kibana
 fi
 
-
 ################################
 ## STRATIO STREAMING EXAMPLES ##
 ################################
@@ -61,14 +52,12 @@ DOWNLOAD_EXAMPLES_URL="https://s3.amazonaws.com/stratioorg/streaming-examples-${
 echo $DOWNLOAD_EXAMPLES_URL
 
 if [ ! -d "/opt/sds/streaming-examples" ]; then
-
 	echo -e 'Building Stratio Streaming Examples...'
 	mkdir /opt/sds/streaming-examples	
 	wget -q $DOWNLOAD_EXAMPLES_URL -P /home/vagrant/downloads
 	tar -xzf /home/vagrant/downloads/streaming-examples-$STRATIO_MODULE_VERSION-app.tar.gz -C /home/vagrant/downloads
 	cp -fr /home/vagrant/downloads/streaming-examples-$STRATIO_MODULE_VERSION/* /opt/sds/streaming-examples
 fi
-
 
 #######################
 ## KIBANA DASHBOARDS ##
@@ -77,9 +66,6 @@ fi
 cp -f /opt/sds/streaming-examples/dashboards/*.json /var/www/html/kibana/app/dashboards
 chmod -R 777 /var/www/html/kibana/app/dashboards
 
-
 #####################
 ## WELCOME MESSAGE ##
 #####################
-
-
