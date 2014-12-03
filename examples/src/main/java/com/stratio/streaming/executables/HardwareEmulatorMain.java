@@ -149,7 +149,6 @@ public class HardwareEmulatorMain {
 
                 List<ColumnNameTypeValue> sensorData = Lists.newArrayList();
                 sensorData.add(new ColumnNameTypeValue("name", null, name));
-                sensorData.add(new ColumnNameTypeValue("ind", null, 1));
                 sensorData.add(new ColumnNameTypeValue("data", null, value));
 
                 message.setColumns(sensorData);

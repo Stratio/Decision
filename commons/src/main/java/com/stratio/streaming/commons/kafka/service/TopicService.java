@@ -15,7 +15,9 @@
  */
 package com.stratio.streaming.commons.kafka.service;
 
-public interface TopicService {
+import java.io.Closeable;
+
+public interface TopicService extends Closeable {
 
     void createTopicIfNotExist(String topic, int replicationFactor, int partitions);
 

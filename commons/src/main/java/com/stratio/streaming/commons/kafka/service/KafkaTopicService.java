@@ -15,8 +15,7 @@
  */
 package com.stratio.streaming.commons.kafka.service;
 
-import java.util.Arrays;
-
+import com.stratio.streaming.commons.kafka.serializer.ZkStringSerializer;
 import kafka.admin.AdminUtils;
 import kafka.common.Topic;
 import kafka.javaapi.TopicMetadata;
@@ -24,15 +23,14 @@ import kafka.javaapi.TopicMetadataRequest;
 import kafka.javaapi.TopicMetadataResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.utils.ZkUtils;
-
 import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import scala.collection.Map;
 import scala.collection.Seq;
 
-import com.stratio.streaming.commons.kafka.serializer.ZkStringSerializer;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class KafkaTopicService implements TopicService {
 
@@ -46,7 +44,7 @@ public class KafkaTopicService implements TopicService {
     private final static String CONSUMER_CLIENT_ID = "leaderLookup";
 
     public KafkaTopicService(String zokeeperCluster, String broker, int brokerPort, int connectionTimeout,
-            int sessionTimeout) {
+                             int sessionTimeout) {
         this.zkClient = new ZkClient(zokeeperCluster, sessionTimeout, connectionTimeout, new ZkStringSerializer());
         this.simpleConsumer = new SimpleConsumer(broker, brokerPort, CONSUMER_TIMEOUT, CONSUMER_BUFFER_SIZE,
                 CONSUMER_CLIENT_ID);
@@ -88,5 +86,11 @@ public class KafkaTopicService implements TopicService {
         }
         logger.warn("Metadata info not found!. TOPIC {}", topic);
         return null;
+    }
+
+    @Override
+    public void close() throws IOException {
+        zkClient.close();
+        simpleConsumer.close();
     }
 }

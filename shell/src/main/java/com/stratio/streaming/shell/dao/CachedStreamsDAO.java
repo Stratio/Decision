@@ -18,22 +18,19 @@ package com.stratio.streaming.shell.dao;
 import java.util.List;
 
 import com.stratio.streaming.api.messaging.ColumnNameType;
-import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
-import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
-import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
-import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
+import com.stratio.streaming.commons.exceptions.*;
 import com.stratio.streaming.commons.streams.StratioStream;
 
 public interface CachedStreamsDAO {
 
-    List<StratioStream> listStreams() throws StratioEngineStatusException, StratioAPIGenericException;
+    List<StratioStream> listStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException;
 
     void newStream(String name, List<ColumnNameType> columns) throws StratioEngineStatusException,
-            StratioAPISecurityException, StratioEngineOperationException;
+            StratioAPISecurityException, StratioEngineOperationException, StratioEngineConnectionException;
 
     void dropStream(String name) throws StratioEngineStatusException, StratioAPISecurityException,
-            StratioEngineOperationException;
+            StratioEngineOperationException, StratioEngineConnectionException;
 
-    List<StratioStream> listUncachedStreams() throws StratioEngineStatusException, StratioAPIGenericException;
+    List<StratioStream> listUncachedStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException;
 
 }

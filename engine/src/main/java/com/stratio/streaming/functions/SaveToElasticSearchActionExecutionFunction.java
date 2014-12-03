@@ -15,9 +15,8 @@
  */
 package com.stratio.streaming.functions;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
@@ -30,8 +29,9 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
-import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecutionFunction {
 
@@ -43,12 +43,12 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
 
     private Client elasticSearchClient;
 
-    private final String elasticSearchHost;
-    private final int elasticSearchPort;
+    private final List<String> elasticSearchHosts;
+    private final String elasticSearchClusterName;
 
-    public SaveToElasticSearchActionExecutionFunction(String elasticSearchHost, int elasticSearchPort) {
-        this.elasticSearchHost = elasticSearchHost;
-        this.elasticSearchPort = elasticSearchPort;
+    public SaveToElasticSearchActionExecutionFunction(List<String> elasticSearchHosts, String elasticSearchClusterName) {
+        this.elasticSearchHosts = elasticSearchHosts;
+        this.elasticSearchClusterName = elasticSearchClusterName;
     }
 
     @Override
@@ -83,10 +83,16 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
 
     private Client getClient() {
         if (elasticSearchClient == null) {
-            Settings settings = ImmutableSettings.settingsBuilder().put("client.transport.ignore_cluster_name", true)
+            Settings settings = ImmutableSettings.settingsBuilder()
+                    .put("client.transport.ignore_cluster_name", true)
+                    .put("cluster.name", elasticSearchClusterName)
                     .build();
-            elasticSearchClient = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress(
-                    elasticSearchHost, elasticSearchPort));
+            TransportClient tc = new TransportClient(settings);
+            for (String elasticSearchHost : elasticSearchHosts) {
+                String[] elements = elasticSearchHost.split(":");
+                tc.addTransportAddress(new InetSocketTransportAddress(elements[0], Integer.parseInt(elements[1])));
+            }
+            elasticSearchClient = tc;
         }
         return elasticSearchClient;
     }

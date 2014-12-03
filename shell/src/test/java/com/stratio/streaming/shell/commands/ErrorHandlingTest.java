@@ -15,17 +15,13 @@
  */
 package com.stratio.streaming.shell.commands;
 
-import static org.junit.Assert.assertEquals;
-
+import com.stratio.streaming.commons.exceptions.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.shell.core.CommandResult;
 
-import com.stratio.streaming.commons.exceptions.StratioAPIGenericException;
-import com.stratio.streaming.commons.exceptions.StratioAPISecurityException;
-import com.stratio.streaming.commons.exceptions.StratioEngineOperationException;
-import com.stratio.streaming.commons.exceptions.StratioEngineStatusException;
+import static org.junit.Assert.assertEquals;
 
 public class ErrorHandlingTest extends BaseShellTest {
 
@@ -41,8 +37,8 @@ public class ErrorHandlingTest extends BaseShellTest {
 
     @Test
     public void listWith0StreamsTest() throws StratioEngineStatusException, StratioAPIGenericException,
-            StratioAPISecurityException, StratioEngineOperationException {
-        Mockito.when(stratioStreamingApi.addQuery(Mockito.anyString(), Mockito.anyString())).thenThrow(
+            StratioAPISecurityException, StratioEngineOperationException, StratioEngineConnectionException {
+        Mockito.when(ssaw.api().addQuery(Mockito.anyString(), Mockito.anyString())).thenThrow(
                 new StratioEngineOperationException(GOOD_ERROR_MESSAGE));
 
         CommandResult cr = shell

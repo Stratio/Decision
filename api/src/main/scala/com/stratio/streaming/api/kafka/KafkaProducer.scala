@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,20 +15,21 @@
  */
 package com.stratio.streaming.kafka
 
-import java.util.UUID
-import java.util.Properties
+import java.io.Closeable
+import java.util.{Properties, UUID}
+
 import kafka.producer._
 import org.slf4j.LoggerFactory
 
 case class KafkaProducer(topic: String,
-                          brokerList: String,
-                          clientId: String = UUID.randomUUID().toString,
-                          synchronously: Boolean = true,
-                          compress: Boolean = true,
-                          batchSize: Integer = 200,
-                          messageSendMaxRetries: Integer = 3,
-                          requestRequiredAcks: Integer = -1
-                          ) {
+                         brokerList: String,
+                         clientId: String = UUID.randomUUID().toString,
+                         synchronously: Boolean = true,
+                         compress: Boolean = true,
+                         batchSize: Integer = 200,
+                         messageSendMaxRetries: Integer = 3,
+                         requestRequiredAcks: Integer = -1
+                          ) extends Closeable {
 
   val props = new Properties()
   val log = LoggerFactory.getLogger(getClass)
@@ -40,14 +41,18 @@ case class KafkaProducer(topic: String,
 
   val producer = new Producer[AnyRef, AnyRef](new ProducerConfig(props))
 
+  override def close(): Unit = {
+    producer.close
+  }
+
   def send(message: String, key: String) = {
     try {
-      log.info("Sending KeyedMessage[key, value]: ["+key+","+message+"]")
+      log.info("Sending KeyedMessage[key, value]: [" + key + "," + message + "]")
       producer.send(new KeyedMessage(topic, key, message))
     } catch {
       case e: Exception =>
-        log.error("Error sending KeyedMessage[key, value]: ["+key+","+message+"]")
-        log.error("Exception: "+e.getMessage)
+        log.error("Error sending KeyedMessage[key, value]: [" + key + "," + message + "]")
+        log.error("Exception: " + e.getMessage)
     }
   }
 }

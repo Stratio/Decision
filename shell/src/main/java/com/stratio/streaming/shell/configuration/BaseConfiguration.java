@@ -15,31 +15,30 @@
  */
 package com.stratio.streaming.shell.configuration;
 
-import java.util.List;
-
+import com.stratio.streaming.commons.streams.StratioStream;
+import com.stratio.streaming.shell.dao.CachedStreamsDAO;
+import com.stratio.streaming.shell.dao.impl.CachedStreamsDAOImpl;
+import com.stratio.streaming.shell.renderer.Renderer;
+import com.stratio.streaming.shell.renderer.StreamListRenderer;
+import com.stratio.streaming.shell.wrapper.StratioStreamingApiWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
-import com.stratio.streaming.api.IStratioStreamingAPI;
-import com.stratio.streaming.commons.streams.StratioStream;
-import com.stratio.streaming.shell.dao.CachedStreamsDAO;
-import com.stratio.streaming.shell.dao.impl.CachedStreamsDAOImpl;
-import com.stratio.streaming.shell.renderer.Renderer;
-import com.stratio.streaming.shell.renderer.StreamListRenderer;
+import java.util.List;
 
 @Configuration
-@Import({ StreamingApiConfiguration.class, CacheConfiguration.class })
+@Import({StreamingApiConfiguration.class, CacheConfiguration.class, StreamingApiWrapperConfiguration.class})
 public class BaseConfiguration {
 
     @Autowired
-    private IStratioStreamingAPI stratioStreamingApi;
+    private StratioStreamingApiWrapper ssaw;
 
     @Bean
     public CachedStreamsDAO cachedStreamsDao() {
-        return new CachedStreamsDAOImpl(stratioStreamingApi);
+        return new CachedStreamsDAOImpl(ssaw);
     }
 
     @Bean
