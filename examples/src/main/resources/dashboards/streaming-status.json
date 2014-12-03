@@ -1,5 +1,5 @@
 {
-  "title": "New Dashboard",
+  "title": "Stratio Streaming Engine",
   "services": {
     "query": {
       "list": {
@@ -8,7 +8,7 @@
           "type": "lucene",
           "query": "*",
           "alias": "Perfomance Metrics",
-          "color": "#447EBC",
+          "color": "#FCEACA",
           "pin": false,
           "enable": true
         },
@@ -23,7 +23,7 @@
         },
         "2": {
           "id": 2,
-          "color": "#E24D42",
+          "color": "#890F02",
           "alias": "Remove",
           "pin": true,
           "type": "lucene",
@@ -50,7 +50,7 @@
         },
         "5": {
           "id": 5,
-          "color": "#629E51",
+          "color": "#7EB26D",
           "alias": "Add Query",
           "pin": true,
           "type": "lucene",
@@ -68,7 +68,7 @@
         },
         "7": {
           "id": 7,
-          "color": "#705DA0",
+          "color": "#EA6460",
           "alias": "Sended events",
           "pin": true,
           "type": "lucene",
@@ -104,33 +104,116 @@
           "active": true,
           "alias": "",
           "id": 1
-        },
-        "2": {
-          "type": "time",
-          "field": "@timestamp",
-          "from": "now-15m",
-          "to": "now",
-          "mandate": "must",
-          "active": true,
-          "alias": "",
-          "id": 2
         }
       },
       "ids": [
         0,
-        1,
-        2
+        1
       ]
     }
   },
   "rows": [
     {
-      "title": "Statistics",
-      "height": "315px",
+      "title": "Trends",
+      "height": "50px",
       "editable": true,
       "collapse": false,
       "collapsable": true,
       "panels": [
+        {
+          "error": false,
+          "span": 8,
+          "editable": true,
+          "type": "text",
+          "loadingEditor": false,
+          "mode": "html",
+          "content": "<a href=\"http://www.stratio.com\"><img title=\"Stratio\" alt=\"statio.com\" src=\"http://www.stratio.com/wp-content/themes/stratio-theme/images/logo1.png\"><img class=\"logoTexto\" title=\"Stratio\" alt=\"stratio.com\" src=\"http://www.stratio.com/wp-content/themes/stratio-theme/images/logo2.png\"></a>\n<h3 color=\"#1AB7EA\"\">Stratio Streaming Engine Monitoring</h3>\n<p></p>\n\n<p>Stratio Streaming is the result of combining the power of Spark Streaming as a continuous computing framework and Siddhi CEP engine as complex event processing engine.</p>\n<p>This dashboard is showing some statistics related to the status of the Stratio Streaming engine, allowing you to inspect commands, events and throughput, in a real-time panel.</p>\n<p>This way, we&nbsp;took advantage of the engine itself to take care of all the internal events produced by the engine.</p>\n<p>In order to get this dashboard working, please execute the following commands in the shell:</p>\n<p>&nbsp;</p>\n<ul>\n<li>index start --stream streaming-gauge-metrics</li>\n<li>index start --stream streaming-meter-metrics</li>\n<li>index start --stream streaming-counter-metrics</li>\n<li>index start --stream streaming-histogram-metrics</li>\n<li>index start --stream streaming-timer-metrics</li>\n</ul>",
+          "style": {},
+          "title": "Stratio Streaming Engine Monitoring"
+        },
+        {
+          "error": false,
+          "span": 4,
+          "editable": true,
+          "type": "text",
+          "loadingEditor": false,
+          "mode": "html",
+          "content": "<center><a href=\"http://es.slideshare.net/Stratio/spark-summit-stratio-streaming\" target=\"_blank\"><img title=\"Stratio\" alt=\"statio.com\" src=\"http://www.openstratio.org/wp-content/uploads/2014/12/ppt_streaming.png\" width=\"530\"></a></center>",
+          "style": {},
+          "title": "Stratio Streaming Overview"
+        }
+      ],
+      "notice": false
+    },
+    {
+      "title": "Commands",
+      "height": "300px",
+      "editable": true,
+      "collapse": false,
+      "collapsable": true,
+      "panels": [
+        {
+          "error": false,
+          "span": 4,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "name",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "term",
+          "style": {
+            "font-size": "10pt"
+          },
+          "donut": true,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "above",
+          "spyable": true,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "max",
+          "valuefield": "count",
+          "title": "Commands"
+        },
+        {
+          "span": 1,
+          "editable": true,
+          "type": "sparklines",
+          "loadingEditor": false,
+          "mode": "total",
+          "time_field": "@timestamp",
+          "value_field": "count",
+          "interval": "30s",
+          "spyable": true,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ]
+          },
+          "title": "Statistics",
+          "derivative": true
+        },
         {
           "span": 7,
           "editable": true,
@@ -208,71 +291,6 @@
             "query_as_alias": true
           },
           "title": "Commands"
-        },
-        {
-          "span": 1,
-          "editable": true,
-          "type": "sparklines",
-          "loadingEditor": false,
-          "mode": "total",
-          "time_field": "@timestamp",
-          "value_field": "count",
-          "interval": "1m",
-          "spyable": true,
-          "queries": {
-            "mode": "selected",
-            "ids": [
-              1,
-              2,
-              3,
-              4,
-              5,
-              6
-            ]
-          },
-          "title": "Statistics",
-          "derivative": true
-        },
-        {
-          "error": false,
-          "span": 4,
-          "editable": true,
-          "type": "stats",
-          "loadingEditor": false,
-          "queries": {
-            "mode": "selected",
-            "ids": [
-              1,
-              2,
-              3,
-              4,
-              5,
-              6
-            ]
-          },
-          "style": {
-            "font-size": "72pt"
-          },
-          "format": "number",
-          "mode": "total",
-          "display_breakdown": "yes",
-          "sort_field": "",
-          "sort_reverse": false,
-          "label_name": "Query",
-          "value_name": "Value",
-          "spyable": true,
-          "show": {
-            "count": true,
-            "min": true,
-            "max": true,
-            "mean": true,
-            "std_deviation": false,
-            "sum_of_squares": false,
-            "total": true,
-            "variance": false
-          },
-          "title": "Commands",
-          "field": "count"
         }
       ],
       "notice": false
@@ -475,7 +493,7 @@
           },
           "auto_int": true,
           "resolution": 100,
-          "interval": "10s",
+          "interval": "1y",
           "intervals": [
             "auto",
             "1s",
@@ -516,63 +534,9 @@
         }
       ],
       "notice": false
-    },
-    {
-      "title": "",
-      "height": "150px",
-      "editable": true,
-      "collapse": false,
-      "collapsable": true,
-      "panels": [
-        {
-          "error": false,
-          "span": 12,
-          "editable": true,
-          "type": "table",
-          "loadingEditor": false,
-          "size": 100,
-          "pages": 5,
-          "offset": 0,
-          "sort": [
-            "_score",
-            "desc"
-          ],
-          "overflow": "min-height",
-          "fields": [],
-          "highlight": [],
-          "sortable": true,
-          "header": true,
-          "paging": true,
-          "field_list": true,
-          "all_fields": false,
-          "trimFactor": 300,
-          "localTime": false,
-          "timeField": "@timestamp",
-          "spyable": true,
-          "queries": {
-            "mode": "all",
-            "ids": [
-              0,
-              1,
-              2,
-              3,
-              4,
-              5,
-              6,
-              7
-            ]
-          },
-          "style": {
-            "font-size": "9pt"
-          },
-          "normTimes": true,
-          "title": "Table"
-        }
-      ],
-      "notice": false
     }
   ],
-  "editable": true,
+  "editable": false,
   "failover": false,
   "index": {
     "interval": "none",
@@ -581,11 +545,11 @@
     "warm_fields": true
   },
   "style": "dark",
-  "panel_hints": true,
+  "panel_hints": false,
   "pulldowns": [
     {
       "type": "query",
-      "collapse": false,
+      "collapse": true,
       "notice": false,
       "enable": true,
       "query": "*",
@@ -604,8 +568,8 @@
     },
     {
       "type": "filtering",
-      "collapse": false,
-      "notice": true,
+      "collapse": true,
+      "notice": false,
       "enable": true
     }
   ],
@@ -640,7 +604,7 @@
         "1d"
       ],
       "timefield": "@timestamp",
-      "now": true,
+      "now": false,
       "filter_id": 2
     }
   ],
