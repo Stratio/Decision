@@ -19,6 +19,21 @@ chkconfig streaming off
 chkconfig cassandra on
 chkconfig elasticsearch on
 
+cat >>/etc/rc.local <<EOF
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+service zookeeper start
+service kafka start
+service streaming start
+
+touch /var/lock/subsys/local
+
+EOF
+
 if ! grep -R "analyzer.default.type" "/etc/sds/elasticsearch/elasticsearch.yml"; then
     echo "index.analysis.analyzer.default.type: keyword" >> /etc/sds/elasticsearch/elasticsearch.yml
 fi
