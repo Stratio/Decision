@@ -19,7 +19,7 @@ chkconfig streaming off
 chkconfig cassandra on
 chkconfig elasticsearch on
 
-cat >>/etc/rc.local <<EOF
+cat >/etc/rc.local <<EOF
 #!/bin/sh
 #
 # This script will be executed *after* all the other init scripts.
