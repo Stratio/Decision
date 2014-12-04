@@ -27,7 +27,9 @@ cat >/etc/rc.local <<EOF
 # want to do the full Sys V style init stuff.
 
 service zookeeper start
+sleep 5
 service kafka start
+sleep 5
 service streaming start
 
 touch /var/lock/subsys/local
