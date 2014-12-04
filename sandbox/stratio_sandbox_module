@@ -13,8 +13,9 @@ echo -e 'Installing Stratio Streaming services...'
 
 yum -y -q --nogpgcheck install httpd stratio-streaming stratio-streaming-shell
 
-chkconfig zookeeper on
-chkconfig kafka on
+chkconfig zookeeper off
+chkconfig kafka off
+chkconfig streaming off
 chkconfig cassandra on
 chkconfig elasticsearch on
 
