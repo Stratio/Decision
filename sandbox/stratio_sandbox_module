@@ -18,6 +18,7 @@ chkconfig kafka off
 chkconfig streaming off
 chkconfig cassandra on
 chkconfig elasticsearch on
+chkconfig httpd on
 
 cat >/etc/rc.local <<EOF
 #!/bin/sh
