@@ -46,7 +46,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "name:\"threads\""
+          "query": "name:threads"
         },
         "5": {
           "id": 5,
@@ -318,7 +318,7 @@
           "counter_pos": "below",
           "spyable": true,
           "queries": {
-            "mode": "pinned",
+            "mode": "all",
             "ids": [
               0,
               1,
@@ -463,22 +463,22 @@
       "query": "*",
       "pinned": true,
       "history": [
-        "name:\"Running Processes\"",
+        "name:Running Processes",
         "name:Threads",
         "name:\"Memory Swap\"",
-        "name:\"Disk Usage\"",
-        "name:\"Memory\"",
-        "name:\"CPU\"",
-        "name:Running Processes",
         "name:Disk Usage",
+        "name:\"Memory\"",
         "name:CPU",
-        "name:Humidity"
+        "name:Humidity",
+        "name:Pressure",
+        "name:anemometer",
+        "name:carbon"
       ],
       "remember": 10
     },
     {
       "type": "filtering",
-      "collapse": true,
+      "collapse": false,
       "notice": true,
       "enable": true
     }

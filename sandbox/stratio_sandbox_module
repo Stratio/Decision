@@ -5,7 +5,6 @@
 #
 #
 
-
 ##############
 ## SERVICES ##
 ##############
@@ -14,23 +13,41 @@ echo -e 'Installing Stratio Streaming services...'
 
 yum -y -q --nogpgcheck install httpd stratio-streaming stratio-streaming-shell
 
-chkconfig zookeeper on
-chkconfig kafka on
+chkconfig zookeeper off
+chkconfig kafka off
+chkconfig streaming off
 chkconfig cassandra on
 chkconfig elasticsearch on
+chkconfig httpd on
+
+cat >/etc/rc.local <<EOF
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+service zookeeper start
+sleep 5
+service kafka start
+sleep 5
+service streaming start
+
+touch /var/lock/subsys/local
+
+EOF
+
+if ! grep -R "analyzer.default.type" "/etc/sds/elasticsearch/elasticsearch.yml"; then
+    echo "index.analysis.analyzer.default.type: keyword" >> /etc/sds/elasticsearch/elasticsearch.yml
+fi
 
 service zookeeper restart
-sleep 10
 service kafka restart
 service cassandra restart
 service mongod restart
 service elasticsearch restart
-sleep 10
 service streaming restart
 service httpd restart
-
-
-
 
 ############
 ## KIBANA ##
@@ -45,7 +62,6 @@ if [ ! -d "/var/www/html/kibana" ]; then
 	mv /var/www/html/kibana-3.1.0 /var/www/html/kibana
 fi
 
-
 ################################
 ## STRATIO STREAMING EXAMPLES ##
 ################################
@@ -55,14 +71,12 @@ DOWNLOAD_EXAMPLES_URL="https://s3.amazonaws.com/stratioorg/streaming-examples-${
 echo $DOWNLOAD_EXAMPLES_URL
 
 if [ ! -d "/opt/sds/streaming-examples" ]; then
-
 	echo -e 'Building Stratio Streaming Examples...'
 	mkdir /opt/sds/streaming-examples	
 	wget -q $DOWNLOAD_EXAMPLES_URL -P /home/vagrant/downloads
 	tar -xzf /home/vagrant/downloads/streaming-examples-$STRATIO_MODULE_VERSION-app.tar.gz -C /home/vagrant/downloads
 	cp -fr /home/vagrant/downloads/streaming-examples-$STRATIO_MODULE_VERSION/* /opt/sds/streaming-examples
 fi
-
 
 #######################
 ## KIBANA DASHBOARDS ##
@@ -71,9 +85,6 @@ fi
 cp -f /opt/sds/streaming-examples/dashboards/*.json /var/www/html/kibana/app/dashboards
 chmod -R 777 /var/www/html/kibana/app/dashboards
 
-
 #####################
 ## WELCOME MESSAGE ##
 #####################
-
-
