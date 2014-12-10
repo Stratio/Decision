@@ -138,7 +138,7 @@ To put all these pieces to work, you need to:
 -    /opt/sds/streaming-shell/bin/shell
 -    Creation of a base stream, where we are going to insert all the sensor measures. A stream definition is similar to a table, with field definition and types:
 ```
-    create --stream sensor_grid --definition "name.string,data.double,ind.integer"
+    create --stream sensor_grid --definition "name.string,data.double"
 ```
 -    **List** command allow us to check out the current state of the CEP engine. How many streams and queries are already created?, Which actions are enabled on a stream?, What is the definition of a stream?
 ```
