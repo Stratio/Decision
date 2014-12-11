@@ -138,7 +138,7 @@ To put all these pieces to work, you need to:
 -    /opt/sds/streaming-shell/bin/shell
 -    Creation of a base stream, where we are going to insert all the sensor measures. A stream definition is similar to a table, with field definition and types:
 ```
-    create --stream sensor_grid --definition "name.string,data.double,ind.integer"
+    create --stream sensor_grid --definition "name.string,data.double"
 ```
 -    **List** command allow us to check out the current state of the CEP engine. How many streams and queries are already created?, Which actions are enabled on a stream?, What is the definition of a stream?
 ```
@@ -192,7 +192,50 @@ To put all these pieces to work, you need to:
 
 #### Dashboard steps
 
--    Open a browser on your machine and go here: http://10.10.10.10/kibana/index.html#/dashboard/file/sensor-grid-monitoring.json
+-    Open a browser on your machine and go here: http://[SANDBOX_IP]/kibana/index.html#/dashboard/file/sensor-grid-monitoring.json
 -    Thanks to this real-time dashboard, you can watch all the things happening inside the engine. All the aggregated events, alarms in some fancy widgets.
 
 ![Kibana sensor grid dashboard](images/kibana-sensor-grid-dashboard.png)
+
+Extra: Streaming metrics
+--------------------------
+
+Stratio Streaming is the result of combining the power of Spark Streaming as a continuous computing framework and Siddhi CEP engine as complex event processing engine. This dashboard is showing some statistics related to the status of the Stratio Streaming engine, allowing you to inspect commands, events and throughput, in a real-time panel. This way, we took advantage of the engine itself to take care of all the internal events produced by the engine. In order to get this dashboard working, please execute the following commands:
+
+-    To start we need change some properties into streaming engine configuration.
+```
+    sudo vi /etc/sds/streaming/config.conf
+```
+-    Set __statsEnabled__ property to true.
+-    Now, is necessary to restart streaming service.
+```
+    sudo service streaming restart
+```
+-    Using the shell, execute this commands:
+```
+    /opt/sds/streaming-shell/bin/shell
+```
+-    You can execute into shell the list command and you should obtain this result:
+```
+stratio-streaming> list
+  Stream name                  User defined  Queries  Elements  Active actions
+  ---------------------------  ------------  -------  --------  --------------
+  streaming-gauge-metrics      false         0        3         []
+  streaming-counter-metrics    false         0        3         []
+  streaming-histogram-metrics  false         0        13        []
+  streaming-meter-metrics      false         0        8         []
+  streaming-timer-metrics      false         0        19        []
+
+```
+-    Execute this commands to index all metric streams
+```
+    index start --stream streaming-gauge-metrics 
+    index start --stream streaming-meter-metrics 
+    index start --stream streaming-counter-metrics 
+    index start --stream streaming-histogram-metrics 
+    index start --stream streaming-timer-metrics
+```
+-    Now, you can access to metrics kibana dashboard:
+```
+    http://[SANDBOX_IP]/kibana/index.html#/dashboard/file/streaming-status.json
+```
