@@ -33,7 +33,7 @@ import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.dto.StratioQueryStream
 import com.stratio.streaming.kafka.{KafkaConsumer, KafkaProducer}
 import com.stratio.streaming.messaging.{InsertMessageBuilder, QueryMessageBuilder, StreamMessageBuilder}
-import org.apache.curator.framework.api.CuratorEventType.WATCHED
+import org.apache.curator.framework.api.CuratorEventType.{CLOSING, WATCHED}
 import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.RetryOneTime
@@ -342,6 +342,9 @@ object StratioStreamingAPI
               case true => streamingUpAndRunning = true
               case false => streamingUpAndRunning = false
             }
+          }
+          case CLOSING => {
+            log.debug("Closing zookeeper connection.")
           }
         }
       }
