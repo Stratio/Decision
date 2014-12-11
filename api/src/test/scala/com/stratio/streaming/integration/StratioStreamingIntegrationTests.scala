@@ -42,11 +42,6 @@ class StratioStreamingIntegrationTests
   with BeforeAndAfterEach
   with BeforeAndAfterAll {
 
-  var zookeeperHost: String = _
-  var zookeeperPort: Int = _
-  var kafkaHost: String = _
-  var kafkaPort: Int = _
-
   var zookeeperCluster: String = _
   val retryPolicy = new RetryOneTime(500)
   var zookeeperClient: CuratorFramework = _
@@ -67,15 +62,18 @@ class StratioStreamingIntegrationTests
 
   override def beforeAll(conf: ConfigMap) {
     if (configurationHasBeenDefinedThroughCommandLine(conf)) {
-      zookeeperHost = conf.get("zookeeperHost").get.toString
-      zookeeperPort = conf.get("zookeeperPort").get.toString.toInt
-      kafkaHost = conf.get("kafkaHost").get.toString
-      kafkaPort = conf.get("kafkaPort").get.toString.toInt
+      val zookeeperHost = conf.get("zookeeperHost").get.toString
+      val zookeeperPort = conf.get("zookeeperPort").get.toString.toInt
+      val kafkaHost = conf.get("kafkaHost").get.toString
+      val kafkaPort = conf.get("kafkaPort").get.toString.toInt
 
       elasticSearchHost = conf.get("elasticSearchHost").get.toString
       elasticSearchPort = conf.get("elasticSearchPort").get.toString
 
-      initializeApi
+      streamingAPI.initializeWithServerConfig(kafkaHost,
+        kafkaPort,
+        zookeeperHost,
+        zookeeperPort)
 
       zookeeperCluster = s"$zookeeperHost:$zookeeperPort"
       zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
@@ -875,22 +873,6 @@ class StratioStreamingIntegrationTests
         streamingAPI.createStream(testStreamName, columnList)
       }
     }
-  }
-
-  describe("The streaming api close") {
-    it("should close and open correctly") {
-      streamingAPI.close
-      initializeApi
-
-      assert(streamingAPI.isInit())
-    }
-  }
-
-  private def initializeApi(): Unit = {
-    streamingAPI.initializeWithServerConfig(kafkaHost,
-      kafkaPort,
-      zookeeperHost,
-      zookeeperPort)
   }
 
   def removeEphemeralNode() {
