@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,25 +15,25 @@
  */
 package com.stratio.streaming.integration
 
-import org.scalatest._
-import com.stratio.streaming.commons.exceptions.{ StratioEngineOperationException, StratioStreamingException, StratioEngineStatusException, StratioAPISecurityException }
-import org.apache.curator.retry.RetryOneTime
-import org.apache.curator.framework.{ CuratorFramework, CuratorFrameworkFactory }
+import com.datastax.driver.core.querybuilder.QueryBuilder
+import com.datastax.driver.core.{Cluster, Session}
+import com.mongodb._
+import com.stratio.streaming.api.messaging.{ColumnNameType, ColumnNameValue}
+import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.api.{StratioStreamingAPI, StratioStreamingAPIConfig, StratioStreamingAPIFactory}
 import com.stratio.streaming.commons.constants.STREAMING._
-import com.stratio.streaming.commons.constants.STREAMING.STATS_NAMES._
-import com.stratio.streaming.api.messaging.{ ColumnNameValue, ColumnNameType }
+import com.stratio.streaming.commons.constants._
+import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineOperationException, StratioEngineStatusException, StratioStreamingException}
+import com.stratio.streaming.commons.streams.StratioStream
+import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
+import org.apache.curator.retry.RetryOneTime
+import org.apache.http.client.methods.{HttpDelete, HttpGet}
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.util.EntityUtils
+import org.scalatest._
+
 import scala.collection.JavaConversions._
 import scala.util.control.Breaks._
-import com.stratio.streaming.api.{ StratioStreamingAPIConfig, StratioStreamingAPIFactory }
-import com.stratio.streaming.commons.constants._
-import com.datastax.driver.core.{ Session, Cluster }
-import com.datastax.driver.core.querybuilder.QueryBuilder
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.client.methods.{ HttpGet, HttpDelete }
-import org.apache.http.util.EntityUtils
-import com.mongodb._
-import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
-import com.stratio.streaming.commons.streams.StratioStream
 
 class StratioStreamingIntegrationTests
   extends FunSpec
@@ -869,6 +869,15 @@ class StratioStreamingIntegrationTests
       intercept[StratioEngineStatusException] {
         streamingAPI.createStream(testStreamName, columnList)
       }
+    }
+  }
+
+  describe("The streaming api close") {
+    it("should close and open correctly") {
+      streamingAPI.close
+      streamingAPI = new StratioStreamingAPI().initialize()
+
+      assert(streamingAPI.isInit())
     }
   }
 
