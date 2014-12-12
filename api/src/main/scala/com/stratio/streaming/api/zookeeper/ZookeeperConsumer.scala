@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,16 +15,15 @@
  */
 package com.stratio.streaming.api.zookeeper
 
-import scala.concurrent.{ ExecutionContext, Future }
-import ExecutionContext.Implicits.global
 import org.apache.curator.framework.CuratorFramework
-import scala.Predef._
-import scala.Some
 import org.slf4j.LoggerFactory
-import org.apache.zookeeper.data.Stat
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
   val log = LoggerFactory.getLogger(getClass)
+
   def readZNode(fullPath: String) = {
     Future {
       var nodeExists = zNodeExists(fullPath)
@@ -59,8 +58,8 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
       val zNodeExists = zNodeStat != null
       Some(zNodeExists)
     } catch {
-      case _ => {
-        log.warn("Unable to check zNode: " + zNodeName)
+      case x => {
+        log.error("Error checking znode", x)
         None
       }
     }
