@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.stratio.streaming</groupId>
     <artifactId>stratio-streaming</artifactId>
-    <version>0.6.1-SNAPSHOT</version>
+    <version>0.6.1</version>
     <name>Stratio streaming parent</name>
     <packaging>pom</packaging>
     <description>Stratio Streaming is a real-time engine with Complex Event Processing capabilities
@@ -50,7 +50,7 @@
         <connection>scm:git:git://github.com/Stratio/stratio-streaming.git</connection>
         <developerConnection>scm:git:git@github.com:Stratio/stratio-streaming.git
         </developerConnection>
-      <tag>0.6.0</tag>
+      <tag>0.6.1</tag>
   </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
