@@ -15,49 +15,67 @@
  */
 package com.stratio.streaming.serializer.gson.impl;
 
-import java.lang.reflect.Type;
-
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Type;
 
 public class ColumnNameTypeValueDeserializer implements JsonDeserializer<ColumnNameTypeValue> {
+
+    private static Logger log = LoggerFactory.getLogger(ColumnNameTypeValueDeserializer.class);
+
+    private static final String COLUMN_FIELD = "column";
+    private static final String TYPE_FIELD = "type";
+    private static final String VALUE_FIELD = "value";
 
     @Override
     public ColumnNameTypeValue deserialize(JsonElement element, Type type, JsonDeserializationContext ctx)
             throws JsonParseException {
         final JsonObject object = element.getAsJsonObject();
-
-        String name = object.get("column").getAsString();
-        ColumnType columnType = ColumnType.valueOf(object.get("type").getAsString());
-        JsonElement jsonValue = object.get("value");
+        String name = null;
+        ColumnType columnType = null;
         Object value = null;
+        if (object != null && object.has(COLUMN_FIELD) && object.has(TYPE_FIELD)) {
+            name = object.get(COLUMN_FIELD).getAsString();
+            columnType = ColumnType.valueOf(object.get(TYPE_FIELD).getAsString());
 
-        switch (columnType) {
-        case BOOLEAN:
-            value = jsonValue.getAsBoolean();
-            break;
-        case DOUBLE:
-            value = jsonValue.getAsDouble();
-            break;
-        case FLOAT:
-            value = jsonValue.getAsFloat();
-            break;
-        case INTEGER:
-            value = jsonValue.getAsInt();
-            break;
-        case LONG:
-            value = jsonValue.getAsLong();
-            break;
-        case STRING:
-            value = jsonValue.getAsString();
-            break;
-        default:
-            break;
+            if (object.has(VALUE_FIELD)) {
+                JsonElement jsonValue = object.get(VALUE_FIELD);
+                switch (columnType) {
+                    case BOOLEAN:
+                        value = jsonValue.getAsBoolean();
+                        break;
+                    case DOUBLE:
+                        value = jsonValue.getAsDouble();
+                        break;
+                    case FLOAT:
+                        value = jsonValue.getAsFloat();
+                        break;
+                    case INTEGER:
+                        value = jsonValue.getAsInt();
+                        break;
+                    case LONG:
+                        value = jsonValue.getAsLong();
+                        break;
+                    case STRING:
+                        value = jsonValue.getAsString();
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                log.warn("Column with name {} has no value", name);
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Values obtained into ColumnNameTypeValue deserialization: " +
+                        "NAME: {}, VALUE: {}, COLUMNTYPE: {}", name, value, columnType);
+            }
+        } else {
+            log.warn("Error deserializing ColumnNameTypeValue from json. JsonObject is not complete: {}", element);
         }
 
         return new ColumnNameTypeValue(name, columnType, value);
