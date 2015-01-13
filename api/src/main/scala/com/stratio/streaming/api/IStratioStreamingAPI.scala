@@ -97,6 +97,10 @@ trait IStratioStreamingAPI {
   def close
 
   /**
+   * Check if stratio streaming is running
+   */
+  def isConnected():Boolean
+  /**
    * Creates a new stream.
    * @param streamName
    * @param columns

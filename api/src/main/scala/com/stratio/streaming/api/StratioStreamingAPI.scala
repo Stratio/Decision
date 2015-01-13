@@ -33,7 +33,7 @@ import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.dto.StratioQueryStream
 import com.stratio.streaming.kafka.{KafkaConsumer, KafkaProducer}
 import com.stratio.streaming.messaging.{InsertMessageBuilder, QueryMessageBuilder, StreamMessageBuilder}
-import org.apache.curator.framework.api.CuratorEventType.{CLOSING, WATCHED}
+import org.apache.curator.framework.api.CuratorEventType.WATCHED
 import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.RetryOneTime
@@ -264,6 +264,8 @@ class StratioStreamingAPI
 
   override def isInit(): Boolean = streamingUpAndRunning
 
+  override def isConnected(): Boolean = zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH)
+
   def defineAcknowledgeTimeOut(timeOutInMs: Int) = {
     ackTimeOut = timeOutInMs
     this
@@ -304,7 +306,7 @@ class StratioStreamingAPI
   lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaDataProducer)
   lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
 
- private def checkEphemeralNode() {
+  private def checkEphemeralNode() {
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_PATH
     if (!zookeeperConsumer.zNodeExists(ephemeralNodePath)) {
       log.warn("Ephemeral node does not exist")
