@@ -20,7 +20,7 @@
 	<parent>
 		<groupId>com.stratio.streaming</groupId>
 		<artifactId>stratio-streaming</artifactId>
-		<version>0.6.2-SNAPSHOT</version>
+		<version>0.6.2</version>
 	</parent>
 	<artifactId>streaming-commons</artifactId>
 	<packaging>jar</packaging>
