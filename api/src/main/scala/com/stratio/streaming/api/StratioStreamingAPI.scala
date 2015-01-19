@@ -33,7 +33,7 @@ import com.stratio.streaming.commons.streams.StratioStream
 import com.stratio.streaming.dto.StratioQueryStream
 import com.stratio.streaming.kafka.{KafkaConsumer, KafkaProducer}
 import com.stratio.streaming.messaging.{InsertMessageBuilder, QueryMessageBuilder, StreamMessageBuilder}
-import org.apache.curator.framework.api.CuratorEventType.WATCHED
+import org.apache.curator.framework.api.CuratorEventType.{CLOSING, WATCHED}
 import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.RetryOneTime
@@ -275,11 +275,7 @@ class StratioStreamingAPI
     topicService.close()
     zookeeperClient.close()
   }
-}
 
-object StratioStreamingAPI
-  extends StratioStreamingAPIConfig {
-  lazy val log = LoggerFactory.getLogger(getClass)
   val streamingTopicName = InternalTopic.TOPIC_REQUEST.getTopicName();
   val streamingDataTopicName = InternalTopic.TOPIC_DATA.getTopicName();
   val sessionId = "" + System.currentTimeMillis()
@@ -308,7 +304,7 @@ object StratioStreamingAPI
   lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaDataProducer)
   lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
 
-  def checkEphemeralNode() {
+ private def checkEphemeralNode() {
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_PATH
     if (!zookeeperConsumer.zNodeExists(ephemeralNodePath)) {
       log.warn("Ephemeral node does not exist")
@@ -317,22 +313,22 @@ object StratioStreamingAPI
       streamingUpAndRunning = true
   }
 
-  def startEphemeralNodeWatch() {
+  private def startEphemeralNodeWatch() {
     zookeeperClient.checkExists().watched().forPath(ZK_EPHEMERAL_NODE_PATH)
     addListener()
   }
 
-  def initializeTopic() {
+  private def initializeTopic() {
     topicService = new KafkaTopicService(zookeeperCluster, consumerBrokerServer, consumerBrokerPort, 10000, 10000)
     topicService.createTopicIfNotExist(streamingTopicName, 1, 1)
     topicService.createTopicIfNotExist(streamingDataTopicName, 1, 1);
   }
 
-  def checkStreamingStatus() {
+  private def checkStreamingStatus() {
     if (!streamingUpAndRunning) throw new StratioEngineStatusException("Stratio streaming is down")
   }
 
-  def addListener() = {
+  private def addListener() = {
     zookeeperClient.getCuratorListenable().addListener(new CuratorListener() {
       def eventReceived(client: CuratorFramework, event: CuratorEvent) = {
         event.getType() match {
@@ -343,8 +339,16 @@ object StratioStreamingAPI
               case false => streamingUpAndRunning = false
             }
           }
+          case x => {
+            log.debug("Unused curatorEvent {}", x)
+          }
         }
       }
     })
   }
+}
+
+object StratioStreamingAPI
+  extends StratioStreamingAPIConfig {
+  lazy val log = LoggerFactory.getLogger(getClass)
 }

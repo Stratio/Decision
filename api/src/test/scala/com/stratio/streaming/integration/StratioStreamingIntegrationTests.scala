@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,25 +15,25 @@
  */
 package com.stratio.streaming.integration
 
-import org.scalatest._
-import com.stratio.streaming.commons.exceptions.{ StratioEngineOperationException, StratioStreamingException, StratioEngineStatusException, StratioAPISecurityException }
-import org.apache.curator.retry.RetryOneTime
-import org.apache.curator.framework.{ CuratorFramework, CuratorFrameworkFactory }
+import com.datastax.driver.core.querybuilder.QueryBuilder
+import com.datastax.driver.core.{Cluster, Session}
+import com.mongodb._
+import com.stratio.streaming.api.messaging.{ColumnNameType, ColumnNameValue}
+import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
+import com.stratio.streaming.api.{StratioStreamingAPIConfig, StratioStreamingAPIFactory}
 import com.stratio.streaming.commons.constants.STREAMING._
-import com.stratio.streaming.commons.constants.STREAMING.STATS_NAMES._
-import com.stratio.streaming.api.messaging.{ ColumnNameValue, ColumnNameType }
+import com.stratio.streaming.commons.constants._
+import com.stratio.streaming.commons.exceptions.{StratioAPISecurityException, StratioEngineOperationException, StratioEngineStatusException, StratioStreamingException}
+import com.stratio.streaming.commons.streams.StratioStream
+import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
+import org.apache.curator.retry.RetryOneTime
+import org.apache.http.client.methods.{HttpDelete, HttpGet}
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.util.EntityUtils
+import org.scalatest._
+
 import scala.collection.JavaConversions._
 import scala.util.control.Breaks._
-import com.stratio.streaming.api.{ StratioStreamingAPIConfig, StratioStreamingAPIFactory }
-import com.stratio.streaming.commons.constants._
-import com.datastax.driver.core.{ Session, Cluster }
-import com.datastax.driver.core.querybuilder.QueryBuilder
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.client.methods.{ HttpGet, HttpDelete }
-import org.apache.http.util.EntityUtils
-import com.mongodb._
-import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
-import com.stratio.streaming.commons.streams.StratioStream
 
 class StratioStreamingIntegrationTests
   extends FunSpec
@@ -63,15 +63,18 @@ class StratioStreamingIntegrationTests
   override def beforeAll(conf: ConfigMap) {
     if (configurationHasBeenDefinedThroughCommandLine(conf)) {
       val zookeeperHost = conf.get("zookeeperHost").get.toString
-      val zookeeperPort = conf.get("zookeeperPort").get.toString
+      val zookeeperPort = conf.get("zookeeperPort").get.toString.toInt
       val kafkaHost = conf.get("kafkaHost").get.toString
-      val kafkaPort = conf.get("kafkaPort").get.toString
+      val kafkaPort = conf.get("kafkaPort").get.toString.toInt
+
       elasticSearchHost = conf.get("elasticSearchHost").get.toString
       elasticSearchPort = conf.get("elasticSearchPort").get.toString
+
       streamingAPI.initializeWithServerConfig(kafkaHost,
-        kafkaPort.toInt,
+        kafkaPort,
         zookeeperHost,
-        zookeeperPort.toInt)
+        zookeeperPort)
+
       zookeeperCluster = s"$zookeeperHost:$zookeeperPort"
       zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
       zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
