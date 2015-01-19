@@ -1,30 +1,9 @@
-+--------------------------------------------------------------------------------------------------------------------+
-| title: Writing and Running a Basic Application for Stratio Streaming                                               |
-+--------------------------------------------------------------------------------------------------------------------+
-| ---                                                                                                                |
-+--------------------------------------------------------------------------------------------------------------------+
-| In this tutorial you will learn how to write a java or scala project for building Stratio Streaming applications   |
-+--------------------------------------------------------------------------------------------------------------------+
-| and how to run it on a local instance or a standalone cluster. Instructions are based on the Eclipse environment   |
-+--------------------------------------------------------------------------------------------------------------------+
-| but any equivalent can be used.                                                                                    |
-+--------------------------------------------------------------------------------------------------------------------+
-| Table of Contents                                                                                                  |
-+--------------------------------------------------------------------------------------------------------------------+
+Writing and Running a Basic Application for Stratio Streaming
+*************************************************************
 
--  [Before you start](#before-you-start)
-
-   -  [Prerequisites](#prerequisites)
-
-   - [Resources](#resources)
--  [Creating the project](#creating-the-project)
-
-   -  [Step 1: Create an empty project](#step-1-create-an-empty-project)
-
-   - [Step 2: Import the project
-   skeleton](#step-2-import-the-project-skeleton)
--  [Running the application](#running-the-application)
--  [Where to go from here](#where-to-go-from-here)
+In this tutorial you will learn how to write a java or scala project for building Stratio Streaming applications
+and how to run it on a local instance or a standalone cluster. Instructions are based on the Eclipse environment
+but any equivalent can be used.
 
 Before you start
 ================

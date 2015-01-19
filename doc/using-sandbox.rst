@@ -1,21 +1,5 @@
-+---------------------------------------------+
-| title: Stratio Streaming sandbox and demo   |
-+---------------------------------------------+
-| ---                                         |
-+---------------------------------------------+
-| Table of Contents                           |
-+---------------------------------------------+
-
--  [Vagrant Setup](#vagrant-setup)
--  [Running the sandbox](#running-the-sandbox)
--  [What you will find in the
-   sandbox](#what-you-will-find-in-the-sandbox)
--  [Access to the sandbox and other useful
-   commands](#access-to-the-sandbox-and-other-useful-commands)
--  [Starting the Stratio Streaming Shell and other useful
-   commands](#starting-the-stratio-streaming-shell-and-other-useful-commands)
--  [F.A.Q about the sandbox](#faq-about-the-sandbox)
--  [Stratio Streaming demos](#stratio-streaming-demos)
+Stratio Streaming sandbox and demo
+**********************************
 
 Vagrant Setup
 =============

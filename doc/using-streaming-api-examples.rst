@@ -1,37 +1,5 @@
-+-------------------------------------------------+
-| title: Using Stratio Streaming API (examples)   |
-+-------------------------------------------------+
-| ---                                             |
-+-------------------------------------------------+
-| Table of Contents                               |
-+-------------------------------------------------+
-
--  [Creating and initializing the
-   API](#creating-and-initializing-the-api)
--  [Creating and initializing the API with server
-   configuration](#creating-and-initializing-the-api-with-server-configuration)
--  [Creating a new stream](#creating-a-new-stream)
--  [Adding columns to an existing
-   stream](#adding-columns-to-an-existing-stream)
--  [Inserting data into a stream](#inserting-data-into-a-stream)
--  [Adding queries to streams](#adding-queries-to-streams)
--  [Removing an existing stream](#removing-an-existing-stream)
--  [Removing an existing query from a
-   stream](#removing-an-existing-query-from-a-stream)
--  [Listening to streams](#listening-to-streams)
--  [Stop listening to streams](#stop-listening-to-streams)
--  [Save the stream to cassandra](#save-the-stream-to-cassandra)
--  [Stop saving the stream to
-   cassandra](#stop-saving-the-stream-to-cassandra)
--  [Save the stream to MongoDB](#save-the-stream-to-mongodb)
--  [Stop saving the stream to
-   MongoDB](#stop-saving-the-stream-to-mongodb)
--  [Index the stream to
-   elasticsearch](#index-the-stream-to-elasticsearch)
--  [Stop indexing the stream to
-   elasticsearch](#stop-indexing-the-stream-to-elasticsearch)
--  [Getting the list of all the streams and their
-   queries](#getting-the-list-of-all-the-streams-and-their-queries)
+Using Stratio Streaming API (examples)
+**************************************
 
 Creating and initializing the API
 =================================
