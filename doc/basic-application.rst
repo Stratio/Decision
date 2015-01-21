@@ -1,3 +1,5 @@
+.. _basic-application:
+
 Writing and Running a Basic Application for Stratio Streaming
 *************************************************************
 
@@ -11,24 +13,12 @@ Before you start
 Prerequisites
 -------------
 
--  A [Stratio installation](/getting-started.html "Getting Started").
--  [Eclipse](https://www.eclipse.org/ "Eclipse website") or an
-   equivalent IDE.
--  [Oracle JDK
-   7](\ http://www.oracle.com/technetwork/java/javase/downloads/index.html
-   "Oracle Java7 download page").
--  [Apache Maven](\ http://maven.apache.org/ "The Maven project
-   website"): Stratio Streaming API is available in a Maven repository
-   that will be used in this tutorial.
--  [Scala](http://www.scala-lang.org/ "Scala website") >=2.10.3.
--  Scala-IDE: follow [instructions at Eclipse
-   marketplace](\ http://marketplace.eclipse.org/marketplace-client-intro
-   "Instructions to use Eclipse Marketplace") to install it from the
-   marketplace (recommended over downloading the plugin from
-   scala-ide.org).
--  m2eclipse-scala plugin: follow [instructions at
-   scala-ide.org](\ http://scala-ide.org/docs/tutorials/m2eclipse/index.html
-   "Tutorial for m2eclipse-scala plugin installation") for installation.
+-  `Eclipse <https://www.eclipse.org/>`_ or an equivalent IDE.
+-  `Oracle JDK 7 <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_.
+-  `Apache Maven <http://maven.apache.org/>`_: Stratio Streaming API is available in a Maven repository that will be used in this tutorial.
+-  `Scala <http://www.scala-lang.org/>`_ >=2.10.3.
+-  Scala-IDE: follow `instructions at Eclipse marketplace <http://marketplace.eclipse.org/marketplace-client-intro>`_ to install it from the marketplace (recommended over downloading the plugin from scala-ide.org).
+-  m2eclipse-scala plugin: follow `instructions at scala-ide.org <http://scala-ide.org/docs/tutorials/m2eclipse/index.html>`_ for installation.
 
 Resources
 ---------
@@ -37,8 +27,8 @@ Here is a list of the resources that will be used in this tutorial. You
 can download them now or as you go through the instructions. Links will
 be provided later as they will be needed.
 
--  [Java project example](resources/StratioStreamingJavaProject.zip)
--  [Scala project example](resources/StratioStreamingScalaProject.zip)
+-  :download:`Java project example <resources/StratioStreamingJavaProject.zip>`.
+-  :download:`Scala project example <resources/StratioStreamingScalaProject.zip>`.
 
 Creating the project
 ====================
@@ -50,13 +40,13 @@ Step 1: Create an empty project
 -  In the “New project” window select “Project” under “General” and
    click “Next”:
 
-![Screenshot of the New Project window in
-Eclipse](images/basicapp-01-newProject.png)
+.. image:: /images/basicapp-01-newProject.png
+   :align: center
 
 -  In the next window, enter a name for your project and click “Finish”:
 
-![Screenshot of the Project Name window in
-Eclipse](images/basicapp-02-projectName.png)
+.. image:: /images/basicapp-02-projectName.png
+   :align: center
 
 The newly created project now appears in the package explorer.
 
@@ -66,14 +56,14 @@ Step 2: Import the project skeleton
 Download the project skeleton of your choice and save it in a convenient
 location:
 
--  [Java project](resources/StratioStreamingJavaProject.zip)
--  [Scala project](resources/StratioStreamingScalaProject.zip)
+-  :download:`Java project example <resources/StratioStreamingJavaProject.zip>`.
+-  :download:`Scala project example <resources/StratioStreamingScalaProject.zip>`.
 
 In the menu, choose File -> Import. In the “Import” window, select
 “Archive file” in the section “General”, and click “Next”:
 
-![Screenshot of the Import window in
-Eclipse](images/basicapp-03-importWindow.png)
+.. image:: /images/basicapp-03-importWindow.png
+   :align: center
 
 In the next screen:
 
@@ -84,8 +74,8 @@ In the next screen:
 -  Check “Overwrite existing resources without warning”,
 -  and click “Finish”
 
-![Screenshot of the Importing from Archive file window in
-Eclipse](images/basicapp-04-importFromFile1.png)
+.. image:: /images/basicapp-04-importFromFile1.png
+   :align: center
 
 The structure of the project will be displayed in the package explorer.
 Give Maven some time to check and download dependencies. The project
@@ -108,9 +98,12 @@ do so, right click on the JavaExample.java file -> Run As -> Java
 Application.
 
 For the Java or Scala project, the result should be similar to the
-following:
+following::
 
-```shell-session Streams in the Stratio Streaming Engine: 3 -- Stream Name: stratio_stats_base -- Stream Name: stratio_stats_global_by_operation -- Stream Name: testStream``\ \`
+    shell-session Streams in the Stratio Streaming Engine: 3
+        -- Stream Name: stratio_stats_base
+        -- Stream Name: stratio_stats_global_by_operation
+        -- Stream Name: testStream
 
 Congratulations! You successfully completed this tutorial.
 
@@ -118,6 +111,5 @@ Where to go from here
 =====================
 
 If you are planning to write your own Stratio Streaming application,
-[these examples](using-streaming-api-examples.html "Using the Stratio
-Streaming API") may be useful. Those are snippets written in both Java
+:ref:`using-stratio-streaming-api` may be useful. Those are snippets written in both Java
 and Scala.

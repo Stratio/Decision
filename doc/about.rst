@@ -118,13 +118,12 @@ Architecture
 Stratio Streaming is composed of three main elements:
 
 -  A Scala API.
--  A publish-subscribe messaging system ([Apache
-   Kafka](\ http://kafka.apache.org/)).
--  A Streaming and CEP engine ([Apache Spark
-   Streaming](\ http://spark.apache.org/) and [Siddhi
-   CEP](\ http://siddhi.sourceforge.net/)).
+-  A publish-subscribe messaging system `Apache Kafka <http://kafka.apache.org/>`_.
+-  A Streaming and CEP engine `Apache Spark Streaming <http://spark.apache.org>`_ and `Siddhi CEP <http://siddhi.sourceforge.net>`_.
 
-![Stratio Streaming Overview](images/about-overview.png)
+ .. image:: images/about-overview.png
+    :width: 70%
+    :align: center
 
 Where to go from here
 =====================
@@ -132,10 +131,6 @@ Where to go from here
 To explore and play with Stratio Streaming, we recommend to visit the
 following:
 
--  [Writing and Running a Basic Application for Stratio
-   Streaming](basic-application.html "Writing and Running a Basic
-   Application for Stratio Streaming"): a step by step tutorial to write
-   an application using Stratio Streaming API.
--  [Using the Stratio Streaming API](using-streaming-api-examples.html
-   "Using the Stratio Streaming API"): snippets in Java and Scala.
--  [Stratio Streaming sandbox and demo](using-sandbox.html)
+-  :ref:`basic-application`: a step by step tutorial to write an application using Stratio Streaming API.
+-  :ref:`using-stratio-streaming-api`: snippets in Java and Scala.
+-  :ref:`stratio-streaming-sandbox`
