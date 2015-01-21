@@ -26,17 +26,16 @@
     </parent>
     <properties>
         <jacoco.skip>true</jacoco.skip>
+        <version>${project.version}</version>
     </properties>
     <groupId>com.stratio.streaming.doc</groupId>
     <artifactId>streaming-doc</artifactId>
     <name>Stratio streaming documentation</name>
+
     <build>
         <resources>
             <resource>
-                <directory>.</directory>
-                <includes>
-                    <include>*</include>
-                </includes>
+                <directory>src/site/sphinx</directory>
                 <filtering>true</filtering>
             </resource>
         </resources>
@@ -61,9 +60,6 @@
                             <groupId>org.tomdz.maven</groupId>
                             <artifactId>sphinx-maven-plugin</artifactId>
                             <version>1.0.3</version>
-                            <configuration>
-                                <sourceDirectory>.</sourceDirectory>
-                            </configuration>
                         </plugin>
                     </reportPlugins>
                 </configuration>
