@@ -53,7 +53,7 @@ copyright = u'2015 Stratio'
 
 # The short X.Y version.
 
-version = '${project.version}'
+version = '${version}'
 # The full version, including alpha/beta/rc tags.
 release = version
 
