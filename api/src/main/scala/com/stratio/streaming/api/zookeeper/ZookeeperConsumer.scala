@@ -53,15 +53,8 @@ case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
   }
 
   private def checkZNode(zNodeName: String) = {
-    try {
-      val zNodeStat = zooKeeperClient.checkExists().forPath(zNodeName)
-      val zNodeExists = zNodeStat != null
-      Some(zNodeExists)
-    } catch {
-      case x => {
-        log.error("Error checking znode", x)
-        None
-      }
-    }
+    val zNodeStat = zooKeeperClient.checkExists().forPath(zNodeName)
+    val zNodeExists = zNodeStat != null
+    Some(zNodeExists)
   }
 }
