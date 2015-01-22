@@ -15,16 +15,16 @@
  */
 package com.stratio.streaming.dao;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.streams.QueryDTO;
 import com.stratio.streaming.streams.StreamStatusDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class StreamStatusDao {
 
@@ -99,7 +99,11 @@ public class StreamStatusDao {
 
     public Set<StreamAction> getEnabledActions(String streamName) {
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
-        return streamStatus.getActionsEnabled();
+        Set<StreamAction> enabledActions = new HashSet<>();
+        if (streamStatus != null) {
+            enabledActions = streamStatus.getActionsEnabled();
+        }
+        return enabledActions;
     }
 
     public String getActionQuery(String streamName) {
