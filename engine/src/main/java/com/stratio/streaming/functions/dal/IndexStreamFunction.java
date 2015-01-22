@@ -24,6 +24,7 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.ActionBaseFunction;
 import com.stratio.streaming.functions.validator.ActionEnabledValidation;
 import com.stratio.streaming.functions.validator.RequestValidation;
+import com.stratio.streaming.functions.validator.StreamNameNotEmptyValidation;
 import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
 import com.stratio.streaming.service.StreamOperationService;
 
@@ -59,11 +60,13 @@ public class IndexStreamFunction extends ActionBaseFunction {
 
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamNameNotEmptyValidation());
         validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamNameNotEmptyValidation());
         validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.INDEXED,
                 ReplyCode.KO_ACTION_ALREADY_ENABLED.getCode()));
         validators.add(new StreamNotExistsValidation(getStreamOperationService()));
