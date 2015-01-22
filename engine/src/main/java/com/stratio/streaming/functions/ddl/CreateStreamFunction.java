@@ -22,10 +22,7 @@ import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.functions.ActionBaseFunction;
-import com.stratio.streaming.functions.validator.RequestValidation;
-import com.stratio.streaming.functions.validator.StreamExistsValidation;
-import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
-import com.stratio.streaming.functions.validator.UserDefinedStreamValidation;
+import com.stratio.streaming.functions.validator.*;
 import com.stratio.streaming.service.StreamOperationService;
 
 public class CreateStreamFunction extends ActionBaseFunction {
@@ -70,6 +67,7 @@ public class CreateStreamFunction extends ActionBaseFunction {
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamNameNotEmptyValidation());
         validators.add(new StreamExistsValidation(getStreamOperationService()));
     }
 
