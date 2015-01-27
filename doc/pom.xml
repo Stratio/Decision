@@ -31,14 +31,7 @@
     <groupId>com.stratio.streaming.doc</groupId>
     <artifactId>streaming-doc</artifactId>
     <name>Stratio streaming documentation</name>
-
     <build>
-        <resources>
-            <resource>
-                <directory>src/site/sphinx</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -57,9 +50,23 @@
                             </reportSets>
                         </plugin>
                         <plugin>
-                            <groupId>org.tomdz.maven</groupId>
+                            <groupId>com.stratio.maven</groupId>
                             <artifactId>sphinx-maven-plugin</artifactId>
-                            <version>1.0.3</version>
+                            <version>2.0.0</version>
+                            <configuration>
+                                <builders>
+                                    <entry>html</entry>
+                                </builders>
+                                <resources>
+                                    <resource>
+                                        <directory>src/site/sphinx</directory>
+                                        <filtering>true</filtering>
+                                        <includes>
+                                            <include>conf.py</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
+                            </configuration>
                         </plugin>
                     </reportPlugins>
                 </configuration>
