@@ -1,0 +1,58 @@
+cat << EOF > streaming
+
+#!/bin/bash
+#
+# /etc/rc.d/init.d/streaming
+#
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+SCRIPT=/opt/stratio/streaming/bin/run
+RUNAS=stratio
+
+PIDFILE=/var/lock/subsys/streaming.pid
+LOGFILE=/var/log/stratio/streaming.log
+
+start() {
+  if [ -f $PIDFILE ] && kill -0 $(cat $PIDFILE); then
+    echo 'Service already running' >&2
+    return 1
+  fi
+  echo 'Starting service…' >&2
+  local CMD="$SCRIPT &> \"$LOGFILE\" & echo \$!"
+  su -c "$CMD" $RUNAS > "$PIDFILE"
+  echo 'Service started' >&2
+}
+
+stop() {
+  if [ ! -f "$PIDFILE" ] || ! kill -0 $(cat "$PIDFILE"); then
+    echo 'Service not running' >&2
+    return 1
+  fi
+  echo 'Stopping service…' >&2
+  kill -15 $(cat "$PIDFILE") && rm -f "$PIDFILE"
+  echo 'Service stopped' >&2
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    stop
+    start
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+    ;;
+esac
+
+EOF
+
+mv streaming /etc/init.d/streaming
+chmod a+x /etc/init.d/streaming
