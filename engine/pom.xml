@@ -28,7 +28,6 @@
     <artifactId>streaming-engine</artifactId>
     <properties>
         <spark.version>1.0.2</spark.version>
-        <logPath>/var/log/stratio/</logPath>
     </properties>
     <dependencies>
         <dependency>
@@ -155,13 +154,6 @@
         </dependency>
     </dependencies>
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/config</directory>
-                <filtering>true</filtering>
-            </resource>
-
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
