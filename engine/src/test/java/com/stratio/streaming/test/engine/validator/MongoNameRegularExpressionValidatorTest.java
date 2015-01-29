@@ -13,34 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.streaming.test.validator;
+package com.stratio.streaming.test.engine.validator;
 
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.exception.RequestValidationException;
-import com.stratio.streaming.functions.validator.KafkaStreamNameValidator;
+import com.stratio.streaming.functions.validator.MongoStreamNameValidator;
 
-public class KafkaNameRegularExpressionValidatorTest extends BaseRegularExpressionValidatorTest {
+public class MongoNameRegularExpressionValidatorTest extends BaseRegularExpressionValidatorTest {
 
-    private KafkaStreamNameValidator kafkaStreamNameValidator;
+    private MongoStreamNameValidator mongoStreamNameValidator;
 
     @Override
     public void setUp() {
-        kafkaStreamNameValidator = new KafkaStreamNameValidator();
+        mongoStreamNameValidator = new MongoStreamNameValidator();
     }
 
     @Override
     public void test(StratioStreamingMessage message) throws RequestValidationException {
-        kafkaStreamNameValidator.validate(message);
+        mongoStreamNameValidator.validate(message);
     }
 
     @Override
     public String[] getGoodStrings() {
-        return new String[] { "tesT_234--234----", "test", "_test", "test_3_3_2_test", "-testasf", "2323easdas" };
+        return new String[] { "test_test$etstsdd", "&&&&", "$$$$", "\n\n\n" };
     }
 
     @Override
     public String[] getBadStrings() {
-        return new String[] { "?asdasda", "asdas?asd", ")asdasd", "`++++´´´", "asd9)Adass", "4352345\"·$\"·45" };
+        return new String[] { "*test", "test*", "test test", ">><<<<>", "_____|" };
     }
 
 }

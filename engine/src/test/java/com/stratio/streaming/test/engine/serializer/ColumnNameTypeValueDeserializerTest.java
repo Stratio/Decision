@@ -1,4 +1,4 @@
-package com.stratio.streaming.test.serializer;
+package com.stratio.streaming.test.engine.serializer;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
