@@ -71,7 +71,7 @@
 	</pluginRepositories>
 
 	<properties>
-		<target>unit</target>
+		<target>test</target>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -269,7 +269,7 @@
 							<goal>test</goal>
 						</goals>
 						<configuration>
-							<membersOnlySuites>com.stratio.streaming.${target}</membersOnlySuites>
+							<membersOnlySuites>com.stratio.streaming.${target}.engine.api</membersOnlySuites>
 						</configuration>
 					</execution>
 				</executions>
