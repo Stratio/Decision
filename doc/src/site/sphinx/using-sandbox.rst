@@ -27,7 +27,7 @@ directory as /install-folder.
 
 Please, be patient the first time it runs.
 
- .. image:: /images/vagrant-shell.png
+ .. image:: /images/vagrant-shell.jpg
     :align: center
 
 What you will find in the sandbox
@@ -233,7 +233,7 @@ Dashboard steps
    happening inside the engine. All the aggregated events, alarms in
    some fancy widgets.
 
- .. image:: /images/kibana-sensor-grid-dashboard.png
+ .. image:: /images/kibana-sensor-grid-dashboard.jpg
     :align: center
 
 Extra: Streaming metrics

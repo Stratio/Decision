@@ -40,12 +40,12 @@ Step 1: Create an empty project
 -  In the “New project” window select “Project” under “General” and
    click “Next”:
 
-.. image:: /images/basicapp-01-newProject.png
+.. image:: /images/basicapp-01-newProject.jpg
    :align: center
 
 -  In the next window, enter a name for your project and click “Finish”:
 
-.. image:: /images/basicapp-02-projectName.png
+.. image:: /images/basicapp-02-projectName.jpg
    :align: center
 
 The newly created project now appears in the package explorer.
@@ -62,7 +62,7 @@ location:
 In the menu, choose File -> Import. In the “Import” window, select
 “Archive file” in the section “General”, and click “Next”:
 
-.. image:: /images/basicapp-03-importWindow.png
+.. image:: /images/basicapp-03-importWindow.jpg
    :align: center
 
 In the next screen:
@@ -74,7 +74,7 @@ In the next screen:
 -  Check “Overwrite existing resources without warning”,
 -  and click “Finish”
 
-.. image:: /images/basicapp-04-importFromFile1.png
+.. image:: /images/basicapp-04-importFromFile1.jpg
    :align: center
 
 The structure of the project will be displayed in the package explorer.
