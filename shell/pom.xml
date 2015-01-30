@@ -140,12 +140,12 @@
                             <assembly>
                                 <copyDirectory>
                                     <from>target/appassembler</from>
-                                    <to>/opt/stratio/streaming-shell</to>
+                                    <to>/opt/sds/streaming-shell</to>
                                 </copyDirectory>
                             </assembly>
                         </configuration>
                         <goals>
-                            <goal>package-deb</goal>
+                            <!--<goal>package-deb</goal> -->
                             <goal>package-rpm</goal>
                             <goal>package-zip</goal>
                         </goals>

@@ -173,6 +173,8 @@
                         <configuration>
                             <configurationSourceDirectory>src/main/config
                             </configurationSourceDirectory>
+                            <configurationDirectory>:/etc/sds/streaming/conf
+                            </configurationDirectory>
                             <copyConfigurationDirectory>true</copyConfigurationDirectory>
                             <includeConfigurationDirectoryInClasspath>true
                             </includeConfigurationDirectoryInClasspath>
@@ -182,6 +184,7 @@
                                 -Dcom.sun.management.jmxremote.authenticate=false
                                 -Dcom.sun.management.jmxremote.ssl=false
                             </extraJvmArguments>
+
                             <filterConfigurationDirectory>true</filterConfigurationDirectory>
                             <programs>
                                 <program>
@@ -189,6 +192,9 @@
                                     <id>run</id>
                                 </program>
                             </programs>
+                            <platforms>
+                                <platform>unix</platform>
+                            </platforms>
                         </configuration>
                         <phase>package</phase>
                         <goals>
@@ -222,15 +228,22 @@
                             <size>1</size>
                             <assembly>
                                 <copyDirectory>
-                                    <from>target/appassembler</from>
-                                    <to>/opt/stratio/streaming</to>
+                                    <from>target/appassembler/bin</from>
+                                    <to>/opt/sds/streaming/bin</to>
+                                </copyDirectory>
+                                <copyDirectory>
+                                    <from>target/appassembler/repo</from>
+                                    <to>/opt/sds/streaming/repo</to>
+                                </copyDirectory>
+                                <copyDirectory>
+                                    <from>target/appassembler/:/etc/sds/streaming/conf</from>
+                                    <to>/etc/sds/streaming/conf</to>
                                 </copyDirectory>
                             </assembly>
                         </configuration>
                         <goals>
-                            <goal>package-deb</goal>
+                           <!-- <goal>package-deb</goal> -->
                             <goal>package-rpm</goal>
-                            <goal>package-zip</goal>
                         </goals>
                     </execution>
                 </executions>
