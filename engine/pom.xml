@@ -242,7 +242,7 @@
                             </assembly>
                         </configuration>
                         <goals>
-                           <!-- <goal>package-deb</goal> -->
+                            <goal>package-deb</goal>
                             <goal>package-rpm</goal>
                         </goals>
                     </execution>
