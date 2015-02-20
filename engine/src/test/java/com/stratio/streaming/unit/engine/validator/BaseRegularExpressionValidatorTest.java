@@ -25,6 +25,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
