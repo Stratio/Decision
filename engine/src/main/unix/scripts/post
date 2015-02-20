@@ -1,19 +1,22 @@
-cat << EOF > streaming
+MODULE="streaming"
+
+cat <<'EOF' > $MODULE
 
 #!/bin/bash
 #
-# /etc/rc.d/init.d/streaming
+# /etc/rc.d/init.d/$MODULE
 #
 
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-SCRIPT=/opt/stratio/streaming/bin/run
+MODULE="streaming"
+SCRIPT=/opt/sds/$MODULE/bin/run
 RUNAS=stratio
-
-PIDFILE=/var/lock/subsys/streaming.pid
-LOGFILE=/var/log/stratio/streaming.log
-
+ 
+PIDFILE=/var/run/sds/$MODULE.pid
+LOGFILE=/var/log/sds/$MODULE.log
+ 
 start() {
   if [ -f $PIDFILE ] && kill -0 $(cat $PIDFILE); then
     echo 'Service already running' >&2
@@ -24,7 +27,7 @@ start() {
   su -c "$CMD" $RUNAS > "$PIDFILE"
   echo 'Service started' >&2
 }
-
+ 
 stop() {
   if [ ! -f "$PIDFILE" ] || ! kill -0 $(cat "$PIDFILE"); then
     echo 'Service not running' >&2
@@ -35,6 +38,14 @@ stop() {
   echo 'Service stopped' >&2
 }
 
+status() {
+	if [ ! -f "$PIDFILE" ]; then
+		echo 'Service not running' >&2
+	else
+		echo 'Service running with pid:' $(cat "$PIDFILE") >&2
+	fi
+}
+
 case "$1" in
   start)
     start
@@ -42,17 +53,43 @@ case "$1" in
   stop)
     stop
     ;;
+  status)
+    status
+    ;;
   restart)
     stop
     start
     ;;
   *)
-    echo "Usage: $0 {start|stop|restart}"
+    echo "Usage: $0 {start|stop|status|restart}"
     exit 1
     ;;
 esac
 
 EOF
 
-mv streaming /etc/init.d/streaming
-chmod a+x /etc/init.d/streaming
+USER="stratio"
+GROUP="stratio"
+
+mv $MODULE /etc/init.d/$MODULE
+chmod a+x /etc/init.d/$MODULE
+mkdir -p /var/run/sds
+mkdir -p /var/log/sds
+
+if ! getent group $GROUP >/dev/null 2>&1; then
+  groupadd $GROUP
+fi
+
+if ! getent passwd $USER >/dev/null 2>&1; then
+  useradd -M -d /opt/sds -g $GROUP -s /bin/bash $USER
+else
+  usermod -G $GROUP $USER
+fi
+
+chown -R $USER:$GROUP /opt/sds/$MODULE
+chmod a+x /opt/sds/$MODULE/bin/run
+chown -R $USER:$GROUP /etc/sds/$MODULE
+chown $USER:$GROUP /var/run/sds
+chown $USER:$GROUP /var/log/sds
+
+/etc/init.d/$MODULE start
