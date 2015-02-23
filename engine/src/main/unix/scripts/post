@@ -92,4 +92,4 @@ chown -R $USER:$GROUP /etc/sds/$MODULE
 chown $USER:$GROUP /var/run/sds
 chown $USER:$GROUP /var/log/sds
 
-/etc/init.d/$MODULE start
+#/etc/init.d/$MODULE start
