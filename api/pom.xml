@@ -277,7 +277,7 @@
                                                         <argLine>${jacoco-UT-argline}</argLine>
 							<reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
 							<membersOnlySuites>com.stratio.streaming.unit.engine.api</membersOnlySuites>
-							<skipTests>${skipUT}</skipTests>
+							<skipTests>${skipUTs}</skipTests>
 						</configuration>
 					</execution>
 					<execution>
@@ -290,6 +290,7 @@
                                                         <argLine>${jacoco-IT-argline}</argLine>
 							<reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
 							<membersOnlySuites>com.stratio.streaming.integration.engine.api</membersOnlySuites>
+                                                        <skipTests>${skipITs}</skipTests>
 						</configuration>
 					</execution>
 				</executions>

@@ -122,7 +122,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.7</version>
                 <configuration>
-                        <skipTests>${skipUT}</skipTests>
+                        <skipTests>${skipUTs}</skipTests>
                         <argLine>${jacoco-UT-argline}</argLine>
                 </configuration>
                 </plugin>
