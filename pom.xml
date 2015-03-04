@@ -47,12 +47,12 @@
     </licenses>
     <issueManagement>
         <system>GitHub</system>
-        <url>http://github.com/Stratio/stratio-streaming/issues</url>
+        <url>https://github.com/Stratio/streaming-cep-engine/issues</url>
     </issueManagement>
     <scm>
         <url>https://github.com/Stratio/stratio-streaming</url>
-        <connection>scm:git:git://github.com/Stratio/stratio-streaming.git</connection>
-        <developerConnection>scm:git:git@github.com:Stratio/stratio-streaming.git
+        <connection>scm:git:git://github.com/Stratio/streaming-cep-engine.git</connection>
+        <developerConnection>scm:git:git@github.com:Stratio/streaming-cep-engine.git
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
