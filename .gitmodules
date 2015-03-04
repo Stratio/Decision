@@ -1,4 +1,4 @@
 [submodule "doc/src/site/sphinx/_themes/stratio"]
 	path = doc/src/site/sphinx/_themes/stratio
-	url = git@github.com:Stratio/sphinx-theme-stratio.git
+	url = https://github.com/Stratio/sphinx-theme-stratio.git
 	branch = master
