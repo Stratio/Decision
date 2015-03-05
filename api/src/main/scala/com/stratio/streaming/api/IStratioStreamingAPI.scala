@@ -36,8 +36,6 @@ trait IStratioStreamingAPI {
   /**
    * /**
    * Initializes the StratioStreamingAPI instance.
-   * @return
-   **/
    * @param kafkaServer
    * @param kafkaPort
    * @param theZookeeperServer
