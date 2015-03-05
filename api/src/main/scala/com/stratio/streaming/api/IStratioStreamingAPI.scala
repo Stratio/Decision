@@ -34,7 +34,6 @@ trait IStratioStreamingAPI {
   def initialize(): IStratioStreamingAPI
 
   /**
-   * /**
    * Initializes the StratioStreamingAPI instance.
    * @param kafkaServer
    * @param kafkaPort
