@@ -119,4 +119,4 @@ To explore and play with Stratio Streaming, we recommend to visit the following:
 
 -   [Writing and Running a Basic Application for Stratio Streaming](basic-application.html "Writing and Running a Basic Application for Stratio Streaming"): a step by step tutorial to write an application using Stratio Streaming API.
 -   [Using the Stratio Streaming API](using-streaming-api-examples.html "Using the Stratio Streaming API"): snippets in Java and Scala.
--   [Stratio Streaming sandbox and demo](using-sandbox.html)
+-   [Stratio Streaming sandbox and demo](using-sandbox.md)
