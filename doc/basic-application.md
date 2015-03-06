@@ -110,5 +110,5 @@ Where to go from here
 =====================
 
 If you are planning to write your own Stratio Streaming application, 
-[these examples](using-streaming-api-examples.html "Using the Stratio Streaming API") may be useful. 
+[these examples](using-streaming-api-examples.md "Using the Stratio Streaming API") may be useful. 
 Those are snippets written in both Java and Scala.
