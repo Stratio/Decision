@@ -109,7 +109,8 @@ html_theme = 'stratio'
 html_theme_options = {    
     'versions' : ['0.7.0-SNAPSHOT'],
     'github' : 'https://github.com/Stratio/streaming-cep-engine',
-    'jira': 'https://stratio.atlassian.net/secure/Dashboard.jspa'
+    'jira': 'https://stratio.atlassian.net/secure/Dashboard.jspa',
+    'module_name' : 'streaming'
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
