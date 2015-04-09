@@ -104,7 +104,7 @@ Windows <http://git-scm.com/download/win>`_.
 
 You may need to configure port forwarding between your guest and hosts machines. To do so, just add the lines
 **\` config.vm.network :forwarded_port, guest:80, host:8081 \`** and
-**\` config.vm.network :forwarded_port, guest:9200, host:9200 `\** to your Vagrantfile. Restart the
+**\` config.vm.network :forwarded_port, guest:9200, host:9200 \`** to your Vagrantfile. Restart the
 Vagrant machine, and now you should be able to access Kibana on port 8081 through your browser.
 
 Stratio Streaming Demos
