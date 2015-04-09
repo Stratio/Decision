@@ -100,6 +100,13 @@ VagrantFile.
 We need to install `Cygwin <https://cygwin.com/install.html>`_ or `Git for
 Windows <http://git-scm.com/download/win>`_.
 
+**I get a connection error when trying to open Kibana dashboards on a web browser:**
+
+You may need to configure port forwarding between your guest and hosts machines. To do so, just add the lines
+**\` config.vm.network :forwarded_port, guest:80, host:8081 \`** and
+**\` config.vm.network :forwarded_port, guest:9200, host:9200 `\** to your Vagrantfile. Restart the
+Vagrant machine, and now you should be able to access Kibana on port 8081 through your browser.
+
 Stratio Streaming Demos
 =======================
 
@@ -192,15 +199,15 @@ output of these queries is sent to the same new stream, again infered by the eng
 
 - Query #1::
 
-     add query --stream sensor_grid_avg --definition "from sensor_grid_avg`name=='cpu' and data > 80]#window.timeBatch(10 seconds)  select name, avg(data) as data, 'Alarm_intensive_CPU_load' as text insert into sensor_grid_alarms  for current-events"
+     add query --stream sensor_grid_avg --definition "from sensor_grid_avg[name=='cpu' and data > 80]#window.timeBatch(10 seconds)  select name, avg(data) as data, 'Alarm_intensive_CPU_load' as text insert into sensor_grid_alarms  for current-events"
 
 - Query #2::
 
-     add query --stream sensor_grid_avg --definition "from sensor_grid_avg`name=='memory' and data > 75]#window.timeBatch(5 seconds)  select name, avg(data) as data, 'Alarm_intensive_MEMORY_load' as text insert into sensor_grid_alarms  for current-events"
+     add query --stream sensor_grid_avg --definition "from sensor_grid_avg[name=='memory' and data > 75]#window.timeBatch(5 seconds)  select name, avg(data) as data, 'Alarm_intensive_MEMORY_load' as text insert into sensor_grid_alarms  for current-events"
 
 - Query #3::
 
-     add query --stream sensor_grid_avg --definition "from sensor_grid_avg`(name=='memory' and data > 80) or (name=='cpu' and data > 90)]#window.timeBatch(15 seconds) select name , avg(data) as data, 'Alarm_inminent_shutdown' as text insert into sensor_grid_alarms for current-events"
+     add query --stream sensor_grid_avg --definition "from sensor_grid_avg[(name=='memory' and data > 80) or (name=='cpu' and data > 90)]#window.timeBatch(15 seconds) select name , avg(data) as data, 'Alarm_inminent_shutdown' as text insert into sensor_grid_alarms for current-events"
 
 - Let’s start indexing the alarms, too::
 
