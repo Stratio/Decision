@@ -34,10 +34,7 @@ trait IStratioStreamingAPI {
   def initialize(): IStratioStreamingAPI
 
   /**
-   * /**
    * Initializes the StratioStreamingAPI instance.
-   * @return
-   **/
    * @param kafkaServer
    * @param kafkaPort
    * @param theZookeeperServer
@@ -96,6 +93,10 @@ trait IStratioStreamingAPI {
    */
   def close
 
+  /**
+   * Check if stratio streaming is running
+   */
+  def isConnected():Boolean
   /**
    * Creates a new stream.
    * @param streamName

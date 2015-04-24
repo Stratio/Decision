@@ -15,12 +15,15 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.stratio.streaming</groupId>
     <artifactId>stratio-streaming</artifactId>
-    <version>0.6.3-SNAPSHOT</version>
-    <name>Stratio streaming parent</name>
+    <version>0.7.0-SNAPSHOT</version>
+    <name>Stratio Streaming</name>
     <packaging>pom</packaging>
     <description>Stratio Streaming is a real-time engine with Complex Event Processing capabilities
         with a built-in and powerful Streaming Query Language for doing on-demand operations on your
@@ -34,6 +37,7 @@
         <module>shell</module>
         <module>siddhi</module>
         <module>examples</module>
+        <module>doc</module>
     </modules>
     <licenses>
         <license>
@@ -43,15 +47,15 @@
     </licenses>
     <issueManagement>
         <system>GitHub</system>
-        <url>http://github.com/Stratio/stratio-streaming/issues</url>
+        <url>https://github.com/Stratio/streaming-cep-engine/issues</url>
     </issueManagement>
     <scm>
         <url>https://github.com/Stratio/stratio-streaming</url>
-        <connection>scm:git:git://github.com/Stratio/stratio-streaming.git</connection>
-        <developerConnection>scm:git:git@github.com:Stratio/stratio-streaming.git
+        <connection>scm:git:git://github.com/Stratio/streaming-cep-engine.git</connection>
+        <developerConnection>scm:git:git@github.com:Stratio/streaming-cep-engine.git
         </developerConnection>
-      <tag>0.6.0</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -71,13 +75,57 @@
                 <version>0.7.1.201405082137</version>
                 <executions>
                     <execution>
-                        <id>pre-test</id>
+                        <id>UT</id>
+                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+			    <destFile>${project.build.directory}/jacocoUT.exec</destFile>
+		  	    <propertyName>jacoco-UT-argline</propertyName>
+			</configuration>
+                    </execution>
+                    <execution>
+                        <id>IT</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+			    <destFile>${project.build.directory}/jacocoIT.exec</destFile>
+		  	    <propertyName>jacoco-IT-argline</propertyName>
+			</configuration>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.4</version>
+                <configuration>
+                    <reportPlugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-project-info-reports-plugin</artifactId>
+                            <version>2.8</version>
+                            <reportSets>
+                                <reportSet>
+                                    <reports></reports>
+                                </reportSet>
+                            </reportSets>
+                        </plugin>
+                    </reportPlugins>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                        <skipTests>${skipUTs}</skipTests>
+                        <argLine>${jacoco-UT-argline}</argLine>
+                </configuration>
+                </plugin>
         </plugins>
     </build>
     <profiles>
@@ -161,24 +209,7 @@
             <id>sonatype-nexus-staging</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-        <snapshotRepository>
-            <id>stratio-snapshots</id>
-            <name>Stratio Snapshots</name>
-            <url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
     </distributionManagement>
-    <repositories>
-        <repository>
-            <id>stratio-snapshots</id>
-            <name>Stratio snapshots</name>
-            <url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
-    </repositories>
     <dependencyManagement>
         <dependencies>
             <dependency>

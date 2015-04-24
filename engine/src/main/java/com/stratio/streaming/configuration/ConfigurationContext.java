@@ -119,10 +119,10 @@ public class ConfigurationContext {
         this.kafkaSessionTimeout = config.getInt(ConfigurationKeys.KAFKA_SESSION_TIMEOUT.getKey());
         this.kafkaConnectionTimeout = config.getInt(ConfigurationKeys.KAFKA_CONNECTION_TIMEOUT.getKey());
 
-        this.elasticSearchHosts = (List<String>) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_HOST.getKey(), config);
+        this.elasticSearchHosts = (List<String>) this.getListOrNull(ConfigurationKeys.ELASTICSEARCH_HOST.getKey(), config);
         this.elasticSearchClusterName = (String) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_CLUSTER_NAME.getKey(), config);
 
-        this.mongoHosts = (List<String>) this.getValueOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
+        this.mongoHosts = (List<String>) this.getListOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
         this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
 
@@ -227,6 +227,14 @@ public class ConfigurationContext {
     private Object getValueOrNull(String key, Config config) {
         if (config.hasPath(key)) {
             return config.getAnyRef(key);
+        } else {
+            return null;
+        }
+    }
+
+    private Object getListOrNull(String key, Config config) {
+        if (config.hasPath(key)) {
+            return config.getAnyRefList(key);
         } else {
             return null;
         }

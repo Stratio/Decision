@@ -22,10 +22,7 @@ import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.ActionBaseFunction;
-import com.stratio.streaming.functions.validator.ActionEnabledValidation;
-import com.stratio.streaming.functions.validator.KafkaStreamNameValidator;
-import com.stratio.streaming.functions.validator.RequestValidation;
-import com.stratio.streaming.functions.validator.StreamNotExistsValidation;
+import com.stratio.streaming.functions.validator.*;
 import com.stratio.streaming.service.StreamOperationService;
 
 public class ListenStreamFunction extends ActionBaseFunction {
@@ -59,11 +56,13 @@ public class ListenStreamFunction extends ActionBaseFunction {
 
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamNameNotEmptyValidation());
         validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
+        validators.add(new StreamNameNotEmptyValidation());
         validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.LISTEN,
                 ReplyCode.KO_LISTENER_ALREADY_EXISTS.getCode()));
         validators.add(new StreamNotExistsValidation(getStreamOperationService()));
