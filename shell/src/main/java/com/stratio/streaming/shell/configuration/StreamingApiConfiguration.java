@@ -41,9 +41,22 @@ public class StreamingApiConfiguration {
     @Value("${zookeeper.port}")
     private Integer zookeeperPort;
 
+    @Value("${kafka.brokers}")
+    private String kafkaBrokers;
+
+    @Value("${zookeeper.quorum}")
+    private String zkQuorum;
+
     @Bean
     public IStratioStreamingAPI stratioStreamingApi() {
-        return StratioStreamingAPIFactory.create().withServerConfig(kafkaHost, kafkaPort, zookeeperHost,
-                zookeeperPort);
+        return kafkaHost == null && zookeeperHost == null ? connectNewApi() : connectOldApi();
+    }
+
+    protected IStratioStreamingAPI connectOldApi() {
+        return StratioStreamingAPIFactory.create().withServerConfig(kafkaHost, kafkaPort, zookeeperHost, zookeeperPort);
+    }
+
+    protected IStratioStreamingAPI connectNewApi() {
+        return StratioStreamingAPIFactory.create().withServerConfig(kafkaBrokers,zkQuorum);
     }
 }
