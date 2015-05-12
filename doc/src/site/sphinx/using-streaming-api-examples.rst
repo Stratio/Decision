@@ -4,28 +4,17 @@ Using Stratio Streaming API
 ***************************
 
 Creating and initializing the API
-=================================
-
-Scala::
-
-   scala val stratioStreamingAPI = StratioStreamingAPIFactory.create().initialize
-
-Java::
-
-   IStratioStreamingAPI stratioStreamingAPI = StratioStreamingAPIFactory.create().initialize();
-
-Creating and initializing the API with server configuration
 ===========================================================
 
 Scala::
 
    val stratioStreamingAPI = StratioStreamingAPIFactory.create()
-        .initializeWithServerConfig("stratio.node.com", 9092, "stratio.node.com", 2181)
+        .withServerConfig("stratio.node.com:9092", "stratio.node.com:2181")
 
 Java::
 
    IStratioStreamingAPI stratioStreamingAPI = StratioStreamingAPIFactory.create()
-        .initializeWithServerConfig("stratio.node.com", 9092, "stratio.node.com", 2181);
+        .withServerConfig("stratio.node.com:9092", "stratio.node.com:2181");
 
 Creating a new stream
 =====================
