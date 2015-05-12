@@ -31,6 +31,7 @@
         <spring.shell.version>1.1.0.RELEASE</spring.shell.version>
         <log4j.version>1.2.17</log4j.version>
         <junit.version>4.11</junit.version>
+        <outputFileName>stratio-streaming-shell</outputFileName>
     </properties>
     <dependencies>
         <dependency>
@@ -124,7 +125,7 @@
             <plugin>
                 <groupId>com.stratio.mojo.unix</groupId>
                 <artifactId>unix-maven-plugin</artifactId>
-                <version>1.0-alpha-9</version>
+                <version>1.1.2</version>
                 <extensions>true</extensions>
                 <inherited>false</inherited>
                 <configuration>
