@@ -31,17 +31,11 @@ import org.springframework.stereotype.Component;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class StratioStreamingBannerProvider extends DefaultBannerProvider {
 
-    @Value("${kafka.host}")
-    private String kafkaHost;
+    @Value("${kafka.brokers}")
+    private String kafkaBrokers;
 
-    @Value("${kafka.port}")
-    private String kafkaPort;
-
-    @Value("${zookeeper.host}")
-    private String zookeeperHost;
-
-    @Value("${zookeeper.port}")
-    private String zookeeperPort;
+    @Value("${zookeeper.quorum}")
+    private String zkQuorum;
 
     @Override
     public String getBanner() {
@@ -49,8 +43,8 @@ public class StratioStreamingBannerProvider extends DefaultBannerProvider {
         sb.append(FileUtils.readBanner(Main.class, "/banner.txt"));
         sb.append(OsUtils.LINE_SEPARATOR);
         sb.append("Connection urls: " + OsUtils.LINE_SEPARATOR);
-        sb.append("    - Kafka: " + kafkaHost + ":" + kafkaPort + OsUtils.LINE_SEPARATOR);
-        sb.append("    - Zookeeper: " + zookeeperHost + ":" + zookeeperPort + OsUtils.LINE_SEPARATOR);
+        sb.append("    - Kafka: " + kafkaBrokers);
+        sb.append("    - Zookeeper: " + zkQuorum);
         sb.append(OsUtils.LINE_SEPARATOR);
         return sb.toString();
     }
