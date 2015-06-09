@@ -147,8 +147,16 @@
                             <size>1</size>
                             <assembly>
                                 <copyDirectory>
-                                    <from>target/appassembler</from>
-                                    <to>/opt/sds/streaming-shell</to>
+                                    <from>target/appassembler/bin</from>
+                                    <to>/opt/sds/streaming-shell/bin</to>
+                                </copyDirectory>
+                                <copyDirectory>
+                                    <from>target/appassembler/repo</from>
+                                    <to>/opt/sds/streaming-shell/repo</to>
+                                </copyDirectory>
+                                <copyDirectory>
+                                    <from>target/appassembler/etc/</from>
+                                    <to>/opt/sds/streaming-shell/config</to>
                                 </copyDirectory>
                             </assembly>
                         </configuration>
