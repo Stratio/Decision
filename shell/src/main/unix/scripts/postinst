@@ -4,4 +4,4 @@
 
 set -e
 
-chmod 0755 /opt/stratio/streaming-shell/bin/*
+chmod 0755 /opt/sds/streaming-shell/bin/*

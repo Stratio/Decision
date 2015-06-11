@@ -15,9 +15,7 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.stratio.streaming</groupId>
@@ -29,9 +27,10 @@
     <packaging>jar</packaging>
     <properties>
         <spring.shell.version>1.1.0.RELEASE</spring.shell.version>
+        <jar.mainclass>org.springframework.shell.Bootstrap</jar.mainclass>
+        <outputFileName>stratio-streaming-shell</outputFileName>
         <log4j.version>1.2.17</log4j.version>
         <junit.version>4.11</junit.version>
-        <outputFileName>stratio-streaming-shell</outputFileName>
     </properties>
     <dependencies>
         <dependency>
@@ -63,12 +62,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/config</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -86,38 +79,46 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-        </plugins>
-    </build>
-    <profiles>
-	<profile>
-	    <id>package</id>
-	    <build>
-	    <plugins>	
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>appassembler-maven-plugin</artifactId>
                 <version>1.8.1</version>
+                <configuration>
+                    <configurationDirectory>config</configurationDirectory>
+                    <copyConfigurationDirectory>true</copyConfigurationDirectory>
+                    <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
+                    <assembleDirectory>target/appassembler</assembleDirectory>
+                    <extraJvmArguments>$SHELL_OPTS -Xms64m -Xmx64m</extraJvmArguments>
+                    <programs>
+                        <program>
+                            <mainClass>${jar.mainclass}</mainClass>
+                            <name>shell</name>
+                        </program>
+                    </programs>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>shell</id>
-                        <configuration>
-                            <configurationSourceDirectory>src/main/config
-                            </configurationSourceDirectory>
-                            <copyConfigurationDirectory>true</copyConfigurationDirectory>
-                            <includeConfigurationDirectoryInClasspath>true
-                            </includeConfigurationDirectoryInClasspath>
-                            <assembleDirectory>target/appassembler</assembleDirectory>
-                            <extraJvmArguments>$SHELL_OPTS -Xms64m -Xmx64m</extraJvmArguments>
-                            <programs>
-                                <program>
-                                    <mainClass>org.springframework.shell.Bootstrap</mainClass>
-                                    <id>run</id>
-                                </program>
-                            </programs>
-                        </configuration>
                         <phase>package</phase>
                         <goals>
                             <goal>assemble</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>assemble</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -155,7 +156,7 @@
                                     <to>/opt/sds/streaming-shell/repo</to>
                                 </copyDirectory>
                                 <copyDirectory>
-                                    <from>target/appassembler/etc/</from>
+                                    <from>target/appassembler/config/</from>
                                     <to>/opt/sds/streaming-shell/config</to>
                                 </copyDirectory>
                             </assembly>
@@ -170,6 +171,4 @@
             </plugin>
             </plugins>
 	</build>
-    </profile>
-    </profiles>
 </project>
