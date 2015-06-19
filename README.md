@@ -22,7 +22,7 @@ Streaming Cep Engine components
 - [Api](api/README.md)
 - [Shell](shell/README.md)
 - [Examples](examples/README.md)
-- [Documentation](doc/about.md)
+- [Documentation](http://docs.stratio.com/modules/streaming-cep-engine/development/)
 
 
 
@@ -98,4 +98,9 @@ Streaming CEP engine FAQ
 
 *Use the API or the Shell provided by Streaming CEP engine. You can send a really BIG amount of events.*
 
+
+Changelog
+---------
+
+See the [changelog](CHANGELOG.md) for changes.
 
