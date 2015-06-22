@@ -264,7 +264,13 @@ class StratioStreamingAPI
 
   override def isInit(): Boolean = streamingUpAndRunning
 
-  override def isConnected(): Boolean = zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH)
+  override def isConnected(): Boolean = {
+    try {
+      zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH)
+    } catch {
+      case ex => return false
+    }
+  }
 
   def defineAcknowledgeTimeOut(timeOutInMs: Int) = {
     ackTimeOut = timeOutInMs

@@ -70,11 +70,6 @@ class StratioStreamingIntegrationTests
       elasticSearchHost = conf.get("elasticSearchHost").get.toString
       elasticSearchPort = conf.get("elasticSearchPort").get.toString
 
-      streamingAPI.initializeWithServerConfig(kafkaHost,
-        kafkaPort,
-        zookeeperHost,
-        zookeeperPort)
-
       zookeeperCluster = s"$zookeeperHost:$zookeeperPort"
       zookeeperClient = CuratorFrameworkFactory.newClient(zookeeperCluster, retryPolicy)
       zookeeperConsumer = new ZookeeperConsumer(zookeeperClient)
