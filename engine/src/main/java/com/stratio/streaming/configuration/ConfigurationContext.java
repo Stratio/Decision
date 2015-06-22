@@ -30,6 +30,8 @@ public class ConfigurationContext {
 
     private final List<String> cassandraHosts;
     private final List<String> kafkaHosts;
+    private final String kafkaConsumerBrokerHost;
+    private final int kafkaConsumerBrokerPort;
     private final List<String> zookeeperHosts;
 
     private final boolean failOverEnabled;
@@ -100,6 +102,8 @@ public class ConfigurationContext {
 
         this.cassandraHosts = config.getStringList(ConfigurationKeys.CASSANDRA_HOSTS.getKey());
         this.kafkaHosts = config.getStringList(ConfigurationKeys.KAFKA_HOSTS.getKey());
+        this.kafkaConsumerBrokerHost = kafkaHosts.get(0).split(":")[0];
+        this.kafkaConsumerBrokerPort = Integer.parseInt(kafkaHosts.get(0).split(":")[1]);
         this.zookeeperHosts = config.getStringList(ConfigurationKeys.ZOOKEEPER_HOSTS.getKey());
         this.sparkHost = config.getString(ConfigurationKeys.SPARK_HOST.getKey());
         this.internalSparkHost = config.getString(ConfigurationKeys.INTERNAL_SPARK_HOST.getKey());
@@ -138,6 +142,14 @@ public class ConfigurationContext {
 
     public List<String> getKafkaHosts() {
         return kafkaHosts;
+    }
+
+    public String getKafkaConsumerBrokerHost() {
+        return kafkaConsumerBrokerHost;
+    }
+
+    public int getKafkaConsumerBrokerPort() {
+        return kafkaConsumerBrokerPort;
     }
 
     public List<String> getZookeeperHosts() {

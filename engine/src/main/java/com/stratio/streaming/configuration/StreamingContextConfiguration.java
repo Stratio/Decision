@@ -21,6 +21,7 @@ import com.stratio.streaming.commons.constants.BUS;
 import com.stratio.streaming.commons.constants.InternalTopic;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.constants.StreamAction;
+import com.stratio.streaming.commons.kafka.service.KafkaTopicService;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.*;
 import com.stratio.streaming.functions.dal.IndexStreamFunction;
@@ -49,6 +50,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,6 +69,8 @@ public class StreamingContextConfiguration {
     @Autowired
     private KafkaToJavaSerializer kafkaToJavaSerializer;
 
+    private KafkaTopicService kafkaTopicService;
+
     private JavaStreamingContext create(String streamingContextName, int port, long streamingBatchTime, String sparkHost) {
         SparkConf conf = new SparkConf();
         conf.set("spark.ui.port", String.valueOf(port));
@@ -77,6 +81,13 @@ public class StreamingContextConfiguration {
         JavaStreamingContext streamingContext = new JavaStreamingContext(conf, new Duration(streamingBatchTime));
 
         return streamingContext;
+    }
+
+    @PostConstruct
+    private void initTopicService() {
+        kafkaTopicService = new KafkaTopicService(configurationContext.getZookeeperHostsQuorum(),
+                configurationContext.getKafkaConsumerBrokerHost(), configurationContext.getKafkaConsumerBrokerPort(),
+                configurationContext.getKafkaConnectionTimeout(), configurationContext.getKafkaSessionTimeout());
     }
 
     @Bean(name = "actionContext", destroyMethod = "stop")
@@ -100,6 +111,8 @@ public class StreamingContextConfiguration {
 
         Map<String, Integer> baseTopicMap = new HashMap<String, Integer>();
         baseTopicMap.put(InternalTopic.TOPIC_REQUEST.getTopicName(), 1);
+
+        kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_REQUEST.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), BUS.STREAMING_GROUP_ID, baseTopicMap);
@@ -228,6 +241,8 @@ public class StreamingContextConfiguration {
         Map<String, Integer> baseTopicMap = new HashMap<String, Integer>();
         baseTopicMap.put(InternalTopic.TOPIC_DATA.getTopicName(), 1);
 
+        kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_DATA.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
+
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), BUS.STREAMING_GROUP_ID, baseTopicMap);
 
@@ -253,6 +268,8 @@ public class StreamingContextConfiguration {
 
         Map<String, Integer> topicActionMap = new HashMap<String, Integer>();
         topicActionMap.put(InternalTopic.TOPIC_ACTION.getTopicName(), 1);
+
+        kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_ACTION.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
         JavaPairDStream<String, String> dataDstream = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), BUS.STREAMING_GROUP_ID, topicActionMap);
