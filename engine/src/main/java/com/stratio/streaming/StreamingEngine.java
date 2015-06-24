@@ -34,6 +34,8 @@ public class StreamingEngine {
 
             annotationConfigApplicationContext.registerShutdownHook();
 
+            JavaStreamingContext actionContext = annotationConfigApplicationContext.getBean("actionContext", JavaStreamingContext.class);
+
             Map<String, JavaStreamingContext> contexts = annotationConfigApplicationContext
                     .getBeansOfType(JavaStreamingContext.class);
 
