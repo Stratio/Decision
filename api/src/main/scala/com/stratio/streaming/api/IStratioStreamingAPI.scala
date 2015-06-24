@@ -238,6 +238,20 @@ trait IStratioStreamingAPI {
   def stopSaveToMongo(streamName: String)
 
   /**
+   * Saves the stream to SolR.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def saveToSolr(streamName: String)
+
+  /**
+   * Stops saving the stream to Solr.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def stopSaveToSolr(streamName: String)
+
+  /**
    * Allows the client to define the time that the API
    * will wait for the engine responses.
    *

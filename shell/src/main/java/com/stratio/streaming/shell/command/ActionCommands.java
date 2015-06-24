@@ -96,6 +96,28 @@ public class ActionCommands implements CommandMarker {
         }
     }
 
+    @CliCommand(value = "save solr start", help = "start save to solr action")
+    public String saveSolrStart(
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+        try {
+            ssaw.api().saveToSolr(streamName);
+            return "Stream ".concat(streamName).concat(" attached to solr correctly");
+        } catch (StratioStreamingException e) {
+            throw new StreamingShellException(e);
+        }
+    }
+
+    @CliCommand(value = "save solr stop", help = "stop save to solr action")
+    public String saveSolrStop(
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+        try {
+            ssaw.api().stopSaveToSolr(streamName);
+            return "Stream ".concat(streamName).concat(" de-attached from solr correctly");
+        } catch (StratioStreamingException e) {
+            throw new StreamingShellException(e);
+        }
+    }
+
     @CliCommand(value = "listen start", help = "attach stream to kafka topic")
     public String listenStart(
             @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {

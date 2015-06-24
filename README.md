@@ -41,7 +41,7 @@ Stream Query Language
 
 **3 Stream Action Language (SAL)**
 
-* Listen to a stream (kafka), save the stream to Cassandra or mongoDB (auto-creation of tables), index the stream to ElasticSearch… here you should find useful operations ready to use.
+* Listen to a stream (kafka), save the stream to Cassandra or mongoDB (auto-creation of tables), index the stream to ElasticSearch or Solr… here you should find useful operations ready to use.
 
 * Start & Stop each action on-demand
 

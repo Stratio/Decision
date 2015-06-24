@@ -35,6 +35,8 @@ public interface STREAM_OPERATIONS {
     public interface ACTION {
         public static final String LISTEN = "LISTEN";
         public static final String STOP_LISTEN = "STOP_LISTEN";
+        public static final String SAVETO_SOLR = "SAVETO_SOLR";
+        public static final String STOP_SAVETO_SOLR = "STOP_SAVETO_SOLR";
         public static final String SAVETO_CASSANDRA = "SAVETO_CASSANDRA";
         public static final String STOP_SAVETO_CASSANDRA = "STOP_SAVETO_CASSANDRA";
         public static final String SAVETO_MONGO = "SAVETO_MONGO";
