@@ -17,14 +17,14 @@ SCRIPT_ACTION=/opt/sds/$MODULE/bin/runActionEngine
 SCRIPT_DATA=/opt/sds/$MODULE/bin/runDataEngine
 SCRIPT_PROCESS=/opt/sds/$MODULE/bin/runProcessEngine
 
-PIDFILE_ACTION=/var/run/sds/$MODULE_action.pid
-LOGFILE_ACTION=/var/log/sds/$MODULE_action.log
+PIDFILE_ACTION=/var/run/sds/"$MODULE"_action.pid
+LOGFILE_ACTION=/var/log/sds/"$MODULE"_action.log
 
-PIDFILE_DATA=/var/run/sds/$MODULE_data.pid
-LOGFILE_DATA=/var/log/sds/$MODULE_data.log
+PIDFILE_DATA=/var/run/sds/"$MODULE"_data.pid
+LOGFILE_DATA=/var/log/sds/"$MODULE"_data.log
 
-PIDFILE_PROCESS=/var/run/sds/$MODULE_process.pid
-LOGFILE_PROCESS=/var/log/sds/$MODULE_process.log
+PIDFILE_PROCESS=/var/run/sds/"$MODULE"_process.pid
+LOGFILE_PROCESS=/var/log/sds/"$MODULE"_process.log
 
 start() {
   if [ -f $PIDFILE_ACTION ] && kill -0 $(cat $PIDFILE_ACTION); then
