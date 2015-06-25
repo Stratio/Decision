@@ -34,7 +34,6 @@ public class SchredulerConfiguration {
     private ConfigurationContext configurationContext;
 
     @Autowired
-    @Lazy
     private StreamingFailoverService streamingFailoverService;
 
     @Bean
