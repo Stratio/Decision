@@ -198,25 +198,49 @@
 			        <includeConfigurationDirectoryInClasspath>true
 			        </includeConfigurationDirectoryInClasspath>
 			        <assembleDirectory>target/appassembler</assembleDirectory>
-			        <extraJvmArguments>$STREAMING_OPTS -Xms512m -Xmx512m
-				    -Dcom.sun.management.jmxremote.port=7193
-				    -Dcom.sun.management.jmxremote.authenticate=false
-				    -Dcom.sun.management.jmxremote.ssl=false
-			        </extraJvmArguments>
-
 			        <filterConfigurationDirectory>true</filterConfigurationDirectory>
 			        <programs>
                         <program>
                             <mainClass>com.stratio.streaming.StreamingActionEngine</mainClass>
                             <id>runActionEngine</id>
+                            <jvmSettings>
+                                <maxMemorySize>256m</maxMemorySize>
+                                <maxStackSize>128m</maxStackSize>
+                                <extraArguments>
+                                    <extraArgument>$STREAMING_OPTS</extraArgument>
+                                    <extraArgument>-Dcom.sun.management.jmxremote.port=7192</extraArgument>
+                                    <extraArgument>-Dcom.sun.management.jmxremote.authenticate=false</extraArgument>
+                                    <extraArgument>-Dcom.sun.management.jmxremote.ssl=false</extraArgument>
+                                </extraArguments>
+                            </jvmSettings>
                         </program>
                         <program>
                             <mainClass>com.stratio.streaming.StreamingProcessEngine</mainClass>
                             <id>runProcessEngine</id>
+                            <jvmSettings>
+                                <maxMemorySize>256m</maxMemorySize>
+                                <maxStackSize>128m</maxStackSize>
+                                <extraArguments>
+                                    <extraArgument>$STREAMING_OPTS</extraArgument>
+                                    <extraArgument>-Dcom.sun.management.jmxremote.port=7193</extraArgument>
+                                    <extraArgument>-Dcom.sun.management.jmxremote.authenticate=false</extraArgument>
+                                    <extraArgument>-Dcom.sun.management.jmxremote.ssl=false</extraArgument>
+                                </extraArguments>
+                            </jvmSettings>
                         </program>
                         <program>
                             <mainClass>com.stratio.streaming.StreamingDataEngine</mainClass>
                             <id>runDataEngine</id>
+                            <jvmSettings>
+                                <maxMemorySize>256m</maxMemorySize>
+                                <maxStackSize>128m</maxStackSize>
+                                <extraArguments>
+                                    <extraArgument>$STREAMING_OPTS</extraArgument>
+                                    <extraArgument>-Dcom.sun.management.jmxremote.port=7194</extraArgument>
+                                    <extraArgument>-Dcom.sun.management.jmxremote.authenticate=false</extraArgument>
+                                    <extraArgument>-Dcom.sun.management.jmxremote.ssl=false</extraArgument>
+                                </extraArguments>
+                            </jvmSettings>
                         </program>
 			        </programs>
 			        <platforms>
