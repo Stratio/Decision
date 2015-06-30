@@ -202,7 +202,7 @@
 			        <programs>
                         <program>
                             <mainClass>com.stratio.streaming.StreamingEngine</mainClass>
-                            <id>runActionEngine</id>
+                            <id>run</id>
                             <jvmSettings>
                                 <maxMemorySize>256m</maxMemorySize>
                                 <maxStackSize>128m</maxStackSize>
