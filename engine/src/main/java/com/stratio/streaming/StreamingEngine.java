@@ -34,16 +34,11 @@ public class StreamingEngine {
 
             annotationConfigApplicationContext.registerShutdownHook();
 
-            JavaStreamingContext actionContext = annotationConfigApplicationContext.getBean("actionContext", JavaStreamingContext.class);
+            JavaStreamingContext context = annotationConfigApplicationContext.getBean("streamingContext", JavaStreamingContext.class);
 
-            Map<String, JavaStreamingContext> contexts = annotationConfigApplicationContext
-                    .getBeansOfType(JavaStreamingContext.class);
+            context.start();
 
-            for (JavaStreamingContext context : contexts.values()) {
-                context.start();
-                log.info("Started context {}", context.sparkContext().appName());
-            }
-            contexts.get("actionContext").awaitTermination();
+            context.awaitTermination();
         } catch (Exception e) {
             log.error("Fatal error", e);
         }
