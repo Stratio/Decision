@@ -12,88 +12,39 @@ cat <<'EOF' > $MODULE
 ### END INIT INFO
  
 MODULE="streaming"
+SCRIPT=/opt/sds/$MODULE/bin/run
 RUNAS=stratio
-
-SCRIPT_ACTION=/opt/sds/$MODULE/bin/runActionEngine
-SCRIPT_DATA=/opt/sds/$MODULE/bin/runDataEngine
-SCRIPT_PROCESS=/opt/sds/$MODULE/bin/runProcessEngine
  
-PIDFILE_ACTION=/var/run/sds/"$MODULE"_action.pid
-LOGFILE_ACTION=/var/log/sds/"$MODULE"_action.log
-
-PIDFILE_DATA=/var/run/sds/"$MODULE"_data.pid
-LOGFILE_DATA=/var/log/sds/"$MODULE"_data.log
-
-PIDFILE_PROCESS=/var/run/sds/"$MODULE"_process.pid
-LOGFILE_PROCESS=/var/log/sds/"$MODULE"_process.log
+PIDFILE=/var/run/sds/$MODULE.pid
+LOGFILE=/var/log/sds/$MODULE.log
  
 start() {
-  if [ -f $PIDFILE_ACTION ] && kill -0 $(cat $PIDFILE_ACTION); then
-    echo 'Service streaming_action already running' >&2
-  else
-    echo 'Starting service streaming_action…' >&2
-    local CMD="$SCRIPT_ACTION &> \"$LOGFILE_ACTION\" & echo \$!"
-    su -c "$CMD" $RUNAS > "$PIDFILE_ACTION"
-    echo 'Service streaming_action started' >&2
+  if [ -f $PIDFILE ] && kill -0 $(cat $PIDFILE); then
+    echo 'Service already running' >&2
+    return 1
   fi
-  if [ -f $PIDFILE_DATA ] && kill -0 $(cat $PIDFILE_DATA); then
-    echo 'Service streaming_data already running' >&2
-  else
-    echo 'Starting service streaming_data…' >&2
-    local CMD="$SCRIPT_DATA &> \"$LOGFILE_DATA\" & echo \$!"
-    su -c "$CMD" $RUNAS > "$PIDFILE_DATA"
-    echo 'Service streaming_data started' >&2
-  fi
-  if [ -f $PIDFILE_PROCESS ] && kill -0 $(cat $PIDFILE_PROCESS); then
-    echo 'Service streaming_process already running' >&2
-  else
-    echo 'Starting service streaming_data…' >&2
-    local CMD="$SCRIPT_PROCESS &> \"$LOGFILE_PROCESS\" & echo \$!"
-    su -c "$CMD" $RUNAS > "$PIDFILE_PROCESS"
-    echo 'Service streaming_process started' >&2
-  fi
+  echo 'Starting service…' >&2
+  local CMD="$SCRIPT &> \"$LOGFILE\" & echo \$!"
+  su -c "$CMD" $RUNAS > "$PIDFILE"
+  echo 'Service started' >&2
 }
  
 stop() {
-  if [ ! -f "$PIDFILE_ACTION" ] || ! kill -0 $(cat "$PIDFILE_ACTION"); then
-    echo 'Service streaming_action not running' >&2
-  else
-    echo 'Stopping service streaming_action…' >&2
-    kill -15 $(cat "$PIDFILE_ACTION") && rm -f "$PIDFILE_ACTION"
-    echo 'Service streaming_action stopped' >&2
+  if [ ! -f "$PIDFILE" ] || ! kill -0 $(cat "$PIDFILE"); then
+    echo 'Service not running' >&2
+    return 1
   fi
-  if [ ! -f "$PIDFILE_DATA" ] || ! kill -0 $(cat "$PIDFILE_DATA"); then
-    echo 'Service streaming_data not running' >&2
-  else
-    echo 'Stopping service streaming_data…' >&2
-    kill -15 $(cat "$PIDFILE_DATA") && rm -f "$PIDFILE_DATA"
-    echo 'Service streaming_data stopped' >&2
-  fi
-  if [ ! -f "$PIDFILE_PROCESS" ] || ! kill -0 $(cat "$PIDFILE_PROCESS"); then
-    echo 'Service streaming_process not running' >&2
-  else
-    echo 'Stopping service streaming_process…' >&2
-    kill -15 $(cat "$PIDFILE_PROCESS") && rm -f "$PIDFILE_PROCESS"
-    echo 'Service streaming_process stopped' >&2
-  fi
+  echo 'Stopping service…' >&2
+  kill -15 $(cat "$PIDFILE") && rm -f "$PIDFILE"
+  echo 'Service stopped' >&2
 }
 
 status() {
-	if [ ! -f "$PIDFILE_ACTION" ]; then
-		echo 'Service streaming_action not running' >&2
+	if [ ! -f "$PIDFILE" ]; then
+		echo 'Service not running' >&2
 	else
-		echo 'Service streaming_action running with pid:' $(cat "$PIDFILE_ACTION") >&2
+		echo 'Service running with pid:' $(cat "$PIDFILE") >&2
 	fi
-	if [ ! -f "$PIDFILE_DATA" ]; then
-        echo 'Service streaming_data not running' >&2
-    else
-        echo 'Service streaming_data running with pid:' $(cat "$PIDFILE_DATA") >&2
-    fi
-    if [ ! -f "$PIDFILE_PROCESS" ]; then
-        echo 'Service streaming_process not running' >&2
-    else
-        echo 'Service streaming_process running with pid:' $(cat "$PIDFILE_PROCESS") >&2
-    fi
 }
 
 case "$1" in
@@ -137,9 +88,7 @@ else
 fi
 
 chown -R $USER:$GROUP /opt/sds/$MODULE
-chmod a+x /opt/sds/$MODULE/bin/runActionEngine
-chmod a+x /opt/sds/$MODULE/bin/runDataEngine
-chmod a+x /opt/sds/$MODULE/bin/runProcessEngine
+chmod a+x /opt/sds/$MODULE/bin/run
 chown -R $USER:$GROUP /etc/sds/$MODULE
 chown $USER:$GROUP /var/run/sds
 chown $USER:$GROUP /var/log/sds
