@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({ ZookeeperConfiguration.class, KafkaConfiguration.class,
+@Import({ StreamingContextConfiguration.class, ZookeeperConfiguration.class, KafkaConfiguration.class,
         MetricsConfiguration.class, CassandraConfiguration.class, SchredulerConfiguration.class })
 public class BaseConfiguration {
 
