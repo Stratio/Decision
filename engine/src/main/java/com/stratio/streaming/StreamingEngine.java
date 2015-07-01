@@ -41,6 +41,8 @@ public class StreamingEngine {
             context.awaitTermination();
         } catch (Exception e) {
             log.error("Fatal error", e);
+        } finally {
+            System.exit(0);
         }
     }
 }
