@@ -35,7 +35,7 @@
 		<level value="ERROR" />
 	</logger>
 	<root>
-		<priority value="DEBUG" />
+		<priority value="WARN" />
 		<appender-ref ref="console" />
 		<appender-ref ref="file" />
 	</root>
