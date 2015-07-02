@@ -15,14 +15,11 @@
  */
 package com.stratio.streaming;
 
-import java.util.Map;
-
+import com.stratio.streaming.configuration.BaseConfiguration;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import com.stratio.streaming.configuration.BaseConfiguration;
 
 public class StreamingEngine {
 
