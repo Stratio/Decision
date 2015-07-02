@@ -275,8 +275,6 @@ public class StreamingContextConfiguration {
     private void configureDataContext(JavaPairDStream<String, String> messages) {
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
 
-        kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_DATA.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
-
         JavaDStream<StratioStreamingMessage> insertRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.INSERT)).map(
                 keepPayloadFromMessageFunction);
