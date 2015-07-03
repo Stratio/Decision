@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2014 Stratio (http://stratio.com)
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,15 +15,17 @@
  */
 package com.stratio.streaming.dao;
 
+import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.constants.StreamAction;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.streams.QueryDTO;
 import com.stratio.streaming.streams.StreamStatusDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.siddhi.query.api.definition.Attribute;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class StreamStatusDao {
@@ -36,18 +38,18 @@ public class StreamStatusDao {
         streamStatuses = new ConcurrentHashMap<>();
     }
 
-    public StreamStatusDTO createInferredStream(String streamName) {
+    public StreamStatusDTO createInferredStream(String streamName, List<ColumnNameTypeValue> columns) {
         StreamStatusDTO streamStatus = null;
         if (streamStatuses.get(streamName) == null) {
-            streamStatus = new StreamStatusDTO(streamName, Boolean.FALSE);
+            streamStatus = new StreamStatusDTO(streamName, Boolean.FALSE, columns);
             streamStatuses.put(streamName, streamStatus);
         }
 
         return streamStatus;
     }
 
-    public StreamStatusDTO create(String streamName) {
-        StreamStatusDTO streamStatus = new StreamStatusDTO(streamName, Boolean.TRUE);
+    public StreamStatusDTO create(String streamName, List<ColumnNameTypeValue> columns) {
+        StreamStatusDTO streamStatus = new StreamStatusDTO(streamName, Boolean.TRUE, columns);
 
         if (streamStatuses.put(streamName, streamStatus) != null) {
             log.warn("Stream status of stream {} has been updated", streamName);
