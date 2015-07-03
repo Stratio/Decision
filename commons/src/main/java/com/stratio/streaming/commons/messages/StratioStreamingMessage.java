@@ -17,7 +17,6 @@ package com.stratio.streaming.commons.messages;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -176,7 +175,7 @@ public class StratioStreamingMessage implements Serializable {
     }
 
     public Set<StreamAction> getActiveActions() {
-        return activeActions != null ? activeActions : new HashSet<StreamAction>();
+        return activeActions;
     }
 
     public void setActiveActions(Set<StreamAction> activeActions) {
