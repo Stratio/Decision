@@ -1,6 +1,6 @@
 chown -R $USER:$GROUP /opt/sds/$MODULE
-chmod a+x /opt/sds/$MODULE/bin/run
 MODULE="streaming"
+chmod a+x /opt/sds/$MODULE/bin/run
 
 cat <<'EOF' > $MODULE
 

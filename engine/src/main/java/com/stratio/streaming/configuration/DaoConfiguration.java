@@ -29,11 +29,9 @@ import com.stratio.streaming.factory.GsonFactory;
 public class DaoConfiguration {
 
     @Autowired
-    @Lazy
     private Session session;
 
     @Bean
-    @Lazy
     public StreamingFailoverDao streamingFailoverDao() {
         return new StreamingFailoverDao(session, GsonFactory.getInstance());
     }
