@@ -1,12 +1,9 @@
 package com.stratio.streaming.configuration;
 
-import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.streaming.commons.constants.BUS;
 import com.stratio.streaming.commons.constants.InternalTopic;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
-import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.functions.*;
 import com.stratio.streaming.functions.dal.IndexStreamFunction;
 import com.stratio.streaming.functions.dal.ListenStreamFunction;
 import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
