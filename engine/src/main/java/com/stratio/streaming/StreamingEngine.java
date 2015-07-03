@@ -15,14 +15,11 @@
  */
 package com.stratio.streaming;
 
-import java.util.Map;
-
+import com.stratio.streaming.configuration.BaseConfiguration;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import com.stratio.streaming.configuration.BaseConfiguration;
 
 public class StreamingEngine {
 
@@ -34,16 +31,15 @@ public class StreamingEngine {
 
             annotationConfigApplicationContext.registerShutdownHook();
 
-            Map<String, JavaStreamingContext> contexts = annotationConfigApplicationContext
-                    .getBeansOfType(JavaStreamingContext.class);
+            JavaStreamingContext context = annotationConfigApplicationContext.getBean("streamingContext", JavaStreamingContext.class);
 
-            for (JavaStreamingContext context : contexts.values()) {
-                context.start();
-                log.info("Started context {}", context.sparkContext().appName());
-            }
-            contexts.get("actionContext").awaitTermination();
+            context.start();
+
+            context.awaitTermination();
         } catch (Exception e) {
             log.error("Fatal error", e);
+        } finally {
+            System.exit(0);
         }
     }
 }
