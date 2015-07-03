@@ -24,6 +24,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,8 +77,11 @@ public class ZKUtils {
         if (client.checkExists().forPath(path) != null) {
             client.delete().deletingChildrenIfNeeded().forPath(path);
         }
-
-        client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, data);
+        try {
+            client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, data);
+        } catch (KeeperException.NodeExistsException e) {
+            logger.warn("Node with path [" + path + "] was already created by another process.");
+        }
     }
 
     public void createZNodeJsonReply(StratioStreamingMessage request, Object reply) throws Exception {
