@@ -50,7 +50,7 @@ public class StreamingActionContextConfiguration extends StreamingContextConfigu
                 configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
         JavaPairDStream<String, String> dataDstream = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), BUS.STREAMING_GROUP_ID, topicActionMap);
+                configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_ACTION.getTopicName(), topicActionMap);
 
         JavaDStream<StratioStreamingMessage> parsedDataDstream = dataDstream.map(new SerializerFunction());
 

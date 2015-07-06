@@ -61,7 +61,7 @@ public class StreamingProcessContextConfiguration extends StreamingContextConfig
                 configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), BUS.STREAMING_GROUP_ID, baseTopicMap);
+                configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_REQUEST.getTopicName(), baseTopicMap);
 
         messages.cache();
 
