@@ -7,6 +7,7 @@ import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.commons.messages.StreamQuery;
 import com.stratio.streaming.dao.StreamStatusDao;
+import com.stratio.streaming.exception.CacheException;
 import com.stratio.streaming.exception.ServiceException;
 import com.stratio.streaming.streams.QueryDTO;
 import com.stratio.streaming.streams.StreamStatusDTO;
@@ -38,7 +39,7 @@ public class StreamOperationServiceWithoutMetrics {
         this.callbackService = callbackService;
     }
 
-    public void createInternalStream(String streamName, List<ColumnNameTypeValue> columns) {
+    public void createInternalStream(String streamName, List<ColumnNameTypeValue> columns) throws CacheException {
         StreamDefinition newStream = QueryFactory.createStreamDefinition().name(streamName);
         for (ColumnNameTypeValue column : columns) {
             newStream.attribute(column.getColumn(), getSiddhiType(column.getType()));
@@ -47,7 +48,7 @@ public class StreamOperationServiceWithoutMetrics {
         streamStatusDao.createInferredStream(streamName);
     }
 
-    public void createStream(String streamName, List<ColumnNameTypeValue> columns) {
+    public void createStream(String streamName, List<ColumnNameTypeValue> columns) throws CacheException {
         StreamDefinition newStream = QueryFactory.createStreamDefinition().name(streamName);
         for (ColumnNameTypeValue column : columns) {
             newStream.attribute(column.getColumn(), getSiddhiType(column.getType()));
@@ -56,11 +57,11 @@ public class StreamOperationServiceWithoutMetrics {
         streamStatusDao.create(streamName);
     }
 
-    public boolean streamExist(String streamName) {
+    public boolean streamExist(String streamName) throws CacheException {
         return streamStatusDao.get(streamName) != null ? true : false;
     }
 
-    public boolean isUserDefined(String streamName) {
+    public boolean isUserDefined(String streamName) throws CacheException {
         StreamStatusDTO streamStatus = streamStatusDao.get(streamName);
         return streamStatus != null ? streamStatus.getUserDefined() : false;
     }
@@ -82,7 +83,7 @@ public class StreamOperationServiceWithoutMetrics {
     }
 
 
-    public void dropStream(String streamName) {
+    public void dropStream(String streamName) throws CacheException {
 
         Map<String, QueryDTO> attachedQueries = streamStatusDao.get(streamName).getAddedQueries();
         for (String queryId : attachedQueries.keySet()) {
@@ -93,7 +94,7 @@ public class StreamOperationServiceWithoutMetrics {
     }
 
 
-    public void addQuery(String streamName, String queryString) {
+    public void addQuery(String streamName, String queryString) throws CacheException {
         String queryId = siddhiManager.addQuery(queryString);
         streamStatusDao.addQuery(streamName, queryId, queryString);
         for (StreamDefinition streamDefinition : siddhiManager.getStreamDefinitions()) {
@@ -103,7 +104,7 @@ public class StreamOperationServiceWithoutMetrics {
     }
 
 
-    public void removeQuery(String queryId, String streamName) {
+    public void removeQuery(String queryId, String streamName) throws CacheException {
         siddhiManager.removeQuery(queryId);
         streamStatusDao.removeQuery(streamName, queryId);
         for (Map.Entry<String, StreamStatusDTO> streamStatus : streamStatusDao.getAll().entrySet()) {
@@ -114,7 +115,7 @@ public class StreamOperationServiceWithoutMetrics {
         }
     }
 
-    public boolean queryIdExists(String streamName, String queryId) {
+    public boolean queryIdExists(String streamName, String queryId) throws CacheException {
         StreamStatusDTO streamStatus = streamStatusDao.get(streamName);
         if (streamStatus != null) {
             return streamStatus.getAddedQueries().containsKey(queryId);
@@ -123,7 +124,7 @@ public class StreamOperationServiceWithoutMetrics {
         }
     }
 
-    public boolean queryRawExists(String streamName, String queryRaw) {
+    public boolean queryRawExists(String streamName, String queryRaw) throws CacheException {
         StreamStatusDTO streamStatus = streamStatusDao.get(streamName);
         if (streamStatus != null) {
             return streamStatus.getAddedQueries().containsValue(new QueryDTO(queryRaw));
@@ -132,7 +133,7 @@ public class StreamOperationServiceWithoutMetrics {
         }
     }
 
-    public void enableAction(String streamName, StreamAction action) {
+    public void enableAction(String streamName, StreamAction action) throws CacheException {
 
         if (streamStatusDao.getEnabledActions(streamName).size() == 0) {
             String actionQueryId = siddhiManager.addQuery(QueryFactory.createQuery()
@@ -148,7 +149,7 @@ public class StreamOperationServiceWithoutMetrics {
         streamStatusDao.enableAction(streamName, action);
     }
 
-    public void disableAction(String streamName, StreamAction action) {
+    public void disableAction(String streamName, StreamAction action) throws CacheException {
         streamStatusDao.disableAction(streamName, action);
 
         if (streamStatusDao.getEnabledActions(streamName).size() == 0) {
@@ -160,12 +161,12 @@ public class StreamOperationServiceWithoutMetrics {
         }
     }
 
-    public boolean isActionEnabled(String streamName, StreamAction action) {
+    public boolean isActionEnabled(String streamName, StreamAction action) throws CacheException {
         return streamStatusDao.getEnabledActions(streamName).contains(action);
     }
 
 
-    public List<StratioStreamingMessage> list() {
+    public List<StratioStreamingMessage> list() throws CacheException {
         List<StratioStreamingMessage> result = new ArrayList<>();
         for (StreamDefinition streamDefinition : siddhiManager.getStreamDefinitions()) {
             if (suitableToList(streamDefinition.getStreamId())) {

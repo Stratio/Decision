@@ -17,6 +17,7 @@ package com.stratio.streaming.service;
 
 import com.stratio.streaming.dao.StreamStatusDao;
 import com.stratio.streaming.dao.StreamingFailoverDao;
+import com.stratio.streaming.exception.CacheException;
 import com.stratio.streaming.model.CassandraPersistenceStoreModel;
 
 public class StreamingFailoverService {
@@ -32,7 +33,7 @@ public class StreamingFailoverService {
         this.streamingFailoverDao = streamingFailoverDao;
     }
 
-    public synchronized void load() {
+    public synchronized void load() throws CacheException {
         CassandraPersistenceStoreModel cassandraPersistenceStoreModel = streamingFailoverDao.load();
         if (cassandraPersistenceStoreModel != null) {
             streamStatusDao.putAll(cassandraPersistenceStoreModel.getStreamStatuses());

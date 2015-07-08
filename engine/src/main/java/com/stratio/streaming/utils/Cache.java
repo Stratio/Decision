@@ -13,23 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.streaming.task;
+package com.stratio.streaming.utils;
 
 import com.stratio.streaming.exception.CacheException;
-import com.stratio.streaming.service.StreamingFailoverService;
 
-public class FailOverTask implements Runnable {
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
-    private final StreamingFailoverService streamingFailoverService;
+/**
+ * Storage of objects by key.
+ */
+public interface Cache<K, V> {
 
-    public FailOverTask(StreamingFailoverService streamingFailoverService) throws CacheException {
-        this.streamingFailoverService = streamingFailoverService;
-        streamingFailoverService.load();
-    }
+    public V get(K key) throws CacheException;
 
-    @Override
-    public void run() {
-        streamingFailoverService.save();
-    }
+    public V put(K key, V value) throws CacheException;
 
+    public void putAll(Map<K, V> elements) throws CacheException;
+
+    public V remove(K key) throws CacheException;
+
+    public void clear() throws CacheException;
+
+    public int size();
+
+    public Set<K> keys();
+
+    public Collection<V> values();
+
+    public Map<K, V> asMap();
 }

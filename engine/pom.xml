@@ -164,6 +164,12 @@
             <artifactId>spring-context</artifactId>
             <version>4.0.6.RELEASE</version>
         </dependency>
+        <!-- DISTRIBUTED CACHE -->
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+            <version>3.4.1</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -17,6 +17,8 @@ package com.stratio.streaming.functions.ddl;
 
 import java.util.Set;
 
+import com.stratio.streaming.exception.CacheException;
+import com.stratio.streaming.exception.ServiceException;
 import org.wso2.siddhi.core.exception.DifferentDefinitionAlreadyExistException;
 import org.wso2.siddhi.query.api.exception.MalformedAttributeException;
 import org.wso2.siddhi.query.api.exception.SourceNotExistException;
@@ -65,13 +67,20 @@ public class AddQueryToStreamFunction extends ActionBaseFunction {
         } catch (DifferentDefinitionAlreadyExistException e) {
             throw new RequestValidationException(
                     ReplyCode.KO_OUTPUTSTREAM_EXISTS_AND_DEFINITION_IS_DIFFERENT.getCode(), e);
+        } catch (CacheException e) {
+            throw new RequestValidationException(ReplyCode.KO_GENERAL_ERROR.getCode(), e);
         }
         return true;
     }
 
     @Override
     protected boolean stopAction(StratioStreamingMessage message) {
-        getStreamOperationService().removeQuery(message.getRequest(), message.getStreamName());
+        try {
+            getStreamOperationService().removeQuery(message.getRequest(), message.getStreamName());
+        } catch (CacheException e) {
+            log.error("Error while accesing Streaming Status cache.", e);
+            return false;
+        }
         return true;
     }
 

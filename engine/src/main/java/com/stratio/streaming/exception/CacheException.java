@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.streaming.task;
+package com.stratio.streaming.exception;
 
-import com.stratio.streaming.exception.CacheException;
-import com.stratio.streaming.service.StreamingFailoverService;
+/**
+ * Exceptions related to caching operations.
+ */
+public class CacheException extends RuntimeException {
 
-public class FailOverTask implements Runnable {
-
-    private final StreamingFailoverService streamingFailoverService;
-
-    public FailOverTask(StreamingFailoverService streamingFailoverService) throws CacheException {
-        this.streamingFailoverService = streamingFailoverService;
-        streamingFailoverService.load();
+    public CacheException() {
+        super();
     }
 
-    @Override
-    public void run() {
-        streamingFailoverService.save();
+    public CacheException(String message) {
+        super(message);
     }
+
+    public CacheException(Throwable cause) {
+        super(cause);
+    }
+
+    public CacheException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 
 }

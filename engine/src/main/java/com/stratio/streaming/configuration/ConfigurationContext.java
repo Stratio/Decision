@@ -51,6 +51,9 @@ public class ConfigurationContext {
     private final String sparkHost;
     private final String internalSparkHost;
 
+    private final String hazelcastInstanceName;
+    private final String hazelcastConfigPath;
+
     /**
      * OPTIONAL PROPERTIES *
      */
@@ -83,7 +86,9 @@ public class ConfigurationContext {
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
         MONGO_HOST("mongo.hosts"),
         MONGO_USER("mongo.user"),
-        MONGO_PASSWORD("mongo.password");
+        MONGO_PASSWORD("mongo.password"),
+        HAZELCAST_INSTANCE_NAME("hazelcast.instanceName"),
+        HAZELCAST_CONFIG_PATH("hazelcast.configPath");
 
         private final String key;
 
@@ -129,6 +134,9 @@ public class ConfigurationContext {
         this.mongoHosts = (List<String>) this.getListOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
         this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
+
+        this.hazelcastInstanceName = config.getString(ConfigurationKeys.HAZELCAST_INSTANCE_NAME.getKey());
+        this.hazelcastConfigPath = config.getString(ConfigurationKeys.HAZELCAST_CONFIG_PATH.getKey());
 
     }
 
@@ -234,6 +242,14 @@ public class ConfigurationContext {
 
     public String getInternalSparkHost() {
         return internalSparkHost;
+    }
+
+    public String getHazelcastInstanceName() {
+        return hazelcastInstanceName;
+    }
+
+    public String getHazelcastConfigPath() {
+        return hazelcastConfigPath;
     }
 
     private Object getValueOrNull(String key, Config config) {

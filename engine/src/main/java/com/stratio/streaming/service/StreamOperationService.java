@@ -21,6 +21,7 @@ import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.dao.StreamStatusDao;
+import com.stratio.streaming.exception.CacheException;
 import com.stratio.streaming.exception.ServiceException;
 import org.wso2.siddhi.core.SiddhiManager;
 
@@ -34,17 +35,17 @@ public class StreamOperationService extends StreamOperationServiceWithoutMetrics
 
     @Override
     @Counted(absolute = true, name = "streams.total.created", monotonic = true)
-    public void createStream(String streamName, List<ColumnNameTypeValue> columns) {
+    public void createStream(String streamName, List<ColumnNameTypeValue> columns) throws CacheException {
         super.createStream(streamName, columns);
     }
 
     @Override
-    public boolean streamExist(String streamName) {
+    public boolean streamExist(String streamName) throws CacheException {
         return super.streamExist(streamName);
     }
 
     @Override
-    public boolean isUserDefined(String streamName) {
+    public boolean isUserDefined(String streamName) throws CacheException {
         return super.isUserDefined(streamName);
     }
 
@@ -56,50 +57,50 @@ public class StreamOperationService extends StreamOperationServiceWithoutMetrics
 
     @Override
     @Counted(absolute = true, name = "streams.total.deleted", monotonic = true)
-    public void dropStream(String streamName) {
+    public void dropStream(String streamName) throws CacheException {
         super.dropStream(streamName);
     }
 
     @Override
     @Counted(absolute = true, name = "queries.total.added", monotonic = true)
-    public void addQuery(String streamName, String queryString) {
+    public void addQuery(String streamName, String queryString) throws CacheException {
         super.addQuery(streamName, queryString);
     }
 
     @Override
     @Counted(absolute = true, name = "queries.total.removed", monotonic = true)
-    public void removeQuery(String queryId, String streamName) {
+    public void removeQuery(String queryId, String streamName) throws CacheException {
         super.removeQuery(queryId, streamName);
     }
 
     @Override
-    public boolean queryIdExists(String streamName, String queryId) {
+    public boolean queryIdExists(String streamName, String queryId) throws CacheException {
         return super.queryIdExists(streamName, queryId);
     }
 
     @Override
-    public boolean queryRawExists(String streamName, String queryRaw) {
+    public boolean queryRawExists(String streamName, String queryRaw) throws CacheException {
         return super.queryRawExists(streamName, queryRaw);
     }
 
     @Override
-    public void enableAction(String streamName, StreamAction action) {
+    public void enableAction(String streamName, StreamAction action) throws CacheException {
         super.enableAction(streamName, action);
     }
 
     @Override
-    public void disableAction(String streamName, StreamAction action) {
+    public void disableAction(String streamName, StreamAction action) throws CacheException {
         super.disableAction(streamName, action);
     }
 
     @Override
-    public boolean isActionEnabled(String streamName, StreamAction action) {
+    public boolean isActionEnabled(String streamName, StreamAction action) throws CacheException {
         return super.isActionEnabled(streamName, action);
     }
 
     @Override
     @Counted(absolute = true, name = "streams.total.listed", monotonic = true)
-    public List<StratioStreamingMessage> list() {
+    public List<StratioStreamingMessage> list() throws CacheException {
         return super.list();
     }
 
