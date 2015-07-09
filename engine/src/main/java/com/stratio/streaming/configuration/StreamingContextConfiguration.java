@@ -234,6 +234,8 @@ public class StreamingContextConfiguration {
 
         baseTopicMap.put(InternalTopic.TOPIC_ACTION.getTopicName(), 1);
 
+        kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_ACTION.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
+
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_ACTION.getTopicName(), baseTopicMap);
         messages.cache();
@@ -268,6 +270,8 @@ public class StreamingContextConfiguration {
         Map<String, Integer> baseTopicMap = new HashMap<>();
 
         baseTopicMap.put(InternalTopic.TOPIC_DATA.getTopicName(), 1);
+
+        kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_DATA.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_DATA.getTopicName(), baseTopicMap);
