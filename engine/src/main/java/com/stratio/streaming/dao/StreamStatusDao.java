@@ -16,7 +16,6 @@
 package com.stratio.streaming.dao;
 
 import com.stratio.streaming.commons.constants.StreamAction;
-import com.stratio.streaming.configuration.StreamingStatusDaoConfiguration;
 import com.stratio.streaming.exception.CacheException;
 import com.stratio.streaming.streams.QueryDTO;
 import com.stratio.streaming.streams.StreamStatusDTO;
@@ -25,27 +24,18 @@ import com.stratio.streaming.utils.hazelcast.HazelcastCache;
 import com.stratio.streaming.utils.hazelcast.StreamingHazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@Component
-@Import({StreamingStatusDaoConfiguration.class})
 public class StreamStatusDao {
 
     private static final Logger log = LoggerFactory.getLogger(StreamStatusDao.class);
 
-    @Autowired
-    private StreamingHazelcastInstance streamingHazelcastInstance;
-
     private Cache<String, StreamStatusDTO> streamStatuses;
 
-
-    public StreamStatusDao() {
+    public StreamStatusDao(StreamingHazelcastInstance streamingHazelcastInstance) {
         streamStatuses = new HazelcastCache<>(streamingHazelcastInstance.getHazelcastInstance(), "streamStatuses");
     }
 
@@ -89,6 +79,7 @@ public class StreamStatusDao {
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
         if (streamStatus != null) {
             streamStatus.getAddedQueries().put(queryId, new QueryDTO(queryRaw));
+            streamStatuses.put(streamName, streamStatus);
         }
         return streamStatus;
     }
@@ -97,17 +88,20 @@ public class StreamStatusDao {
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
         if (streamStatus != null) {
             streamStatus.getAddedQueries().remove(queryId);
+            streamStatuses.put(streamName, streamStatus);
         }
     }
 
     public void enableAction(String streamName, StreamAction action) throws CacheException {
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
         streamStatus.getActionsEnabled().add(action);
+        streamStatuses.put(streamName, streamStatus);
     }
 
     public void disableAction(String streamName, StreamAction action) throws CacheException {
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
         streamStatus.getActionsEnabled().remove(action);
+        streamStatuses.put(streamName, streamStatus);
     }
 
     public Set<StreamAction> getEnabledActions(String streamName) throws CacheException {
@@ -123,12 +117,14 @@ public class StreamStatusDao {
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
         String actionQueryId = streamStatus.getActionQueryId();
         streamStatus.setActionQueryId(null);
+        streamStatuses.put(streamName, streamStatus);
         return actionQueryId;
     }
 
     public void setActionQuery(String streamName, String queryId) throws CacheException {
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
         streamStatus.setActionQueryId(queryId);
+        streamStatuses.put(streamName, streamStatus);
     }
 
 }

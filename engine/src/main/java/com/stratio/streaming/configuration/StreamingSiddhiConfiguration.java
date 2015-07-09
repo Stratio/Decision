@@ -15,42 +15,27 @@
  */
 package com.stratio.streaming.configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.stratio.streaming.utils.hazelcast.SharedSiddhiManager;
+import com.stratio.streaming.utils.hazelcast.StreamingHazelcastInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.config.SiddhiConfiguration;
-
-import com.stratio.streaming.siddhi.extension.DistinctWindowExtension;
 
 @Configuration
+@Import({HazelcastConfiguration.class})
 public class StreamingSiddhiConfiguration {
-
-    public static final String QUERY_PLAN_IDENTIFIER = "StratioStreamingCEP-Cluster";
 
     @Autowired
     private ConfigurationContext configurationContext;
 
+    @Autowired
+    private StreamingHazelcastInstance streamingHazelcastInstance;
+
     @Bean(destroyMethod = "shutdown")
     public SiddhiManager siddhiManager() {
-        SiddhiConfiguration conf = new SiddhiConfiguration();
-        conf.setInstanceIdentifier("StratioStreamingCEP-Instance-" + UUID.randomUUID().toString());
-        conf.setQueryPlanIdentifier(QUERY_PLAN_IDENTIFIER);
-        conf.setDistributedProcessing(false);
-
-        @SuppressWarnings("rawtypes")
-        List<Class> extensions = new ArrayList<>();
-        extensions.add(DistinctWindowExtension.class);
-        conf.setSiddhiExtensions(extensions);
-
-        // Create Siddhi Manager
-        SiddhiManager siddhiManager = new SiddhiManager(conf);
-
-        return siddhiManager;
+        return new SharedSiddhiManager(streamingHazelcastInstance);
     }
 
 }

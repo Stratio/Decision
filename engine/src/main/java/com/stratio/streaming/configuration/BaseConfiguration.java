@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import({ StreamingContextConfiguration.class, StreamingActionContextConfiguration.class, StreamingDataContextConfiguration.class,
         StreamingProcessContextConfiguration.class, ZookeeperConfiguration.class, KafkaConfiguration.class,
-        MetricsConfiguration.class, CassandraConfiguration.class, SchredulerConfiguration.class, StreamingStatusDaoConfiguration.class })
+        MetricsConfiguration.class, CassandraConfiguration.class, SchredulerConfiguration.class, HazelcastConfiguration.class })
 public class BaseConfiguration {
 
     @Bean

@@ -15,9 +15,11 @@
  */
 package com.stratio.streaming.configuration;
 
+import com.stratio.streaming.utils.hazelcast.StreamingHazelcastInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 
 import com.datastax.driver.core.Session;
@@ -26,11 +28,15 @@ import com.stratio.streaming.dao.StreamingFailoverDao;
 import com.stratio.streaming.factory.GsonFactory;
 
 @Configuration
+@Import({HazelcastConfiguration.class})
 public class DaoConfiguration {
 
     @Autowired
     @Lazy
     private Session session;
+
+    @Autowired
+    private StreamingHazelcastInstance streamingHazelcastInstance;
 
     @Bean
     @Lazy
@@ -40,7 +46,7 @@ public class DaoConfiguration {
 
     @Bean
     public StreamStatusDao streamStatusDao() {
-        return new StreamStatusDao();
+        return new StreamStatusDao(streamingHazelcastInstance);
     }
 
 }

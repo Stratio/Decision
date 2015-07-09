@@ -34,8 +34,11 @@
 	<logger name="org.apache">
 		<level value="ERROR" />
 	</logger>
+	<logger name="com.hazelcast">
+		<level value="DEBUG" />
+	</logger>
 	<root>
-		<priority value="WARN" />
+		<priority value="ERROR" />
 		<appender-ref ref="console" />
 		<appender-ref ref="file" />
 	</root>

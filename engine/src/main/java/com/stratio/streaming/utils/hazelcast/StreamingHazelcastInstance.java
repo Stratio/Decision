@@ -3,12 +3,8 @@ package com.stratio.streaming.utils.hazelcast;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.stratio.streaming.configuration.ConfigurationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,26 +12,17 @@ import java.io.IOException;
 /**
  * Hazelcast instance.
  */
-@Component
-
 public class StreamingHazelcastInstance {
 
     private static Logger log = LoggerFactory.getLogger(StreamingHazelcastInstance.class);
 
-    @Autowired
-    private ConfigurationContext configurationContext;
-
     private HazelcastInstance hazelcastInstance;
 
-    private String hazelcastInstanceName = "streaming";
-    private String hazelcastConfigPath = "hazelcast.xml";
-
-
-    public StreamingHazelcastInstance() throws IOException {
+    public StreamingHazelcastInstance(String hazelcastInstanceName, String hazelcastConfigPath) throws IOException {
         log.debug("Creating Hazelcast instance");
-        this.hazelcastInstanceName = configurationContext.getHazelcastInstanceName();
-        this.hazelcastConfigPath = configurationContext.getHazelcastConfigPath();
         Config config = new Config();
+        config.setProperty("hazelcast.logging.type", "log4j");
+        config.setProperty("log4j.configuration", "log4j.xml");
         config.setInstanceName(hazelcastInstanceName);
         File f = new File(getClass().getClassLoader().getResource(hazelcastConfigPath).getPath());
         if (f.exists() && !f.isDirectory()) {
@@ -44,7 +31,8 @@ public class StreamingHazelcastInstance {
         } else {
             throw new IOException("Hazelcast configuration [" + hazelcastConfigPath + "] not found");
         }
-        this.hazelcastInstance = Hazelcast.getOrCreateHazelcastInstance(config);
+        this.hazelcastInstance = Hazelcast.newHazelcastInstance(config);
+        log.error("Number of hazelcast members in cluster");
     }
 
     public void destroy() {
