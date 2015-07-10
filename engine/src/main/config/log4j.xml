@@ -32,10 +32,10 @@
 		</layout>
 	</appender>
 	<logger name="org.apache">
-		<level value="ERROR" />
+		<level value="DEBUG" />
 	</logger>
 	<root>
-		<priority value="WARN" />
+		<priority value="DEBUG" />
 		<appender-ref ref="console" />
 		<appender-ref ref="file" />
 	</root>
