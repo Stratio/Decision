@@ -254,15 +254,6 @@
                         <dir>/bin</dir>
                     </excludeDirectoryAttributes>
                     <assembly>
-                        <copyFile>
-                            <path>src/main/unix/files_and_dirs/etc/init.d/streaming</path>
-                            <toFile>/etc/init.d/datavis</toFile>
-                            <attributes>
-                                <user>root</user>
-                                <group>root</group>
-                                <mode>755</mode>
-                            </attributes>
-                        </copyFile>
                         <mkdirs>
                             <path>/opt/sds/streaming</path>
                             <attributes>

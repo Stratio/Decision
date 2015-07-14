@@ -123,52 +123,104 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>com.stratio.mojo.unix</groupId>
                 <artifactId>unix-maven-plugin</artifactId>
-                <version>1.1.2</version>
+                <version>1.1.6</version>
                 <extensions>true</extensions>
                 <inherited>false</inherited>
                 <configuration>
-                    <contact><![CDATA[Stratio Streaming<streaming@stratio.com>]]></contact>
+                    <outputFileName>stratio-streaming-shell</outputFileName>
+                    <contact>
+                        <![CDATA[Stratio Streaming<streaming@stratio.com>]]>
+                    </contact>
                     <contactEmail>streaming@stratio.com</contactEmail>
                     <deb>
                         <section>devel</section>
                     </deb>
                     <rpm>
                         <group>stratio</group>
+                        <requires>bash</requires>
                     </rpm>
+                    <name>Streaming Shell</name>
+                    <excludeDirectoryAttributes>
+                        <dir>/etc</dir>
+                        <dir>/etc/init.d</dir>
+                        <dir>/etc/default</dir>
+                        <dir>/var</dir>
+                        <dir>/opt</dir>
+                        <dir>/usr</dir>
+                        <dir>/bin</dir>
+                    </excludeDirectoryAttributes>
+                    <assembly>
+                        <mkdirs>
+                            <path>/opt/sds/datavis</path>
+                            <attributes>
+                                <user>stratio</user>
+                                <group>stratio</group>
+                            </attributes>
+                        </mkdirs>
+                        <mkdirs>
+                            <path>/var/run/sds</path>
+                            <attributes>
+                                <user>stratio</user>
+                                <group>stratio</group>
+                            </attributes>
+                        </mkdirs>
+                        <copyDirectory>
+                            <from>target/appassembler/bin</from>
+                            <to>/opt/sds/streaming-shell/bin</to>
+                        </copyDirectory>
+                        <copyDirectory>
+                            <from>target/appassembler/repo</from>
+                            <to>/opt/sds/streaming-shell/repo</to>
+                        </copyDirectory>
+                        <copyDirectory>
+                            <from>target/appassembler/config/</from>
+                            <to>/opt/sds/streaming-shell/config</to>
+                        </copyDirectory>
+                    </assembly>
+                    <defaults>
+                        <directoryAttributes>
+                            <mode>0755</mode>
+                        </directoryAttributes>
+                        <fileAttributes>
+                            <mode>0644</mode>
+                        </fileAttributes>
+                    </defaults>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>shell</id>
+                        <id>deb</id>
                         <phase>package</phase>
-                        <configuration>
-                            <name>Shell</name>
-                            <size>1</size>
-                            <assembly>
-                                <copyDirectory>
-                                    <from>target/appassembler/bin</from>
-                                    <to>/opt/sds/streaming-shell/bin</to>
-                                </copyDirectory>
-                                <copyDirectory>
-                                    <from>target/appassembler/repo</from>
-                                    <to>/opt/sds/streaming-shell/repo</to>
-                                </copyDirectory>
-                                <copyDirectory>
-                                    <from>target/appassembler/config/</from>
-                                    <to>/opt/sds/streaming-shell/config</to>
-                                </copyDirectory>
-                            </assembly>
-                        </configuration>
                         <goals>
                             <goal>package-deb</goal>
+                        </goals>
+                        <configuration>
+                            <architecture>all</architecture>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>rpm</id>
+                        <phase>package</phase>
+                        <goals>
                             <goal>package-rpm</goal>
+                        </goals>
+                        <configuration>
+                            <architecture>noarch</architecture>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>zip</id>
+                        <phase>package</phase>
+                        <goals>
                             <goal>package-zip</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+
             </plugins>
 	</build>
 </project>
