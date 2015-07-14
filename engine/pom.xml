@@ -27,7 +27,7 @@
     <name>Streaming engine</name>
     <artifactId>streaming-engine</artifactId>
     <properties>
-        <spark.version>1.0.2</spark.version>
+        <spark.version>1.4.0</spark.version>
         <outputFileName>stratio-streaming</outputFileName>
     </properties>
     <dependencies>
@@ -55,6 +55,12 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>
             <version>${spark.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -70,6 +76,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.3</version>
         </dependency>
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
@@ -93,6 +104,11 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>3.5.3</version>
         </dependency>
         <dependency>
             <groupId>com.stratio.streaming</groupId>
