@@ -58,6 +58,7 @@ public class ConfigurationContext {
 
     private final String solrHosts;
     private final Boolean solrCloud;
+    private final String solrDataDir;
 
     private final List<String> mongoHosts;
     private final String mongoUsername;
@@ -84,6 +85,7 @@ public class ConfigurationContext {
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
         SOLR_HOST("solr.hosts"),
         SOLR_CLOUD("solr.cloud"),
+        SOLR_DATADIR("solr.dataDir"),
         MONGO_HOST("mongo.hosts"),
         MONGO_USER("mongo.user"),
         MONGO_PASSWORD("mongo.password");
@@ -129,6 +131,7 @@ public class ConfigurationContext {
 
         this.solrHosts = (String) this.getValueOrNull(ConfigurationKeys.SOLR_HOST.getKey(), config);
         this.solrCloud = (Boolean) this.getValueOrNull(ConfigurationKeys.SOLR_CLOUD.getKey(), config);
+        this.solrDataDir = (String) this.getValueOrNull(ConfigurationKeys.SOLR_DATADIR.getKey(), config);
 
         this.mongoHosts = (List<String>) this.getListOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
@@ -218,6 +221,10 @@ public class ConfigurationContext {
 
     public Boolean getSolrCloud() {
         return solrCloud;
+    }
+
+    public String getSolrDataDir() {
+        return solrDataDir;
     }
 
     public List<String> getMongoHosts() {

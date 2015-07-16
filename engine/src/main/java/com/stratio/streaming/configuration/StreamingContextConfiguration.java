@@ -295,7 +295,7 @@ public class StreamingContextConfiguration {
                         configurationContext.getElasticSearchClusterName()));
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_SOLR)).foreachRDD(
-                new SaveToSolrActionExecutionFunction(configurationContext.getSolrHosts(), configurationContext.getSolrCloud()));
+                new SaveToSolrActionExecutionFunction(configurationContext.getSolrHosts(), configurationContext.getSolrCloud(), configurationContext.getSolrDataDir()));
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
                 new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));
