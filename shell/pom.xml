@@ -155,7 +155,7 @@
                     </excludeDirectoryAttributes>
                     <assembly>
                         <mkdirs>
-                            <path>/opt/sds/datavis</path>
+                            <path>/opt/sds/streaming-shell</path>
                             <attributes>
                                 <user>stratio</user>
                                 <group>stratio</group>
