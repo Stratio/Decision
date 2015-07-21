@@ -41,6 +41,8 @@ public interface STREAM_OPERATIONS {
         public static final String STOP_SAVETO_MONGO = "STOP_SAVETO_MONGO";
         public static final String INDEX = "INDEX";
         public static final String STOP_INDEX = "STOP_INDEX";
+        public static final String SAVETO_RABBITMQ = "SAVETO_RABBITMQ";
+        public static final String STOP_SAVETO_RABBITMQ = "STOP_SAVETO_RABBITMQ";
     }
 
 }

@@ -238,6 +238,20 @@ trait IStratioStreamingAPI {
   def stopSaveToMongo(streamName: String)
 
   /**
+   * Saves the stream to RabbitMQ.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def saveToRabbitMQ(streamName: String)
+
+  /**
+   * Stops saving the stream to RabbitMQ.
+   * @param streamName
+   */
+  @throws(classOf[StratioEngineStatusException])
+  def stopSaveToRabbitMQ(streamName: String)
+
+  /**
    * Allows the client to define the time that the API
    * will wait for the engine responses.
    *

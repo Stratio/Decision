@@ -17,17 +17,13 @@ package com.stratio.streaming.configuration;
 
 import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.streaming.StreamingEngine;
-import com.stratio.streaming.commons.constants.BUS;
 import com.stratio.streaming.commons.constants.InternalTopic;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.kafka.service.KafkaTopicService;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.*;
-import com.stratio.streaming.functions.dal.IndexStreamFunction;
-import com.stratio.streaming.functions.dal.ListenStreamFunction;
-import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
-import com.stratio.streaming.functions.dal.SaveToMongoStreamFunction;
+import com.stratio.streaming.functions.dal.*;
 import com.stratio.streaming.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.streaming.functions.ddl.AlterStreamFunction;
 import com.stratio.streaming.functions.ddl.CreateStreamFunction;
@@ -157,6 +153,22 @@ public class StreamingContextConfiguration {
             log.warn("Mongodb configuration not found.");
         }
 
+        if (configurationContext.getRabbitMQHost() != null) {
+            SaveToRabbitMQStreamFunction saveToRabbitMQStreamFunction = new SaveToRabbitMQStreamFunction(
+                    streamOperationService, configurationContext.getZookeeperHostsQuorum());
+
+            JavaDStream<StratioStreamingMessage> saveToRabbitRequests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_RABBITMQ)).map(
+                    keepPayloadFromMessageFunction);
+
+            JavaDStream<StratioStreamingMessage> stopSaveToRabbitRequests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_RABBITMQ)).map(
+                    keepPayloadFromMessageFunction);
+
+            saveToRabbitRequests.foreachRDD(saveToRabbitMQStreamFunction);
+            stopSaveToRabbitRequests.foreachRDD(saveToRabbitMQStreamFunction);
+        }
+
         // Create a DStream for each command, so we can treat all related
         // requests in the same way and also apply functions by command
         JavaDStream<StratioStreamingMessage> createRequests = messages.filter(
@@ -263,6 +275,10 @@ public class StreamingContextConfiguration {
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
                 new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));
+
+        groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_RABBIT_MQ)).foreachRDD(
+                new SaveToRabbitMQActionExecutionFunction(configurationContext.getRabbitMQHost(),
+                        configurationContext.getRabbitMQUser(), configurationContext.getRabbitMQPassword()));
 
     }
 

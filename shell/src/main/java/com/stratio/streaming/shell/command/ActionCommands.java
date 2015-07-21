@@ -118,4 +118,26 @@ public class ActionCommands implements CommandMarker {
         }
     }
 
+    @CliCommand(value = "save rabbit start", help = "attach stream to Rabbit MQ")
+    public String saveRabbitStart(
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+        try {
+            ssaw.api().saveToRabbitMQ(streamName);
+            return "Stream ".concat(streamName).concat(" attached to Rabbit MQ correctly");
+        } catch (StratioStreamingException e) {
+            throw new StreamingShellException(e);
+        }
+    }
+
+    @CliCommand(value = "save rabbit stop", help = "de-attach stream to Rabbit MQ")
+    public String saveRabbitStop(
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+        try {
+            ssaw.api().stopSaveToRabbitMQ(streamName);
+            return "Stream ".concat(streamName).concat(" de-attacched from Rabbit MQ correctly");
+        } catch (StratioStreamingException e) {
+            throw new StreamingShellException(e);
+        }
+    }
+
 }

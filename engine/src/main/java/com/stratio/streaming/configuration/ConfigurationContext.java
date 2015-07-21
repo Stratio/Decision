@@ -62,6 +62,10 @@ public class ConfigurationContext {
     private final String mongoUsername;
     private final String mongoPassword;
 
+    private final String rabbitMQHost;
+    private final String rabbitMQUser;
+    private final String rabbitMQPassword;
+
     public enum ConfigurationKeys {
         CASSANDRA_HOSTS("cassandra.hosts"),
         KAFKA_HOSTS("kafka.hosts"),
@@ -82,8 +86,11 @@ public class ConfigurationContext {
         ELASTICSEARCH_HOST("elasticsearch.hosts"),
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
         MONGO_HOST("mongo.hosts"),
-        MONGO_USER("mongo.user"),
-        MONGO_PASSWORD("mongo.password");
+        MONGO_USER("mongo.username"),
+        MONGO_PASSWORD("mongo.password"),
+        RABBITMQ_HOST("rabbitmq.host"),
+        RABBITMQ_USER("rabbitmq.username"),
+        RABBITMQ_PASSWORD("rabbitmq.password");
 
         private final String key;
 
@@ -129,6 +136,10 @@ public class ConfigurationContext {
         this.mongoHosts = (List<String>) this.getListOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
         this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
+
+        this.rabbitMQHost = (String) this.getValueOrNull(ConfigurationKeys.RABBITMQ_HOST.getKey(), config);
+        this.rabbitMQUser = (String) this.getValueOrNull(ConfigurationKeys.RABBITMQ_USER.getKey(), config);
+        this.rabbitMQPassword = (String) this.getValueOrNull(ConfigurationKeys.RABBITMQ_PASSWORD.getKey(), config);
 
     }
 
@@ -226,6 +237,18 @@ public class ConfigurationContext {
 
     public String getMongoPassword() {
         return mongoPassword;
+    }
+
+    public String getRabbitMQHost() {
+        return rabbitMQHost;
+    }
+
+    public String getRabbitMQUser() {
+        return rabbitMQUser;
+    }
+
+    public String getRabbitMQPassword() {
+        return rabbitMQPassword;
     }
 
     public long getInternalStreamingBatchTime() {
