@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
+import org.hsqldb.lib.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +34,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFunction {
 
@@ -62,14 +62,20 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
 
     @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
-
+        Map<String, Collection<SolrInputDocument>> elemntsToInsert = new HashMap<String, Collection<SolrInputDocument>>();
         for (StratioStreamingMessage stratioStreamingMessage : messages) {
             SolrInputDocument document = new SolrInputDocument();
             document.addField("id", stratioStreamingMessage.getTimestamp());
             for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
                 document.addField(column.getColumn(), column.getValue());
             }
+            Collection<SolrInputDocument> collection = elemntsToInsert.get(stratioStreamingMessage.getStreamName());
+            collection.add(document);
+            elemntsToInsert.put(stratioStreamingMessage.getStreamName(), collection);
             getClient(stratioStreamingMessage).add(document);
+        }
+        for (Map.Entry<String, Collection<SolrInputDocument>> elem: elemntsToInsert.entrySet()) {
+            getSolrclient(elem.getKey()).add(elem.getValue());
         }
         flushClients();
     }
