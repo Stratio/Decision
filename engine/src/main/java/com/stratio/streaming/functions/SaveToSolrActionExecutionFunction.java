@@ -37,6 +37,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFunction {
 
@@ -71,6 +72,9 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
             }
             checkCore(stratioStreamingMessage);
             Collection<SolrInputDocument> collection = elemntsToInsert.get(stratioStreamingMessage.getStreamName());
+            if(collection == null) {
+                collection = new HashSet<>();
+            }
             collection.add(document);
             elemntsToInsert.put(stratioStreamingMessage.getStreamName(), collection);
         }
