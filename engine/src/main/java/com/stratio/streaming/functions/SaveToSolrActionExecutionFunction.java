@@ -126,6 +126,12 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
         } else {
             solrClient = new HttpSolrClient("http://" + solrHosts + "/solr/" + core);
         }
+        if (solrClients.containsKey(core)) {
+            //we have a client for this core
+            return solrClients.get(core);
+        } else {
+            solrClients.put(core, solrClient);
+        }
         return solrClient;
     }
 
