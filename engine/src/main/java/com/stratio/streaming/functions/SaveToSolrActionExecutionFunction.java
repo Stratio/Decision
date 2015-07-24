@@ -69,6 +69,7 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
             for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
                 document.addField(column.getColumn(), column.getValue());
             }
+            checkCore(stratioStreamingMessage);
             Collection<SolrInputDocument> collection = elemntsToInsert.get(stratioStreamingMessage.getStreamName());
             collection.add(document);
             elemntsToInsert.put(stratioStreamingMessage.getStreamName(), collection);
@@ -80,23 +81,27 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
         flushClients();
     }
 
+    private void checkCore(StratioStreamingMessage message) throws IOException, SolrServerException, ParserConfigurationException, TransformerException, SAXException, URISyntaxException {
+        String core = message.getStreamName();
+        //check if core exists
+        if (solrCores.size() == 0) {
+            // Initialize solrcores list
+            solrCores = solrOperationsService.getCoreList();
+        }
+        if (!solrCores.contains(core)) {
+            // Create Core
+            solrOperationsService.createCore(message);
+            // Update core list
+            solrCores = solrOperationsService.getCoreList();
+        }
+    }
+
     private SolrClient getClient(StratioStreamingMessage message) throws IOException, SolrServerException, URISyntaxException, TransformerException, SAXException, ParserConfigurationException {
         String core = message.getStreamName();
         if (solrClients.containsKey(core)) {
             //we have a client for this core
             return solrClients.get(core);
         } else {
-            //check if core exists
-            if (solrCores.size() == 0) {
-                // Initialize solrcores list
-                solrCores = solrOperationsService.getCoreList();
-            }
-            if (!solrCores.contains(core)) {
-                // Create Core
-                solrOperationsService.createCore(message);
-                // Update core list
-                solrCores = solrOperationsService.getCoreList();
-            }
             SolrClient solrClient = getSolrclient(core);
             solrClients.put(core, solrClient);
             return solrClient;
