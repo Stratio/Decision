@@ -73,7 +73,6 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
             Collection<SolrInputDocument> collection = elemntsToInsert.get(stratioStreamingMessage.getStreamName());
             collection.add(document);
             elemntsToInsert.put(stratioStreamingMessage.getStreamName(), collection);
-            getClient(stratioStreamingMessage).add(document);
         }
         for (Map.Entry<String, Collection<SolrInputDocument>> elem: elemntsToInsert.entrySet()) {
             getSolrclient(elem.getKey()).add(elem.getValue());
