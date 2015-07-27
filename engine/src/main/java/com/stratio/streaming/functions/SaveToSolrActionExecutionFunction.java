@@ -19,10 +19,12 @@ import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 
 import com.stratio.streaming.service.SolrOperationsService;
+import com.stratio.streaming.utils.RetryStrategy;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.hsqldb.lib.*;
 import org.slf4j.Logger;
@@ -50,6 +52,8 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
 
     private SolrOperationsService solrOperationsService;
 
+    private RetryStrategy retryStrategy;
+
     private final String dataDir;
     private final String solrHosts;
     private final Boolean isCloud;
@@ -59,14 +63,17 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
         this.dataDir = dataDir;
         this.isCloud = isCloud;
         this.solrOperationsService = new SolrOperationsService(solrHosts, dataDir, isCloud);
+        this.retryStrategy = new RetryStrategy();
     }
 
     @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
         Map<String, Collection<SolrInputDocument>> elemntsToInsert = new HashMap<String, Collection<SolrInputDocument>>();
+        int count = 0;
         for (StratioStreamingMessage stratioStreamingMessage : messages) {
+            count += 1;
             SolrInputDocument document = new SolrInputDocument();
-            document.addField("id", stratioStreamingMessage.getTimestamp());
+            document.addField("stratio_streaming_id", System.nanoTime() + "-" + count);
             for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
                 document.addField(column.getColumn(), column.getValue());
             }
@@ -78,13 +85,27 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
             collection.add(document);
             elemntsToInsert.put(stratioStreamingMessage.getStreamName(), collection);
         }
-        for (Map.Entry<String, Collection<SolrInputDocument>> elem: elemntsToInsert.entrySet()) {
-            getSolrclient(elem.getKey()).add(elem.getValue());
+        while(retryStrategy.shouldRetry()) {
+            try {
+                for (Map.Entry<String, Collection<SolrInputDocument>> elem : elemntsToInsert.entrySet()) {
+                    getSolrclient(elem.getKey()).add(elem.getValue());
+                }
+                break;
+            } catch(SolrException e) {
+                try {
+                    log.error("Solr cloud status not yet properly initialized, retrying");
+                    retryStrategy.errorOccured();
+                } catch (RuntimeException ex) {
+                    throw new RuntimeException("Error while initializing Solr Cloud core", ex);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
         }
         flushClients();
     }
 
-    private void checkCore(StratioStreamingMessage message) throws IOException, SolrServerException, ParserConfigurationException, TransformerException, SAXException, URISyntaxException {
+    private void checkCore(StratioStreamingMessage message) throws IOException, SolrServerException, ParserConfigurationException, TransformerException, SAXException, URISyntaxException, InterruptedException {
         String core = message.getStreamName();
         //check if core exists
         if (solrCores.size() == 0) {
@@ -120,16 +141,16 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
 
     private SolrClient getSolrclient(String core) {
         SolrClient solrClient;
-        if (isCloud) {
-            solrClient = new CloudSolrClient(solrHosts);
-            ((CloudSolrClient)solrClient).setDefaultCollection(core);
-        } else {
-            solrClient = new HttpSolrClient("http://" + solrHosts + "/solr/" + core);
-        }
         if (solrClients.containsKey(core)) {
             //we have a client for this core
             return solrClients.get(core);
         } else {
+            if (isCloud) {
+                solrClient = new CloudSolrClient(solrHosts);
+                ((CloudSolrClient)solrClient).setDefaultCollection(core);
+            } else {
+                solrClient = new HttpSolrClient("http://" + solrHosts + "/solr/" + core);
+            }
             solrClients.put(core, solrClient);
         }
         return solrClient;

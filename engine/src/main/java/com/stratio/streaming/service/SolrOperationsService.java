@@ -15,7 +15,6 @@
  */
 package com.stratio.streaming.service;
 
-import com.datastax.driver.core.DataType;
 import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
@@ -32,14 +31,12 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -47,10 +44,8 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class SolrOperationsService {
@@ -69,7 +64,7 @@ public class SolrOperationsService {
         this.isCloud = isCloud;
     }
 
-    public void createCore(StratioStreamingMessage message) throws IOException, URISyntaxException, SolrServerException, ParserConfigurationException, SAXException, TransformerException {
+    public void createCore(StratioStreamingMessage message) throws IOException, URISyntaxException, SolrServerException, ParserConfigurationException, SAXException, TransformerException, InterruptedException {
         String core = message.getStreamName();
         String dataPath = this.dataDir + '/' + core + "/data";
         String confPath = this.dataDir + '/' + core + "/conf";
