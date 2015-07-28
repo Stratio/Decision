@@ -109,6 +109,10 @@
             <groupId>com.stratio.streaming</groupId>
             <artifactId>streaming-siddhi</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+        </dependency>
         <!-- METRICS -->
         <dependency>
             <groupId>com.codahale.metrics</groupId>

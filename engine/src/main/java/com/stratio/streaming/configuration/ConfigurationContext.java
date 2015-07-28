@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2014 Stratio (http://stratio.com)
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,6 +58,10 @@ public class ConfigurationContext {
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
 
+    private final String solrHosts;
+    private final Boolean solrCloud;
+    private final String solrDataDir;
+
     private final List<String> mongoHosts;
     private final String mongoUsername;
     private final String mongoPassword;
@@ -81,6 +85,9 @@ public class ConfigurationContext {
         KAFKA_CONNECTION_TIMEOUT("kafka.connectionTimeout"),
         ELASTICSEARCH_HOST("elasticsearch.hosts"),
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
+        SOLR_HOST("solr.hosts"),
+        SOLR_CLOUD("solr.cloud"),
+        SOLR_DATADIR("solr.dataDir"),
         MONGO_HOST("mongo.hosts"),
         MONGO_USER("mongo.user"),
         MONGO_PASSWORD("mongo.password");
@@ -125,6 +132,10 @@ public class ConfigurationContext {
 
         this.elasticSearchHosts = (List<String>) this.getListOrNull(ConfigurationKeys.ELASTICSEARCH_HOST.getKey(), config);
         this.elasticSearchClusterName = (String) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_CLUSTER_NAME.getKey(), config);
+
+        this.solrHosts = (String) this.getValueOrNull(ConfigurationKeys.SOLR_HOST.getKey(), config);
+        this.solrCloud = (Boolean) this.getValueOrNull(ConfigurationKeys.SOLR_CLOUD.getKey(), config);
+        this.solrDataDir = (String) this.getValueOrNull(ConfigurationKeys.SOLR_DATADIR.getKey(), config);
 
         this.mongoHosts = (List<String>) this.getListOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
@@ -214,6 +225,18 @@ public class ConfigurationContext {
 
     public String getElasticSearchClusterName() {
         return elasticSearchClusterName;
+    }
+
+    public String getSolrHosts() {
+        return solrHosts;
+    }
+
+    public Boolean getSolrCloud() {
+        return solrCloud;
+    }
+
+    public String getSolrDataDir() {
+        return solrDataDir;
     }
 
     public List<String> getMongoHosts() {

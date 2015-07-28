@@ -24,10 +24,7 @@ import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.kafka.service.KafkaTopicService;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.*;
-import com.stratio.streaming.functions.dal.IndexStreamFunction;
-import com.stratio.streaming.functions.dal.ListenStreamFunction;
-import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
-import com.stratio.streaming.functions.dal.SaveToMongoStreamFunction;
+import com.stratio.streaming.functions.dal.*;
 import com.stratio.streaming.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.streaming.functions.ddl.AlterStreamFunction;
 import com.stratio.streaming.functions.ddl.CreateStreamFunction;
@@ -136,6 +133,25 @@ public class StreamingContextConfiguration {
             stopStreamToIndexerRequests.foreachRDD(indexStreamFunction);
         } else {
             log.warn("Elasticsearch configuration not found.");
+        }
+
+        if (configurationContext.getSolrHosts() != null) {
+            SaveToSolrStreamFunction solrStreamFunction = new SaveToSolrStreamFunction(streamOperationService,
+                    configurationContext.getZookeeperHostsQuorum());
+
+            JavaDStream<StratioStreamingMessage> saveToSolrRequests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_SOLR)).map(
+                    keepPayloadFromMessageFunction);
+
+            JavaDStream<StratioStreamingMessage> stopSaveToSolrRequests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_SOLR)).map(
+                    keepPayloadFromMessageFunction);
+
+            saveToSolrRequests.foreachRDD(solrStreamFunction);
+
+            stopSaveToSolrRequests.foreachRDD(solrStreamFunction);
+        } else {
+            log.warn("Solr configuration not found.");
         }
 
         if (configurationContext.getMongoHosts() != null) {
@@ -260,6 +276,9 @@ public class StreamingContextConfiguration {
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.INDEXED)).foreachRDD(
                 new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHosts(),
                         configurationContext.getElasticSearchClusterName()));
+
+        groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_SOLR)).foreachRDD(
+                new SaveToSolrActionExecutionFunction(configurationContext.getSolrHosts(), configurationContext.getSolrCloud(), configurationContext.getSolrDataDir()));
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
                 new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));

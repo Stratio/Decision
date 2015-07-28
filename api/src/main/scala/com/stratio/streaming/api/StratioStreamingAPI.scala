@@ -22,7 +22,7 @@ import com.stratio.streaming.api.messaging.{ColumnNameType, ColumnNameValue, Mes
 import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants.InternalTopic
 import com.stratio.streaming.commons.constants.STREAMING.ZK_EPHEMERAL_NODE_PATH
-import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.{INDEX, LISTEN, SAVETO_CASSANDRA, SAVETO_MONGO, STOP_INDEX, STOP_LISTEN, STOP_SAVETO_CASSANDRA, STOP_SAVETO_MONGO}
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.{INDEX, LISTEN, SAVETO_CASSANDRA, SAVETO_MONGO, SAVETO_SOLR, STOP_INDEX, STOP_LISTEN, STOP_SAVETO_CASSANDRA, STOP_SAVETO_MONGO, STOP_SAVETO_SOLR}
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION.{ADD_QUERY, ALTER, DROP, REMOVE_QUERY}
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.MANIPULATION.LIST
@@ -177,6 +177,20 @@ class StratioStreamingAPI
     val operation = STOP_SAVETO_MONGO.toLowerCase
     val stopSaveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(stopSaveToCassandraMessage)
+  }
+
+  def saveToSolr(streamName: String) = {
+    checkStreamingStatus()
+    val operation = SAVETO_SOLR.toLowerCase
+    val saveToSolrMEssage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    syncOperation.performSyncOperation(saveToSolrMEssage)
+  }
+
+  def stopSaveToSolr(streamName: String) = {
+    checkStreamingStatus()
+    val operation = STOP_SAVETO_SOLR.toLowerCase
+    val stopSaveToSolrMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    syncOperation.performSyncOperation(stopSaveToSolrMessage)
   }
 
   def indexStream(streamName: String) = {
