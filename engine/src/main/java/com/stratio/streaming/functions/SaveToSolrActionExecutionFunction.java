@@ -17,7 +17,6 @@ package com.stratio.streaming.functions;
 
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-
 import com.stratio.streaming.service.SolrOperationsService;
 import com.stratio.streaming.utils.RetryStrategy;
 import org.apache.solr.client.solrj.SolrClient;
@@ -26,10 +25,8 @@ import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
-import org.hsqldb.lib.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,9 +34,6 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 
 public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFunction {
 
