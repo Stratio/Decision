@@ -2,8 +2,18 @@
 
 Only listing significant user-visible, not internal code cleanups and minor bug fixes.
 
-## 0.7.0 (upcoming)
+## 0.8.0 (upcoming)
 
+
+## 0.7.0 (July 2015)
+
+* New feature save to Solr.
+* New feature high availability with Zookeeper.
+* (issue #36, issue #17) Update Spark version to 1.3.1.
+* (issue #30) Fixed problem with config files.
+* (issue #35) Fixed failover problems.
+* (issue #27) Base topics are now created when the engine starts.
+* (issue #28) Fixed connection problems with Stratio Ingestion.
 
 ## 0.6.2 (January 2015)
 

@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.stratio</groupId>
         <artifactId>parent</artifactId>
-        <version>0.3.1</version>
+        <version>0.4.0</version>
     </parent>
 
     <groupId>com.stratio.streaming</groupId>
@@ -66,7 +66,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cassandra.driver>2.1.0</cassandra.driver>
-        <mongo.driver>2.12.4</mongo.driver>
+        <mongo.driver>2.13.2</mongo.driver>
         <kafka.driver>0.8.1.1</kafka.driver>
         <solr.driver>5.2.1</solr.driver>
         <metrics.version>3.0.1</metrics.version>

@@ -8,14 +8,14 @@ Configuring the Shell
 
 Before starting the Shell, review the configuration and make sure it points correctly to your running Kafka brokers
 and Zookeeper quorum. On a standard installation, you should find the shell configuration in
-/opt/sds/shell/config/shell.properties.
+/opt/sds/streaming-shell/config/shell.properties.
 
 
 Starting the Shell
 ==================
 
 Stratio Streaming distribution includes a bundled shell for interacting with the engine. For using it, just go to
-the installation folder (typically /opt/sds/shell) and run the command::
+the installation folder (typically /opt/sds/streaming-shell) and run the command::
 
     ./bin/shell
 

@@ -236,6 +236,106 @@ Java::
     }
 
 
+Stop saving the stream to Cassandra
+===================================
+
+Scala::
+
+    try {
+        stratioStreamingAPI.stopSaveToCassandra("testStream")
+    } catch {
+       case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
+    }
+
+Java::
+
+    try {
+       stratioStreamingAPI.stopSaveToCassandra("testStream");
+    } catch(StratioStreamingException ssEx) {
+       ssEx.printStackTrace();
+    }
+
+
+Save the stream to MongoDB
+==========================
+
+Scala::
+
+    try {
+        stratioStreamingAPI.saveToMongo("testStream")
+    } catch {
+       case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
+    }
+
+Java::
+
+    try {
+       stratioStreamingAPI.saveToMongo("testStream");
+    } catch(StratioStreamingException ssEx) {
+       ssEx.printStackTrace();
+    }
+
+
+Stop saving the stream to MongoDB
+=================================
+
+Scala::
+
+    try {
+        stratioStreamingAPI.stopSaveToMongo("testStream")
+    } catch {
+       case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
+    }
+
+Java::
+
+    try {
+       stratioStreamingAPI.stopSaveToMongo("testStream");
+    } catch(StratioStreamingException ssEx) {
+       ssEx.printStackTrace();
+    }
+
+
+Save the stream to Solr
+=======================
+
+Scala::
+
+    try {
+        stratioStreamingAPI.saveToSolr("testStream")
+    } catch {
+       case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
+    }
+
+Java::
+
+    try {
+       stratioStreamingAPI.saveToSolr("testStream");
+    } catch(StratioStreamingException ssEx) {
+       ssEx.printStackTrace();
+    }
+
+
+Stop saving the stream to Solr
+==============================
+
+Scala::
+
+    try {
+        stratioStreamingAPI.stopSaveToSolr("testStream")
+    } catch {
+       case ssEx: StratioStreamingException => println(ssEx.printStackTrace())
+    }
+
+Java::
+
+    try {
+       stratioStreamingAPI.stopSaveToSolr("testStream");
+    } catch(StratioStreamingException ssEx) {
+       ssEx.printStackTrace();
+    }
+
+
 Getting the list of all the streams and their queries
 =====================================================
 
