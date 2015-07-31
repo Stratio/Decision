@@ -28,7 +28,7 @@
 
     <groupId>com.stratio.streaming</groupId>
     <artifactId>stratio-streaming</artifactId>
-    <version>0.7.1-RC1-SNAPSHOT</version>
+    <version>0.7.1</version>
     <name>Stratio Streaming</name>
     <packaging>pom</packaging>
     <description>Stratio Streaming is a real-time engine with Complex Event Processing capabilities
