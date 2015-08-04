@@ -14,7 +14,7 @@ cat <<'EOF' > $MODULE
 MODULE="streaming"
 SCRIPT=/opt/sds/$MODULE/bin/run
 RUNAS=stratio
- 
+
 PIDFILE=/var/run/sds/$MODULE.pid
 LOGFILE=/var/log/sds/$MODULE.log
  
@@ -75,7 +75,9 @@ GROUP="stratio"
 mv $MODULE /etc/init.d/$MODULE
 chmod a+x /etc/init.d/$MODULE
 mkdir -p /var/run/sds
+chmod 775 /var/run/sds
 mkdir -p /var/log/sds
+chmod 775 /var/log/sds
 
 if ! getent group $GROUP >/dev/null 2>&1; then
   groupadd $GROUP

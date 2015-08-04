@@ -183,7 +183,7 @@
                     </assembly>
                     <defaults>
                         <directoryAttributes>
-                            <mode>0755</mode>
+                            <mode>0775</mode>
                         </directoryAttributes>
                         <fileAttributes>
                             <mode>0644</mode>
