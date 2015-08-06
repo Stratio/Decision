@@ -1,4 +1,6 @@
+chown -R $USER:$GROUP /opt/sds/$MODULE
 MODULE="streaming"
+chmod a+x /opt/sds/$MODULE/bin/run
 
 cat <<'EOF' > $MODULE
 

@@ -92,7 +92,7 @@ public class StreamOperationServiceTest {
         streamOperationService.addQuery(STREAM_NAME_GOOD, "from " + STREAM_NAME_GOOD + " select * insert into "
                 + INFERRED_STREAM_GOOD + " for current-events");
 
-        Mockito.verify(streamStatusDao, VerificationModeFactory.times(2)).createInferredStream(Mockito.anyString());
+        Mockito.verify(streamStatusDao, VerificationModeFactory.times(2)).createInferredStream(Mockito.anyString(), null);
 
         Assert.assertEquals(2, sm.getStreamDefinitions().size());
 
