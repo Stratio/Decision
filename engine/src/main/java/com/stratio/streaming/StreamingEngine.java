@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,6 @@ import java.util.Map;
 
 import com.stratio.streaming.configuration.FirstConfiguration;
 import com.stratio.streaming.highAvailability.LeadershipManager;
-import com.stratio.streaming.configuration.BaseConfiguration;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +44,11 @@ public class StreamingEngine {
                         BaseConfiguration.class)) {
                     annotationConfigApplicationContext.registerShutdownHook();
 
-                    Map<String, JavaStreamingContext> contexts = annotationConfigApplicationContext
-                            .getBeansOfType(JavaStreamingContext.class);
+                    JavaStreamingContext context = annotationConfigApplicationContext.getBean("streamingContext", JavaStreamingContext.class);
 
-                    for (JavaStreamingContext context : contexts.values()) {
-                        context.start();
-                        log.info("Started context {}", context.sparkContext().appName());
-                    }
-                    contexts.get("actionContext").awaitTermination();
+                    context.start();
+
+                    context.awaitTermination();
                 } catch (Exception e) {
                     log.error("Fatal error", e);
                 }
