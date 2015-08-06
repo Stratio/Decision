@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2014 Stratio (http://stratio.com)
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,30 +15,17 @@
  */
 package com.stratio.streaming.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-
-import com.datastax.driver.core.Session;
-import com.stratio.streaming.dao.StreamStatusDao;
-import com.stratio.streaming.dao.StreamingFailoverDao;
-import com.stratio.streaming.factory.GsonFactory;
+import org.springframework.context.annotation.Import;
 
 @Configuration
-public class DaoConfiguration {
-
-    @Autowired
-    private Session session;
+@Import({HighAvailabilityConfiguration.class})
+public class FirstConfiguration {
 
     @Bean
-    public StreamingFailoverDao streamingFailoverDao() {
-        return new StreamingFailoverDao(session, GsonFactory.getInstance());
-    }
-
-    @Bean
-    public StreamStatusDao streamStatusDao() {
-        return new StreamStatusDao();
+    public ConfigurationContext configurationContext() {
+        return new ConfigurationContext();
     }
 
 }

@@ -44,7 +44,7 @@ public class StreamOperationServiceWithoutMetrics {
             newStream.attribute(column.getColumn(), getSiddhiType(column.getType()));
         }
         siddhiManager.defineStream(newStream);
-        streamStatusDao.createInferredStream(streamName);
+        streamStatusDao.createInferredStream(streamName, columns);
     }
 
     public void createStream(String streamName, List<ColumnNameTypeValue> columns) {
@@ -53,7 +53,7 @@ public class StreamOperationServiceWithoutMetrics {
             newStream.attribute(column.getColumn(), getSiddhiType(column.getType()));
         }
         siddhiManager.defineStream(newStream);
-        streamStatusDao.create(streamName);
+        streamStatusDao.create(streamName, columns);
     }
 
     public boolean streamExist(String streamName) {
@@ -98,10 +98,17 @@ public class StreamOperationServiceWithoutMetrics {
         streamStatusDao.addQuery(streamName, queryId, queryString);
         for (StreamDefinition streamDefinition : siddhiManager.getStreamDefinitions()) {
             // XXX refactor to obtain exactly siddhi inferred streams.
-            streamStatusDao.createInferredStream(streamDefinition.getStreamId());
+            streamStatusDao.createInferredStream(streamName,  castToColumnNameTypeValue(streamDefinition.getAttributeList()));
         }
     }
 
+    private List<ColumnNameTypeValue> castToColumnNameTypeValue(List<Attribute> attributeList) {
+        List<ColumnNameTypeValue> result = new ArrayList<>();
+        for (Attribute attribute : attributeList) {
+            result.add(new ColumnNameTypeValue(attribute.getName(), getStreamingType(attribute.getType()), null));
+        }
+        return result;
+    }
 
     public void removeQuery(String queryId, String streamName) {
         siddhiManager.removeQuery(queryId);

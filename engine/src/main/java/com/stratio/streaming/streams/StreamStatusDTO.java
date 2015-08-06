@@ -16,30 +16,30 @@
 package com.stratio.streaming.streams;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.stratio.streaming.commons.constants.StreamAction;
+import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import org.wso2.siddhi.query.api.definition.Attribute;
 
 public class StreamStatusDTO implements Serializable {
 
     private static final long serialVersionUID = -714024710449331531L;
 
     private String streamName;
-    private String streamDefinition;
+    private List<ColumnNameTypeValue> streamDefinition;
     private String actionQueryId;
 
     private Boolean userDefined;
     private final Set<StreamAction> actionsEnabled;
     private final Map<String, QueryDTO> addedQueries;
 
-    public StreamStatusDTO(String streamName, Boolean userDefined) {
+    public StreamStatusDTO(String streamName, Boolean userDefined, List<ColumnNameTypeValue> columns) {
         this.streamName = streamName;
         this.userDefined = userDefined;
         this.actionsEnabled = new HashSet<>();
         this.addedQueries = new HashMap<>();
+        this.streamDefinition = columns;
     }
 
     public String getStreamName() {
@@ -50,11 +50,11 @@ public class StreamStatusDTO implements Serializable {
         this.streamName = streamName;
     }
 
-    public String getStreamDefinition() {
+    public List<ColumnNameTypeValue> getStreamDefinition() {
         return streamDefinition;
     }
 
-    public void setStreamDefinition(String streamDefinition) {
+    public void setStreamDefinition(List<ColumnNameTypeValue> streamDefinition) {
         this.streamDefinition = streamDefinition;
     }
 
