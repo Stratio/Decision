@@ -15,30 +15,27 @@
  */
 package com.stratio.streaming.configuration;
 
+import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.highAvailability.LeadershipManager;
+import com.stratio.streaming.utils.ZKUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
-import com.datastax.driver.core.Session;
-import com.stratio.streaming.dao.StreamStatusDao;
-import com.stratio.streaming.dao.StreamingFailoverDao;
-import com.stratio.streaming.factory.GsonFactory;
+import javax.annotation.PostConstruct;
+import java.util.Random;
 
 @Configuration
-public class DaoConfiguration {
+public class HighAvailabilityConfiguration {
+
+    private static final String PATH = "/latch";
 
     @Autowired
-    private Session session;
+    private ConfigurationContext configurationContext;
 
-    @Bean
-    public StreamingFailoverDao streamingFailoverDao() {
-        return new StreamingFailoverDao(session, GsonFactory.getInstance());
-    }
+    @PostConstruct
+    public void startUp() throws Exception {
+        LeadershipManager.getLeadershipManager(configurationContext.getZookeeperHostsQuorum());
 
-    @Bean
-    public StreamStatusDao streamStatusDao() {
-        return new StreamStatusDao();
     }
 
 }
