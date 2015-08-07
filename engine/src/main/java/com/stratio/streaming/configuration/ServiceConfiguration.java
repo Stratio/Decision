@@ -15,7 +15,6 @@
  */
 package com.stratio.streaming.configuration;
 
-import com.stratio.streaming.service.*;
 import kafka.javaapi.producer.Producer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +32,11 @@ import com.stratio.streaming.factory.GsonFactory;
 import com.stratio.streaming.serializer.Serializer;
 import com.stratio.streaming.serializer.impl.JavaToSiddhiSerializer;
 import com.stratio.streaming.serializer.impl.KafkaToJavaSerializer;
+import com.stratio.streaming.service.CallbackService;
+import com.stratio.streaming.service.StreamMetadataService;
+import com.stratio.streaming.service.StreamOperationService;
+import com.stratio.streaming.service.StreamStatusMetricService;
+import com.stratio.streaming.service.StreamingFailoverService;
 
 @Configuration
 @Import({ DaoConfiguration.class, StreamingSiddhiConfiguration.class })
@@ -48,6 +52,7 @@ public class ServiceConfiguration {
     private StreamOperationService streamOperationService;
 
     @Autowired
+    @Lazy
     private StreamingFailoverDao streamingFailoverDao;
 
     @Autowired
@@ -84,6 +89,7 @@ public class ServiceConfiguration {
     }
 
     @Bean
+    @Lazy
     public StreamingFailoverService streamingFailoverService() {
         return new StreamingFailoverService(streamStatusDao, streamMetadataService(), streamingFailoverDao, streamOperationService);
     }

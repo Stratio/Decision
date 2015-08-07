@@ -21,14 +21,18 @@ public class FailOverTask implements Runnable {
 
     private final StreamingFailoverService streamingFailoverService;
 
-    public FailOverTask(StreamingFailoverService streamingFailoverService) {
+    public FailOverTask(StreamingFailoverService streamingFailoverService) throws Exception {
         this.streamingFailoverService = streamingFailoverService;
         streamingFailoverService.load();
     }
 
     @Override
     public void run() {
-        streamingFailoverService.save();
+        try {
+            streamingFailoverService.save();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
