@@ -98,7 +98,7 @@ public class StreamOperationServiceWithoutMetrics {
         streamStatusDao.addQuery(streamName, queryId, queryString);
         for (StreamDefinition streamDefinition : siddhiManager.getStreamDefinitions()) {
             // XXX refactor to obtain exactly siddhi inferred streams.
-            streamStatusDao.createInferredStream(streamName,  castToColumnNameTypeValue(streamDefinition.getAttributeList()));
+            streamStatusDao.createInferredStream(streamDefinition.getStreamId(),  castToColumnNameTypeValue(streamDefinition.getAttributeList()));
         }
     }
 

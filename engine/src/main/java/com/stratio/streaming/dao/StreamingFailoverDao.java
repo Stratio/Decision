@@ -17,6 +17,7 @@ package com.stratio.streaming.dao;
 
 import java.util.Calendar;
 
+import com.google.gson.Gson;
 import com.stratio.streaming.configuration.ConfigurationContext;
 import com.stratio.streaming.utils.ZKUtils;
 import org.slf4j.Logger;
@@ -30,11 +31,12 @@ public class StreamingFailoverDao  {
 
     private static final String PERSISTENCE_STORE_PATH = "/failoverStorage";
 
-    private ConfigurationContext configurationContext;
-
     private ZKUtils zkutils;
 
-    public StreamingFailoverDao(ConfigurationContext configurationContext) throws Exception {
+    private Gson gson;
+
+    public StreamingFailoverDao(ConfigurationContext configurationContext, Gson gson) throws Exception {
+        this.gson = gson;
         this.zkutils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum());
     }
 
@@ -43,7 +45,7 @@ public class StreamingFailoverDao  {
         if (!zkutils.existZNode(PERSISTENCE_STORE_PATH)) {
             log.info("Failover loading data...");
             byte[] bytes = zkutils.getZNode(PERSISTENCE_STORE_PATH);
-            return new FailoverPersistenceStoreModel(bytes);
+            return gson.fromJson(new String(bytes), FailoverPersistenceStoreModel.class);
         } else {
             return null;
         }
@@ -52,7 +54,7 @@ public class StreamingFailoverDao  {
     public void save(FailoverPersistenceStoreModel failoverPersistenceStoreModel) throws Exception {
         log.info("Failover data to save. HASH {}, TOSTRING {} ", failoverPersistenceStoreModel.hashCode(),
                 failoverPersistenceStoreModel);
-        zkutils.createZNode(PERSISTENCE_STORE_PATH, failoverPersistenceStoreModel.FailOverPersistenceModelToByte());
+        zkutils.createZNode(PERSISTENCE_STORE_PATH, gson.toJson(failoverPersistenceStoreModel).getBytes());
     }
 
 }

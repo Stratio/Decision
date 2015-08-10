@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2014 Stratio (http://stratio.com)
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,12 +15,16 @@
  */
 package com.stratio.streaming.service;
 
+import com.stratio.streaming.commons.constants.StreamAction;
+import com.stratio.streaming.commons.messages.StreamQuery;
 import com.stratio.streaming.dao.StreamStatusDao;
 import com.stratio.streaming.dao.StreamingFailoverDao;
 import com.stratio.streaming.model.FailoverPersistenceStoreModel;
+import com.stratio.streaming.streams.QueryDTO;
 import com.stratio.streaming.streams.StreamStatusDTO;
 
 import java.util.Map;
+import java.util.Set;
 
 public class StreamingFailoverService {
 
@@ -44,16 +48,23 @@ public class StreamingFailoverService {
             streamStatusDao.putAll(failoverPersistenceStoreModel.getStreamStatuses());
             Map<String, StreamStatusDTO> streamsStatus = failoverPersistenceStoreModel.getStreamStatuses();
             for (Map.Entry<String, StreamStatusDTO> entry : streamsStatus.entrySet()) {
-                StreamStatusDTO streamStatusDTO = entry.getValue();
-                streamOperationService.createStream(streamStatusDTO.getStreamName(), streamStatusDTO.getStreamDefinition());
+                StreamStatusDTO stream = entry.getValue();
+                streamOperationService.createStream(stream.getStreamName(), stream.getStreamDefinition());
+                for (Map.Entry<String, QueryDTO> query : stream.getAddedQueries().entrySet()) {
+                    streamOperationService.addQuery(entry.getKey(), query.getValue().getQueryRaw());
+                }
+                for (StreamAction action : stream.getActionsEnabled()) {
+                    streamOperationService.enableAction(entry.getKey(), action);
+                }
             }
-            streamMetadataService.setSnapshot(failoverPersistenceStoreModel.getSiddhiSnapshot());
+//            streamMetadataService.setSnapshot(failoverPersistenceStoreModel.getSiddhiSnapshot());
         }
     }
 
     public synchronized void save() throws Exception {
-        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), streamMetadataService
-                .getSnapshot()));
+//        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), streamMetadataService
+//                .getSnapshot()));
+        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), null));
     }
 
 }

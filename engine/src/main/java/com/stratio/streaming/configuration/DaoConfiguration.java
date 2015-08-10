@@ -33,7 +33,7 @@ public class DaoConfiguration {
 
     @Bean
     public StreamingFailoverDao streamingFailoverDao() throws Exception {
-        return new StreamingFailoverDao(configurationContext);
+        return new StreamingFailoverDao(configurationContext, GsonFactory.getInstance());
     }
 
     @Bean
