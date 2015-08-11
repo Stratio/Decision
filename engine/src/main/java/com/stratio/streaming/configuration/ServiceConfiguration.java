@@ -49,9 +49,6 @@ public class ServiceConfiguration {
     private StreamStatusDao streamStatusDao;
 
     @Autowired
-    private StreamOperationService streamOperationService;
-
-    @Autowired
     @Lazy
     private StreamingFailoverDao streamingFailoverDao;
 
@@ -91,6 +88,6 @@ public class ServiceConfiguration {
     @Bean
     @Lazy
     public StreamingFailoverService streamingFailoverService() {
-        return new StreamingFailoverService(streamStatusDao, streamMetadataService(), streamingFailoverDao, streamOperationService);
+        return new StreamingFailoverService(streamStatusDao, streamMetadataService(), streamingFailoverDao);
     }
 }

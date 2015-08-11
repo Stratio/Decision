@@ -22,6 +22,7 @@ import com.stratio.streaming.dao.StreamingFailoverDao;
 import com.stratio.streaming.model.FailoverPersistenceStoreModel;
 import com.stratio.streaming.streams.QueryDTO;
 import com.stratio.streaming.streams.StreamStatusDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 import java.util.Set;
@@ -31,15 +32,16 @@ public class StreamingFailoverService {
     private final StreamStatusDao streamStatusDao;
     private final StreamMetadataService streamMetadataService;
     private final StreamingFailoverDao streamingFailoverDao;
-    private final StreamOperationService streamOperationService;
+
+    @Autowired
+    private StreamOperationService streamOperationService;
 
 
     public StreamingFailoverService(StreamStatusDao streamStatusDao, StreamMetadataService streamMetadataService,
-                                    StreamingFailoverDao streamingFailoverDao, StreamOperationService streamOperationService) {
+                                    StreamingFailoverDao streamingFailoverDao) {
         this.streamStatusDao = streamStatusDao;
         this.streamMetadataService = streamMetadataService;
         this.streamingFailoverDao = streamingFailoverDao;
-        this.streamOperationService = streamOperationService;
     }
 
     public synchronized void load() throws Exception {
@@ -57,14 +59,13 @@ public class StreamingFailoverService {
                     streamOperationService.enableAction(entry.getKey(), action);
                 }
             }
-//            streamMetadataService.setSnapshot(failoverPersistenceStoreModel.getSiddhiSnapshot());
+            streamMetadataService.setSnapshot(failoverPersistenceStoreModel.getSiddhiSnapshot());
         }
     }
 
     public synchronized void save() throws Exception {
-//        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), streamMetadataService
-//                .getSnapshot()));
-        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), null));
+        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), streamMetadataService
+                .getSnapshot()));
     }
 
 }

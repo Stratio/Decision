@@ -46,6 +46,7 @@ public class StreamingFailoverDao  {
             log.info("Failover loading data...");
             byte[] bytes = zkutils.getZNode(PERSISTENCE_STORE_PATH);
             return gson.fromJson(new String(bytes), FailoverPersistenceStoreModel.class);
+//            return new FailoverPersistenceStoreModel(bytes);
         } else {
             return null;
         }
@@ -55,6 +56,7 @@ public class StreamingFailoverDao  {
         log.info("Failover data to save. HASH {}, TOSTRING {} ", failoverPersistenceStoreModel.hashCode(),
                 failoverPersistenceStoreModel);
         zkutils.createZNode(PERSISTENCE_STORE_PATH, gson.toJson(failoverPersistenceStoreModel).getBytes());
+//        zkutils.createZNode(PERSISTENCE_STORE_PATH, failoverPersistenceStoreModel.FailOverPersistenceModelToByte());
     }
 
 }
