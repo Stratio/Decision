@@ -18,8 +18,11 @@ package com.stratio.streaming;
 import java.io.IOException;
 import java.util.Map;
 
+import com.stratio.streaming.commons.constants.STREAMING;
+import com.stratio.streaming.configuration.ConfigurationContext;
 import com.stratio.streaming.configuration.FirstConfiguration;
 import com.stratio.streaming.highAvailability.LeadershipManager;
+import com.stratio.streaming.utils.ZKUtils;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,16 +42,22 @@ public class StreamingEngine {
 
             node.waitForLeadership();
             if (node.isLeader()) {
-                System.out.println("I'm the leader");
+                log.error("This is the Streaming leader node.");
                 try (AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(
                         BaseConfiguration.class)) {
+                    ConfigurationContext configurationContext = annotationConfigApplicationContext.getBean("configurationContext", ConfigurationContext.class);
+                    ZKUtils zkUtils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum());
+                    zkUtils.createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_CONNECTED.getBytes());
                     annotationConfigApplicationContext.registerShutdownHook();
 
                     JavaStreamingContext context = annotationConfigApplicationContext.getBean("streamingContext", JavaStreamingContext.class);
 
                     context.start();
 
+                    zkUtils.createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
+
                     context.awaitTermination();
+
                 } catch (Exception e) {
                     log.error("Fatal error", e);
                 }

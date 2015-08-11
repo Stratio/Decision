@@ -21,7 +21,7 @@ import com.stratio.streaming.api.messaging.MessageBuilder.builder
 import com.stratio.streaming.api.messaging.{ColumnNameType, ColumnNameValue, MessageBuilderWithColumns}
 import com.stratio.streaming.api.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.constants.InternalTopic
-import com.stratio.streaming.commons.constants.STREAMING.ZK_EPHEMERAL_NODE_PATH
+import com.stratio.streaming.commons.constants.STREAMING.{ZK_EPHEMERAL_NODE_STATUS_PATH, ZK_EPHEMERAL_NODE_STATUS_CONNECTED, ZK_EPHEMERAL_NODE_STATUS_INITIALIZED}
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.ACTION.{INDEX, LISTEN, SAVETO_CASSANDRA, SAVETO_MONGO, SAVETO_SOLR, STOP_INDEX, STOP_LISTEN, STOP_SAVETO_CASSANDRA, STOP_SAVETO_MONGO, STOP_SAVETO_SOLR}
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS.DEFINITION.{ADD_QUERY, ALTER, DROP, REMOVE_QUERY}
@@ -276,14 +276,10 @@ class StratioStreamingAPI
     }
   }
 
-  override def isInit(): Boolean = streamingUpAndRunning
+  override def isInit(): Boolean = streamingUp && streamingRunning
 
   override def isConnected(): Boolean = {
-    try {
-      zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH)
-    } catch {
-      case ex => return false
-    }
+    return streamingUp && streamingRunning
   }
 
   def defineAcknowledgeTimeOut(timeOutInMs: Int) = {
@@ -310,7 +306,8 @@ class StratioStreamingAPI
   lazy val kafkaBroker = s"$kafkaCluster"
   var zookeeperServer = ""
   lazy val zookeeperCluster = s"$zookeeperServer"
-  var streamingUpAndRunning = false
+  var streamingUp = false
+  var streamingRunning = false
   val streamingListeners = scala.collection.mutable.Map[String, KafkaConsumer]()
   lazy val kafkaProducer = new KafkaProducer(InternalTopic.TOPIC_REQUEST.getTopicName(), kafkaBroker)
   lazy val kafkaDataProducer = new KafkaProducer(InternalTopic.TOPIC_DATA.getTopicName(), kafkaBroker)
@@ -327,17 +324,26 @@ class StratioStreamingAPI
   lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
 
   private def checkEphemeralNode() {
-    val ephemeralNodePath = ZK_EPHEMERAL_NODE_PATH
+    val ephemeralNodePath = ZK_EPHEMERAL_NODE_STATUS_PATH
     if (!zookeeperConsumer.zNodeExists(ephemeralNodePath)) {
       log.warn("Ephemeral node does not exist")
       throw new StratioEngineStatusException("Can't connect. Check if Stratio streaming is down or connection to " +
         "Zookeeper")
-    } else
-      streamingUpAndRunning = true
+    } else {
+      val streamingStatus = zookeeperConsumer.getZNodeData(ZK_EPHEMERAL_NODE_STATUS_PATH).get
+      streamingStatus match {
+        case ZK_EPHEMERAL_NODE_STATUS_CONNECTED =>
+          streamingUp = true
+          streamingRunning = false
+        case ZK_EPHEMERAL_NODE_STATUS_INITIALIZED =>
+          streamingUp = true
+          streamingRunning = true
+      }
+    }
   }
 
   private def startEphemeralNodeWatch() {
-    zookeeperClient.checkExists().watched().forPath(ZK_EPHEMERAL_NODE_PATH)
+    zookeeperClient.checkExists().watched().forPath(ZK_EPHEMERAL_NODE_STATUS_PATH)
     addListener()
   }
 
@@ -348,7 +354,8 @@ class StratioStreamingAPI
   }
 
   private def checkStreamingStatus() {
-    if (!streamingUpAndRunning) throw new StratioEngineStatusException("Stratio streaming is down")
+    if (!streamingUp) throw new StratioEngineStatusException("Stratio streaming is down")
+    if (!streamingRunning) throw new StratioEngineStatusException("Stratio streaming not yet initialized")
   }
 
   private def addListener() = {
@@ -356,10 +363,14 @@ class StratioStreamingAPI
       def eventReceived(client: CuratorFramework, event: CuratorEvent) = {
         event.getType() match {
           case WATCHED => {
-            zookeeperClient.checkExists().watched().forPath(ZK_EPHEMERAL_NODE_PATH)
-            zookeeperConsumer.zNodeExists(ZK_EPHEMERAL_NODE_PATH) match {
-              case true => streamingUpAndRunning = true
-              case false => streamingUpAndRunning = false
+            zookeeperClient.checkExists().watched().forPath(ZK_EPHEMERAL_NODE_STATUS_PATH)
+            zookeeperConsumer.getZNodeData(ZK_EPHEMERAL_NODE_STATUS_PATH) match {
+              case Some(ZK_EPHEMERAL_NODE_STATUS_CONNECTED) => streamingUp = true
+              case Some(ZK_EPHEMERAL_NODE_STATUS_INITIALIZED) => streamingUp = false
+              case _ => {
+                streamingUp = false
+                streamingRunning = false
+              }
             }
           }
           case x => {
