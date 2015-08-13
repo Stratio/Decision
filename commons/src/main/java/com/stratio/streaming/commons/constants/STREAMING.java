@@ -20,6 +20,9 @@ public interface STREAMING {
     public static final String STREAM_STATUS_MAP = "stratio_stream_map";
 
     public static final String ZK_EPHEMERAL_NODE_PATH = "/stratio/streaming/engine";
+    public static final String ZK_EPHEMERAL_NODE_STATUS_PATH = "/stratio/streaming/status";
+    public static final String ZK_EPHEMERAL_NODE_STATUS_CONNECTED = "connected";
+    public static final String ZK_EPHEMERAL_NODE_STATUS_INITIALIZED = "initialized";
     public static final String STREAMING_KEYSPACE_NAME = "stratio_streaming";
 
     public interface STATS_NAMES {
