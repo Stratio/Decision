@@ -15,43 +15,58 @@
  */
 package com.stratio.streaming.service;
 
+import com.stratio.streaming.commons.constants.StreamAction;
+import com.stratio.streaming.commons.messages.StreamQuery;
 import com.stratio.streaming.dao.StreamStatusDao;
 import com.stratio.streaming.dao.StreamingFailoverDao;
-import com.stratio.streaming.model.CassandraPersistenceStoreModel;
+import com.stratio.streaming.model.FailoverPersistenceStoreModel;
+import com.stratio.streaming.streams.QueryDTO;
 import com.stratio.streaming.streams.StreamStatusDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Map;
+import java.util.Set;
 
 public class StreamingFailoverService {
 
     private final StreamStatusDao streamStatusDao;
     private final StreamMetadataService streamMetadataService;
     private final StreamingFailoverDao streamingFailoverDao;
-    private final StreamOperationService streamOperationService;
+
+    @Autowired
+    private StreamOperationService streamOperationService;
+
 
     public StreamingFailoverService(StreamStatusDao streamStatusDao, StreamMetadataService streamMetadataService,
-                                    StreamingFailoverDao streamingFailoverDao, StreamOperationService streamOperationService) {
+                                    StreamingFailoverDao streamingFailoverDao) {
         this.streamStatusDao = streamStatusDao;
         this.streamMetadataService = streamMetadataService;
         this.streamingFailoverDao = streamingFailoverDao;
-        this.streamOperationService = streamOperationService;
     }
 
-    public synchronized void load() {
-        CassandraPersistenceStoreModel cassandraPersistenceStoreModel = streamingFailoverDao.load();
-        if (cassandraPersistenceStoreModel != null) {
-            Map<String, StreamStatusDTO> streamsStatus = cassandraPersistenceStoreModel.getStreamStatuses();
-            streamStatusDao.putAll(cassandraPersistenceStoreModel.getStreamStatuses());
+    public synchronized void load() throws Exception {
+        FailoverPersistenceStoreModel failoverPersistenceStoreModel = streamingFailoverDao.load();
+        if (failoverPersistenceStoreModel != null) {
+            streamStatusDao.putAll(failoverPersistenceStoreModel.getStreamStatuses());
+            Map<String, StreamStatusDTO> streamsStatus = failoverPersistenceStoreModel.getStreamStatuses();
             for (Map.Entry<String, StreamStatusDTO> entry : streamsStatus.entrySet()) {
-                StreamStatusDTO streamStatusDTO = entry.getValue();
-                streamOperationService.createStream(streamStatusDTO.getStreamName(), streamStatusDTO.getStreamDefinition());
+                StreamStatusDTO stream = entry.getValue();
+                streamOperationService.createStream(stream.getStreamName(), stream.getStreamDefinition());
+                for (Map.Entry<String, QueryDTO> query : stream.getAddedQueries().entrySet()) {
+                    streamOperationService.addQuery(entry.getKey(), query.getValue().getQueryRaw());
+                }
+                for (StreamAction action : stream.getActionsEnabled()) {
+                    streamOperationService.enableAction(entry.getKey(), action);
+                }
             }
-            streamMetadataService.setSnapshot(cassandraPersistenceStoreModel.getSiddhiSnapshot());
+//            streamMetadataService.setSnapshot(failoverPersistenceStoreModel.getSiddhiSnapshot());
         }
     }
 
-    public synchronized void save() {
-        streamingFailoverDao.save(new CassandraPersistenceStoreModel(streamStatusDao.getAll(), streamMetadataService
-                .getSnapshot()));
+    public synchronized void save() throws Exception {
+//        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), streamMetadataService
+//                .getSnapshot()));
+        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), null));
     }
 
 }
