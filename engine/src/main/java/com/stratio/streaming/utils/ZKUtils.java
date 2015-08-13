@@ -96,6 +96,23 @@ public class ZKUtils {
 
     }
 
+    public void createZNode(String path, byte[] data) throws Exception {
+        if (client.checkExists().forPath(path) != null) {
+            client.delete().deletingChildrenIfNeeded().forPath(path);
+        }
+
+        client.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(path, data);
+    }
+
+    public byte[] getZNode(String path) throws Exception {
+        return client.getData().forPath(path);
+    }
+
+    public boolean existZNode(String path) throws Exception {
+        Stat stat = client.checkExists().forPath(path);
+        return (stat == null) ? true : false;
+    }
+
     private class ZookeeperBackgroundCleaner implements Runnable {
 
         private Logger logger = LoggerFactory.getLogger(ZookeeperBackgroundCleaner.class);
@@ -105,8 +122,8 @@ public class ZKUtils {
         private static final long CLEAN_INTERVAL = 30000; // 5 minutes
 
         /**
-		 * 
-		 */
+         *
+         */
         public ZookeeperBackgroundCleaner(CuratorFramework client) {
             this.client = client;
             logger.debug("Starting ZookeeperBackgroundCleaner...");
