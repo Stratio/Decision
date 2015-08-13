@@ -59,13 +59,14 @@ public class StreamingFailoverService {
                     streamOperationService.enableAction(entry.getKey(), action);
                 }
             }
-            streamMetadataService.setSnapshot(failoverPersistenceStoreModel.getSiddhiSnapshot());
+//            streamMetadataService.setSnapshot(failoverPersistenceStoreModel.getSiddhiSnapshot());
         }
     }
 
     public synchronized void save() throws Exception {
-        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), streamMetadataService
-                .getSnapshot()));
+//        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), streamMetadataService
+//                .getSnapshot()));
+        streamingFailoverDao.save(new FailoverPersistenceStoreModel(streamStatusDao.getAll(), null));
     }
 
 }

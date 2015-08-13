@@ -30,7 +30,8 @@ public class FailoverPersistenceStoreModel implements Serializable {
 
     public FailoverPersistenceStoreModel(Map<String, StreamStatusDTO> streamStatuses, byte[] siddhiSnapshot) {
         this.streamStatuses = streamStatuses;
-        this.siddhiSnapshot = siddhiSnapshot.clone();
+//        this.siddhiSnapshot = siddhiSnapshot.clone();
+        this.siddhiSnapshot = null;
     }
 
     public FailoverPersistenceStoreModel(byte[] bytes) {
