@@ -4,6 +4,9 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 ## 0.8.0 (upcoming)
 
+## 0.7.1 (July 2015)
+
+* Fixed problem with documentation generation.
 
 ## 0.7.0 (July 2015)
 
