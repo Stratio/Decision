@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.stratio.streaming</groupId>
         <artifactId>stratio-streaming</artifactId>
-        <version>0.8.0-RC2-SNAPSHOT</version>
+        <version>0.8.0</version>
     </parent>
     <name>Streaming engine</name>
     <artifactId>streaming-engine</artifactId>
