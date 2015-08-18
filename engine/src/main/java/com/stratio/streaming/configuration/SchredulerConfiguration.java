@@ -37,7 +37,7 @@ public class SchredulerConfiguration {
     private StreamingFailoverService streamingFailoverService;
 
     @Bean
-    public TaskScheduler taskScheduler() {
+    public TaskScheduler taskScheduler() throws Exception {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         taskScheduler.initialize();
         if (configurationContext.isFailOverEnabled()) {
@@ -46,7 +46,7 @@ public class SchredulerConfiguration {
         return taskScheduler;
     }
 
-    public FailOverTask failOverTask() {
+    public FailOverTask failOverTask() throws Exception {
         return new FailOverTask(streamingFailoverService);
     }
 }

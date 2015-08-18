@@ -113,8 +113,26 @@ public class StreamingContextConfiguration {
                 configurationContext.getZookeeperHostsQuorum());
         ListStreamsFunction listStreamsFunction = new ListStreamsFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorum());
-        SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
-                streamOperationService, configurationContext.getZookeeperHostsQuorum());
+
+        if (configurationContext.getCassandraHosts() != null) {
+            SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
+                    streamOperationService, configurationContext.getZookeeperHostsQuorum());
+
+            JavaDStream<StratioStreamingMessage> saveToCassandraRequests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)).map(
+                    keepPayloadFromMessageFunction);
+
+            JavaDStream<StratioStreamingMessage> stopSaveToCassandraRequests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA)).map(
+                    keepPayloadFromMessageFunction);
+
+            saveToCassandraRequests.foreachRDD(saveToCassandraStreamFunction);
+
+            stopSaveToCassandraRequests.foreachRDD(saveToCassandraStreamFunction);
+
+        } else {
+            log.warn("Cassandra configuration not found.");
+        }
 
         if (configurationContext.getElasticSearchHosts() != null) {
             IndexStreamFunction indexStreamFunction = new IndexStreamFunction(streamOperationService,
@@ -199,14 +217,6 @@ public class StreamingContextConfiguration {
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_LISTEN)).map(
                 keepPayloadFromMessageFunction);
 
-        JavaDStream<StratioStreamingMessage> saveToCassandraRequests = messages.filter(
-                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)).map(
-                keepPayloadFromMessageFunction);
-
-        JavaDStream<StratioStreamingMessage> stopSaveToCassandraRequests = messages.filter(
-                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA)).map(
-                keepPayloadFromMessageFunction);
-
         JavaDStream<StratioStreamingMessage> listRequests = messages.filter(
                 new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.LIST)).map(
                 keepPayloadFromMessageFunction);
@@ -221,8 +231,6 @@ public class StreamingContextConfiguration {
         removeQueryRequests.foreachRDD(addQueryToStreamFunction);
         listenRequests.foreachRDD(listenStreamFunction);
         stopListenRequests.foreachRDD(listenStreamFunction);
-        saveToCassandraRequests.foreachRDD(saveToCassandraStreamFunction);
-        stopSaveToCassandraRequests.foreach(saveToCassandraStreamFunction);
         listRequests.foreachRDD(listStreamsFunction);
         dropRequests.foreachRDD(createStreamFunction);
 
@@ -230,7 +238,7 @@ public class StreamingContextConfiguration {
 
             JavaDStream<StratioStreamingMessage> allRequests = createRequests.union(alterRequests)
                     .union(addQueryRequests).union(removeQueryRequests).union(listenRequests).union(stopListenRequests)
-                    .union(saveToCassandraRequests).union(listRequests).union(dropRequests);
+                    .union(listRequests).union(dropRequests);
 
             // TODO enable audit functionality
             // if (configurationContext.isAuditEnabled()) {
