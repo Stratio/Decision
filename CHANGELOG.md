@@ -6,6 +6,7 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 * Failover implemented using Zookeeper, no need for a running Cassandra instance when starting the engine.
 * Streaming Engine now takes care of its initialization status, allowing the shell to show more precise error messages.
+* Upgraded ElasticSearch version (1.7.1)
 
 ## 0.7.1 (July 2015)
 
