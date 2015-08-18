@@ -42,7 +42,7 @@ Failover Configuration
 ----------------------
 **This field is mandatory**
 
-You can enable the failover for saving the engine state in Cassandra. You must have configured the Cassandra settings and the enabled field to true. If Stratio Streaming closes abruptly when you start it again, it will recover its last state from Cassandra.
+You can enable the failover for saving the engine state in Zookeeper. You must have configured the Zookeeper settings and the enabled field to true. If Stratio Streaming closes abruptly when you start it again, it will recover its last state from Zookeeper.
 
 Example::
 
@@ -99,9 +99,8 @@ Example::
 
 Cassandra Configuration
 -----------------------
-**This field is mandatory**
 
-You must set the cassandra configuration by setting the hosts of cassandra with IP.
+You can set the cassandra configuration by setting the hosts of cassandra with IP.
 
 Example::
 
