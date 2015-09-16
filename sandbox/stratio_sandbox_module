@@ -44,7 +44,7 @@ fi
 service zookeeper restart
 service kafka restart
 service cassandra restart
-service mongod restart
+service mongodb restart
 service elasticsearch restart
 service streaming restart
 service httpd restart

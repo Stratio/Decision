@@ -1,0 +1,180 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides: stratio-streaming
+# Required-Start: $remote_fs
+# Required-Stop: $remote_fs
+# Should-Stop: $all
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Streaming CEP Engine
+# Description: Description for stratio-streaming
+### END INIT INFO
+# Developed by pmadrid@stratio.com
+# Broken by alvaro@stratio.com
+# Version: 0.1 2014
+# When I learn scripting a bit better, I'll try to improve this one...
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INIT_HOME=`cd "${DIR}/.." >/dev/null; pwd`
+
+NAME="stratio-streaming"
+DESC="Description for stratio-streaming"
+BASEDIR=/opt/sds/streaming
+CONFDIR=/etc/sds/streaming
+LOGFILE=/var/log/sds/streaming/streaming.log
+RUNFILE=$BASEDIR/bin/run
+pidDir=/var/run/sds
+serviceUser=stratio
+serviceGroup=stratio
+PIDFileName=streaming
+
+# If JAVA_HOME has not been set, try to determine it.ner
+JVM_SEARCH_DIRS="/usr/java/default /usr/java/latest /opt/java"
+
+if [ ! -d "$pidDir" ]; then
+	mkdir -p "$pidDir"
+	if [ $? -ne 0 ]; then exit 1; fi
+    if [ -n "$serviceGroup" ]; then chown ${serviceUser}:${serviceGroup} "$pidDir"; fi
+    if [ $? -ne 0 ]; then exit 1; fi
+fi
+pidFile="${pidDir}/${NAME}.pid"
+
+if [ ! -z "${PIDFileName}" ]; then
+    pidFile="${pidDir}/${PIDFileName}.pid"
+fi
+
+# Returns 0 if the process with PID $1 is running.
+function checkProcessIsRunning {
+	local pid="$1"
+	if [ -z "$pid" -o "$pid" == " " ]; then return 1; fi
+	ps -Af | grep ${pid} | grep java > /dev/null 2>&1
+        if [ $? -ne 0 ]; then return 1; fi
+	return 0;
+}
+
+# Returns 0 if the process with PID $1 is our Java service process.
+function checkProcessIsOurService {
+	local pid="$1"
+	ps -Af | grep ${pid} | grep java > /dev/null 2>&1
+	if [ $? -ne 0 ]; then return 1; fi
+	return 0;
+}
+
+# Returns 0 when the service is running and sets the variable $servicePid to the PID.
+function getServicePid {
+	if [ ! -f $pidFile ]; then return 1; fi
+	local servicePid="$(<$pidFile)"
+	checkProcessIsRunning $servicePid || return 1
+	checkProcessIsOurService $servicePid || return 1
+	return 0;
+}
+
+function startServiceProcess {
+	cd $BASEDIR || return 1
+	rm -f $pidFile
+	local cmd="$RUNFILE >>$LOGFILE 2>&1 & echo \$! >$pidFile"
+	echo "Launching service process: ${NAME}"
+	echo ""
+	su $serviceUser -c "$cmd" || return 1
+	sleep 0.1
+	servicePid="$(<$pidFile)"
+	echo "PID: ${pidFile} servicePid: ${servicePid}"
+	if checkProcessIsRunning $servicePid; then :; else
+		echo -e "\n${NAME} start failed, see logfile."
+		rm -f $pidfile
+		return 1
+	fi
+	return 0;
+}
+
+function stopServiceProcess {
+	servicePid="$(<$pidFile)"
+	kill $servicePid || return 1
+	local killWaitTime=10
+	for ((i=0; i<$killWaitTime*10; i++)); do
+		checkProcessIsRunning $servicePid
+		if [ $? -ne 0 ]; then
+			rm -f $pidFile
+			return 0
+		fi
+		sleep 0.1
+	done
+	echo -e "\n${NAME} did not terminate within 10 seconds, sending SIGKILL..."
+	kill -s KILL $servicePid || return 1
+	for ((i=0; i<$killWaitTime*10; i++)); do
+		checkProcessIsRunning $servicePid
+		if [ $? -ne 0 ]; then
+			rm -f $pidFile
+			return 0
+		fi
+		sleep 0.1
+	done
+	echo "Error: ${NAME} could not be stopped within 20 seconds!"
+	return 1;
+}
+
+function startService {
+	# Add any service start conditions here
+	getServicePid
+	if [ $? -eq 0 ]; then echo "${NAME} is already running"; return 0; fi
+	echo "Starting ${NAME}"
+	startServiceProcess
+	if [ $? -ne 0 ]; then echo "Error starting ${NAME}" ; return 1; fi
+	return 0;
+}
+
+function stopService {
+	getServicePid
+	if [ $? -ne 0 ]; then echo "${NAME} is not running"; return 0; fi
+	echo "Stopping ${NAME} "
+	stopServiceProcess
+	if [ $? -ne 0 ]; then echo "Error stopping ${NAME}"; return 1; fi
+	return 0;
+}
+
+function checkServiceStatus {
+	echo "Checking for ${NAME}: "
+	if [ ! -f "${CONFDIR}/config.conf" ]; then
+		echo "Error: Configuration file not found!"
+		return 1
+	fi	
+	if getServicePid; then
+		local servicePid="$(<$pidFile)"
+		echo "$DESC seems to be running (pid $servicePid)"
+		return 0
+	else
+		echo "${NAME} seems to be stopped"
+		return 1
+	fi
+	return 0;
+}
+
+case "$1" in
+	start)
+		startService
+		retval=$?
+		exit $retval
+	;;
+	stop)
+		stopService
+		retval=$?
+		exit $retval
+	;;
+	restart)
+		stopService && startService
+		retval=$?
+		exit $retval
+	;;
+	status)
+		checkServiceStatus
+		retval=$?
+		exit $retval
+	;;
+	*)
+		echo "Usage: $0 {start|stop|restart|status}"
+		exit 1
+	;;
+esac
+
+exit 0
