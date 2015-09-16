@@ -83,7 +83,7 @@ public class StreamCommands implements CommandMarker {
     @CliCommand(value = "create", help = "create new stream")
     public String create(
             @CliOption(key = {"stream"}, help = "The new stream name", mandatory = true) final String streamName,
-            @CliOption(key = {"definition"}, help = "Stream definition. Comma seaparated name.type fields. Example: 'id.int,name.string,age.int,date.long", mandatory = true) final ColumnNameTypeList columns) {
+            @CliOption(key = {"definition"}, help = "Stream definition. Comma seaparated name.type fields. Example: 'id.integer,name.string,age.integer,date.long", mandatory = true) final ColumnNameTypeList columns) {
         try {
             cachedStreamsDAO.newStream(streamName, columns);
             return "Stream ".concat(streamName).concat(" created correctly");
@@ -107,7 +107,7 @@ public class StreamCommands implements CommandMarker {
     @CliCommand(value = "alter", help = "alter existing stream")
     public String alter(
             @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName,
-            @CliOption(key = {"definition"}, help = "Stream definition to add. Comma seaparated name.type fields. Example: 'id.int,name.string,age.int,date.long", mandatory = true) final ColumnNameTypeList columns) {
+            @CliOption(key = {"definition"}, help = "Stream definition to add. Comma seaparated name.type fields. Example: 'id.integer,name.string,age.integer,date.long", mandatory = true) final ColumnNameTypeList columns) {
         try {
             ssaw.api().alterStream(streamName, columns);
             return "Stream ".concat(streamName).concat(" altered correctly");
