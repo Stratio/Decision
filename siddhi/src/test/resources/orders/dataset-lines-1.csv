@@ -1,0 +1,9 @@
+order_id,timestamp,day_time_zone,client_id,payment_method,latitude,longitude,credit_card,shopping_center,channel,city,country,employee,total_amount,total_products,order_size,product,family,quantity,price
+111,2014-01-07T03:08:57 -01:0,morning,1,credit card,32,-3,111,Madrid,online,Madrid,Spain,9000,17,5,3,Oranges,Fruit,2,5
+112,2014-01-07T03:08:57 -01:0,morning,1,credit card,32,-3,111,Madrid,online,Madrid,Spain,9000,17,5,14,Bananas,Fruit,3,2
+113,2014-01-07T03:08:57 -01:0,morning,1,credit card,32,-3,111,Madrid,online,Madrid,Spain,9000,17,5,14,Bread,Bread,2,1
+114,2014-01-07T03:08:57 -01:0,morning,1,credit card,32,-3,111,Madrid,online,Madrid,Spain,9000,17,5,14,Milk,Milk,2,2
+211,2014-01-07T03:08:57 -01:0,morning,2,credit card,32,-3,222,Madrid,online,Madrid,Spain,9001,3,3,14,Milk,Milk,3,3
+311,2014-01-07T03:08:57 -01:0,morning,3,credit card,32,-3,333,Madrid,online,Madrid,Spain,9000,10,5,14,Bananas,Fruit,10,8
+114,2014-01-07T03:08:57 -01:0,morning,1,credit card,32,-3,444,Madrid,online,Madrid,Spain,9000,7,7,14,Bread,Bread,14,7
+555,2014-01-07T03:08:57 -01:0,morning,5,credit card,32,-3,555,Madrid,online,Madrid,Spain,9000,5,2,3,Oranges,Fruit,2,5

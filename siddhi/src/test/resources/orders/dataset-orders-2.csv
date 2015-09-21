@@ -1,0 +1,8 @@
+order_id,timestamp,day_time_zone,client_id,payment_method,latitude,longitude,credit_card,shopping_center,channel,city,country,employee,total_amount,total_products,order_size,lines
+111,2014-01-07T03:08:57 -01:0,morning,1,credit card,32,-3,111,Madrid,online,Madrid,Spain,9000,300,14,14,[]
+222,2014-01-07T03:08:57 -01:0,morning,2,credit card,32,-3,222,Madrid,online,Madrid,Spain,9000,300,4,4,[]
+444,2014-01-07T03:08:58 -01:0,morning,1,credit card,32,-3,333,Madrid,online,Madrid,Spain,9000,300,4,4,[]
+555,2014-01-07T03:08:58 -01:0,morning,3,credit card,32,-3,333123,Madrid,online,Madrid,Spain,9000,300,15,15,[]
+666,2014-01-07T03:08:58 -01:0,morning,3,credit card,32,-3,444123,Madrid,online,Madrid,Spain,9000,300,14,14,[]
+777,2014-01-07T03:08:58 -01:0,morning,3,credit card,32,-3,444124,Madrid,online,Madrid,Spain,9000,300,14,14,[]
+888,2014-01-07T03:08:58 -01:0,morning,3,credit card,32,-3,444124,Madrid,online,Madrid,Spain,9000,300,14,14,[]
