@@ -8,3 +8,5 @@
 *.iml
 *.ipr
 *.iws
+shell.log
+streaming.log

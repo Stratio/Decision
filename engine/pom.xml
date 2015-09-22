@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.stratio.streaming</groupId>
         <artifactId>stratio-streaming</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.8.2-RC1-SNAPSHOT</version>
     </parent>
     <name>Streaming engine</name>
     <artifactId>streaming-engine</artifactId>
@@ -266,6 +266,15 @@
                         <dir>/bin</dir>
                     </excludeDirectoryAttributes>
                     <assembly>
+                        <copyFile>
+                            <path>src/main/unix/files_and_dirs/etc/init.d/streaming</path>
+                            <toFile>/etc/init.d/streaming</toFile>
+                            <attributes>
+                                <user>root</user>
+                                <group>root</group>
+                                <mode>755</mode>
+                            </attributes>
+                        </copyFile>
                         <mkdirs>
                             <path>/opt/sds/streaming</path>
                             <attributes>
@@ -280,6 +289,13 @@
                                 <group>stratio</group>
                             </attributes>
                         </mkdirs>
+                        <mkdirs>
+                            <path>/var/log/sds/streaming</path>
+                            <attributes>
+                                <user>stratio</user>
+                                <group>stratio</group>
+                            </attributes>
+                        </mkdirs>
                         <copyDirectory>
                             <from>target/appassembler/bin</from>
                             <to>/opt/sds/streaming/bin</to>
@@ -287,10 +303,6 @@
                                 <user>stratio</user>
                                 <group>stratio</group>
                             </directoryAttributes>
-                            <fileAttributes>
-                                <user>stratio</user>
-                                <group>stratio</group>
-                            </fileAttributes>
                         </copyDirectory>
                         <copyDirectory>
                             <from>target/appassembler/repo</from>
@@ -299,30 +311,31 @@
                                 <user>stratio</user>
                                 <group>stratio</group>
                             </directoryAttributes>
-                            <fileAttributes>
-                                <user>stratio</user>
-                                <group>stratio</group>
-                            </fileAttributes>
                         </copyDirectory>
                         <copyDirectory>
                             <from>target/appassembler/:/etc/sds/streaming/conf</from>
-                            <to>/etc/sds/streaming/conf</to>
+                            <to>/etc/sds/streaming</to>
                             <directoryAttributes>
                                 <user>stratio</user>
                                 <group>stratio</group>
                             </directoryAttributes>
-                            <fileAttributes>
-                                <user>stratio</user>
-                                <group>stratio</group>
-                            </fileAttributes>
                         </copyDirectory>
+                        <copyFile>
+                            <path>src/main/unix/files_and_dirs/etc/default/streaming</path>
+                            <toFile>/etc/default/streaming</toFile>
+                            <attributes>
+                                <user>root</user>
+                                <group>root</group>
+                                <mode>755</mode>
+                            </attributes>
+                        </copyFile>
                     </assembly>
                     <defaults>
                         <directoryAttributes>
                             <mode>0775</mode>
                         </directoryAttributes>
                         <fileAttributes>
-                            <mode>0644</mode>
+                            <mode>0664</mode>
                         </fileAttributes>
                     </defaults>
                 </configuration>

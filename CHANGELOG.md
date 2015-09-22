@@ -4,6 +4,10 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 ## 0.9.0 (upcoming)
 
+## 0.8.1 (September 2015)
+
+* Update deb and rpm generation.
+
 ## 0.8.0 (August 2015)
 
 * Failover implemented using Zookeeper, no need for a running Cassandra instance when starting the engine.
@@ -49,4 +53,3 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 * Updated ElasticSearch driver to version 1.3.2
 * Updated Spark to version 1.0.2
 * Added a new module with examples
-
