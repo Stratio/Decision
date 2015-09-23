@@ -32,11 +32,11 @@ public abstract class StreamsHelper {
 
     public static final List<ColumnNameTypeValue> COLUMNS= new LinkedList<ColumnNameTypeValue>() {{
         add(new ColumnNameTypeValue("name", ColumnType.STRING, "name"));
-        add(new ColumnNameTypeValue("timestamp", ColumnType.DOUBLE, "timestamp"));
-        add(new ColumnNameTypeValue("value", ColumnType.INTEGER, "value"));
+        add(new ColumnNameTypeValue("timestamp", ColumnType.DOUBLE, "0.0"));
+        add(new ColumnNameTypeValue("value", ColumnType.INTEGER, "3"));
         add(new ColumnNameTypeValue("enabled", ColumnType.BOOLEAN, "enabled"));
-        add(new ColumnNameTypeValue("numberl", ColumnType.LONG, "long"));
-        add(new ColumnNameTypeValue("numberf", ColumnType.FLOAT, "float"));
+        add(new ColumnNameTypeValue("numberl", ColumnType.LONG, 123L));
+        add(new ColumnNameTypeValue("numberf", ColumnType.FLOAT, 13f));
     }};
 
     // Helper test info #2
@@ -51,9 +51,9 @@ public abstract class StreamsHelper {
 
     public static final List<ColumnNameTypeValue> COLUMNS2= new LinkedList<ColumnNameTypeValue>() {{
         add(new ColumnNameTypeValue("name2", ColumnType.STRING, "name2"));
-        add(new ColumnNameTypeValue("timestamp2", ColumnType.DOUBLE, "timestamp2"));
-        add(new ColumnNameTypeValue("value2", ColumnType.INTEGER, "value2"));
-        add(new ColumnNameTypeValue("enabled2", ColumnType.BOOLEAN, "enabled2"));
+        add(new ColumnNameTypeValue("timestamp2", ColumnType.DOUBLE, "0.0"));
+        add(new ColumnNameTypeValue("value2", ColumnType.INTEGER, 2222L));
+        add(new ColumnNameTypeValue("enabled2", ColumnType.BOOLEAN, 222f));
     }};
 
 
