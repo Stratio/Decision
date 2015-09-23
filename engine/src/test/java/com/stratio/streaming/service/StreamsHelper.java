@@ -1,10 +1,14 @@
 package com.stratio.streaming.service;
 
 import com.stratio.streaming.commons.constants.ColumnType;
+import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
+import org.apache.commons.collections.set.ListOrderedSet;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by aitor on 9/22/15.
@@ -54,5 +58,13 @@ public abstract class StreamsHelper {
 
 
     public static final String ACTION_LISTEN_TOKEN= "[LISTEN]";
+
+    public static StratioStreamingMessage getSampleMessage()    {
+        Set<StreamAction> actions= new ListOrderedSet();
+        actions.add(StreamAction.LISTEN);
+        StratioStreamingMessage message= new StratioStreamingMessage(STREAM_NAME, Long.parseLong("1234567890"), COLUMNS);
+        message.setActiveActions(actions);
+        return message;
+    }
 
 }
