@@ -34,20 +34,6 @@ public class StreamOperationServiceWithoutMetricsTest {
 
     private StreamOperationServiceWithoutMetrics streamOperationsService;
 
-    private static final String STREAM_NAME= "testStream";
-    private static final String RESULT_STREAM_NAME= "resultStream";
-    private static final String QUERY = " from "+ STREAM_NAME+ "[value >= 50] select name,timestamp,value insert into "
-            + RESULT_STREAM_NAME+ " ;";
-
-    private static final List<ColumnNameTypeValue> COLUMNS= new LinkedList<ColumnNameTypeValue>() {{
-            add(new ColumnNameTypeValue("name", ColumnType.STRING, "name"));
-            add(new ColumnNameTypeValue("timestamp", ColumnType.DOUBLE, "timestamp"));
-            add(new ColumnNameTypeValue("value", ColumnType.INTEGER, "value"));
-            add(new ColumnNameTypeValue("enabled", ColumnType.BOOLEAN, "enabled"));
-            add(new ColumnNameTypeValue("long", ColumnType.LONG, "long"));
-            add(new ColumnNameTypeValue("float", ColumnType.FLOAT, "float"));
-    }};
-
     @Before
     public void setUp() throws Exception {
 
@@ -69,40 +55,40 @@ public class StreamOperationServiceWithoutMetricsTest {
 
     @Test
     public void testCreateInternalStream() throws Exception {
-        streamOperationsService.createInternalStream(STREAM_NAME, COLUMNS);
-        assertTrue(streamOperationsService.streamExist(STREAM_NAME));
+        streamOperationsService.createInternalStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
+        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
     }
 
     @Test
     public void testCreateStream() throws Exception {
-        streamOperationsService.createStream(STREAM_NAME, COLUMNS);
-        assertTrue(streamOperationsService.streamExist(STREAM_NAME));
-        assertTrue(streamOperationsService.isUserDefined(STREAM_NAME));
+        streamOperationsService.createStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
+        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
+        assertTrue(streamOperationsService.isUserDefined(StreamsHelper.STREAM_NAME));
     }
 
     @Test
     public void testEnlargeStream() throws Exception {
-        streamOperationsService.createInternalStream(STREAM_NAME, COLUMNS);
-        streamOperationsService.enlargeStream(STREAM_NAME, new LinkedList<ColumnNameTypeValue>() {
+        streamOperationsService.createInternalStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
+        streamOperationsService.enlargeStream(StreamsHelper.STREAM_NAME, new LinkedList<ColumnNameTypeValue>() {
             {
                 add(new ColumnNameTypeValue("additionalColumn", ColumnType.STRING, "additionalColumn"));
             }
         });
 
-        assertTrue(streamOperationsService.streamExist(STREAM_NAME));
+        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
 
     }
 
     @Test(expected = ServiceException.class)
     public void testEnlargeStreamNotExistingColumn() throws Exception {
-        streamOperationsService.createInternalStream(STREAM_NAME, COLUMNS);
-        streamOperationsService.enlargeStream(STREAM_NAME, new LinkedList<ColumnNameTypeValue>() {
+        streamOperationsService.createInternalStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
+        streamOperationsService.enlargeStream(StreamsHelper.STREAM_NAME, new LinkedList<ColumnNameTypeValue>() {
             {
                 add(new ColumnNameTypeValue("name", ColumnType.STRING, "name"));
             }
         });
 
-        assertTrue(streamOperationsService.streamExist(STREAM_NAME));
+        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
 
     }
 
@@ -110,53 +96,53 @@ public class StreamOperationServiceWithoutMetricsTest {
 
     @Test
     public void testDropStream() throws Exception {
-        streamOperationsService.createStream(STREAM_NAME, COLUMNS);
-        assertTrue(streamOperationsService.streamExist(STREAM_NAME));
+        streamOperationsService.createStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
+        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
 
-        String queryId= streamOperationsService.addQuery(STREAM_NAME, QUERY);
+        String queryId= streamOperationsService.addQuery(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY);
 
-        streamOperationsService.dropStream(STREAM_NAME);
-        assertFalse(streamOperationsService.streamExist(STREAM_NAME));
+        streamOperationsService.dropStream(StreamsHelper.STREAM_NAME);
+        assertFalse(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
     }
 
     @Test
     public void testAddAndRemoveQuery() throws Exception {
-        streamOperationsService.createInternalStream(STREAM_NAME, COLUMNS);
-        String queryId= streamOperationsService.addQuery(STREAM_NAME, QUERY);
+        streamOperationsService.createInternalStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
+        String queryId= streamOperationsService.addQuery(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY);
 
-        assertTrue(streamOperationsService.streamExist(STREAM_NAME));
-        assertTrue(streamOperationsService.queryRawExists(STREAM_NAME, QUERY));
-        assertFalse(streamOperationsService.queryRawExists(STREAM_NAME, "notExistingQuery"));
-        assertTrue(streamOperationsService.queryIdExists(STREAM_NAME, queryId));
-        assertFalse(streamOperationsService.queryIdExists(STREAM_NAME, "notExistingQueryAgain"));
+        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
+        assertTrue(streamOperationsService.queryRawExists(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY));
+        assertFalse(streamOperationsService.queryRawExists(StreamsHelper.STREAM_NAME, "notExistingQuery"));
+        assertTrue(streamOperationsService.queryIdExists(StreamsHelper.STREAM_NAME, queryId));
+        assertFalse(streamOperationsService.queryIdExists(StreamsHelper.STREAM_NAME, "notExistingQueryAgain"));
 
-        streamOperationsService.removeQuery(queryId, STREAM_NAME);
+        streamOperationsService.removeQuery(queryId, StreamsHelper.STREAM_NAME);
     }
 
     @Test
     public void testActions() throws Exception {
-        streamOperationsService.createStream(STREAM_NAME, COLUMNS);
-        String queryId= streamOperationsService.addQuery(STREAM_NAME, QUERY);
+        streamOperationsService.createStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
+        String queryId= streamOperationsService.addQuery(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY);
 
-        streamOperationsService.enableAction(STREAM_NAME, StreamAction.LISTEN);
-        assertTrue(streamOperationsService.isActionEnabled(STREAM_NAME, StreamAction.LISTEN));
-        streamOperationsService.disableAction(STREAM_NAME, StreamAction.LISTEN);
-        assertFalse(streamOperationsService.isActionEnabled(STREAM_NAME, StreamAction.LISTEN));
+        streamOperationsService.enableAction(StreamsHelper.STREAM_NAME, StreamAction.LISTEN);
+        assertTrue(streamOperationsService.isActionEnabled(StreamsHelper.STREAM_NAME, StreamAction.LISTEN));
+        streamOperationsService.disableAction(StreamsHelper.STREAM_NAME, StreamAction.LISTEN);
+        assertFalse(streamOperationsService.isActionEnabled(StreamsHelper.STREAM_NAME, StreamAction.LISTEN));
 
 
     }
 
     @Test
     public void testList() throws Exception {
-        streamOperationsService.createStream(STREAM_NAME, COLUMNS);
-        String queryId= streamOperationsService.addQuery(STREAM_NAME, QUERY);
+        streamOperationsService.createStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
+        String queryId= streamOperationsService.addQuery(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY);
 
-        streamOperationsService.enableAction(STREAM_NAME, StreamAction.LISTEN);
+        streamOperationsService.enableAction(StreamsHelper.STREAM_NAME, StreamAction.LISTEN);
 
         List<StratioStreamingMessage> list= streamOperationsService.list();
 
         for (StratioStreamingMessage message: list) {
-            if (message.getStreamName().equals(STREAM_NAME)) {
+            if (message.getStreamName().equals(StreamsHelper.STREAM_NAME)) {
                 assertEquals(1, message.getQueries().size());
                 assertEquals(6, message.getColumns().size());
             } else {

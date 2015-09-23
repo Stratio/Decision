@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.streaming.unit.engine.service;
+package com.stratio.streaming.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +34,7 @@ import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.dao.StreamStatusDao;
 import com.stratio.streaming.exception.ServiceException;
-import com.stratio.streaming.service.CallbackService;
-import com.stratio.streaming.service.StreamOperationService;
+
 
 public class StreamOperationServiceTest {
 
