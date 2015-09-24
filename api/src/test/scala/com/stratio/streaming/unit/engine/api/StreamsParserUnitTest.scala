@@ -17,11 +17,14 @@ package com.stratio.streaming.unit.engine.api
 
 import org.scalatest._
 import com.stratio.streaming.utils.StreamsParser
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
 import scala.collection.JavaConversions._
 import com.stratio.streaming.commons.constants.{StreamAction, ColumnType}
 import com.stratio.streaming.commons.exceptions.StratioAPIGenericException
 
-class StreamsParserUnitTests
+@RunWith(classOf[JUnitRunner])
+class StreamsParserUnitTest
   extends FunSpec
   with GivenWhenThen
   with ShouldMatchers {

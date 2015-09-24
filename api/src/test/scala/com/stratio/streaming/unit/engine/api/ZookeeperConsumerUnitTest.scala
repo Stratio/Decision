@@ -15,6 +15,8 @@
  */
 package com.stratio.streaming.unit.engine.api
 
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{ BeforeAndAfterAll, GivenWhenThen, ShouldMatchers, FunSpec }
 import scala.concurrent._
 import scala.concurrent.duration._
@@ -24,7 +26,8 @@ import org.apache.curator.retry.RetryOneTime
 import com.netflix.curator.test.TestingServer
 import org.apache.curator.framework.CuratorFrameworkFactory
 
-class ZookeeperConsumerUnitTests
+@RunWith(classOf[JUnitRunner])
+class ZookeeperConsumerUnitTest
   extends FunSpec
   with ShouldMatchers
   with GivenWhenThen

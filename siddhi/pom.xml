@@ -115,34 +115,14 @@
 	</dependencies>
 
 	<build>
-
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.scala-tools</groupId>
-                    <artifactId>maven-scala-plugin</artifactId>
-                    <version>2.15.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.googlecode</groupId>
-                    <artifactId>maven-idea-plugin</artifactId>
-                    <version>1.6.1</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
-
 		<plugins>
-
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
                 <version>3.1.6</version>
+				<configuration>
+					<checkMultipleScalaVersions>false</checkMultipleScalaVersions>
+				</configuration>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>

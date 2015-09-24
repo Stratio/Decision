@@ -15,7 +15,9 @@
  */
 package com.stratio.streaming.unit.engine.api
 
+import org.junit.runner.RunWith
 import org.scalatest._
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import org.mockito.Mockito
@@ -29,7 +31,8 @@ import scala.collection.JavaConversions._
 import com.stratio.streaming.commons.exceptions.{ StratioEngineOperationException, StratioAPIGenericException }
 import java.util.concurrent.TimeoutException
 
-class StreamingAPIListOperationTests extends FunSpec
+@RunWith(classOf[JUnitRunner])
+class StreamingAPIListOperationTest extends FunSpec
   with GivenWhenThen
   with ShouldMatchers
   with MockitoSugar {

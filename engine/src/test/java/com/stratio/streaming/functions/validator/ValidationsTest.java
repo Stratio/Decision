@@ -1,9 +1,9 @@
 package com.stratio.streaming.functions.validator;
 
 import com.stratio.streaming.commons.constants.ReplyCode;
+import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.constants.StreamAction;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.commons.messages.StreamQuery;
 import com.stratio.streaming.configuration.ServiceConfiguration;
 import com.stratio.streaming.configuration.StreamingSiddhiConfiguration;
 import com.stratio.streaming.dao.StreamStatusDao;
@@ -11,13 +11,13 @@ import com.stratio.streaming.exception.RequestValidationException;
 import com.stratio.streaming.service.CallbackService;
 import com.stratio.streaming.service.StreamOperationService;
 import com.stratio.streaming.service.StreamsHelper;
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Before;
 import org.junit.Test;
 import org.wso2.siddhi.core.SiddhiManager;
 
-import java.util.Set;
+
 
 import static org.junit.Assert.*;
 
@@ -106,4 +106,66 @@ public class ValidationsTest {
         assertEquals(ReplyCode.KO_QUERY_ALREADY_EXISTS.getCode(), (Integer) code);
 
     }
+
+    @Test
+    public void testQueryNotExistsValidation()   throws Exception {
+        QueryNotExistsValidation validation= new QueryNotExistsValidation(streamOperationsService);
+        StratioStreamingMessage message= StreamsHelper.getSampleMessage();
+
+        streamOperationsService.createStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
+        String queryId= streamOperationsService.addQuery(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY);
+
+        int code= -1;
+        try {
+            validation.validate(message);
+        } catch (RequestValidationException ex) {
+            code= ex.getCode();
+        }
+        assertEquals(ReplyCode.KO_QUERY_DOES_NOT_EXIST.getCode(), (Integer) code);
+
+    }
+
+
+    @Test
+    public void testQueryStreamAllowedValidation()   throws Exception {
+        StreamAllowedValidation validation= new StreamAllowedValidation();
+        StratioStreamingMessage message= StreamsHelper.getSampleMessage();
+
+        message.setOperation(STREAM_OPERATIONS.ACTION.LISTEN);
+        validation.validate(message);
+
+        message.setOperation("Not Existing operation");
+
+        int code= -1;
+        try {
+            validation.validate(message);
+        } catch (RequestValidationException ex) {
+            code= ex.getCode();
+        }
+        assertEquals(ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
+
+    }
+
+/**
+    @Test
+    @Ignore
+    public void testStreamNameByRegularExpressionValidation()   throws Exception {
+        StreamNameByRegularExpressionValidator validation= new StreamNameByRegularExpressionValidator();
+        StratioStreamingMessage message= StreamsHelper.getSampleMessage();
+
+        message.setOperation(STREAM_OPERATIONS.ACTION.LISTEN);
+        validation.validate(message);
+
+        message.setOperation("Not Existing operation");
+
+        int code= -1;
+        try {
+            validation.validate(message);
+        } catch (RequestValidationException ex) {
+            code= ex.getCode();
+        }
+        assertEquals(ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
+
+    }
+*/
 }

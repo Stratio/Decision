@@ -123,8 +123,8 @@
             <artifactId>metrics-spring</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>*</artifactId>
                     <groupId>org.springframework</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -15,11 +15,14 @@
  */
 package com.stratio.streaming.unit.engine.api
 
+import org.junit.runner.RunWith
 import org.scalatest._
 import com.stratio.streaming.kafka.JsonGenericDecoder
 import com.stratio.streaming.commons.exceptions.StratioAPIGenericException
+import org.scalatest.junit.JUnitRunner
 
-class JsonGenericDecoderUnitTests
+@RunWith(classOf[JUnitRunner])
+class JsonGenericDecoderUnitTest
   extends FunSpec
   with ShouldMatchers {
 
