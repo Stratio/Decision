@@ -1,14 +1,18 @@
 package com.stratio.streaming.functions.dal;
 
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
+import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.functions.ActionBaseFunctionHelper;
-import com.stratio.streaming.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.streaming.service.StreamsHelper;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -18,8 +22,6 @@ import static org.junit.Assert.*;
 public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DALActionsFunctionTest.class);
-
-
 
     @Before
     public void setUp() throws Exception {
@@ -99,5 +101,26 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
         func.addStopRequestsValidations(validators);
     }
 
+    @Test
+    @Ignore
+    public void testActionBaseFunctionCall() throws Exception {
 
+        List<StratioStreamingMessage> list= new ArrayList<StratioStreamingMessage>();
+        list.add(message);
+
+        JavaSparkContext context = new JavaSparkContext("local[2]", "test");
+        //JavaRDD<StratioStreamingMessage> rdd= context.emptyRDD();
+        JavaRDD<StratioStreamingMessage> rdd= context.parallelize(list);
+
+        ListenStreamFunction func= new ListenStreamFunction(streamOperationsService, ZOO_HOST);
+        Exception ex= null;
+        try {
+            func.startAction(message);
+            func.call(rdd);
+        } catch (Exception e) { ex= e; }
+
+        assertNull(ex);
+        context.stop();
+
+    }
 }
