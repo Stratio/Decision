@@ -93,13 +93,14 @@ public class StreamOperationServiceWithoutMetrics {
     }
 
 
-    public void addQuery(String streamName, String queryString) {
+    public String addQuery(String streamName, String queryString) {
         String queryId = siddhiManager.addQuery(queryString);
         streamStatusDao.addQuery(streamName, queryId, queryString);
         for (StreamDefinition streamDefinition : siddhiManager.getStreamDefinitions()) {
             // XXX refactor to obtain exactly siddhi inferred streams.
             streamStatusDao.createInferredStream(streamDefinition.getStreamId(),  castToColumnNameTypeValue(streamDefinition.getAttributeList()));
         }
+        return queryId;
     }
 
     private List<ColumnNameTypeValue> castToColumnNameTypeValue(List<Attribute> attributeList) {

@@ -62,8 +62,8 @@ public class StreamOperationService extends StreamOperationServiceWithoutMetrics
 
     @Override
     @Counted(absolute = true, name = "queries.total.added", monotonic = true)
-    public void addQuery(String streamName, String queryString) {
-        super.addQuery(streamName, queryString);
+    public String addQuery(String streamName, String queryString) {
+        return super.addQuery(streamName, queryString);
     }
 
     @Override
