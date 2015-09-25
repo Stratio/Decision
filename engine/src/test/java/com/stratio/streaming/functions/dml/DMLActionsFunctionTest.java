@@ -44,7 +44,7 @@ public class DMLActionsFunctionTest extends ActionBaseFunctionHelper {
             func.startAction(message);
             assertTrue(func.stopAction(message));
         } catch (Exception e)   { ex= e;}
-        assertEquals(null, ex);
+        assertEquals("Expected not exception raised", null, ex);
 
 
         func.addStartRequestsValidations(validators);
@@ -56,8 +56,9 @@ public class DMLActionsFunctionTest extends ActionBaseFunctionHelper {
     public void testListStreamFunction() throws Exception {
 
         ListStreamsFunction func= new ListStreamsFunction(streamOperationsService, ZOO_HOST);
-        assertEquals(STREAM_OPERATIONS.MANIPULATION.LIST, func.getStartOperationCommand());
-        assertEquals(null, func.getStopOperationCommand());
+        assertEquals("Expected operation not found",
+                STREAM_OPERATIONS.MANIPULATION.LIST, func.getStartOperationCommand());
+        assertEquals("Expected null value not found", null, func.getStopOperationCommand());
 
         func.addStartRequestsValidations(validators);
         func.addStopRequestsValidations(validators);

@@ -39,8 +39,8 @@ public class DDLActionsFunctionTest extends ActionBaseFunctionHelper {
         assertEquals(STREAM_OPERATIONS.DEFINITION.ADD_QUERY, func.getStartOperationCommand());
         assertEquals(STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY, func.getStopOperationCommand());
 
-        assertTrue(func.startAction(message));
-        assertTrue(func.stopAction(message));
+        assertTrue("Not true value found", func.startAction(message));
+        assertTrue("Not true value found", func.stopAction(message));
 
         func.addStartRequestsValidations(validators);
         func.addStopRequestsValidations(validators);
@@ -58,8 +58,8 @@ public class DDLActionsFunctionTest extends ActionBaseFunctionHelper {
             new ColumnNameTypeValue("newcolumn", ColumnType.STRING, "newcolumn");
         }});
 
-        assertTrue(func.startAction(message));
-        assertTrue(func.stopAction(message));
+        assertTrue("Not true value found", func.startAction(message));
+        assertTrue("Not true value found", func.stopAction(message));
 
         func.addStartRequestsValidations(validators);
         func.addStopRequestsValidations(validators);
@@ -73,8 +73,8 @@ public class DDLActionsFunctionTest extends ActionBaseFunctionHelper {
         assertEquals(STREAM_OPERATIONS.DEFINITION.CREATE, func.getStartOperationCommand());
         assertEquals(STREAM_OPERATIONS.DEFINITION.DROP, func.getStopOperationCommand());
 
-        assertTrue(func.startAction(message));
-        assertTrue(func.stopAction(message));
+        assertTrue("Not true value found", func.startAction(message));
+        assertTrue("Not true value found", func.stopAction(message));
 
         func.addStartRequestsValidations(validators);
         func.addStopRequestsValidations(validators);

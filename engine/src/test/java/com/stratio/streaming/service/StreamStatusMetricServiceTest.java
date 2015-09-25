@@ -56,15 +56,15 @@ public class StreamStatusMetricServiceTest {
     public void testGetStreamNames() throws Exception {
         List<String> listNames= service.getStreamNames();
 
-        assertTrue(listNames.contains(StreamsHelper.STREAM_NAME));
-        assertTrue(listNames.contains(StreamsHelper.STREAM_NAME2));
+        assertTrue("Expected true not found", listNames.contains(StreamsHelper.STREAM_NAME));
+        assertTrue("Expected true not found", listNames.contains(StreamsHelper.STREAM_NAME2));
     }
 
     @Test
     public void testGetStreamActions() throws Exception {
         Map<String, String> listActions= service.getStreamActions();
-        assertEquals(2, listActions.size());
-        assertTrue(listActions.containsKey(StreamsHelper.STREAM_NAME));
-        assertTrue(listActions.get(StreamsHelper.STREAM_NAME).equals(StreamsHelper.ACTION_LISTEN_TOKEN));
+        assertEquals("Expected value not found", 2, listActions.size());
+        assertTrue("Expected true not found", listActions.containsKey(StreamsHelper.STREAM_NAME));
+        assertTrue("Expected true not found", listActions.get(StreamsHelper.STREAM_NAME).equals(StreamsHelper.ACTION_LISTEN_TOKEN));
     }
 }

@@ -61,8 +61,8 @@ public class SolrOperationsServiceTest {
         String testDataDir= DATA_FOLDER.getRoot().getAbsolutePath() + File.separator + "testData";
         String testConfDir= DATA_FOLDER.getRoot().getAbsolutePath() + File.separator + "testConf";
         service.createDirs(testDataDir, testConfDir);
-        assertTrue(new File(testDataDir).isDirectory());
-        assertTrue(new File(testConfDir).isDirectory());
+        assertTrue("Expected true value not found", new File(testDataDir).isDirectory());
+        assertTrue("Expected true value not found", new File(testConfDir).isDirectory());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class SolrOperationsServiceTest {
 
         service.createSolrSchema(StreamsHelper.COLUMNS, CONF_FOLDER.getRoot().getAbsolutePath());
         File schemaFile= new File(CONF_FOLDER.getRoot().getAbsolutePath() + File.separator + "schema.xml");
-        assertTrue(schemaFile.canRead());
+        assertTrue("Expected true value not found", schemaFile.canRead());
     }
 
 }

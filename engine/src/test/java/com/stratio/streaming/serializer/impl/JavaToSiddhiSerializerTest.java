@@ -44,9 +44,9 @@ public class JavaToSiddhiSerializerTest {
     public void testSerialize() throws Exception {
         StratioStreamingMessage message= StreamsHelper.getSampleMessage();
         Event event= serializer.serialize(message);
-        assertEquals("name", event.getData(0));
-        assertEquals(3, event.getData(2));
-        assertEquals(13f, event.getData(5));
+        assertEquals("Expected value not found", "name", event.getData(0));
+        assertEquals("Expected value not found", 3, event.getData(2));
+        assertEquals("Expected value not found", 13f, event.getData(5));
     }
 
     @Test
@@ -58,7 +58,7 @@ public class JavaToSiddhiSerializerTest {
 
         List<Event> events= serializer.serialize(messages);
 
-        assertEquals(2, events.size());
+        assertEquals("Expected value not found", 2, events.size());
 
     }
 
@@ -74,9 +74,12 @@ public class JavaToSiddhiSerializerTest {
         Event event= new InEvent(StreamsHelper.STREAM_NAME, System.currentTimeMillis(), values);
         StratioStreamingMessage message= serializer.deserialize(event);
 
-        assertEquals("test", ((ColumnNameTypeValue) message.getColumns().get(0).getValue()).getValue());
-        assertEquals(10, ((ColumnNameTypeValue) message.getColumns().get(1).getValue()).getValue());
-        assertEquals(true, ((ColumnNameTypeValue) message.getColumns().get(2).getValue()).getValue());
+        assertEquals("Expected value not found", "test",
+                ((ColumnNameTypeValue) message.getColumns().get(0).getValue()).getValue());
+        assertEquals("Expected value not found",10,
+                ((ColumnNameTypeValue) message.getColumns().get(1).getValue()).getValue());
+        assertEquals("Expected value not found", true,
+                ((ColumnNameTypeValue) message.getColumns().get(2).getValue()).getValue());
     }
 
 
@@ -97,6 +100,6 @@ public class JavaToSiddhiSerializerTest {
         events.add(new InEvent(StreamsHelper.STREAM_NAME, System.currentTimeMillis(), values));
 
         List<StratioStreamingMessage> messages= serializer.deserialize(events);
-        assertEquals(2, messages.size());
+        assertEquals("Expected value not found", 2, messages.size());
     }
 }

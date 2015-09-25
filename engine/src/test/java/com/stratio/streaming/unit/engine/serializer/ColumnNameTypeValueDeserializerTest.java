@@ -55,9 +55,9 @@ public class ColumnNameTypeValueDeserializerTest {
 
         ColumnNameTypeValue result = columnNameTypeValueDeserializer.deserialize(jsonElement, type, ctx);
 
-        Assert.assertNull(result.getColumn());
-        Assert.assertNull(result.getType());
-        Assert.assertNull(result.getValue());
+        Assert.assertNull("Expected null but found a value", result.getColumn());
+        Assert.assertNull("Expected null but found a value", result.getType());
+        Assert.assertNull("Expected null but found a value", result.getValue());
     }
 
     @Test
@@ -66,9 +66,9 @@ public class ColumnNameTypeValueDeserializerTest {
 
         ColumnNameTypeValue result = columnNameTypeValueDeserializer.deserialize(jsonElement, type, ctx);
 
-        Assert.assertNull(result.getColumn());
-        Assert.assertNull(result.getType());
-        Assert.assertNull(result.getValue());
+        Assert.assertNull("Expected null but found a value", result.getColumn());
+        Assert.assertNull("Expected null but found a value", result.getType());
+        Assert.assertNull("Expected null but found a value", result.getValue());
     }
 
     @Test
@@ -79,9 +79,9 @@ public class ColumnNameTypeValueDeserializerTest {
 
         ColumnNameTypeValue result = columnNameTypeValueDeserializer.deserialize(jsonElement, type, ctx);
 
-        Assert.assertNotNull(result.getColumn());
-        Assert.assertNotNull(result.getType());
-        Assert.assertNotNull(result.getValue());
+        Assert.assertNotNull("Expected value but found null", result.getColumn());
+        Assert.assertNotNull("Expected value but found null", result.getType());
+        Assert.assertNotNull("Expected value but found null", result.getValue());
     }
 
     @Test
@@ -92,8 +92,8 @@ public class ColumnNameTypeValueDeserializerTest {
 
         ColumnNameTypeValue result = columnNameTypeValueDeserializer.deserialize(jsonElement, type, ctx);
 
-        Assert.assertNotNull(result.getColumn());
-        Assert.assertNotNull(result.getType());
-        Assert.assertNull(result.getValue());
+        Assert.assertNotNull("Expected value but found null", result.getColumn());
+        Assert.assertNotNull("Expected value but found null", result.getType());
+        Assert.assertNull("Expected null but found a value", result.getValue());
     }
 }

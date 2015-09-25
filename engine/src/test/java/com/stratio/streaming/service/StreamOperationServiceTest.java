@@ -63,25 +63,28 @@ public class StreamOperationServiceTest {
     public void createStreamTest() {
         createBaseStream();
 
-        Assert.assertEquals(1, sm.getStreamDefinitions().size());
+        Assert.assertEquals("Expected value not found", 1, sm.getStreamDefinitions().size());
 
-        Assert.assertEquals(2, sm.getStreamDefinitions().get(0).getAttributeList().size());
+        Assert.assertEquals("Expected value not found", 2,
+                sm.getStreamDefinitions().get(0).getAttributeList().size());
     }
 
     @Test
     public void enlargeStreamTest() throws ServiceException {
         createBaseStream();
 
-        Assert.assertEquals(1, sm.getStreamDefinitions().size());
-        Assert.assertEquals(2, sm.getStreamDefinitions().get(0).getAttributeList().size());
+        Assert.assertEquals("Expected value not found", 1, sm.getStreamDefinitions().size());
+        Assert.assertEquals("Expected value not found", 2,
+                sm.getStreamDefinitions().get(0).getAttributeList().size());
 
         List<ColumnNameTypeValue> columns = new ArrayList<>();
         columns.add(new ColumnNameTypeValue("col3", ColumnType.INTEGER, null));
 
         streamOperationService.enlargeStream(STREAM_NAME_GOOD, columns);
 
-        Assert.assertEquals(1, sm.getStreamDefinitions().size());
-        Assert.assertEquals(3, sm.getStreamDefinitions().get(0).getAttributeList().size());
+        Assert.assertEquals("Expected value not found", 1, sm.getStreamDefinitions().size());
+        Assert.assertEquals("Expected value not found", 3,
+                sm.getStreamDefinitions().get(0).getAttributeList().size());
     }
 
     @Test
@@ -93,7 +96,7 @@ public class StreamOperationServiceTest {
 
         Mockito.verify(streamStatusDao, VerificationModeFactory.times(2)).createInferredStream(Mockito.anyString(), Mockito.anyList());
 
-        Assert.assertEquals(2, sm.getStreamDefinitions().size());
+        Assert.assertEquals("Expected value not found", 2, sm.getStreamDefinitions().size());
 
     }
 

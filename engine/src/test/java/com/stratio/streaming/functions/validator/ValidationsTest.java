@@ -12,7 +12,6 @@ import com.stratio.streaming.service.CallbackService;
 import com.stratio.streaming.service.StreamOperationService;
 import com.stratio.streaming.service.StreamsHelper;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Before;
 import org.junit.Test;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -65,7 +64,7 @@ public class ValidationsTest {
         } catch (RequestValidationException ex) {
             code= ex.getCode();
         }
-        assertEquals(1, code);
+        assertEquals("Expected exception doesn't occurs", 1, code);
     }
 
     @Test
@@ -81,7 +80,8 @@ public class ValidationsTest {
         } catch (RequestValidationException ex) {
             code= ex.getCode();
         }
-        assertEquals(ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
+        assertEquals("Expected exception doesn't occurs",
+                ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
     }
 
     @Test
@@ -103,7 +103,8 @@ public class ValidationsTest {
         } catch (RequestValidationException ex) {
             code= ex.getCode();
         }
-        assertEquals(ReplyCode.KO_QUERY_ALREADY_EXISTS.getCode(), (Integer) code);
+        assertEquals("Expected exception doesn't occurs",
+                ReplyCode.KO_QUERY_ALREADY_EXISTS.getCode(), (Integer) code);
 
     }
 
@@ -122,7 +123,8 @@ public class ValidationsTest {
         } catch (RequestValidationException ex) {
             code= ex.getCode();
         }
-        assertEquals(ReplyCode.KO_QUERY_DOES_NOT_EXIST.getCode(), (Integer) code);
+        assertEquals("Expected exception doesn't occurs",
+                ReplyCode.KO_QUERY_DOES_NOT_EXIST.getCode(), (Integer) code);
 
 
         //validation.validate(message);
@@ -146,7 +148,8 @@ public class ValidationsTest {
         } catch (RequestValidationException ex) {
             code= ex.getCode();
         }
-        assertEquals(ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
+        assertEquals("Expected exception doesn't occurs",
+                ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
 
     }
 
@@ -167,7 +170,8 @@ public class ValidationsTest {
         } catch (RequestValidationException ex) {
             code= ex.getCode();
         }
-        assertEquals(ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
+        assertEquals("Expected exception doesn't occurs",
+                ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
 
     }
 
@@ -185,7 +189,8 @@ public class ValidationsTest {
         } catch (RequestValidationException ex) {
             code= ex.getCode();
         }
-        assertEquals(ReplyCode.KO_STREAM_ALREADY_EXISTS.getCode(), (Integer) code);
+        assertEquals("Expected exception doesn't occurs",
+                ReplyCode.KO_STREAM_ALREADY_EXISTS.getCode(), (Integer) code);
 
     }
 
@@ -201,7 +206,8 @@ public class ValidationsTest {
         } catch (RequestValidationException ex) {
             code= ex.getCode();
         }
-        assertEquals(ReplyCode.KO_STREAM_DOES_NOT_EXIST.getCode(), (Integer) code);
+        assertEquals("Expected exception doesn't occurs",
+                ReplyCode.KO_STREAM_DOES_NOT_EXIST.getCode(), (Integer) code);
 
         streamOperationsService.createStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
         String queryId= streamOperationsService.addQuery(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY);
@@ -225,7 +231,8 @@ public class ValidationsTest {
         } catch (RequestValidationException ex) {
             code= ex.getCode();
         }
-        assertEquals(ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
+        assertEquals("Expected exception doesn't occurs",
+                ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
     }
 
 
@@ -246,7 +253,8 @@ public class ValidationsTest {
         } catch (RequestValidationException ex) {
             code= ex.getCode();
         }
-        assertEquals(ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
+        assertEquals("Expected exception doesn't occurs",
+                ReplyCode.KO_STREAM_OPERATION_NOT_ALLOWED.getCode(), (Integer) code);
 
     }
 

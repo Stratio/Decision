@@ -36,8 +36,8 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
         assertEquals(STREAM_OPERATIONS.ACTION.LISTEN, func.getStartOperationCommand());
         assertEquals(STREAM_OPERATIONS.ACTION.STOP_LISTEN, func.getStopOperationCommand());
 
-        assertTrue(func.startAction(StreamsHelper.getSampleMessage()));
-        assertTrue(func.stopAction(StreamsHelper.getSampleMessage()));
+        assertTrue("Expected true value", func.startAction(StreamsHelper.getSampleMessage()));
+        assertTrue("Expected true value", func.stopAction(StreamsHelper.getSampleMessage()));
 
         func.addStartRequestsValidations(validators);
         func.addStopRequestsValidations(validators);
@@ -51,8 +51,8 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
         assertEquals(STREAM_OPERATIONS.ACTION.INDEX, func.getStartOperationCommand());
         assertEquals(STREAM_OPERATIONS.ACTION.STOP_INDEX, func.getStopOperationCommand());
 
-        assertTrue(func.startAction(StreamsHelper.getSampleMessage()));
-        assertTrue(func.stopAction(StreamsHelper.getSampleMessage()));
+        assertTrue("Expected true value", func.startAction(StreamsHelper.getSampleMessage()));
+        assertTrue("Expected true value", func.stopAction(StreamsHelper.getSampleMessage()));
 
         func.addStartRequestsValidations(validators);
         func.addStopRequestsValidations(validators);
@@ -66,8 +66,8 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
         assertEquals(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA, func.getStartOperationCommand());
         assertEquals(STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA, func.getStopOperationCommand());
 
-        assertTrue(func.startAction(StreamsHelper.getSampleMessage()));
-        assertTrue(func.stopAction(StreamsHelper.getSampleMessage()));
+        assertTrue("Expected true value", func.startAction(StreamsHelper.getSampleMessage()));
+        assertTrue("Expected true value", func.stopAction(StreamsHelper.getSampleMessage()));
 
         func.addStartRequestsValidations(validators);
         func.addStopRequestsValidations(validators);
@@ -80,8 +80,8 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
         assertEquals(STREAM_OPERATIONS.ACTION.SAVETO_MONGO, func.getStartOperationCommand());
         assertEquals(STREAM_OPERATIONS.ACTION.STOP_SAVETO_MONGO, func.getStopOperationCommand());
 
-        assertTrue(func.startAction(StreamsHelper.getSampleMessage()));
-        assertTrue(func.stopAction(StreamsHelper.getSampleMessage()));
+        assertTrue("Expected true value", func.startAction(StreamsHelper.getSampleMessage()));
+        assertTrue("Expected true value", func.stopAction(StreamsHelper.getSampleMessage()));
 
         func.addStartRequestsValidations(validators);
         func.addStopRequestsValidations(validators);
@@ -119,7 +119,7 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
             func.call(rdd);
         } catch (Exception e) { ex= e; }
 
-        assertNull(ex);
+        assertNull("Expected null value", ex);
         context.stop();
 
     }

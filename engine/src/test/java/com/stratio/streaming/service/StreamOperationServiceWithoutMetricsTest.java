@@ -56,14 +56,14 @@ public class StreamOperationServiceWithoutMetricsTest {
     @Test
     public void testCreateInternalStream() throws Exception {
         streamOperationsService.createInternalStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
-        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
+        assertTrue("Expected true not found", streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
     }
 
     @Test
     public void testCreateStream() throws Exception {
         streamOperationsService.createStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
-        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
-        assertTrue(streamOperationsService.isUserDefined(StreamsHelper.STREAM_NAME));
+        assertTrue("Expected true not found", streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
+        assertTrue("Expected true not found", streamOperationsService.isUserDefined(StreamsHelper.STREAM_NAME));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class StreamOperationServiceWithoutMetricsTest {
             }
         });
 
-        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
+        assertTrue("Expected true not found", streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
 
     }
 
@@ -88,7 +88,7 @@ public class StreamOperationServiceWithoutMetricsTest {
             }
         });
 
-        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
+        assertTrue("Expected true not found", streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
 
     }
 
@@ -102,7 +102,7 @@ public class StreamOperationServiceWithoutMetricsTest {
         String queryId= streamOperationsService.addQuery(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY);
 
         streamOperationsService.dropStream(StreamsHelper.STREAM_NAME);
-        assertFalse(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
+        assertFalse("Expected false not found", streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
     }
 
     @Test
@@ -110,11 +110,11 @@ public class StreamOperationServiceWithoutMetricsTest {
         streamOperationsService.createInternalStream(StreamsHelper.STREAM_NAME, StreamsHelper.COLUMNS);
         String queryId= streamOperationsService.addQuery(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY);
 
-        assertTrue(streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
-        assertTrue(streamOperationsService.queryRawExists(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY));
-        assertFalse(streamOperationsService.queryRawExists(StreamsHelper.STREAM_NAME, "notExistingQuery"));
-        assertTrue(streamOperationsService.queryIdExists(StreamsHelper.STREAM_NAME, queryId));
-        assertFalse(streamOperationsService.queryIdExists(StreamsHelper.STREAM_NAME, "notExistingQueryAgain"));
+        assertTrue("Expected true not found", streamOperationsService.streamExist(StreamsHelper.STREAM_NAME));
+        assertTrue("Expected true not found", streamOperationsService.queryRawExists(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY));
+        assertFalse("Expected false not found", streamOperationsService.queryRawExists(StreamsHelper.STREAM_NAME, "notExistingQuery"));
+        assertTrue("Expected true not found", streamOperationsService.queryIdExists(StreamsHelper.STREAM_NAME, queryId));
+        assertFalse("Expected false not found", streamOperationsService.queryIdExists(StreamsHelper.STREAM_NAME, "notExistingQueryAgain"));
 
         streamOperationsService.removeQuery(queryId, StreamsHelper.STREAM_NAME);
     }
@@ -125,9 +125,9 @@ public class StreamOperationServiceWithoutMetricsTest {
         String queryId= streamOperationsService.addQuery(StreamsHelper.STREAM_NAME, StreamsHelper.QUERY);
 
         streamOperationsService.enableAction(StreamsHelper.STREAM_NAME, StreamAction.LISTEN);
-        assertTrue(streamOperationsService.isActionEnabled(StreamsHelper.STREAM_NAME, StreamAction.LISTEN));
+        assertTrue("Expected true not found", streamOperationsService.isActionEnabled(StreamsHelper.STREAM_NAME, StreamAction.LISTEN));
         streamOperationsService.disableAction(StreamsHelper.STREAM_NAME, StreamAction.LISTEN);
-        assertFalse(streamOperationsService.isActionEnabled(StreamsHelper.STREAM_NAME, StreamAction.LISTEN));
+        assertFalse("Expected false not found", streamOperationsService.isActionEnabled(StreamsHelper.STREAM_NAME, StreamAction.LISTEN));
 
 
     }
@@ -143,11 +143,11 @@ public class StreamOperationServiceWithoutMetricsTest {
 
         for (StratioStreamingMessage message: list) {
             if (message.getStreamName().equals(StreamsHelper.STREAM_NAME)) {
-                assertEquals(1, message.getQueries().size());
-                assertEquals(6, message.getColumns().size());
+                assertEquals("Expected value not found", 1, message.getQueries().size());
+                assertEquals("Expected value not found", 6, message.getColumns().size());
             } else {
-                assertEquals(0, message.getActiveActions().size());
-                assertEquals(3, message.getColumns().size());
+                assertEquals("Expected value not found", 0, message.getActiveActions().size());
+                assertEquals("Expected value not found", 3, message.getColumns().size());
             }
         }
 

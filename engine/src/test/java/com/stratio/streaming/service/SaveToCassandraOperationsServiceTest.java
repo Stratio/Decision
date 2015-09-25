@@ -75,7 +75,7 @@ public class SaveToCassandraOperationsServiceTest {
         } catch (Exception e)  {
             ex= e;
         }
-        assertEquals(null, ex);
+        assertEquals("Expected null but exception found", null, ex);
     }
 
     @Test
@@ -86,13 +86,14 @@ public class SaveToCassandraOperationsServiceTest {
         } catch (Exception e)  {
             ex= e;
         }
-        assertEquals(null, ex);
+        assertEquals("Expected null but exception found", null, ex);
     }
 
     @Test
     public void testCreateInsertStatement() throws Exception {
         Insert insert= service.createInsertStatement(TABLE, columns, "timestamp");
-        assertEquals("\"" + STREAMING.STREAMING_KEYSPACE_NAME + "\"", insert.getKeyspace());
+        assertEquals("Expected keyspace not found",
+                "\"" + STREAMING.STREAMING_KEYSPACE_NAME + "\"", insert.getKeyspace());
 
     }
 
@@ -113,7 +114,7 @@ public class SaveToCassandraOperationsServiceTest {
         } catch (Exception e)  {
             ex= e;
         }
-        assertEquals(null, ex);
+        assertEquals("Expected null but exception found", null, ex);
 
     }
 }
