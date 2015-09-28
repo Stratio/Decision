@@ -6,6 +6,8 @@ import com.stratio.streaming.functions.ActionBaseFunctionHelper;
 import com.stratio.streaming.service.StreamsHelper;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,6 +24,7 @@ import static org.junit.Assert.*;
 public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DALActionsFunctionTest.class);
+    private static JavaSparkContext context= null;
 
     @Before
     public void setUp() throws Exception {
@@ -29,12 +32,20 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
         initialize();
     }
 
+    @AfterClass
+    public static void tearDown() throws Exception {
+        try {
+            if (context instanceof JavaSparkContext)
+                context.stop();
+        } catch (Exception ex) {}
+    }
+
     @Test
     public void testListeStreamFunction() throws Exception {
 
         ListenStreamFunction func= new ListenStreamFunction(streamOperationsService, ZOO_HOST);
-        assertEquals(STREAM_OPERATIONS.ACTION.LISTEN, func.getStartOperationCommand());
-        assertEquals(STREAM_OPERATIONS.ACTION.STOP_LISTEN, func.getStopOperationCommand());
+        assertEquals("Expected action not found", STREAM_OPERATIONS.ACTION.LISTEN, func.getStartOperationCommand());
+        assertEquals("Expected action not found", STREAM_OPERATIONS.ACTION.STOP_LISTEN, func.getStopOperationCommand());
 
         assertTrue("Expected true value", func.startAction(StreamsHelper.getSampleMessage()));
         assertTrue("Expected true value", func.stopAction(StreamsHelper.getSampleMessage()));
@@ -48,8 +59,8 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
     public void testIndexStreamFunction() throws Exception {
 
         IndexStreamFunction func= new IndexStreamFunction(streamOperationsService, ZOO_HOST);
-        assertEquals(STREAM_OPERATIONS.ACTION.INDEX, func.getStartOperationCommand());
-        assertEquals(STREAM_OPERATIONS.ACTION.STOP_INDEX, func.getStopOperationCommand());
+        assertEquals("Expected action not found", STREAM_OPERATIONS.ACTION.INDEX, func.getStartOperationCommand());
+        assertEquals("Expected action not found", STREAM_OPERATIONS.ACTION.STOP_INDEX, func.getStopOperationCommand());
 
         assertTrue("Expected true value", func.startAction(StreamsHelper.getSampleMessage()));
         assertTrue("Expected true value", func.stopAction(StreamsHelper.getSampleMessage()));
@@ -63,8 +74,8 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
     public void testSaveToCassandraStreamFunction() throws Exception {
 
         SaveToCassandraStreamFunction func= new SaveToCassandraStreamFunction(streamOperationsService, ZOO_HOST);
-        assertEquals(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA, func.getStartOperationCommand());
-        assertEquals(STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA, func.getStopOperationCommand());
+        assertEquals("Expected action not found", STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA, func.getStartOperationCommand());
+        assertEquals("Expected action not found", STREAM_OPERATIONS.ACTION.STOP_SAVETO_CASSANDRA, func.getStopOperationCommand());
 
         assertTrue("Expected true value", func.startAction(StreamsHelper.getSampleMessage()));
         assertTrue("Expected true value", func.stopAction(StreamsHelper.getSampleMessage()));
@@ -77,8 +88,8 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
     public void testSaveToMongoStreamFunction() throws Exception {
 
         SaveToMongoStreamFunction func= new SaveToMongoStreamFunction(streamOperationsService, ZOO_HOST);
-        assertEquals(STREAM_OPERATIONS.ACTION.SAVETO_MONGO, func.getStartOperationCommand());
-        assertEquals(STREAM_OPERATIONS.ACTION.STOP_SAVETO_MONGO, func.getStopOperationCommand());
+        assertEquals("Expected action not found", STREAM_OPERATIONS.ACTION.SAVETO_MONGO, func.getStartOperationCommand());
+        assertEquals("Expected action not found", STREAM_OPERATIONS.ACTION.STOP_SAVETO_MONGO, func.getStopOperationCommand());
 
         assertTrue("Expected true value", func.startAction(StreamsHelper.getSampleMessage()));
         assertTrue("Expected true value", func.stopAction(StreamsHelper.getSampleMessage()));
@@ -106,9 +117,11 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
     public void testActionBaseFunctionCall() throws Exception {
 
         List<StratioStreamingMessage> list= new ArrayList<StratioStreamingMessage>();
+
+        message.setOperation("stop_listen");
         list.add(message);
 
-        JavaSparkContext context = new JavaSparkContext("local[2]", "test");
+        context = new JavaSparkContext("local[2]", "test");
         //JavaRDD<StratioStreamingMessage> rdd= context.emptyRDD();
         JavaRDD<StratioStreamingMessage> rdd= context.parallelize(list);
 
@@ -117,6 +130,7 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
         try {
             func.startAction(message);
             func.call(rdd);
+
         } catch (Exception e) { ex= e; }
 
         assertNull("Expected null value", ex);

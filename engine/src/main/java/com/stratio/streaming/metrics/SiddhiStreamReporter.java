@@ -220,8 +220,7 @@ public class SiddhiStreamReporter extends ScheduledReporter {
             streamOperationService.send(streamName, columns);
         } catch (ServiceException e) {
             LOGGER.error("Metric event not sended to stream {}", streamName, e);
-        } catch (Exception e) {
-            LOGGER.error("FATAL ERROR", e);
+        } catch (Exception e) {            LOGGER.error("FATAL ERROR", e);
         }
     }
 

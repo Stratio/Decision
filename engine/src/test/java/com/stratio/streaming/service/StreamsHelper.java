@@ -52,8 +52,10 @@ public abstract class StreamsHelper {
     public static final List<ColumnNameTypeValue> COLUMNS2= new LinkedList<ColumnNameTypeValue>() {{
         add(new ColumnNameTypeValue("name2", ColumnType.STRING, "name2"));
         add(new ColumnNameTypeValue("timestamp2", ColumnType.DOUBLE, "0.0"));
-        add(new ColumnNameTypeValue("value2", ColumnType.INTEGER, 2222L));
-        add(new ColumnNameTypeValue("enabled2", ColumnType.BOOLEAN, 222f));
+        add(new ColumnNameTypeValue("value2", ColumnType.INTEGER, 2222));
+        add(new ColumnNameTypeValue("mybool", ColumnType.BOOLEAN, true));
+        add(new ColumnNameTypeValue("myfloat", ColumnType.FLOAT, 222f));
+        add(new ColumnNameTypeValue("mylong", ColumnType.LONG, 22223L));
     }};
 
 

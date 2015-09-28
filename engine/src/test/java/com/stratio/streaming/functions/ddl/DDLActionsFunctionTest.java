@@ -36,8 +36,8 @@ public class DDLActionsFunctionTest extends ActionBaseFunctionHelper {
     public void testAddQueryToStreamFunction() throws Exception {
 
         AddQueryToStreamFunction func= new AddQueryToStreamFunction(streamOperationsService, ZOO_HOST);
-        assertEquals(STREAM_OPERATIONS.DEFINITION.ADD_QUERY, func.getStartOperationCommand());
-        assertEquals(STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY, func.getStopOperationCommand());
+        assertEquals("Expected operation not found", STREAM_OPERATIONS.DEFINITION.ADD_QUERY, func.getStartOperationCommand());
+        assertEquals("Expected operation not found", STREAM_OPERATIONS.DEFINITION.REMOVE_QUERY, func.getStopOperationCommand());
 
         assertTrue("Not true value found", func.startAction(message));
         assertTrue("Not true value found", func.stopAction(message));
@@ -51,8 +51,8 @@ public class DDLActionsFunctionTest extends ActionBaseFunctionHelper {
     public void testAlterStreamFunction() throws Exception {
 
         AlterStreamFunction func= new AlterStreamFunction(streamOperationsService, ZOO_HOST);
-        assertEquals(STREAM_OPERATIONS.DEFINITION.ALTER, func.getStartOperationCommand());
-        assertEquals(null, func.getStopOperationCommand());
+        assertEquals("Expected operation not found", STREAM_OPERATIONS.DEFINITION.ALTER, func.getStartOperationCommand());
+        assertEquals("Expected null value not found", null, func.getStopOperationCommand());
 
         message.setColumns(new LinkedList<ColumnNameTypeValue>() {{
             new ColumnNameTypeValue("newcolumn", ColumnType.STRING, "newcolumn");
@@ -70,8 +70,8 @@ public class DDLActionsFunctionTest extends ActionBaseFunctionHelper {
     public void testCreateStreamFunction() throws Exception {
 
         CreateStreamFunction func= new CreateStreamFunction(streamOperationsService, ZOO_HOST);
-        assertEquals(STREAM_OPERATIONS.DEFINITION.CREATE, func.getStartOperationCommand());
-        assertEquals(STREAM_OPERATIONS.DEFINITION.DROP, func.getStopOperationCommand());
+        assertEquals("Expected operation not found", STREAM_OPERATIONS.DEFINITION.CREATE, func.getStartOperationCommand());
+        assertEquals("Expected operation not found", STREAM_OPERATIONS.DEFINITION.DROP, func.getStopOperationCommand());
 
         assertTrue("Not true value found", func.startAction(message));
         assertTrue("Not true value found", func.stopAction(message));
