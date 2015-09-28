@@ -36,13 +36,13 @@ public class DMLActionsFunctionTest extends ActionBaseFunctionHelper {
     public void testIntoStreamFunction() throws Exception {
 
         InsertIntoStreamFunction func= new InsertIntoStreamFunction(streamOperationsService, ZOO_HOST);
-        assertEquals(STREAM_OPERATIONS.MANIPULATION.INSERT, func.getStartOperationCommand());
-        assertEquals(null, func.getStopOperationCommand());
+        assertEquals("Expected operation not found", STREAM_OPERATIONS.MANIPULATION.INSERT, func.getStartOperationCommand());
+        assertEquals("Expected null value not found", null, func.getStopOperationCommand());
 
         Exception ex= null;
         try {
             func.startAction(message);
-            assertTrue(func.stopAction(message));
+            assertTrue("Expected true not found", func.stopAction(message));
         } catch (Exception e)   { ex= e;}
         assertEquals("Expected not exception raised", null, ex);
 

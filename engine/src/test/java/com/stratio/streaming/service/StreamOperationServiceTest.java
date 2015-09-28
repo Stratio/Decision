@@ -65,7 +65,7 @@ public class StreamOperationServiceTest {
 
         Assert.assertEquals("Expected value not found", 1, sm.getStreamDefinitions().size());
 
-        Assert.assertEquals("Expected value not found", 2,
+        Assert.assertEquals("Expected value not found", 6,
                 sm.getStreamDefinitions().get(0).getAttributeList().size());
     }
 
@@ -74,16 +74,16 @@ public class StreamOperationServiceTest {
         createBaseStream();
 
         Assert.assertEquals("Expected value not found", 1, sm.getStreamDefinitions().size());
-        Assert.assertEquals("Expected value not found", 2,
+        Assert.assertEquals("Expected value not found", 6,
                 sm.getStreamDefinitions().get(0).getAttributeList().size());
 
         List<ColumnNameTypeValue> columns = new ArrayList<>();
-        columns.add(new ColumnNameTypeValue("col3", ColumnType.INTEGER, null));
+        columns.add(new ColumnNameTypeValue("col7", ColumnType.INTEGER, null));
 
         streamOperationService.enlargeStream(STREAM_NAME_GOOD, columns);
 
         Assert.assertEquals("Expected value not found", 1, sm.getStreamDefinitions().size());
-        Assert.assertEquals("Expected value not found", 3,
+        Assert.assertEquals("Expected value not found", 7,
                 sm.getStreamDefinitions().get(0).getAttributeList().size());
     }
 
@@ -123,6 +123,11 @@ public class StreamOperationServiceTest {
 
         List<ColumnNameTypeValue> columns = new ArrayList<>();
         columns.add(new ColumnNameTypeValue("col1", ColumnType.INTEGER, 34));
+        columns.add(new ColumnNameTypeValue("col2", ColumnType.STRING, "text value"));
+        columns.add(new ColumnNameTypeValue("col3", ColumnType.BOOLEAN, true));
+        columns.add(new ColumnNameTypeValue("col4", ColumnType.DOUBLE, 1.2));
+        columns.add(new ColumnNameTypeValue("col5", ColumnType.FLOAT, 10f));
+        columns.add(new ColumnNameTypeValue("col6", ColumnType.LONG, 2L));
 
         streamOperationService.send(STREAM_NAME_GOOD, columns);
 
@@ -141,6 +146,10 @@ public class StreamOperationServiceTest {
         List<ColumnNameTypeValue> columns = new ArrayList<>();
         columns.add(new ColumnNameTypeValue("col1", ColumnType.INTEGER, 1));
         columns.add(new ColumnNameTypeValue("col2", ColumnType.STRING, "test string"));
+        columns.add(new ColumnNameTypeValue("col3", ColumnType.BOOLEAN, true));
+        columns.add(new ColumnNameTypeValue("col4", ColumnType.DOUBLE, 1.3));
+        columns.add(new ColumnNameTypeValue("col5", ColumnType.FLOAT, 20f));
+        columns.add(new ColumnNameTypeValue("col6", ColumnType.LONG, 1L));
 
         streamOperationService.createStream(STREAM_NAME_GOOD, columns);
     }
