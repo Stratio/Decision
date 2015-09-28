@@ -1,6 +1,12 @@
 package com.stratio.streaming.service;
 
+import com.stratio.streaming.configuration.BaseConfiguration;
+import com.stratio.streaming.configuration.CassandraConfiguration;
+import com.stratio.streaming.configuration.ConfigurationContext;
+import com.stratio.streaming.configuration.MetricsConfiguration;
+import com.stratio.streaming.configuration.SchredulerConfiguration;
 import com.stratio.streaming.configuration.ServiceConfiguration;
+import com.stratio.streaming.configuration.StreamingContextConfiguration;
 import com.stratio.streaming.configuration.StreamingSiddhiConfiguration;
 import com.stratio.streaming.dao.StreamStatusDao;
 import com.stratio.streaming.dao.StreamingFailoverDao;
@@ -11,8 +17,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.wso2.siddhi.core.SiddhiManager;
 
 import java.util.HashMap;
@@ -24,9 +32,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Created by aitor on 9/22/15.
- */
-//@RunWith( SpringJUnit4ClassRunner.class )
-//@ContextConfiguration(classes = {})
+ * TODO: Review to test class injecting needed resources with spring
+
+@RunWith( SpringJUnit4ClassRunner.class )
+@ContextConfiguration(classes = {ConfigurationContext.class, StreamingSiddhiConfiguration.class })
 public class StreamingFailoverServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StreamingFailoverServiceTest.class);
@@ -42,11 +51,11 @@ public class StreamingFailoverServiceTest {
 
     private SiddhiManager siddhiManager;
 
-    private StreamOperationService operationService;
+    //private StreamOperationService operationService;
 
     private CallbackService callbackService;
 
-    /**
+
 
     @Before
     public void setUp() throws Exception {
@@ -60,7 +69,7 @@ public class StreamingFailoverServiceTest {
         ServiceConfiguration serviceConfiguration= new ServiceConfiguration();
         callbackService= serviceConfiguration.callbackService();
 
-        operationService= new StreamOperationService(siddhiManager, streamStatusDao, callbackService);
+        //operationService= new StreamOperationService(siddhiManager, streamStatusDao, callbackService);
         service= new StreamingFailoverService(streamStatusDao, streamMetadataService, mockedDao);
     }
 
@@ -84,6 +93,5 @@ public class StreamingFailoverServiceTest {
     @Test
     public void testSave() throws Exception {
 
-    }
-    */
-}
+    }/
+}*/
