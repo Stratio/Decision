@@ -1,0 +1,5 @@
+  Column   Type
+  -------  -------
+  column1  STRING
+  column2  INTEGER
+  column3  BOOLEAN
