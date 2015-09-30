@@ -7,6 +7,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.service.StreamsHelper;
@@ -19,6 +22,8 @@ import com.typesafe.config.ConfigFactory;
 @RunWith(JUnit4.class)
 public class ZKUtilsTestIT {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(ZKUtils.class);
+
     private static Config conf;
     private static ZKUtils zkUtils;
 
@@ -26,8 +31,7 @@ public class ZKUtilsTestIT {
     public static void setUp() throws Exception {
         conf= ConfigFactory.load();
         zkUtils= ZKUtils.getZKUtils(conf.getString("zookeeper.hosts"));
-        //LOGGER.debug("Zookeeper hosts: " + conf.getString("zookeeper.hosts"));
-        //LOGGER.debug("Kafka hosts: " + conf.getString("kafka.hosts"));
+        LOGGER.debug("Zookeeper hosts: " + conf.getString("zookeeper.hosts"));
     }
 
     @AfterClass
@@ -42,6 +46,7 @@ public class ZKUtilsTestIT {
         Exception ex= null;
         try {
             zkUtils.createEphemeralZNode(path, bytes);
+            zkUtils.createEphemeralZNode(path, bytes);
         } catch (Exception e)   { ex= e; }
 
         assertNull("Not exception expected", ex);
@@ -54,6 +59,7 @@ public class ZKUtilsTestIT {
 
         Exception ex= null;
         try {
+            zkUtils.createZNode(path, bytes);
             zkUtils.createZNode(path, bytes);
         } catch (Exception e)   { ex= e; }
 
@@ -76,6 +82,7 @@ public class ZKUtilsTestIT {
 
         Exception ex= null;
         try {
+            zkUtils.createZNodeJsonReply(message, reply);
             zkUtils.createZNodeJsonReply(message, reply);
         } catch (Exception e)   { ex= e; }
 
