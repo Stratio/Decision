@@ -19,7 +19,7 @@ import org.apache.curator.framework.CuratorFramework
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Future}
 
 case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
   val log = LoggerFactory.getLogger(getClass)

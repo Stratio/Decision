@@ -42,9 +42,9 @@ class StreamsParserUnitTests
       firstStreamfirstColumn.getColumn should be ("column1")
       firstStreamfirstColumn.getType should be (ColumnType.STRING)
       val firstStreamQueries = firstStream.getQueries.toList
-      firstStreamQueries.size() should be(0)
+      firstStreamQueries.size should be(0)
       val firstStreamActiveActions = firstStream.getActiveActions.toList
-      firstStreamActiveActions.size() should be(0)
+      firstStreamActiveActions.size should be(0)
       firstStream.getUserDefined should be(false)
       And("the second stream should contain all the info")
       val secondStream = streamsList(1)
