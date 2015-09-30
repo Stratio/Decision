@@ -5,9 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.service.StreamsHelper;
@@ -17,6 +16,7 @@ import com.typesafe.config.ConfigFactory;
 /**
  * Created by aitor on 9/30/15.
  */
+@RunWith(JUnit4.class)
 public class ZKUtilsTestIT {
 
     private static Config conf;
