@@ -3,7 +3,9 @@ package com.stratio.streaming.unit.messaging.api
 import com.stratio.streaming.api.messaging.{ColumnNameType, MessageBuilder, MessageBuilderWithColumns}
 import com.stratio.streaming.commons.constants.ColumnType
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue
+import org.junit.runner.RunWith
 import org.scalatest.WordSpec
+import org.scalatest.junit.JUnitRunner
 
 import scala.collection.JavaConversions._
 
@@ -11,6 +13,8 @@ import scala.collection.JavaConversions._
 /**
  * Created by eruiz on 29/09/15.
  */
+
+@RunWith(classOf[JUnitRunner])
 class MessagingTests extends WordSpec {
   /*
   describe("When get the type") {
