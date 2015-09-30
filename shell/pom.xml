@@ -22,13 +22,13 @@
         <artifactId>stratio-streaming</artifactId>
         <version>0.9.0-SNAPSHOT</version>
     </parent>
-    <artifactId>streaming-shell</artifactId>
-    <name>Streaming shell</name>
+    <artifactId>shell</artifactId>
+    <name>Decision shell</name>
     <packaging>jar</packaging>
     <properties>
         <spring.shell.version>1.1.0.RELEASE</spring.shell.version>
         <jar.mainclass>org.springframework.shell.Bootstrap</jar.mainclass>
-        <outputFileName>stratio-streaming-shell</outputFileName>
+        <outputFileName>stratio-decision-shell</outputFileName>
         <log4j.version>1.2.17</log4j.version>
         <junit.version>4.11</junit.version>
     </properties>
@@ -132,11 +132,11 @@
                 <extensions>true</extensions>
                 <inherited>false</inherited>
                 <configuration>
-                    <outputFileName>stratio-streaming-shell</outputFileName>
+                    <outputFileName>stratio-decision-shell</outputFileName>
                     <contact>
-                        <![CDATA[Stratio Streaming<streaming@stratio.com>]]>
+                        <![CDATA[Stratio Decision<decision@stratio.com>]]>
                     </contact>
-                    <contactEmail>streaming@stratio.com</contactEmail>
+                    <contactEmail>decision@stratio.com</contactEmail>
                     <deb>
                         <section>devel</section>
                     </deb>
@@ -144,7 +144,7 @@
                         <group>stratio</group>
                         <requires>bash</requires>
                     </rpm>
-                    <name>Streaming Shell</name>
+                    <name>Decision Shell</name>
                     <excludeDirectoryAttributes>
                         <dir>/etc</dir>
                         <dir>/etc/init.d</dir>
@@ -156,7 +156,7 @@
                     </excludeDirectoryAttributes>
                     <assembly>
                         <mkdirs>
-                            <path>/opt/sds/streaming-shell</path>
+                            <path>/opt/sds/decision-shell</path>
                             <attributes>
                                 <user>stratio</user>
                                 <group>stratio</group>
@@ -171,15 +171,15 @@
                         </mkdirs>
                         <copyDirectory>
                             <from>target/appassembler/bin</from>
-                            <to>/opt/sds/streaming-shell/bin</to>
+                            <to>/opt/sds/decision-shell/bin</to>
                         </copyDirectory>
                         <copyDirectory>
                             <from>target/appassembler/repo</from>
-                            <to>/opt/sds/streaming-shell/repo</to>
+                            <to>/opt/sds/decision-shell/repo</to>
                         </copyDirectory>
                         <copyDirectory>
                             <from>target/appassembler/config/</from>
-                            <to>/opt/sds/streaming-shell/config</to>
+                            <to>/opt/sds/decision-shell/config</to>
                         </copyDirectory>
                     </assembly>
                     <defaults>
@@ -211,13 +211,6 @@
                         <configuration>
                             <architecture>noarch</architecture>
                         </configuration>
-                    </execution>
-                    <execution>
-                        <id>zip</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>package-zip</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>

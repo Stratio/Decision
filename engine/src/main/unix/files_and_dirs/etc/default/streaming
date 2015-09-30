@@ -1,3 +1,0 @@
-export STREAMING_CONF="/etc/sds/streaming"
-export STREAMING_HOME="/opt/sds/streaming"
-export STREAMING_LOGS="/var/logs/sds/streaming"
