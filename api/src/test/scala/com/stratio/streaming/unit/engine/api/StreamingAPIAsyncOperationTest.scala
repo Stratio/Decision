@@ -4,15 +4,17 @@ import com.stratio.streaming.api.StreamingAPIAsyncOperation
 import com.stratio.streaming.commons.constants.ReplyCode._
 import com.stratio.streaming.commons.messages.StratioStreamingMessage
 import com.stratio.streaming.kafka.KafkaProducer
+import org.junit.runner.RunWith
 import org.mockito.Matchers.anyString
 import org.mockito.Mockito
 import org.scalatest._
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 /**
  * Created by eruiz on 30/09/15.
  */
-
+@RunWith(classOf[JUnitRunner])
 class StreamingAPIAsyncOperationTest extends FunSpec
 with GivenWhenThen
 with ShouldMatchers
