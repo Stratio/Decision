@@ -59,7 +59,6 @@ public class FunctionsTestIT extends ActionBaseFunctionHelper {
         list.add(message);
 
         context = new JavaSparkContext("local[2]", "test");
-        //JavaRDD<StratioStreamingMessage> rdd= context.emptyRDD();
         JavaRDD<StratioStreamingMessage> rdd= context.parallelize(list);
 
         ListenStreamFunction func= new ListenStreamFunction(streamOperationsService, ZOO_HOST);
