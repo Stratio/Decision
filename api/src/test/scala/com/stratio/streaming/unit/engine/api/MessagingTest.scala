@@ -1,4 +1,4 @@
-package com.stratio.streaming.unit.messaging.api
+package com.stratio.streaming.unit.engine.api
 
 import com.stratio.streaming.api.messaging.{ColumnNameType, MessageBuilderWithColumns, MessageBuilder}
 import com.stratio.streaming.commons.constants.ColumnType
@@ -9,7 +9,7 @@ import org.scalatest.junit.JUnitRunner
 import scala.collection.JavaConversions._
 
 @RunWith(classOf[JUnitRunner])
-class MessagingTests extends WordSpec{
+class MessagingTest extends WordSpec{
   trait MyTestComponent {
     var m = MessageBuilder
     var mw = MessageBuilderWithColumns
