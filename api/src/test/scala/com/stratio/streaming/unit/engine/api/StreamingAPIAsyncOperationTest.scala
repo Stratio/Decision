@@ -11,9 +11,6 @@ import org.scalatest._
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
-/**
- * Created by eruiz on 30/09/15.
- */
 @RunWith(classOf[JUnitRunner])
 class StreamingAPIAsyncOperationTest extends FunSpec
 with GivenWhenThen
@@ -26,7 +23,7 @@ with MockitoSugar {
   describe("The Streaming API Async Operation") {
     it("should throw no exceptions when the engine returns an OK return code") {
       Given("an OK engine response")
-      val errorCode = OK.getCode();
+      val errorCode = OK.getCode
       val engineResponse = s"""{"errorCode":$errorCode}"""
       When("we perform the async operation")
       Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
