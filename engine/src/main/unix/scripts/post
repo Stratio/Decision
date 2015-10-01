@@ -6,9 +6,9 @@ set -e
 
 GROUP='stratio'
 USER='stratio'
-DIR_INSTALL='/opt/sds/streaming'
-DIR_CONF='/etc/sds/streaming'
-DIR_LOG='/var/log/sds/streaming'
+DIR_INSTALL='/opt/sds/decision'
+DIR_CONF='/etc/sds/decision'
+DIR_LOG='/var/log/sds/decision'
 DIR_RUN='/var/run/sds'
 
 # Add stratio group if it doesn't already exists
@@ -28,7 +28,7 @@ if [ ! -d "$DIR_LOG" ]; then
 mkdir $DIR_LOG
 fi
 
-chown root:root /etc/init.d/streaming
+chown root:root /etc/init.d/decision
 
 chown -R ${USER}:${GROUP} $DIR_INSTALL
 
@@ -39,12 +39,12 @@ chmod 775 $DIR_LOG
 
 chown -R ${USER}:${GROUP} $DIR_RUN
 
-chmod 755 /etc/init.d/streaming
-chmod 755 /opt/sds/streaming/bin/run
-chmod +x /etc/default/streaming
+chmod 755 /etc/init.d/decision
+chmod 755 /opt/sds/decision/bin/run
+chmod +x /etc/default/decision
 
-sed -i 's!"$BASEDIR"/:/etc/sds/streaming/conf!/etc/sds/streaming!g' /opt/sds/streaming/bin/run
+sed -i 's!"$BASEDIR"/:/etc/sds/decision/conf!/etc/sds/decision!g' /opt/sds/decision/bin/run
 
-/sbin/chkconfig --add streaming
+/sbin/chkconfig --add decision
 
 exit 0
