@@ -19,7 +19,7 @@ import com.typesafe.config.ConfigFactory;
 /**
  * Created by aitor on 9/30/15.
  */
-@RunWith(JUnit4.class)
+//@RunWith(JUnit4.class)
 public class ZKUtilsTestIT {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ZKUtils.class);

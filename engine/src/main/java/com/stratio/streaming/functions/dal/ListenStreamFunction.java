@@ -43,7 +43,7 @@ public class ListenStreamFunction extends ActionBaseFunction {
     }
 
     @Override
-    protected boolean startAction(StratioStreamingMessage message) {
+    public boolean startAction(StratioStreamingMessage message) {
         getStreamOperationService().enableAction(message.getStreamName(), StreamAction.LISTEN);
         return true;
     }

@@ -9,6 +9,9 @@ import com.stratio.streaming.functions.validator.StreamNameNotEmptyValidation;
 import com.stratio.streaming.service.CallbackService;
 import com.stratio.streaming.service.StreamOperationService;
 import com.stratio.streaming.service.StreamsHelper;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
 import org.apache.commons.collections.set.ListOrderedSet;
 import org.junit.After;
 import org.junit.Before;
@@ -35,9 +38,15 @@ public abstract class ActionBaseFunctionHelper {
 
     protected StratioStreamingMessage message;
 
-    protected static final String ZOO_HOST= "localhost";
+    protected static Config conf;
+
+    protected static String ZOO_HOST;
 
     protected void initialize()  {
+        conf= ConfigFactory.load();
+
+        ZOO_HOST= conf.getString("zookeeper.hosts");
+
         siddhiManager= new StreamingSiddhiConfiguration().siddhiManager();
         streamStatusDao= new StreamStatusDao();
         ServiceConfiguration serviceConfiguration= new ServiceConfiguration();
