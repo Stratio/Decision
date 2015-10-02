@@ -13,13 +13,11 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 import org.apache.commons.collections.set.ListOrderedSet;
-import org.junit.After;
-import org.junit.Before;
 import org.wso2.siddhi.core.SiddhiManager;
 
+import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
 
 /**
  * Created by aitor on 9/23/15.
@@ -42,10 +40,13 @@ public abstract class ActionBaseFunctionHelper {
 
     protected static String ZOO_HOST;
 
+    protected static String MONGO_HOST;
+
     protected void initialize()  {
         conf= ConfigFactory.load();
 
-        ZOO_HOST= conf.getString("zookeeper.hosts");
+        ZOO_HOST= getHostsStringFromList(conf.getStringList("zookeeper.hosts"));
+        MONGO_HOST= getHostsStringFromList(conf.getStringList("mongo.hosts"));
 
         siddhiManager= new StreamingSiddhiConfiguration().siddhiManager();
         streamStatusDao= new StreamStatusDao();
@@ -63,5 +64,17 @@ public abstract class ActionBaseFunctionHelper {
         StreamNameNotEmptyValidation validation= new StreamNameNotEmptyValidation();
         validators.add(validation);
     }
+
+    protected String getHostsStringFromList(List<String> hosts)  {
+        String hostsUrl= "";
+        for (String host: hosts)    {
+            hostsUrl += host + ",";
+        }
+        if (hostsUrl.length()>0)
+            return hostsUrl.substring(0,hostsUrl.length()-1);
+        else
+            return "";
+    }
+
 
 }
