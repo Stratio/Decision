@@ -27,7 +27,7 @@ import org.mockito.Mockito._
 import org.mockito.Matchers._
 import scala.collection.JavaConversions._
 
-import com.stratio.streaming.api.{ StratioStreamingAPI, StreamingAPIListOperation }
+import com.stratio.streaming.api.{StreamingAPISyncOperation, StratioStreamingAPI, StreamingAPIListOperation}
 
 @RunWith(classOf[JUnitRunner])
 class StratioStreamingAPIUnitTests
@@ -41,6 +41,7 @@ class StratioStreamingAPIUnitTests
     api.streamingRunning = false
 
     val streamingAPIListOperationMock = mock[StreamingAPIListOperation]
+    val streamingAPISyncOperationMock = mock[StreamingAPISyncOperation]
   }
 
   "The Stratio Streaming API" when {
@@ -117,7 +118,7 @@ class StratioStreamingAPIUnitTests
       }
     }
 
-    "query an stream" should {
+    "query a stream" should {
 
       val streamName = "unitTestsStream"
 
@@ -203,5 +204,80 @@ class StratioStreamingAPIUnitTests
         thrown.getMessage should be("Stratio streaming not yet initialized")
       }
     }
+
+    "index a stream" should {
+
+      val streamName = "unitTestsStream"
+
+      "index a stratio stream" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+        api.syncOperation = streamingAPISyncOperationMock
+
+        doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
+
+        api.indexStream(streamName)
+      }
+
+      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+        api.streamingUp = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.indexStream(streamName)
+        }
+
+        thrown.getMessage should be("Stratio streaming is down")
+      }
+
+      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.indexStream(streamName)
+        }
+
+        thrown.getMessage should be("Stratio streaming not yet initialized")
+      }
+    }
+
+    "index a stream" should {
+
+      val streamName = "unitTestsStream"
+
+      "index a stratio stream" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+        api.syncOperation = streamingAPISyncOperationMock
+
+        doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
+
+        api.indexStream(streamName)
+      }
+
+      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+        api.streamingUp = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.indexStream(streamName)
+        }
+
+        thrown.getMessage should be("Stratio streaming is down")
+      }
+
+      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.indexStream(streamName)
+        }
+
+        thrown.getMessage should be("Stratio streaming not yet initialized")
+      }
+    }
+
   }
 }
