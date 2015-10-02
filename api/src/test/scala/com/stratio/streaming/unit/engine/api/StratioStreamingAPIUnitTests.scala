@@ -242,7 +242,7 @@ class StratioStreamingAPIUnitTests
       }
     }
 
-    "index a stream" should {
+    "stop index stream" should {
 
       val streamName = "unitTestsStream"
 
@@ -254,14 +254,14 @@ class StratioStreamingAPIUnitTests
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
-        api.indexStream(streamName)
+        api.stopIndexStream(streamName)
       }
 
       "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
-          api.indexStream(streamName)
+          api.stopIndexStream(streamName)
         }
 
         thrown.getMessage should be("Stratio streaming is down")
@@ -272,12 +272,11 @@ class StratioStreamingAPIUnitTests
         api.streamingRunning = false
 
         val thrown = intercept[StratioEngineStatusException] {
-          api.indexStream(streamName)
+          api.stopIndexStream(streamName)
         }
 
         thrown.getMessage should be("Stratio streaming not yet initialized")
       }
     }
-
   }
 }
