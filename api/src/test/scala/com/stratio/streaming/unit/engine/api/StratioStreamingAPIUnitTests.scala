@@ -15,6 +15,8 @@
  */
 package com.stratio.streaming.unit.engine.api
 
+import com.stratio.streaming.api.messaging.{ColumnNameValue, ColumnNameType}
+import com.stratio.streaming.commons.constants.ColumnType
 import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioEngineStatusException}
 import com.stratio.streaming.commons.messages.{StreamQuery, StratioStreamingMessage}
 import com.stratio.streaming.commons.streams.StratioStream
@@ -246,7 +248,7 @@ class StratioStreamingAPIUnitTests
 
       val streamName = "unitTestsStream"
 
-      "index a stratio stream" in new DummyStratioStreamingAPI {
+      "stop an index stream" in new DummyStratioStreamingAPI {
 
         api.streamingUp = true
         api.streamingRunning = true
@@ -273,6 +275,123 @@ class StratioStreamingAPIUnitTests
 
         val thrown = intercept[StratioEngineStatusException] {
           api.stopIndexStream(streamName)
+        }
+
+        thrown.getMessage should be("Stratio streaming not yet initialized")
+      }
+    }
+
+    "create stream" should {
+
+      val streamName = "unitTestsStream"
+      val columnNameType = new ColumnNameType("columnName", ColumnType.INTEGER)
+      val columns = List(columnNameType)
+
+      "create a stream" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+        api.syncOperation = streamingAPISyncOperationMock
+
+        doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
+
+        api.createStream(streamName, columns)
+      }
+
+      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+        api.streamingUp = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.createStream(streamName, columns)
+        }
+
+        thrown.getMessage should be("Stratio streaming is down")
+      }
+
+      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.createStream(streamName, columns)
+        }
+
+        thrown.getMessage should be("Stratio streaming not yet initialized")
+      }
+    }
+
+    "alter stream" should {
+
+      val streamName = "unitTestsStream"
+      val columnNameType = new ColumnNameType("columnName", ColumnType.INTEGER)
+      val columns = List(columnNameType)
+
+      "alter a stream" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+        api.syncOperation = streamingAPISyncOperationMock
+
+        doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
+
+        api.alterStream(streamName, columns)
+      }
+
+      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+        api.streamingUp = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.alterStream(streamName, columns)
+        }
+
+        thrown.getMessage should be("Stratio streaming is down")
+      }
+
+      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.alterStream(streamName, columns)
+        }
+
+        thrown.getMessage should be("Stratio streaming not yet initialized")
+      }
+    }
+
+    "insert data" should {
+
+      val streamName = "unitTestsStream"
+      val columnNameValue = new ColumnNameValue("columnName", ColumnType.INTEGER)
+      val data = List(columnNameValue)
+
+      "insert data" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+        api.syncOperation = streamingAPISyncOperationMock
+
+        doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
+
+        api.insertData(streamName, data)
+      }
+
+      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+        api.streamingUp = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.insertData(streamName, data)
+        }
+
+        thrown.getMessage should be("Stratio streaming is down")
+      }
+
+      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.insertData(streamName, data)
         }
 
         thrown.getMessage should be("Stratio streaming not yet initialized")
