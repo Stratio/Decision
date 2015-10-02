@@ -15,53 +15,35 @@
  */
 package com.stratio.streaming.unit.engine.api
 
-import com.stratio.streaming.api.StratioStreamingAPI
-import com.stratio.streaming.commons.exceptions.StratioEngineStatusException
+import com.stratio.streaming.commons.exceptions.{StratioEngineOperationException, StratioEngineStatusException}
+import com.stratio.streaming.commons.messages.{StreamQuery, StratioStreamingMessage}
+import com.stratio.streaming.commons.streams.StratioStream
+import com.stratio.streaming.dto.StratioQueryStream
+import org.junit.runner.RunWith
 import org.scalatest._
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.mock.MockitoSugar
+import org.mockito.Mockito._
+import org.mockito.Matchers._
+import scala.collection.JavaConversions._
 
+import com.stratio.streaming.api.{ StratioStreamingAPI, StreamingAPIListOperation }
+
+@RunWith(classOf[JUnitRunner])
 class StratioStreamingAPIUnitTests
   extends WordSpec
-  with ShouldMatchers {
+  with ShouldMatchers
+  with MockitoSugar{
 
   trait DummyStratioStreamingAPI {
     val api = new StratioStreamingAPI()
     api.streamingUp = false
     api.streamingRunning = false
+
+    val streamingAPIListOperationMock = mock[StreamingAPIListOperation]
   }
 
   "The Stratio Streaming API" when {
-    /*"checks the status of streaming" should {
-
-      "no throws any exception" in new DummyStratioStreamingAPI {
-        api.streamingUp = true
-        api.streamingRunning = true
-
-        api.checkStreamingStatus() should equal(())
-
-      }
-
-      "throws an exception if streaming is down" in new DummyStratioStreamingAPI {
-        api.streamingUp = false
-
-        val thrown = intercept[StratioEngineStatusException] {
-          api.checkStreamingStatus()
-        }
-
-        thrown.getMessage should be("Stratio streaming is down")
-      }
-
-      "throws an exception if streaming is not running" in new DummyStratioStreamingAPI {
-        api.streamingUp = true
-        api.streamingRunning = false
-
-        val thrown = intercept[StratioEngineStatusException] {
-          api.checkStreamingStatus()
-        }
-
-        thrown.getMessage should be("Stratio streaming not yet initialized")
-      }
-    }*/
-
     "set the server config" should {
       "modifies the server config values" in new DummyStratioStreamingAPI {
         api.kafkaCluster = ""
@@ -78,7 +60,7 @@ class StratioStreamingAPIUnitTests
     }
 
     "set the server config (with ports)" should {
-      "modifies the server config values" in new DummyStratioStreamingAPI {
+      "modify the server config values" in new DummyStratioStreamingAPI {
         api.kafkaCluster = ""
         api.zookeeperServer = ""
 
@@ -94,6 +76,131 @@ class StratioStreamingAPIUnitTests
 
         api.kafkaCluster should be(newKafkaCluster)
         api.zookeeperServer should be(newZookeeperServer)
+      }
+    }
+
+    "list streams" should {
+      "return a new StratioQueryStream" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+        val stratioStreamMock = mock[StratioStream]
+
+        api.statusOperation = streamingAPIListOperationMock
+
+        when(
+          streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
+        ).thenReturn(List(stratioStreamMock))
+
+        api.listStreams().toList should be(List(stratioStreamMock))
+      }
+
+      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+        api.streamingUp = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.listStreams()
+        }
+
+        thrown.getMessage should be("Stratio streaming is down")
+      }
+
+      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.listStreams()
+        }
+
+        thrown.getMessage should be("Stratio streaming not yet initialized")
+      }
+    }
+
+    "query an stream" should {
+
+      val streamName = "unitTestsStream"
+
+      val streamsList =
+        """{"count":1,"timestamp":1402494388420,"streams":[{"streamName":"unitTestsStream",
+          |"columns":[{"column":"column1","type":"STRING"}],"queries":[],"activeActions":[],
+          |"userDefined":true}]}""".stripMargin
+
+      "return a new StratioQueryStream" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+        val stratioStreamMock = mock[StratioStream]
+        api.statusOperation = streamingAPIListOperationMock
+
+        when(stratioStreamMock.getStreamName()).thenReturn(streamsList)
+        val streamQueryMock = mock[StreamQuery]
+        when(streamQueryMock.getQuery).thenReturn("query")
+        when(streamQueryMock.getQueryId).thenReturn("queryId")
+        when(stratioStreamMock.getQueries()).thenReturn(List(streamQueryMock))
+        when(
+          streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
+        ).thenReturn(List(stratioStreamMock))
+
+        val expected = new StratioQueryStream(streamQueryMock.getQuery, streamQueryMock.getQueryId)
+        api.queriesFromStream(streamsList).toList should be(List(expected))
+      }
+
+      "throw an exception if there is not any coincidence" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = true
+        val stratioStreamMock = mock[StratioStream]
+
+        api.statusOperation = streamingAPIListOperationMock
+
+        when(
+          streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
+        ).thenReturn(List(stratioStreamMock))
+        when(stratioStreamMock.getStreamName()).thenReturn("test")
+
+        val thrown = intercept[StratioEngineOperationException] {
+          api.queriesFromStream(streamsList)
+        }
+
+        thrown.getMessage should be("StratioEngine error: STREAM DOES NOT EXIST")
+      }
+
+      "throw an exception if there is not any stratio stream" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = true
+
+        api.statusOperation = streamingAPIListOperationMock
+
+        when(
+          streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
+        ).thenReturn(List())
+
+        val thrown = intercept[StratioEngineOperationException] {
+          api.queriesFromStream(streamsList)
+        }
+
+        thrown.getMessage should be("StratioEngine error: STREAM DOES NOT EXIST")
+      }
+
+      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+        api.streamingUp = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.queriesFromStream(streamsList)
+        }
+
+        thrown.getMessage should be("Stratio streaming is down")
+      }
+
+      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.queriesFromStream(streamsList)
+        }
+
+        thrown.getMessage should be("Stratio streaming not yet initialized")
       }
     }
   }

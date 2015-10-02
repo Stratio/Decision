@@ -321,7 +321,11 @@ class StratioStreamingAPI
   }
   lazy val syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
   lazy val asyncOperation = new StreamingAPIAsyncOperation(kafkaDataProducer)
-  lazy val statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
+  private var _statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
+
+  def statusOperation = _statusOperation
+  def statusOperation_= (value:StreamingAPIListOperation):Unit = _statusOperation = value
+
 
   private def checkEphemeralNode() {
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_STATUS_PATH
