@@ -867,5 +867,70 @@ class StratioStreamingAPIUnitTests
         thrown.getMessage should be("Stratio streaming not yet initialized")
       }
     }
+
+    "check if the system is initialized" should {
+      "return true if the system is up and running" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+
+        api.isInit should be(true)
+      }
+
+      "return false if the system is down" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = false
+        api.streamingRunning = true
+
+        api.isInit should be(false)
+      }
+
+      "return false if the system is not running" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        api.isInit should be(false)
+      }
+    }
+
+    "check if the system is connected" should {
+      "return true if the system is up and running" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+
+        api.isConnected should be(true)
+      }
+
+      "return false if the system is down" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = false
+        api.streamingRunning = true
+
+        api.isConnected should be(false)
+      }
+
+      "return false if the system is not running" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        api.isConnected should be(false)
+      }
+    }
+
+    "define acknowledge timeout" should {
+      "define an acknowledge timeout" in new DummyStratioStreamingAPI {
+
+        val newTimeout = 1
+
+        api.ackTimeOut should be(8000)
+
+        api.defineAcknowledgeTimeOut(newTimeout)
+
+        api.ackTimeOut should be(newTimeout)
+      }
+    }
   }
 }
