@@ -43,7 +43,7 @@
         <module>shell</module>
         <module>siddhi</module>
         <module>examples</module>
-        <module>benchmark</module>
+<!--        <module>benchmark</module>-->
         <module>doc</module>
     </modules>
     <licenses>

@@ -68,7 +68,6 @@
 			<groupId>com.stratio.streaming</groupId>
 			<artifactId>streaming-api</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.10</artifactId>

@@ -13,7 +13,7 @@ object SensorsBenchmark {
     val config: Config = ConfigFactory.load()
 
     val decisionApi= StratioStreamingAPIFactory.create()
-    decisionApi.
+    //decisionApi.
   }
 
 }
