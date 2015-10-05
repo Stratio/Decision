@@ -1,31 +1,22 @@
 package com.stratio.streaming.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.datastax.driver.core.ProtocolOptions;
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.functions.*;
+import com.stratio.decision.functions.dal.ListenStreamFunction;
+import com.stratio.decision.service.StreamsHelper;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.ProtocolOptions;
-import com.stratio.streaming.commons.constants.STREAM_OPERATIONS;
-import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.functions.dal.IndexStreamFunction;
-import com.stratio.streaming.functions.dal.ListenStreamFunction;
-import com.stratio.streaming.functions.dal.SaveToCassandraStreamFunction;
-import com.stratio.streaming.functions.dal.SaveToMongoStreamFunction;
-import com.stratio.streaming.functions.dal.SaveToSolrStreamFunction;
-import com.stratio.streaming.service.StreamsHelper;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by aitor on 9/23/15.

@@ -1,12 +1,12 @@
 .. _using-streaming-engine:
 
-Using Stratio Streaming Engine
+Using Stratio Decision Engine
 ******************************
 
 Configuring the Engine
 ======================
 
-Before starting the Stratio Streaming Engine, you must review the configuration to adapt it to Kafka and Zookeeper. On a standard installation, you should find the configuration file in /opt/sds/streaming/config
+Before starting the Stratio Decision Engine, you must review the configuration to adapt it to Kafka and Zookeeper. On a standard installation, you should find the configuration file in /opt/sds/streaming/config
 
 Print Streams Configuration
 ---------------------------
@@ -42,7 +42,7 @@ Failover Configuration
 ----------------------
 **This field is mandatory**
 
-You can enable the failover for saving the engine state in Zookeeper. You must have configured the Zookeeper settings and the enabled field to true. If Stratio Streaming closes abruptly when you start it again, it will recover its last state from Zookeeper.
+You can enable the failover for saving the engine state in Zookeeper. You must have configured the Zookeeper settings and the enabled field to true. If Stratio Decision closes abruptly when you start it again, it will recover its last state from Zookeeper.
 
 Example::
 
@@ -146,7 +146,7 @@ Example::
 Starting the Engine
 ===================
 
-On a standard installation you can start Stratio Streaming Engine by executing the command:
+On a standard installation you can start Stratio Decision Engine by executing the command:
 
 ::
 

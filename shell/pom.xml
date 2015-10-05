@@ -18,8 +18,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.stratio.streaming</groupId>
-        <artifactId>stratio-streaming</artifactId>
+        <groupId>com.stratio.decision</groupId>
+        <artifactId>stratio-decision</artifactId>
         <version>0.9.0-SNAPSHOT</version>
     </parent>
     <artifactId>shell</artifactId>
@@ -56,8 +56,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.stratio.streaming</groupId>
-            <artifactId>streaming-api</artifactId>
+            <groupId>com.stratio.decision</groupId>
+            <artifactId>api</artifactId>
         </dependency>
     </dependencies>
 

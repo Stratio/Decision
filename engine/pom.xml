@@ -20,8 +20,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.stratio.streaming</groupId>
-        <artifactId>stratio-streaming</artifactId>
+        <groupId>com.stratio.decision</groupId>
+        <artifactId>stratio-decision</artifactId>
         <version>0.9.0-SNAPSHOT</version>
     </parent>
     <name>Decision engine</name>
@@ -93,8 +93,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.stratio.streaming</groupId>
-            <artifactId>streaming-commons</artifactId>
+            <groupId>com.stratio.decision</groupId>
+            <artifactId>commons</artifactId>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch</groupId>
@@ -106,8 +106,8 @@
             <artifactId>mongo-java-driver</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.stratio.streaming</groupId>
-            <artifactId>streaming-siddhi</artifactId>
+            <groupId>com.stratio.decision</groupId>
+            <artifactId>siddhi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
@@ -231,7 +231,7 @@
 			        <filterConfigurationDirectory>true</filterConfigurationDirectory>
 			        <programs>
 				    <program>
-				        <mainClass>com.stratio.streaming.StreamingEngine</mainClass>
+				        <mainClass>com.stratio.decision.StreamingEngine</mainClass>
 				        <id>run</id>
 				    </program>
 			        </programs>

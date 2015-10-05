@@ -1,9 +1,9 @@
 .. _basic-application:
 
-Writing and Running a Basic Application for Stratio Streaming
+Writing and Running a Basic Application for Stratio Decision
 *************************************************************
 
-In this tutorial you will learn how to write a java or scala project for building Stratio Streaming applications
+In this tutorial you will learn how to write a java or scala project for building Stratio Decision applications
 and how to run it on a local instance or a standalone cluster. Instructions are based on the Eclipse environment
 but any equivalent can be used.
 
@@ -15,7 +15,7 @@ Prerequisites
 
 -  `Eclipse <https://www.eclipse.org/>`_ or an equivalent IDE.
 -  `Oracle JDK 7 <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_.
--  `Apache Maven <http://maven.apache.org/>`_: Stratio Streaming API is available in a Maven repository that will be used in this tutorial.
+-  `Apache Maven <http://maven.apache.org/>`_: Stratio Decision API is available in a Maven repository that will be used in this tutorial.
 -  `Scala <http://www.scala-lang.org/>`_ >=2.10.3.
 -  Scala-IDE: follow `instructions at Eclipse marketplace <http://marketplace.eclipse.org/marketplace-client-intro>`_ to install it from the marketplace (recommended over downloading the plugin from scala-ide.org).
 -  m2eclipse-scala plugin: follow `instructions at scala-ide.org <http://scala-ide.org/docs/tutorials/m2eclipse/index.html>`_ for installation.
@@ -100,7 +100,7 @@ Application.
 For the Java or Scala project, the result should be similar to the
 following::
 
-    shell-session Streams in the Stratio Streaming Engine: 3
+    shell-session Streams in the Stratio Decision Engine: 3
         -- Stream Name: stratio_stats_base
         -- Stream Name: stratio_stats_global_by_operation
         -- Stream Name: testStream
@@ -110,6 +110,6 @@ Congratulations! You successfully completed this tutorial.
 Where to go from here
 =====================
 
-If you are planning to write your own Stratio Streaming application,
+If you are planning to write your own Stratio Decision application,
 :ref:`using-stratio-streaming-api` may be useful. Those are snippets written in both Java
 and Scala.
