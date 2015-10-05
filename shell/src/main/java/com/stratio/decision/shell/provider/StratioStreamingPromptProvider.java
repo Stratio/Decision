@@ -30,12 +30,12 @@ public class StratioStreamingPromptProvider extends DefaultPromptProvider {
 
     @Override
     public String getPrompt() {
-        return "stratio-streaming> ";
+        return "stratio-decision> ";
     }
 
     @Override
     public String getProviderName() {
-        return "Stratio Streaming";
+        return "Stratio Decision";
     }
 
 }

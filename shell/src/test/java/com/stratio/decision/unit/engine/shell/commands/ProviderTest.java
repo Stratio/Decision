@@ -28,7 +28,7 @@ public class ProviderTest extends BaseShellTest{
     @Test
     public void testGetProviderName() throws Exception {
         String name= bannerProvider.getProviderName();
-        assertEquals("Stratio Streaming",name);
+        assertEquals("Stratio Decision",name);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class ProviderTest extends BaseShellTest{
     @Test
     public void testGetProviderName2() throws Exception {
         String name= promptProvider.getProviderName();
-        assertEquals("Stratio Streaming",name);
+        assertEquals("Stratio Decision",name);
     }
     @Test
     public void testGetProviderName3() throws Exception {

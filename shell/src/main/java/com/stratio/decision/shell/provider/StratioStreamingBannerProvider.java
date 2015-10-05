@@ -61,7 +61,7 @@ public class StratioStreamingBannerProvider extends DefaultBannerProvider {
 
     @Override
     public String getProviderName() {
-        return "Stratio Streaming";
+        return "Stratio Decision";
     }
 
 }

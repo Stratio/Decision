@@ -17,7 +17,7 @@
 packageProject = "mvn package -DskipTests=true"
 system(packageProject)
 
-scalaTestRunnerCommand = "scala -cp /home/albertorodriguez/.m2/repository/org/scalatest/scalatest_2.10/2.1.0/scalatest_2.10-2.1.0.jar:target/streaming-api-jar-with-dependencies.jar org.scalatest.tools.Runner -o -R target/test-classes -s com.stratio.streaming.integration.StratioStreamingIntegrationTests -DzookeeperHost=172.19.0.228 -DzookeeperPort=2181 -DkafkaHost=172.19.0.228 -DkafkaPort=9092 -DelasticSearchHost=172.19.0.228 -DelasticSearchPort=9200 -DcassandraHost=172.19.0.228 -DmongoHost=172.19.0.228 -u target/it-tests-report"
+scalaTestRunnerCommand = "scala -cp /home/albertorodriguez/.m2/repository/org/scalatest/scalatest_2.10/2.1.0/scalatest_2.10-2.1.0.jar:target/decision-api-jar-with-dependencies.jar org.scalatest.tools.Runner -o -R target/test-classes -s com.stratio.decision.integration.StratioStreamingIntegrationTests -DzookeeperHost=172.19.0.228 -DzookeeperPort=2181 -DkafkaHost=172.19.0.228 -DkafkaPort=9092 -DelasticSearchHost=172.19.0.228 -DelasticSearchPort=9200 -DcassandraHost=172.19.0.228 -DmongoHost=172.19.0.228 -u target/it-tests-report"
 if ARGV.length == 1
   scalaTestRunnerCommand << " -n \"" << ARGV[0] << "\""
 end

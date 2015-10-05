@@ -8,17 +8,16 @@ import com.typesafe.config.ConfigFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 /**
  * Created by aitor on 9/30/15.
  */
-@RunWith(JUnit4.class)
 public class ZKUtilsTestIT {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ZKUtils.class);
@@ -26,11 +25,20 @@ public class ZKUtilsTestIT {
     private static Config conf;
     private static ZKUtils zkUtils;
 
+    private static String ZOOKEEPER_HOSTS= "";
+
     @BeforeClass
     public static void setUp() throws Exception {
         conf= ConfigFactory.load();
-        zkUtils= ZKUtils.getZKUtils(conf.getString("zookeeper.hosts"));
-        LOGGER.debug("Zookeeper hosts: " + conf.getString("zookeeper.hosts"));
+        List<String> hosts= conf.getStringList("zookeeper.hosts");
+
+        for (String host: hosts)    {
+            ZOOKEEPER_HOSTS += host + ",";
+        }
+        ZOOKEEPER_HOSTS= ZOOKEEPER_HOSTS.substring(0,ZOOKEEPER_HOSTS.length()-1);
+
+        zkUtils= ZKUtils.getZKUtils(ZOOKEEPER_HOSTS);
+        LOGGER.debug("Using Zookeeper hosts: " + ZOOKEEPER_HOSTS);
     }
 
     @AfterClass

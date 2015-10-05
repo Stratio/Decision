@@ -17,7 +17,7 @@ package com.stratio.decision.commons.exceptions;
 
 public class StratioStreamingException extends Exception {
 
-    private String errorCode="Stratio Streaming Exception";
+    private String errorCode="Stratio Decision Exception";
 
     public StratioStreamingException(String message){
         super(message);

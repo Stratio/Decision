@@ -1,8 +1,8 @@
-# Stratio Streaming Examples
+# Stratio Decision Examples
 
 ## Synopsis
 
-In this module you can browse different code examples using the Stratio Streaming platform.
+In this module you can browse different code examples using the Stratio Decision platform.
 
 ### Examples
 There are some examples to generate example data.

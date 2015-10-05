@@ -80,6 +80,139 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+        </plugins>
+    </build>      
+    
+    <profiles>
+        <profile>
+            <id>package</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>appassembler-maven-plugin</artifactId>
+                        <version>1.8.1</version>
+                        <configuration>
+                            <configurationDirectory>config</configurationDirectory>
+                            <copyConfigurationDirectory>true</copyConfigurationDirectory>
+                            <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
+                            <assembleDirectory>target/appassembler</assembleDirectory>
+                            <extraJvmArguments>$SHELL_OPTS -Xms64m -Xmx64m</extraJvmArguments>
+                            <programs>
+                                <program>
+                                    <mainClass>${jar.mainclass}</mainClass>
+                                    <name>shell</name>
+                                </program>
+                            </programs>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>assemble</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>com.stratio.mojo.unix</groupId>
+                        <artifactId>unix-maven-plugin</artifactId>
+                        <version>1.1.6</version>
+                        <extensions>true</extensions>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <outputFileName>stratio-decision-shell</outputFileName>
+                            <contact>
+                                <![CDATA[Stratio Decision<decision@stratio.com>]]>
+                            </contact>
+                            <contactEmail>decision@stratio.com</contactEmail>
+                            <deb>
+                                <section>devel</section>
+                            </deb>
+                            <rpm>
+                                <group>stratio</group>
+                                <requires>bash</requires>
+                            </rpm>
+                            <name>Streaming Shell</name>
+                            <excludeDirectoryAttributes>
+                                <dir>/etc</dir>
+                                <dir>/etc/init.d</dir>
+                                <dir>/etc/default</dir>
+                                <dir>/var</dir>
+                                <dir>/opt</dir>
+                                <dir>/usr</dir>
+                                <dir>/bin</dir>
+                            </excludeDirectoryAttributes>
+                            <assembly>
+                                <mkdirs>
+                                    <path>/opt/sds/streaming-shell</path>
+                                    <attributes>
+                                        <user>stratio</user>
+                                        <group>stratio</group>
+                                    </attributes>
+                                </mkdirs>
+                                <mkdirs>
+                                    <path>/var/run/sds</path>
+                                    <attributes>
+                                        <user>stratio</user>
+                                        <group>stratio</group>
+                                    </attributes>
+                                </mkdirs>
+                                <copyDirectory>
+                                    <from>target/appassembler/bin</from>
+                                    <to>/opt/sds/streaming-shell/bin</to>
+                                </copyDirectory>
+                                <copyDirectory>
+                                    <from>target/appassembler/repo</from>
+                                    <to>/opt/sds/streaming-shell/repo</to>
+                                </copyDirectory>
+                                <copyDirectory>
+                                    <from>target/appassembler/config/</from>
+                                    <to>/opt/sds/streaming-shell/config</to>
+                                </copyDirectory>
+                            </assembly>
+                            <defaults>
+                                <directoryAttributes>
+                                    <mode>0775</mode>
+                                </directoryAttributes>
+                                <fileAttributes>
+                                    <mode>0644</mode>
+                                </fileAttributes>
+                            </defaults>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>deb</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package-deb</goal>
+                                </goals>
+                                <configuration>
+                                    <architecture>all</architecture>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>rpm</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package-rpm</goal>
+                                </goals>
+                                <configuration>
+                                    <architecture>noarch</architecture>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>zip</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package-zip</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>                    
+    
+<!--            
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>appassembler-maven-plugin</artifactId>
@@ -213,8 +346,10 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
+            </plugin>-->         
+               
             </plugins>
-	</build>
+            </build>
+        </profile>
+    </profiles>   
 </project>

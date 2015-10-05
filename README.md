@@ -1,8 +1,8 @@
-STREAMING-CEP-ENGINE
+DECISION-CEP-ENGINE
 ===================
 
 
-Streaming CEP engine is a Complex Event Processing platform built on Spark Streaming.
+Decision CEP engine is a Complex Event Processing platform built on Spark Streaming.
 
 It is the result of combining the power of Spark Streaming as a continuous computing framework and Siddhi CEP engine as complex event processing engine.
 
@@ -15,7 +15,7 @@ Complex event processing, or CEP, is event processing that combines data from mu
  CEP as a technique helps discover complex events by analyzing and correlating other events
 
 
-Streaming Cep Engine components
+Decision Cep Engine components
 -----------------------------------------
 
 - [Engine](engine/README.md)
@@ -49,12 +49,12 @@ Stream Query Language
 **4 Built-in functions**
 
 
-* Auditing all the requests in the streaming engine (Cassandra or MongoDB)
+* Auditing all the requests in the decision engine (Cassandra or MongoDB)
 * Statistics (requests per operation, requests per stream…)
 * Failover system (recovering windows, streams and queries from Cassandra or MongoDB)
 
 
-Streaming Cep Engine: API
+Decision Cep Engine: API
 ------------------------------
 
 * Java & Scala API
@@ -63,7 +63,7 @@ Streaming Cep Engine: API
 
 
 
-Streaming Cep Engine: SHELL
+Decision Cep Engine: SHELL
 ----------------------------------
 
 * Autocomplete & help
@@ -72,7 +72,7 @@ Streaming Cep Engine: SHELL
 
 
 
-Interesting facts about Streaming Cep Engine
+Interesting facts about Decision Cep Engine
 -----------------------------------------------
 
  * It was presented in Spark Summit 2014 ([link](http://spark-summit.org/2014/talk/stratio-streaming-a-new-approach-to-spark-streaming))
@@ -80,15 +80,15 @@ Interesting facts about Streaming Cep Engine
  * It is fully open source. 
 
 
-Streaming CEP engine FAQ
+Decision CEP engine FAQ
 -------------------------
 
 
-**Is Streaming CEP engine multi-persistence?**
+**Is Decision CEP engine multi-persistence?**
 
 *For sure, we have included ready-to-use actions in the engine that allows you, any time, to start or stop saving all the events in that stream to the persistence of your choice: MongoDB, Cassandra or ElasticSearch.*
 
-*The engine takes care about creating keyspaces, tables, collections, indexes or whatever it needs to properly store the events (and,what’s more, if the stream is changed by an alter request, Stratio Streaming will also change the persistence for you).*
+*The engine takes care about creating keyspaces, tables, collections, indexes or whatever it needs to properly store the events (and,what’s more, if the stream is changed by an alter request, Stratio Decision will also change the persistence for you).*
 
 **Can I work with temporal windows?**
 
@@ -96,7 +96,7 @@ Streaming CEP engine FAQ
 
 **How can I send data to the engine?**
 
-*Use the API or the Shell provided by Streaming CEP engine. You can send a really BIG amount of events.*
+*Use the API or the Shell provided by Decision CEP engine. You can send a really BIG amount of events.*
 
 
 Changelog
