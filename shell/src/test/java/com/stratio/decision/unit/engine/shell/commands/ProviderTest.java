@@ -50,7 +50,7 @@ public class ProviderTest extends BaseShellTest{
     @Test
     public void testGetPrompt() throws Exception {
         String prompt= promptProvider.getPrompt();
-        assertEquals("stratio-streaming> ",prompt);
+        assertEquals("stratio-decision> ",prompt);
     }
     @Test
     public void testGetProviderName2() throws Exception {

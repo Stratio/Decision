@@ -15,6 +15,7 @@
  */
 package com.stratio.decision.integration.engine.api
 
+import com.stratio.decision.api.dto.StratioQueryStream
 import com.stratio.decision.api.messaging.{ColumnNameType, ColumnNameValue}
 import com.stratio.decision.api.{StratioStreamingAPI, StreamingAPIAsyncOperation, StreamingAPIListOperation, StreamingAPISyncOperation}
 import com.stratio.decision.commons.constants.ColumnType
