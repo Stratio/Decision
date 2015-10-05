@@ -47,7 +47,7 @@
    
    
   <!-- general -->
-  <field name="stratio_streaming_id"  type="string"   	indexed="true"  stored="true"  required="true"/>
+  <field name="stratio_decision_id"  type="string"   	indexed="true"  stored="true"  required="true"/>
 
   
   <!-- auxiliary -->
@@ -63,7 +63,7 @@
   
 
  <!-- field to use to determine and enforce document uniqueness. -->
- <uniqueKey>stratio_streaming_id</uniqueKey>
+ <uniqueKey>stratio_decision_id</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
  <!--<defaultSearchField>name</defaultSearchField>-->
