@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ### BEGIN INIT INFO
-# Provides: stratio-streaming
+# Provides: stratio-decision
 # Required-Start: $remote_fs
 # Required-Stop: $remote_fs
 # Should-Stop: $all
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
-# Short-Description: Streaming CEP Engine
-# Description: Description for stratio-streaming
+# Short-Description: Decision
+# Description: Description for stratio-decision
 ### END INIT INFO
 # Developed by pmadrid@stratio.com
 # Broken by alvaro@stratio.com
@@ -18,16 +18,16 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 INIT_HOME=`cd "${DIR}/.." >/dev/null; pwd`
 
-NAME="stratio-streaming"
-DESC="Description for stratio-streaming"
-BASEDIR=/opt/sds/streaming
-CONFDIR=/etc/sds/streaming
-LOGFILE=/var/log/sds/streaming/streaming.log
+NAME="stratio-decision"
+DESC="Description for stratio-decision"
+BASEDIR=/opt/sds/decision
+CONFDIR=/etc/sds/decision
+LOGFILE=/var/log/sds/decision/decision.log
 RUNFILE=$BASEDIR/bin/run
 pidDir=/var/run/sds
 serviceUser=stratio
 serviceGroup=stratio
-PIDFileName=streaming
+PIDFileName=decision
 
 # If JAVA_HOME has not been set, try to determine it.ner
 JVM_SEARCH_DIRS="/usr/java/default /usr/java/latest /opt/java"

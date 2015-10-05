@@ -24,11 +24,11 @@
         <artifactId>stratio-streaming</artifactId>
         <version>0.9.0-SNAPSHOT</version>
     </parent>
-    <name>Streaming engine</name>
-    <artifactId>streaming-engine</artifactId>
+    <name>Decision engine</name>
+    <artifactId>engine</artifactId>
     <properties>
         <spark.version>1.3.1</spark.version>
-        <outputFileName>stratio-streaming</outputFileName>
+        <outputFileName>stratio-decision</outputFileName>
     </properties>
     <dependencies>
         <dependency>
@@ -167,6 +167,12 @@
             <artifactId>cassandra-all</artifactId>
             <version>${cassandra.driver}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- INJECTION -->
         <dependency>
@@ -210,13 +216,13 @@
 			    <configuration>
 			        <configurationSourceDirectory>src/main/config
     			        </configurationSourceDirectory>
-			        <configurationDirectory>:/etc/sds/streaming/conf
+			        <configurationDirectory>:/etc/sds/decision/conf
 			        </configurationDirectory>
 			        <copyConfigurationDirectory>true</copyConfigurationDirectory>
 			        <includeConfigurationDirectoryInClasspath>true
 			        </includeConfigurationDirectoryInClasspath>
 			        <assembleDirectory>target/appassembler</assembleDirectory>
-			        <extraJvmArguments>$STREAMING_OPTS -Xms512m -Xmx512m
+			        <extraJvmArguments>$DECISION_OPTS -Xms512m -Xmx512m
 				    -Dcom.sun.management.jmxremote.port=7193
 				    -Dcom.sun.management.jmxremote.authenticate=false
 				    -Dcom.sun.management.jmxremote.ssl=false
@@ -249,11 +255,11 @@
                 <extensions>true</extensions>
                 <inherited>false</inherited>
                 <configuration>
-                    <outputFileName>stratio-streaming</outputFileName>
+                    <outputFileName>stratio-decision</outputFileName>
                     <contact>
-                        <![CDATA[Stratio Streaming<streaming@stratio.com>]]>
+                        <![CDATA[Stratio Decision<decision@stratio.com>]]>
                     </contact>
-                    <contactEmail>streaming@stratio.com</contactEmail>
+                    <contactEmail>decision@stratio.com</contactEmail>
                     <deb>
                         <section>devel</section>
                     </deb>
@@ -261,7 +267,7 @@
                         <group>stratio</group>
                         <requires>bash</requires>
                     </rpm>
-                    <name>Streaming</name>
+                    <name>Decision</name>
                     <excludeDirectoryAttributes>
                         <dir>/etc</dir>
                         <dir>/etc/init.d</dir>
@@ -273,8 +279,8 @@
                     </excludeDirectoryAttributes>
                     <assembly>
                         <copyFile>
-                            <path>src/main/unix/files_and_dirs/etc/init.d/streaming</path>
-                            <toFile>/etc/init.d/streaming</toFile>
+                            <path>src/main/unix/files_and_dirs/etc/init.d/decision</path>
+                            <toFile>/etc/init.d/decision</toFile>
                             <attributes>
                                 <user>root</user>
                                 <group>root</group>
@@ -282,7 +288,7 @@
                             </attributes>
                         </copyFile>
                         <mkdirs>
-                            <path>/opt/sds/streaming</path>
+                            <path>/opt/sds/decision</path>
                             <attributes>
                                 <user>stratio</user>
                                 <group>stratio</group>
@@ -296,7 +302,7 @@
                             </attributes>
                         </mkdirs>
                         <mkdirs>
-                            <path>/var/log/sds/streaming</path>
+                            <path>/var/log/sds/decision</path>
                             <attributes>
                                 <user>stratio</user>
                                 <group>stratio</group>
@@ -304,7 +310,7 @@
                         </mkdirs>
                         <copyDirectory>
                             <from>target/appassembler/bin</from>
-                            <to>/opt/sds/streaming/bin</to>
+                            <to>/opt/sds/decision/bin</to>
                             <directoryAttributes>
                                 <user>stratio</user>
                                 <group>stratio</group>
@@ -312,23 +318,23 @@
                         </copyDirectory>
                         <copyDirectory>
                             <from>target/appassembler/repo</from>
-                            <to>/opt/sds/streaming/repo</to>
+                            <to>/opt/sds/decision/repo</to>
                             <directoryAttributes>
                                 <user>stratio</user>
                                 <group>stratio</group>
                             </directoryAttributes>
                         </copyDirectory>
                         <copyDirectory>
-                            <from>target/appassembler/:/etc/sds/streaming/conf</from>
-                            <to>/etc/sds/streaming</to>
+                            <from>target/appassembler/:/etc/sds/decision/conf</from>
+                            <to>/etc/sds/decision</to>
                             <directoryAttributes>
                                 <user>stratio</user>
                                 <group>stratio</group>
                             </directoryAttributes>
                         </copyDirectory>
                         <copyFile>
-                            <path>src/main/unix/files_and_dirs/etc/default/streaming</path>
-                            <toFile>/etc/default/streaming</toFile>
+                            <path>src/main/unix/files_and_dirs/etc/default/decision</path>
+                            <toFile>/etc/default/decision</toFile>
                             <attributes>
                                 <user>root</user>
                                 <group>root</group>

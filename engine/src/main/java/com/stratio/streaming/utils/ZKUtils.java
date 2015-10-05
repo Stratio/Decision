@@ -110,7 +110,7 @@ public class ZKUtils {
 
     public boolean existZNode(String path) throws Exception {
         Stat stat = client.checkExists().forPath(path);
-        return (stat == null) ? true : false;
+        return (stat == null) ? false : true;
     }
 
     private class ZookeeperBackgroundCleaner implements Runnable {

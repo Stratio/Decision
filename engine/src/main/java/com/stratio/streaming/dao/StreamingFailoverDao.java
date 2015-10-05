@@ -42,7 +42,7 @@ public class StreamingFailoverDao  {
 
 
     public FailoverPersistenceStoreModel load() throws Exception {
-        if (!zkutils.existZNode(PERSISTENCE_STORE_PATH)) {
+        if (zkutils.existZNode(PERSISTENCE_STORE_PATH)) {
             log.info("Failover loading data...");
             byte[] bytes = zkutils.getZNode(PERSISTENCE_STORE_PATH);
             return gson.fromJson(new String(bytes), FailoverPersistenceStoreModel.class);
