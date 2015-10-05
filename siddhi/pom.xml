@@ -18,13 +18,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.stratio.streaming</groupId>
-		<artifactId>stratio-streaming</artifactId>
+		<groupId>com.stratio.decision</groupId>
+		<artifactId>stratio-decision</artifactId>
 		<version>0.9.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>streaming-siddhi</artifactId>
+	<artifactId>siddhi</artifactId>
 	<packaging>jar</packaging>
-	<name>Streamng Siddhi extensions</name>
+	<name>Decision Siddhi extensions</name>
 	<properties>
 		<siddhi.version>2.1.0-wso2v1</siddhi.version>
 	</properties>
@@ -204,9 +204,9 @@
 									<repositoryId>sonatype-nexus-staging</repositoryId>
 									<pomFile>pom.xml</pomFile>
 									<files>
-										<file>target/streaming-siddhi-${project.version}.jar</file>
-										<file>target/streaming-siddhi-${project.version}-javadoc.jar</file>
-										<file>target/streaming-siddhi-${project.version}-sources.jar</file>
+										<file>target/decision-siddhi-${project.version}.jar</file>
+										<file>target/decision-siddhi-${project.version}-javadoc.jar</file>
+										<file>target/decision-siddhi-${project.version}-sources.jar</file>
 									</files>
 								</configuration>
 								<id>sign-artifacts</id>
