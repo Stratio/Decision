@@ -1,15 +1,15 @@
-About Stratio Streaming
+About Stratio Decision
 ***********************
 
 Nowadays data-intensive processes and organizations of all sorts require the use of real-time data
-with increasing flexibility and complexity, so we created Stratio Streaming to meet this demand.
-Stratio Streaming is one of the core modules on which the Stratio platform is based.
-Stratio Streaming is the union of a real-time messaging bus with a complex event processing engine
-using Spark Streaming. Thanks to this technology, Stratio Streaming allows the creation of streams
+with increasing flexibility and complexity, so we created Stratio Decision to meet this demand.
+Stratio Decision is one of the core modules on which the Stratio platform is based.
+Stratio Decision is the union of a real-time messaging bus with a complex event processing engine
+using Spark Streaming. Thanks to this technology, Stratio Decision allows the creation of streams
 and queries on the fly, sending massive data streams, building complex windows over the data or
 manipulating the streams in a simple way by using an SQL-like language.
-Stratio Streaming’s API masks the complexity of the system so that developers can work with live
-streams straightaway. The engine Stratio Streaming also offers built-in solution patterns which
+Stratio Decision’s API masks the complexity of the system so that developers can work with live
+streams straightaway. The engine Stratio Decision also offers built-in solution patterns which
 solve typical use cases and common problems related to streaming. Additionally, we have added global
 features to the engine such as auditing and statistics.
 
@@ -29,13 +29,13 @@ challenging.
 With the advent of Apache Spark, all these issues and challenges have
 been resolved and now there is a new and powerful way to design
 distributed, scalable and fault-tolerant systems. For that reason,
-Stratio Streaming Engine is based on Apache Spark Streaming.
+Stratio Decision Engine is based on Apache Spark Streaming.
 
 But real-time and big data require a high level of flexibility,
 performance, powerful features and on-demand queries, so we have
 included Complex Event Processing capabilities and real-time operations.
 
-This way, you can use Stratio Streaming to define or alter your streams
+This way, you can use Stratio Decision to define or alter your streams
 on the fly, launch a complex query with sliding temporal windows, or
 save your streams to Apache Cassandra… and these are only a few examples
 of the features available.
@@ -54,7 +54,7 @@ You can see streams as SQL tables in a relational database, but streams
 are created in an ephemeral environment and no relationship or
 constraint rules are applied on them.
 
-**Stratio Streaming lets you *create, alter or drop streams* on the
+**Stratio Decision lets you *create, alter or drop streams* on the
 fly.**
 
 Queries on streams:
@@ -86,7 +86,7 @@ There are some built-in operations ready to use on streams:
 Stream Query Language
 ---------------------
 
-In order to use all these features, Stratio Streaming has a SQL-like
+In order to use all these features, Stratio Decision has a SQL-like
 language called Stream Query Language.
 
 This way, the previous explained features can be organized in a similar
@@ -115,7 +115,7 @@ way than SQL:
 Architecture
 ============
 
-Stratio Streaming is composed of three main elements:
+Stratio Decision is composed of three main elements:
 
 -  A Scala API.
 -  A publish-subscribe messaging system `Apache Kafka <http://kafka.apache.org/>`_.
@@ -128,9 +128,9 @@ Stratio Streaming is composed of three main elements:
 Where to go from here
 =====================
 
-To explore and play with Stratio Streaming, we recommend to visit the
+To explore and play with Stratio Decision, we recommend to visit the
 following:
 
--  :ref:`basic-application`: a step by step tutorial to write an application using Stratio Streaming API.
+-  :ref:`basic-application`: a step by step tutorial to write an application using Stratio Decision API.
 -  :ref:`using-stratio-streaming-api`: snippets in Java and Scala.
 -  :ref:`stratio-streaming-sandbox`

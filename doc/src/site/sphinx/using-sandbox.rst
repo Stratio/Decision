@@ -1,6 +1,6 @@
 .. _stratio-streaming-sandbox:
 
-Stratio Streaming sandbox and demo
+Stratio Decision sandbox and demo
 **********************************
 
 Vagrant Setup
@@ -39,7 +39,7 @@ What you will find in the sandbox
 
 Name\|Version\|Service name\|Other Stratio
 Streaming\|{{site.projects`2].version}}\|stratio-streaming\|service
-streaming start Stratio Streaming
+streaming start Stratio Decision
 Shell\|{{site.projects`2].version}}\|-\|/opt/sds/streaming-shell/bin
 Apache Kafka\|0.8.1.1\|kafka\|service kafka start Apache
 Zookeeper\|3.4.6\|zookeeper\|service zookeeper start Stratio
@@ -65,15 +65,15 @@ Accessing the sandbox
 -  Located in /install-folder
 -  **\` vagrant ssh \`**
 
-Starting the Stratio Streaming Shell and other useful commands
+Starting the Stratio Decision Shell and other useful commands
 ==============================================================
 
 From the sandbox (vagrant ssh):
 
--  Starting the Stratio Streaming Shell:
+-  Starting the Stratio Decision Shell:
    **/opt/sds/streaming-shell/bin/shell**
 -  List all available commands: **help**
--  Exit the Stratio Stratio Streaming Shell: **exit**
+-  Exit the Stratio Stratio Decision Shell: **exit**
 
 F.A.Q about the sandbox
 =======================
@@ -107,13 +107,13 @@ You may need to configure port forwarding between your guest and hosts machines.
 **\` config.vm.network :forwarded_port, guest:9200, host:9200 \`** to your Vagrantfile. Restart the
 Vagrant machine, and now you should be able to access Kibana on port 8081 through your browser.
 
-Stratio Streaming Demos
+Stratio Decision Demos
 =======================
 
 Demo #1: Sensor Monitoring
 --------------------------
 
-This demo will show up some of the features of Stratio Streaming, an
+This demo will show up some of the features of Stratio Decision, an
 interactive CEP engine built with Apache Spark and Apache Siddhi, such
 as:
 
@@ -133,11 +133,11 @@ ciber-security, among others.
 
 In this demo, you will use the following components and features:
 
--  The Stratio Streaming Engine, taking care of all the real-time
+-  The Stratio Decision Engine, taking care of all the real-time
    processing and all the CEP operations.
--  The Stratio Streaming Shell, in order to interact with the engine in
+-  The Stratio Decision Shell, in order to interact with the engine in
    real-time.
--  The Stratio Streaming API, in order to send simulated sensor measures
+-  The Stratio Decision API, in order to send simulated sensor measures
    to the engine.
 -  The INDEX action over several streams, in order to send all the
    events in a stream to a data storage, in this case Elastic Search.
@@ -145,7 +145,7 @@ In this demo, you will use the following components and features:
 
 To put all these pieces to work, you need to:
 
--  Write some commands in the Stratio Streaming Shell to create all the
+-  Write some commands in the Stratio Decision Shell to create all the
    streams, queries and actions.
 -  Simulate some random sensor measures related to basic signals of a
    system (cpu, memory, processes…)
@@ -246,10 +246,10 @@ Dashboard steps
 Extra: Streaming metrics
 ------------------------
 
-Stratio Streaming is the result of combining the power of Spark
+Stratio Decision is the result of combining the power of Spark
 Streaming as a continuous computing framework and Siddhi CEP engine as
 complex event processing engine. This dashboard is showing some
-statistics related to the status of the Stratio Streaming engine,
+statistics related to the status of the Stratio Decision engine,
 allowing you to inspect commands, events and throughput, in a real-time
 panel. This way, we took advantage of the engine itself to take care of
 all the internal events produced by the engine. In order to get this

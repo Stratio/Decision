@@ -9,13 +9,13 @@
 ## SERVICES ##
 ##############
 
-echo -e 'Installing Stratio Streaming services...'
+echo -e 'Installing Stratio Decision services...'
 
-yum -y -q --nogpgcheck install httpd stratio-streaming stratio-streaming-shell
+yum -y -q --nogpgcheck install httpd stratio-decision stratio-decision-shell
 
 chkconfig zookeeper off
 chkconfig kafka off
-chkconfig streaming off
+chkconfig decision off
 chkconfig cassandra on
 chkconfig elasticsearch on
 chkconfig httpd on
@@ -31,7 +31,7 @@ service zookeeper start
 sleep 5
 service kafka start
 sleep 5
-service streaming start
+service decision start
 
 touch /var/lock/subsys/local
 
@@ -46,7 +46,7 @@ service kafka restart
 service cassandra restart
 service mongodb restart
 service elasticsearch restart
-service streaming restart
+service decision restart
 service httpd restart
 
 ############
@@ -63,26 +63,26 @@ if [ ! -d "/var/www/html/kibana" ]; then
 fi
 
 ################################
-## STRATIO STREAMING EXAMPLES ##
+## STRATIO DECISION EXAMPLES ##
 ################################
 
-DOWNLOAD_EXAMPLES_URL="https://s3.amazonaws.com/stratioorg/streaming-examples-${STRATIO_MODULE_VERSION}-app.tar.gz"
+DOWNLOAD_EXAMPLES_URL="https://s3.amazonaws.com/stratioorg/decision-examples-${STRATIO_MODULE_VERSION}-app.tar.gz"
 
 echo $DOWNLOAD_EXAMPLES_URL
 
-if [ ! -d "/opt/sds/streaming-examples" ]; then
-	echo -e 'Building Stratio Streaming Examples...'
-	mkdir /opt/sds/streaming-examples	
+if [ ! -d "/opt/sds/decision-examples" ]; then
+	echo -e 'Building Stratio Decision Examples...'
+	mkdir /opt/sds/decision-examples
 	wget -q $DOWNLOAD_EXAMPLES_URL -P /home/vagrant/downloads
-	tar -xzf /home/vagrant/downloads/streaming-examples-$STRATIO_MODULE_VERSION-app.tar.gz -C /home/vagrant/downloads
-	cp -fr /home/vagrant/downloads/streaming-examples-$STRATIO_MODULE_VERSION/* /opt/sds/streaming-examples
+	tar -xzf /home/vagrant/downloads/decision-examples-$STRATIO_MODULE_VERSION-app.tar.gz -C /home/vagrant/downloads
+	cp -fr /home/vagrant/downloads/decision-examples-$STRATIO_MODULE_VERSION/* /opt/sds/decision-examples
 fi
 
 #######################
 ## KIBANA DASHBOARDS ##
 #######################
 
-cp -f /opt/sds/streaming-examples/dashboards/*.json /var/www/html/kibana/app/dashboards
+cp -f /opt/sds/decision-examples/dashboards/*.json /var/www/html/kibana/app/dashboards
 chmod -R 777 /var/www/html/kibana/app/dashboards
 
 #####################

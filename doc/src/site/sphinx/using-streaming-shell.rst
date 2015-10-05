@@ -1,6 +1,6 @@
 .. _using-stratio-streaming-shell:
 
-Using Stratio Streaming Shell
+Using Stratio Decision Shell
 *****************************
 
 Configuring the Shell
@@ -14,7 +14,7 @@ and Zookeeper quorum. On a standard installation, you should find the shell conf
 Starting the Shell
 ==================
 
-Stratio Streaming distribution includes a bundled shell for interacting with the engine. For using it, just go to
+Stratio Decision distribution includes a bundled shell for interacting with the engine. For using it, just go to
 the installation folder (typically /opt/sds/streaming-shell) and run the command::
 
     ./bin/shell

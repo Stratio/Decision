@@ -24,7 +24,7 @@ The key components of Streaming Engine provide a fault-tolerant, high availabili
 **Using the provided script**
 
 ```
-sudo sh run-stratio-streaming com.stratio.streaming.StreamingEngine --spark-master local_2 --zookeeper-cluster fqdn:port,fqdn2:port,... --kafka-cluster fqdn:port,fqdn2:port,... --cassandra-cluster fqdn,fqdn,...
+sudo sh run-stratio-streaming com.stratio.decision.StreamingEngine --spark-master local_2 --zookeeper-cluster fqdn:port,fqdn2:port,... --kafka-cluster fqdn:port,fqdn2:port,... --cassandra-cluster fqdn,fqdn,...
 ```
 
 How to run engine Integration Tests

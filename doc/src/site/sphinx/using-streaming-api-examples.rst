@@ -1,6 +1,6 @@
 .. _using-stratio-streaming-api:
 
-Using Stratio Streaming API
+Using Stratio Decision API
 ***************************
 
 Creating and initializing the API

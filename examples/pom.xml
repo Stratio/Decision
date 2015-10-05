@@ -18,17 +18,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.stratio.streaming</groupId>
-		<artifactId>stratio-streaming</artifactId>
+		<groupId>com.stratio.decision</groupId>
+		<artifactId>stratio-decision</artifactId>
 		<version>0.9.0-SNAPSHOT</version>
 	</parent>
 	<properties>
 		<jacoco.skip>true</jacoco.skip>
 	</properties>
-	<groupId>com.stratio.streaming.examples</groupId>
-	<artifactId>streaming-examples</artifactId>
-	<name>Stratio streaming examples</name>
-	<description>Stratio streaming examples and executables.</description>
+	<groupId>com.stratio.decision.examples</groupId>
+	<artifactId>decision-examples</artifactId>
+	<name>Stratio Decision examples</name>
+	<description>Stratio Decision examples and executables.</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
@@ -58,8 +58,8 @@
 			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.stratio.streaming</groupId>
-			<artifactId>streaming-commons</artifactId>
+			<groupId>com.stratio.decision</groupId>
+			<artifactId>commons</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -86,15 +86,15 @@
 					<extraJvmArguments>-Xms64m -Xmx64m</extraJvmArguments>
 					<programs>
 						<program>
-							<mainClass>com.stratio.streaming.executables.DataFlowFromCsvMain</mainClass>
+							<mainClass>com.stratio.decision.executables.DataFlowFromCsvMain</mainClass>
 							<name>data-from-csv</name>
 						</program>
 						<program>
-							<mainClass>com.stratio.streaming.executables.HardwareEmulatorMain</mainClass>
+							<mainClass>com.stratio.decision.executables.HardwareEmulatorMain</mainClass>
 							<name>hardware-emulator</name>
 						</program>
 						<program>
-							<mainClass>com.stratio.streaming.executables.SensorGridSimulation</mainClass>
+							<mainClass>com.stratio.decision.executables.SensorGridSimulation</mainClass>
 							<name>sensor-grid-simulation</name>
 						</program>
 					</programs>

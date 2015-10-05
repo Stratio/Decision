@@ -25,14 +25,14 @@
 	<fileSets>
 		<fileSet>
 			<directory>target/appassembler</directory>
-			<outputDirectory>streaming-examples-${version}</outputDirectory>
+			<outputDirectory>decision-examples-${version}</outputDirectory>
 			<excludes>
 				<exclude>bin/**</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet>
 			<directory>target/appassembler/bin</directory>
-			<outputDirectory>streaming-examples-${version}/bin</outputDirectory>
+			<outputDirectory>decision-examples-${version}/bin</outputDirectory>
 			<includes>
 				<include>*</include>
 			</includes>
@@ -41,7 +41,7 @@
 		</fileSet>
 		<fileSet>
 			<directory>src/main/resources</directory>
-			<outputDirectory>streaming-examples-${version}</outputDirectory>
+			<outputDirectory>decision-examples-${version}</outputDirectory>
 			<excludes>
 				<exclude>*.properties</exclude>
 				<exclude>*.xml</exclude>
