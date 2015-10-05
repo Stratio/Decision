@@ -122,7 +122,7 @@
                         <extensions>true</extensions>
                         <inherited>false</inherited>
                         <configuration>
-                            <outputFileName>stratio-streaming-shell</outputFileName>
+                            <outputFileName>stratio-decision-shell</outputFileName>
                             <contact>
                                 <![CDATA[Stratio Decision<decision@stratio.com>]]>
                             </contact>
