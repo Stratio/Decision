@@ -143,5 +143,28 @@ public class FunctionsTestIT extends ActionBaseFunctionHelper {
     }
 
 
+    @Test
+    public void testSaveToElasticSearch() throws Exception {
+        LOGGER.debug("Connecting to Elastic Search: " + conf.getStringList("elasticsearch.hosts").toString());
+
+        SaveToElasticSearchActionExecutionFunction func = new SaveToElasticSearchActionExecutionFunction(
+                conf.getStringList("elasticsearch.hosts"), conf.getString("elasticsearch.clusterName"));
+
+        List<StratioStreamingMessage> list = new ArrayList<StratioStreamingMessage>();
+        message.setColumns(StreamsHelper.COLUMNS3);
+        list.add(message);
+
+        Exception ex = null;
+        try {
+            func.process(list);
+
+        } catch (Exception e) {
+            ex = e;
+            ex.printStackTrace();
+        }
+
+        assertNull("Expected null value", ex);
+    }
+
 
 }

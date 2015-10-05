@@ -51,13 +51,18 @@ docker run -dit --name zk --hostname zk.zookeeper.local.dev qa.stratio.com:5000/
 docker run -dit --name kf --hostname kf.kafka.local.dev --env "ZK_CONNECT=zk.zookeeper.local.dev" qa.stratio.com:5000/kafka:0.8.1.1
 docker run -dit --name mongo --hostname db.mongo.local.dev qa.stratio.com:5000/stratio/mongo:latest
 docker run -dit --name cs --hostname cs.cassandra.local.dev stratio/cassandra:2.1.8
+docker run -dit --name es --hostname es.elastic.local.dev elasticsearch:1.4.2
 ```
 
 - Execute the integration tests adding the following JVM parameters:
+
     -Dkafka.hosts.0=kf.kafka.local.dev:9092  
     -Dmongo.hosts.0=db.mongo.local.dev:27017  
     -Dzookeeper.hosts.0=zk.zookeeper.local.dev:2181
     -Dcassandra.hosts.0=cs.cassandra.local.dev 
+    -Delasticsearch.hosts.0=es.elastic.local.dev:9300
+
+
 
 
 
