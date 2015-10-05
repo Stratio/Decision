@@ -58,6 +58,10 @@ public abstract class StreamsHelper {
         add(new ColumnNameTypeValue("mylong", ColumnType.LONG, 22223L));
     }};
 
+    public static final List<ColumnNameTypeValue> COLUMNS3= new LinkedList<ColumnNameTypeValue>() {{
+        add(new ColumnNameTypeValue("name", ColumnType.STRING, "my name"));
+        add(new ColumnNameTypeValue("value", ColumnType.INTEGER, 1234));
+    }};
 
     public static final String ACTION_LISTEN_TOKEN= "[LISTEN]";
 
