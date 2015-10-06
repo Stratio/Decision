@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.integration.engine.api
+package com.stratio.decision.unit.engine.api
 
 import com.stratio.decision.api.dto.StratioQueryStream
 import com.stratio.decision.api.messaging.{ColumnNameType, ColumnNameValue}
@@ -47,7 +47,7 @@ class StratioStreamingAPIUnitTests
     val streamingAPIAsyncOperationMock = mock[StreamingAPIAsyncOperation]
   }
 
-  "The Stratio Streaming API" when {
+  "The Stratio Decision API" when {
     "set the server config" should {
       "modifies the server config values" in new DummyStratioStreamingAPI {
         api.kafkaCluster = ""
@@ -99,17 +99,17 @@ class StratioStreamingAPIUnitTests
         api.listStreams().toList should be(List(stratioStreamMock))
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.listStreams()
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -117,7 +117,7 @@ class StratioStreamingAPIUnitTests
           api.listStreams()
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -191,10 +191,10 @@ class StratioStreamingAPIUnitTests
           api.queriesFromStream(streamsList)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -202,7 +202,7 @@ class StratioStreamingAPIUnitTests
           api.queriesFromStream(streamsList)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -221,17 +221,17 @@ class StratioStreamingAPIUnitTests
         api.indexStream(streamName)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.indexStream(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -239,7 +239,7 @@ class StratioStreamingAPIUnitTests
           api.indexStream(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -258,17 +258,17 @@ class StratioStreamingAPIUnitTests
         api.stopIndexStream(streamName)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.stopIndexStream(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -276,7 +276,7 @@ class StratioStreamingAPIUnitTests
           api.stopIndexStream(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -297,17 +297,17 @@ class StratioStreamingAPIUnitTests
         api.createStream(streamName, columns)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.createStream(streamName, columns)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -315,7 +315,7 @@ class StratioStreamingAPIUnitTests
           api.createStream(streamName, columns)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -336,17 +336,17 @@ class StratioStreamingAPIUnitTests
         api.alterStream(streamName, columns)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.alterStream(streamName, columns)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -354,7 +354,7 @@ class StratioStreamingAPIUnitTests
           api.alterStream(streamName, columns)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -375,17 +375,17 @@ class StratioStreamingAPIUnitTests
         api.insertData(streamName, data)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.insertData(streamName, data)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -393,7 +393,7 @@ class StratioStreamingAPIUnitTests
           api.insertData(streamName, data)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -475,17 +475,17 @@ class StratioStreamingAPIUnitTests
         thrown.getMessage should be("StratioEngine error: STREAM DOES NOT EXIST")
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.getQueryId(streamName, query)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -493,7 +493,7 @@ class StratioStreamingAPIUnitTests
           api.getQueryId(streamName, query)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -586,17 +586,17 @@ class StratioStreamingAPIUnitTests
         thrown.getMessage should be("StratioEngine error: STREAM DOES NOT EXIST")
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.addQuery(streamName, query)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -604,7 +604,7 @@ class StratioStreamingAPIUnitTests
           api.addQuery(streamName, query)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -624,17 +624,17 @@ class StratioStreamingAPIUnitTests
         api.removeQuery(streamName, queryId)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.removeQuery(streamName, queryId)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -642,7 +642,7 @@ class StratioStreamingAPIUnitTests
           api.removeQuery(streamName, queryId)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -661,17 +661,17 @@ class StratioStreamingAPIUnitTests
         api.saveToCassandra(streamName)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.saveToCassandra(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -679,7 +679,7 @@ class StratioStreamingAPIUnitTests
           api.saveToCassandra(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -698,17 +698,17 @@ class StratioStreamingAPIUnitTests
         api.stopSaveToCassandra(streamName)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.stopSaveToCassandra(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -716,7 +716,7 @@ class StratioStreamingAPIUnitTests
           api.stopSaveToCassandra(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -735,17 +735,17 @@ class StratioStreamingAPIUnitTests
         api.saveToMongo(streamName)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.saveToMongo(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -753,7 +753,7 @@ class StratioStreamingAPIUnitTests
           api.saveToMongo(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -772,17 +772,17 @@ class StratioStreamingAPIUnitTests
         api.stopSaveToMongo(streamName)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.stopSaveToMongo(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -790,7 +790,7 @@ class StratioStreamingAPIUnitTests
           api.stopSaveToMongo(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -809,17 +809,17 @@ class StratioStreamingAPIUnitTests
         api.saveToSolr(streamName)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.saveToSolr(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -827,7 +827,7 @@ class StratioStreamingAPIUnitTests
           api.saveToSolr(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
@@ -846,17 +846,17 @@ class StratioStreamingAPIUnitTests
         api.stopSaveToSolr(streamName)
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {
           api.stopSaveToSolr(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming is down")
+        thrown.getMessage should be("Stratio Decision is down")
       }
 
-      "throw an exception if streaming is not running" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = false
 
@@ -864,7 +864,7 @@ class StratioStreamingAPIUnitTests
           api.stopSaveToSolr(streamName)
         }
 
-        thrown.getMessage should be("Stratio streaming not yet initialized")
+        thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
 
