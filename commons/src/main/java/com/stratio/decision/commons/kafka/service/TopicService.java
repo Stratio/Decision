@@ -23,6 +23,6 @@ public interface TopicService extends Closeable {
 
     void createOrUpdateTopic(String topic, int replicationFactor, int partitions);
 
-//    Integer getNumPartitionsForTopic(String topic);
+    Integer getNumPartitionsForTopic(String topic);
 
 }

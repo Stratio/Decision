@@ -16,6 +16,7 @@
 package com.stratio.decision.commons.kafka.service;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
@@ -25,6 +26,9 @@ import com.stratio.decision.commons.kafka.serializer.ZkStringSerializer;
 
 import kafka.admin.AdminUtils;
 import kafka.common.Topic;
+import kafka.javaapi.TopicMetadata;
+import kafka.javaapi.TopicMetadataRequest;
+import kafka.javaapi.TopicMetadataResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.utils.ZkUtils;
 import scala.collection.Map;
@@ -71,20 +75,20 @@ public class KafkaTopicService implements TopicService {
         logger.debug("Topic {} created", topic);
     }
 
-//    @Override
-//    public Integer getNumPartitionsForTopic(String topic){
-//        TopicMetadataRequest topicRequest = new TopicMetadataRequest(Arrays.asList(topic));
-//        TopicMetadataResponse topicResponse = simpleConsumer.send(topicRequest);
-//        for (TopicMetadata topicMetadata : topicResponse.topicsMetadata()) {
-//            if (topic.equals(topicMetadata.topic())) {
-//                int partitionSize = topicMetadata.partitionsMetadata().size();
-//                logger.debug("Partition size found ({}) for {} topic", partitionSize, topic);
-//                return partitionSize;
-//            }
-//        }
-//        logger.warn("Metadata info not found!. TOPIC {}", topic);
-//        return null;
-//    }
+    @Override
+    public Integer getNumPartitionsForTopic(String topic){
+        TopicMetadataRequest topicRequest = new TopicMetadataRequest(Arrays.asList(topic));
+        TopicMetadataResponse topicResponse = simpleConsumer.send(topicRequest);
+        for (TopicMetadata topicMetadata : topicResponse.topicsMetadata()) {
+            if (topic.equals(topicMetadata.topic())) {
+                int partitionSize = topicMetadata.partitionsMetadata().size();
+                logger.debug("Partition size found ({}) for {} topic", partitionSize, topic);
+                return partitionSize;
+            }
+        }
+        logger.warn("Metadata info not found!. TOPIC {}", topic);
+        return null;
+    }
 
     public void deleteTopics(){
         zkClient.deleteRecursive("/brokers/topics");
