@@ -17,6 +17,6 @@ stopDockerImage mongo
 stopDockerImage kf
 stopDockerImage zk
 
-stopDockerImage skydoc
-stopDockerImage skydns
+#stopDockerImage skydock
+#stopDockerImage skydns
 

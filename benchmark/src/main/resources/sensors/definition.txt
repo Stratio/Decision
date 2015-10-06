@@ -1,0 +1,15 @@
+create --stream sensor_grid --definition "name.string,data.double"
+
+add query --stream sensor_grid --definition "from sensor_grid#window.length(250) select name, avg(data) as data group by name insert into sensor_grid_avg  for current-events"
+
+index start --stream sensor_grid_avg
+
+add query --stream sensor_grid_avg --definition "from sensor_grid_avg[name=='cpu' and data > 80]#window.timeBatch(10 seconds)  select name, avg(data) as data, 'Alarm_intensive_CPU_load' as text insert into sensor_grid_alarms  for current-events"
+
+add query --stream sensor_grid_avg --definition "from sensor_grid_avg[name=='memory' and data > 75]#window.timeBatch(5 seconds)  select name, avg(data) as data, 'Alarm_intensive_MEMORY_load' as text insert into sensor_grid_alarms  for current-events"
+
+add query --stream sensor_grid_avg --definition "from sensor_grid_avg[(name=='memory' and data > 80) or (name=='cpu' and data > 90)]#window.timeBatch(15 seconds) select name , avg(data) as data, 'Alarm_inminent_shutdown' as text insert into sensor_grid_alarms for current-events"
+
+index start --stream sensor_grid_alarms
+
+
