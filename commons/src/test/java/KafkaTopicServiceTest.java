@@ -19,7 +19,7 @@ public class KafkaTopicServiceTest {
     public void setUp() throws Exception {
         LOGGER.debug("Initializing Kafka Topic Service");
         func = new KafkaTopicService("zk.zookeeper.local.dev:2181", "",
-                6667, 6000, 6000);
+                6667, 10000, 10000);
     }
 
     @Test
