@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.unit.engine.api
+package com.stratio.decision.api
 
 import com.stratio.decision.api.StreamingAPISyncOperation
 import com.stratio.decision.api.kafka.KafkaProducer
@@ -53,7 +53,7 @@ class StreamingAPISyncOperationTest extends FunSpec
   describe("The Decision API Sync Operation") {
     it("should throw no exceptions when the engine returns an OK return code") {
       Given("an OK engine response")
-      val errorCode = OK.getCode();
+      val errorCode = OK.getCode
       val engineResponse = s"""{"errorCode":$errorCode}"""
       When("we perform the sync operation")
       Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
@@ -70,7 +70,7 @@ class StreamingAPISyncOperationTest extends FunSpec
 
     it("should throw a StratioAPISecurityException when the engine returns a KO_STREAM_OPERATION_NOT_ALLOWED return code") {
       Given("a KO_STREAM_OPERATION_NOT_ALLOWED engine response")
-      val errorCode = KO_STREAM_OPERATION_NOT_ALLOWED.getCode();
+      val errorCode = KO_STREAM_OPERATION_NOT_ALLOWED.getCode
       val engineResponse = s"""{"errorCode":$errorCode}"""
       When("we perform the sync operation")
       Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
@@ -85,7 +85,7 @@ class StreamingAPISyncOperationTest extends FunSpec
 
     it("should throw a StratioAPISecurityException when the engine returns a KO_STREAM_IS_NOT_USER_DEFINED return code") {
       Given("a KO_STREAM_IS_NOT_USER_DEFINED engine response")
-      val errorCode = KO_STREAM_IS_NOT_USER_DEFINED.getCode();
+      val errorCode = KO_STREAM_IS_NOT_USER_DEFINED.getCode
       val engineResponse = s"""{"errorCode":$errorCode}"""
       When("we perform the sync operation")
       Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())
@@ -100,7 +100,7 @@ class StreamingAPISyncOperationTest extends FunSpec
 
     it("should throw a StratioEngineOperationException when the engine returns an ERROR return code") {
       Given("a KO_STREAM_IS_NOT_USER_DEFINED engine response")
-      val errorCode = KO_COLUMN_DOES_NOT_EXIST.getCode();
+      val errorCode = KO_COLUMN_DOES_NOT_EXIST.getCode
       val engineResponse = s"""{"errorCode":$errorCode}"""
       When("we perform the sync operation")
       Mockito.doNothing().when(kafkaProducerMock).send(anyString(), anyString())

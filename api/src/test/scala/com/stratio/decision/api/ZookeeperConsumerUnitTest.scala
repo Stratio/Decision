@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.unit.engine.api
+package com.stratio.decision.api
 
 import java.util.UUID
 

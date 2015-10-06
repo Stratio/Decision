@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.unit.engine.api
+package com.stratio.decision.api
 
 import com.stratio.decision.api.utils.StreamsParser
 import com.stratio.decision.commons.constants.{ColumnType, StreamAction}
@@ -46,9 +46,9 @@ class StreamsParserUnitTest
       firstStreamfirstColumn.getColumn should be ("column1")
       firstStreamfirstColumn.getType should be (ColumnType.STRING)
       val firstStreamQueries = firstStream.getQueries.toList
-      firstStreamQueries.size() should be(0)
+      firstStreamQueries.size should be(0)
       val firstStreamActiveActions = firstStream.getActiveActions.toList
-      firstStreamActiveActions.size() should be(0)
+      firstStreamActiveActions.size should be(0)
       firstStream.getUserDefined should be(false)
       And("the second stream should contain all the info")
       val secondStream = streamsList(1)

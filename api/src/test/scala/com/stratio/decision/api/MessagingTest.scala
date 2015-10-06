@@ -1,4 +1,4 @@
-package com.stratio.decision.unit.engine.api
+package com.stratio.decision.api
 
 import com.stratio.decision.api.messaging.{ColumnNameType, MessageBuilderWithColumns, MessageBuilder}
 import com.stratio.decision.commons.constants.ColumnType
@@ -8,11 +8,9 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 import scala.collection.JavaConversions._
 
-/**
- * Created by eruiz on 6/10/15.
- */
+
 @RunWith(classOf[JUnitRunner])
-class MessagingTests extends WordSpec {
+class MessagingTest extends WordSpec {
   trait MyTestComponent {
     var m = MessageBuilder
     var mw = MessageBuilderWithColumns

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.unit.engine.api
+package com.stratio.decision.api
 
 import com.stratio.decision.api.kafka.JsonGenericDecoder
 import com.stratio.decision.commons.exceptions.StratioAPIGenericException
@@ -30,7 +30,7 @@ class JsonGenericDecoderUnitTest
     it("should decode json to StratioStreamingMessage") {
       val jsonToBeParsed = """{"operation":"insert","streamName":"testStream","session_id":"1396942951802","request_id":"1396942953315","request":"","timestamp":1396942953315,"columns":[{"column":"field1","value":"testString"},{"column":"field2","value":200}],"userDefined":true}"""
       val jsonGenericDecoder = new JsonGenericDecoder
-      val fieldsList = jsonGenericDecoder.fromBytes(jsonToBeParsed.getBytes())
+      val fieldsList = jsonGenericDecoder.fromBytes(jsonToBeParsed.getBytes)
 
       fieldsList.getColumns.size should be(2)
       fieldsList.getOperation should be("insert")
@@ -41,7 +41,7 @@ class JsonGenericDecoderUnitTest
       val jsonToBeParsed = """{not well-formed json"""
       val jsonGenericDecoder = new JsonGenericDecoder
       intercept[StratioAPIGenericException] {
-      jsonGenericDecoder.fromBytes(jsonToBeParsed.getBytes())
+      jsonGenericDecoder.fromBytes(jsonToBeParsed.getBytes)
       }
     }
   }
