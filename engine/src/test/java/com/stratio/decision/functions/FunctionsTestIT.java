@@ -1,10 +1,10 @@
-package com.stratio.streaming.functions;
+package com.stratio.decision.functions;
 
-import com.datastax.driver.core.ProtocolOptions;
-import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.functions.*;
-import com.stratio.decision.functions.dal.ListenStreamFunction;
-import com.stratio.decision.service.StreamsHelper;
+import static org.junit.Assert.assertNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.AfterClass;
@@ -13,10 +13,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertNull;
+import com.datastax.driver.core.ProtocolOptions;
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.functions.dal.ListenStreamFunction;
+import com.stratio.decision.service.StreamsHelper;
 
 /**
  * Created by aitor on 9/23/15.

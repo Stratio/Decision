@@ -15,7 +15,15 @@
  */
 package com.stratio.decision.commons.kafka.service;
 
+import java.io.IOException;
+import java.util.Arrays;
+
+import org.I0Itec.zkclient.ZkClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.stratio.decision.commons.kafka.serializer.ZkStringSerializer;
+
 import kafka.admin.AdminUtils;
 import kafka.common.Topic;
 import kafka.javaapi.TopicMetadata;
@@ -23,14 +31,8 @@ import kafka.javaapi.TopicMetadataRequest;
 import kafka.javaapi.TopicMetadataResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.utils.ZkUtils;
-import org.I0Itec.zkclient.ZkClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import scala.collection.Map;
 import scala.collection.Seq;
-
-import java.io.IOException;
-import java.util.Arrays;
 
 public class KafkaTopicService implements TopicService {
 
@@ -74,7 +76,7 @@ public class KafkaTopicService implements TopicService {
     }
 
     @Override
-    public Integer getNumPartitionsForTopic(String topic) {
+    public Integer getNumPartitionsForTopic(String topic){
         TopicMetadataRequest topicRequest = new TopicMetadataRequest(Arrays.asList(topic));
         TopicMetadataResponse topicResponse = simpleConsumer.send(topicRequest);
         for (TopicMetadata topicMetadata : topicResponse.topicsMetadata()) {
@@ -86,6 +88,10 @@ public class KafkaTopicService implements TopicService {
         }
         logger.warn("Metadata info not found!. TOPIC {}", topic);
         return null;
+    }
+
+    public void deleteTopics(){
+        zkClient.deleteRecursive("/brokers/topics");
     }
 
     @Override
