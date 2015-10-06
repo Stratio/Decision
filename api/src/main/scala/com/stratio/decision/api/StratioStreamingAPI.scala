@@ -223,7 +223,7 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-      case ex => throw new StratioEngineConnectionException("Unable to connect to stratio streaming. " + ex.getMessage)
+      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
     }
   }
 
@@ -242,7 +242,7 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-      case ex => throw new StratioEngineConnectionException("Unable to connect to stratio streaming. " + ex.getMessage)
+      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
     }
   }
 
@@ -271,7 +271,7 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-      case ex => throw new StratioEngineConnectionException("Unable to connect to stratio streaming. " + ex.getMessage)
+      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
     }
   }
 
@@ -334,7 +334,7 @@ class StratioStreamingAPI
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_STATUS_PATH
     if (!zookeeperConsumer.zNodeExists(ephemeralNodePath)) {
       log.warn("Ephemeral node does not exist")
-      throw new StratioEngineStatusException("Can't connect. Check if Stratio streaming is down or connection to " +
+      throw new StratioEngineStatusException("Can't connect. Check if Stratio Decision is down or connection to " +
         "Zookeeper")
     } else {
       val streamingStatus = zookeeperConsumer.getZNodeData(ZK_EPHEMERAL_NODE_STATUS_PATH).get

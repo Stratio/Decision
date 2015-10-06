@@ -146,7 +146,7 @@
                             </excludeDirectoryAttributes>
                             <assembly>
                                 <mkdirs>
-                                    <path>/opt/sds/streaming-shell</path>
+                                    <path>/opt/sds/decision-shell</path>
                                     <attributes>
                                         <user>stratio</user>
                                         <group>stratio</group>
@@ -161,15 +161,15 @@
                                 </mkdirs>
                                 <copyDirectory>
                                     <from>target/appassembler/bin</from>
-                                    <to>/opt/sds/streaming-shell/bin</to>
+                                    <to>/opt/sds/decision-shell/bin</to>
                                 </copyDirectory>
                                 <copyDirectory>
                                     <from>target/appassembler/repo</from>
-                                    <to>/opt/sds/streaming-shell/repo</to>
+                                    <to>/opt/sds/decision-shell/repo</to>
                                 </copyDirectory>
                                 <copyDirectory>
                                     <from>target/appassembler/config/</from>
-                                    <to>/opt/sds/streaming-shell/config</to>
+                                    <to>/opt/sds/decision-shell/config</to>
                                 </copyDirectory>
                             </assembly>
                             <defaults>
