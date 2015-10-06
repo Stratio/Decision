@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Streaming CEP documentation build configuration file, created by
+# Decision CEP documentation build configuration file, created by
 # sphinx-quickstart on Thu Jan 15 16:21:58 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Streaming CEP'
+project = u'Decision CEP'
 copyright = u'2015 Stratio'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -108,9 +108,9 @@ html_theme = 'stratio'
 # documentation.
 html_theme_options = {    
     'versions' : ['0.7.0-SNAPSHOT'],
-    'github' : 'https://github.com/Stratio/streaming-cep-engine',
+    'github' : 'https://github.com/Stratio/Decision',
     'jira': 'https://stratio.atlassian.net/secure/Dashboard.jspa',
-    'module_name' : 'streaming'
+    'module_name' : 'Decision'
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -198,7 +198,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'StreamingCEPdoc'
+htmlhelp_basename = 'DecisionCEPdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -220,7 +220,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'StreamingCEP.tex', u'Streaming CEP Documentation',
+    ('index', 'DecisionCEP.tex', u'Decision CEP Documentation',
      u'David Morales, Alberto Rodríguez, Antonio Jesus Navarro', 'manual'),
 ]
 
@@ -250,7 +250,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'streamingcep', u'Streaming CEP Documentation',
+    ('index', 'decisioncep', u'Decision CEP Documentation',
      [u'David Morales, Alberto Rodríguez, Antonio Jesus Navarro'], 1)
 ]
 
@@ -264,8 +264,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'StreamingCEP', u'Streaming CEP Documentation',
-     u'David Morales, Alberto Rodríguez, Antonio Jesus Navarro', 'StreamingCEP',
+    ('index', 'DecisionCEP', u'Decision CEP Documentation',
+     u'David Morales, Alberto Rodríguez, Antonio Jesus Navarro', 'DecisionCEP',
      'One line description of project.',
      'Miscellaneous'),
 ]

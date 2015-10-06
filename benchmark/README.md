@@ -1,7 +1,7 @@
 PERFORMANCE SUITE
 ===================
 
-This performance suite should be able to run a defined set of tests to validate the proper performance of Stratio Streaming application.
+This performance suite should be able to run a defined set of tests to validate the proper performance of Stratio Decision application.
 The performance suite will do the following steps:
 
 * Start a Zookeeper Docker Instance

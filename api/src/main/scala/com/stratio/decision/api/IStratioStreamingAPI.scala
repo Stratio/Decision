@@ -89,12 +89,12 @@ trait IStratioStreamingAPI {
   def isInit(): Boolean
 
   /**
-   * Close all connections to streaming engine.
+   * Close all connections to decision engine.
    */
   def close
 
   /**
-   * Check if stratio streaming is running
+   * Check if stratio decision is running
    */
   def isConnected():Boolean
   /**

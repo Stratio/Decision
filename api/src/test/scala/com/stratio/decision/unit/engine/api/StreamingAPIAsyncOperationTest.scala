@@ -20,7 +20,7 @@ with MockitoSugar {
   val stratioStreamingAPIAsyncOperation = new StreamingAPIAsyncOperation(kafkaProducerMock)
   val stratioStreamingMessage = new StratioStreamingMessage()
 
-  describe("The Streaming API Async Operation") {
+  describe("The Decision API Async Operation") {
     it("should throw no exceptions when the engine returns an OK return code") {
       Given("an OK engine response")
       val errorCode = OK.getCode

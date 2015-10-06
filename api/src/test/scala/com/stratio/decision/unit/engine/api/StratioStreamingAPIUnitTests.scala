@@ -184,7 +184,7 @@ class StratioStreamingAPIUnitTests
         thrown.getMessage should be("StratioEngine error: STREAM DOES NOT EXIST")
       }
 
-      "throw an exception if streaming is down" in new DummyStratioStreamingAPI {
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
         api.streamingUp = false
 
         val thrown = intercept[StratioEngineStatusException] {

@@ -51,7 +51,7 @@ class StreamingAPIListOperationTest extends FunSpec
     Seq(),
     true)
 
-  describe("The Streaming API Sync Operation") {
+  describe("The Decision API Sync Operation") {
     it("should throw no exceptions when the engine returns a proper list") {
       Given("a proper streams list")
       val streamsList = """{"count":1,"timestamp":1402494388420,"streams":[{"streamName":"unitTestsStream","columns":[{"column":"column1","type":"STRING"}],"queries":[],"activeActions":[],"userDefined":true}]}"""
