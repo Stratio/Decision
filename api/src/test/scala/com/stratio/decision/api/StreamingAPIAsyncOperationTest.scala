@@ -1,4 +1,4 @@
-package com.stratio.decision.unit.engine.api
+package com.stratio.decision.api
 
 import com.stratio.decision.api.StreamingAPIAsyncOperation
 import com.stratio.decision.api.kafka.KafkaProducer

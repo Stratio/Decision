@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.unit.engine.api
+package com.stratio.decision.api
 
 import com.stratio.decision.api.dto.StratioQueryStream
 import com.stratio.decision.api.messaging.{ColumnNameType, ColumnNameValue}
@@ -32,7 +32,7 @@ import org.scalatest.mock.MockitoSugar
 import scala.collection.JavaConversions._
 
 @RunWith(classOf[JUnitRunner])
-class StratioStreamingAPIUnitTests
+class StratioStreamingAPIUnitTest
   extends WordSpec
   with ShouldMatchers
   with MockitoSugar {
