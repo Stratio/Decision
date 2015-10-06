@@ -10,4 +10,5 @@ Contents:
    using-streaming-api-examples.rst
    basic-application.rst
    using-sandbox.rst
+   cep-query-syntax.rst
 
