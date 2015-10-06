@@ -50,7 +50,7 @@ class StreamingAPISyncOperationTest extends FunSpec
     Seq(),
     true)
 
-  describe("The Streaming API Sync Operation") {
+  describe("The Decision API Sync Operation") {
     it("should throw no exceptions when the engine returns an OK return code") {
       Given("an OK engine response")
       val errorCode = OK.getCode();
