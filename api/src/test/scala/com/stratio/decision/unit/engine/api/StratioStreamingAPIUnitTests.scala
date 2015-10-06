@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.integration.engine.api
+package com.stratio.decision.unit.engine.api
 
 import com.stratio.decision.api.dto.StratioQueryStream
 import com.stratio.decision.api.messaging.{ColumnNameType, ColumnNameValue}
