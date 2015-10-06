@@ -15,9 +15,9 @@ import com.stratio.decision.commons.kafka.service.KafkaTopicService;
 /**
  * Created by eruiz on 5/10/15.
  */
-public class KafkaTopicServiceTest {
+public class KafkaTopicServiceTestIT {
     private KafkaTopicService func;
-    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaTopicServiceTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaTopicServiceTestIT.class);
 
     protected static Config conf;
     protected static String ZOO_HOST;
