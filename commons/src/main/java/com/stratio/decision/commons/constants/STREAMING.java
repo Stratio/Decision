@@ -16,20 +16,20 @@
 package com.stratio.decision.commons.constants;
 
 public interface STREAMING {
-    public static final String ZK_BASE_PATH = "/stratio/streaming";
-    public static final String STREAM_STATUS_MAP = "stratio_stream_map";
+    String ZK_BASE_PATH = "/stratio/streaming";
+    String STREAM_STATUS_MAP = "stratio_stream_map";
 
-    public static final String ZK_EPHEMERAL_NODE_PATH = "/stratio/streaming/engine";
-    public static final String ZK_EPHEMERAL_NODE_STATUS_PATH = "/stratio/streaming/status";
-    public static final String ZK_EPHEMERAL_NODE_STATUS_CONNECTED = "connected";
-    public static final String ZK_EPHEMERAL_NODE_STATUS_INITIALIZED = "initialized";
-    public static final String STREAMING_KEYSPACE_NAME = "stratio_streaming";
+    String ZK_EPHEMERAL_NODE_PATH = "/stratio/streaming/engine";
+    String ZK_EPHEMERAL_NODE_STATUS_PATH = "/stratio/streaming/status";
+    String ZK_EPHEMERAL_NODE_STATUS_CONNECTED = "connected";
+    String ZK_EPHEMERAL_NODE_STATUS_INITIALIZED = "initialized";
+    String STREAMING_KEYSPACE_NAME = "stratio_streaming";
 
     public interface STATS_NAMES {
-        public static final String SINK_STREAM_PREFIX = "VOID_";
-        public static final String BASE = "stratio_stats_base";
-        public static final String GLOBAL_STATS_BY_OPERATION = "stratio_stats_global_by_operation";
-        public static final String[] STATS_STREAMS = new String[] { BASE, GLOBAL_STATS_BY_OPERATION };
+        String SINK_STREAM_PREFIX = "VOID_";
+        String BASE = "stratio_stats_base";
+        String GLOBAL_STATS_BY_OPERATION = "stratio_stats_global_by_operation";
+        String[] STATS_STREAMS = new String[] { BASE, GLOBAL_STATS_BY_OPERATION };
 
     }
 

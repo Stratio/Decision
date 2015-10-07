@@ -1,4 +1,4 @@
-package com.stratio.decision.functions.configuration;
+package com.stratio.decision.configuration;
 
 import static org.junit.Assert.assertEquals;
 

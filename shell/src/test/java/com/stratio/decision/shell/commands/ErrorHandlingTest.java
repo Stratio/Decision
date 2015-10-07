@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.unit.engine.shell.commands;
+package com.stratio.decision.shell.commands;
 
 import com.stratio.decision.commons.exceptions.*;
 import com.stratio.decision.shell.dao.CachedStreamsDAO;

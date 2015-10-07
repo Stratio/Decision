@@ -1,4 +1,4 @@
-package com.stratio.decision.unit.engine.shell.commands;
+package com.stratio.decision.shell.commands;
 
 import com.stratio.decision.shell.provider.DefaultFileNameProvider;
 import com.stratio.decision.shell.provider.StratioStreamingBannerProvider;
