@@ -1,5 +1,4 @@
-/**
- * Copyright (C) 2014 Stratio (http://stratio.com)
+/**Copyright (C) 2014 Stratio (http://stratio.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +14,11 @@
  */
 package com.stratio.decision.commons.kafka.serializer;
 
-import kafka.utils.ZKStringSerializer;
-import org.I0Itec.zkclient.exception.ZkMarshallingError;
 import org.I0Itec.zkclient.serialize.ZkSerializer;
 
-/**
- * A simple zookeeper serializer implementation
+import kafka.utils.ZKStringSerializer;
+
+/** A simple zookeeper serializer implementation
  * 
  * @author ajnavarro
  * 
@@ -28,12 +26,12 @@ import org.I0Itec.zkclient.serialize.ZkSerializer;
 public class ZkStringSerializer implements ZkSerializer {
 
     @Override
-    public byte[] serialize(Object data) throws ZkMarshallingError {
+    public byte[] serialize(Object data){
         return ZKStringSerializer.serialize(data);
     }
 
     @Override
-    public Object deserialize(byte[] bytes) throws ZkMarshallingError {
+    public Object deserialize(byte[] bytes){
         return ZKStringSerializer.deserialize(bytes);
     }
 

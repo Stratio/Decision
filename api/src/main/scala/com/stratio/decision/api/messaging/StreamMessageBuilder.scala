@@ -17,7 +17,7 @@ package com.stratio.decision.api.messaging
 
 import com.stratio.decision.api.messaging.MessageBuilder._
 
-case class StreamMessageBuilder(sessionId: String) {
+class StreamMessageBuilder(sessionId: String) {
   def build(streamName: String, operation: String) = {
     builder.withOperation(operation)
       .withStreamName(streamName)

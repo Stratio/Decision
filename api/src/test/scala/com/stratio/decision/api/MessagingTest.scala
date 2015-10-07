@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
 class MessagingTest extends WordSpec {
   trait MyTestComponent {
     var m = MessageBuilder
-    var mw = MessageBuilderWithColumns
+    var mw = new MessageBuilderWithColumns("sessionID","operation")
   }
 
   "When build a MessageBuilder" should {
@@ -43,7 +43,7 @@ class MessagingTest extends WordSpec {
     }
     "be equal at the columnTypeValue parametres created when apply" in new MyTestComponent{
       val columnNameType: ColumnNameType = new ColumnNameType("column1", ColumnType.STRING)
-      val p = mw.apply("sessionID","operation").build("streamName",List(columnNameType))
+      val p = mw.build("streamName",List(columnNameType))
       assert(p.getSession_id == "sessionID" )
       assert(p.getOperation == "operation" )
       assert(p.getStreamName == "streamName" )
