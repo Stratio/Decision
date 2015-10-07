@@ -15,6 +15,6 @@
  */
 package com.stratio.decision.api.dto
 
-case class StratioQueryStream(query: String, queryId: String)
+class StratioQueryStream(val query: String, val queryId: String)
 
 
