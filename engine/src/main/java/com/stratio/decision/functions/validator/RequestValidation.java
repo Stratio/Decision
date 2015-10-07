@@ -20,6 +20,6 @@ import com.stratio.decision.exception.RequestValidationException;
 
 public interface RequestValidation {
 
-    public void validate(StratioStreamingMessage request) throws RequestValidationException;
+    void validate(StratioStreamingMessage request) throws RequestValidationException;
 
 }

@@ -17,7 +17,12 @@ package com.stratio.decision.generator;
 
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ValuesGenerator {
+    private static final Logger log = LoggerFactory.getLogger(ValuesGenerator.class);
+
     private List<RangeData> ranges;
     private double valueDeviation = 0;
 
@@ -101,9 +106,11 @@ public class ValuesGenerator {
             count++;
             if (count == groupValuesSize) {
                 for (int i = 0; i < (o * (avg / count)); i++) {
-                    System.out.print("█");
+                    log.info("█");
+                    //System.out.print("█");
                 }
-                System.out.println(" (" + avg / count + ")");
+                log.info(" (" + avg / count + ")");
+                //System.out.println(" (" + avg / count + ")");
                 avg = 0d;
                 count = 0;
             }
