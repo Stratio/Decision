@@ -316,7 +316,7 @@ class StratioStreamingAPI
   var ackTimeOut = 8000
   lazy val zookeeperConsumer = {
     zookeeperClient.start()
-    ZookeeperConsumer(zookeeperClient)
+    new ZookeeperConsumer(zookeeperClient)
   }
   private var _syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
   private var _asyncOperation = new StreamingAPIAsyncOperation(kafkaDataProducer)

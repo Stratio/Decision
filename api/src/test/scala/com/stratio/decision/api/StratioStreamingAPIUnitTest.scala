@@ -145,7 +145,11 @@ class StratioStreamingAPIUnitTest
         ).thenReturn(List(stratioStreamMock))
 
         val expected = new StratioQueryStream(streamQueryMock.getQuery, streamQueryMock.getQueryId)
-        api.queriesFromStream(streamsList).toList should be(List(expected))
+        val result = api.queriesFromStream(streamsList).toList
+        result.size should be(1)
+        val element = result.head
+        element.query should be(expected.query)
+        element.queryId should be(expected.queryId)
       }
 
       "throw an exception if there is not any coincidence" in new DummyStratioStreamingAPI {

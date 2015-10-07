@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
+class ZookeeperConsumer(zooKeeperClient: CuratorFramework) {
   val log = LoggerFactory.getLogger(getClass)
 
   def readZNode(fullPath: String) = {
