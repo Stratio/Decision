@@ -26,6 +26,7 @@
     </parent>
     <properties>
         <jacoco.skip>true</jacoco.skip>
+        <sonar.coverage.exclusions>**/*</sonar.coverage.exclusions>
         <version>${project.version}</version>
     </properties>
     <artifactId>decision-doc</artifactId>

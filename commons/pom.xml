@@ -25,6 +25,11 @@
 	<artifactId>commons</artifactId>
 	<packaging>jar</packaging>
 	<name>Decision commons</name>
+
+	<properties>
+		<sonar.coverage.exclusions>**/constants/*</sonar.coverage.exclusions>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>

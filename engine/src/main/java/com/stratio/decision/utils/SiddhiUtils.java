@@ -70,7 +70,7 @@ public class SiddhiUtils {
 
     }
 
-    private static Object decodeSiddhiValue(String originalValue, Attribute.Type type) {
+    protected static Object decodeSiddhiValue(String originalValue, Attribute.Type type) {
 
         switch (type) {
         case STRING:
@@ -91,7 +91,7 @@ public class SiddhiUtils {
 
     }
 
-    private static Object decodeSiddhiValue(Double originalValue, Attribute.Type type) {
+    protected static Object decodeSiddhiValue(Double originalValue, Attribute.Type type) {
 
         switch (type) {
         case STRING:
