@@ -40,7 +40,7 @@ public class StreamingEngine {
 
             node.waitForLeadership();
             if (node.isLeader()) {
-                log.info("This is the Streaming leader node.");
+                log.info("This is the Decision leader node.");
                 try (AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(
                         BaseConfiguration.class)) {
                     ConfigurationContext configurationContext = annotationConfigApplicationContext.getBean("configurationContext", ConfigurationContext.class);

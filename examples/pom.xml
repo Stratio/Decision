@@ -24,6 +24,7 @@
 	</parent>
 	<properties>
 		<jacoco.skip>true</jacoco.skip>
+		<sonar.coverage.exclusions>**/*.java</sonar.coverage.exclusions>
 	</properties>
 	<groupId>com.stratio.decision.examples</groupId>
 	<artifactId>decision-examples</artifactId>

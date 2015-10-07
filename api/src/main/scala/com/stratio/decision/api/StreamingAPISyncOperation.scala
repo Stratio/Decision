@@ -25,7 +25,7 @@ import com.stratio.decision.commons.dto.ActionCallbackDto
 import com.stratio.decision.commons.exceptions.{StratioAPIGenericException, StratioAPISecurityException, StratioEngineOperationException}
 import com.stratio.decision.commons.messages.StratioStreamingMessage
 
-case class StreamingAPISyncOperation(
+class StreamingAPISyncOperation(
   kafkaProducer: KafkaProducer,
   zookeeperConsumer: ZookeeperConsumer,
   ackTimeOutInMs: Int)

@@ -6,7 +6,7 @@ Stratio Decision sandbox and demo
 Vagrant Setup
 =============
 
-To get an operating virtual machine with stratio streaming distribution
+To get an operating virtual machine with Stratio Decision distribution
 up and running, we use `Vagrant <https://www.vagrantup.com/>`_.
 
 -  Download and install
@@ -20,7 +20,7 @@ Running the sandbox
 ===================
 
 Create any system folder and using the command line, type
-**vagrant init stratio/streaming**.
+**vagrant init stratio/decision**.
 
 To facilitate the reading of the document , we will refer to this
 directory as /install-folder.
@@ -38,9 +38,9 @@ What you will find in the sandbox
 -  Two ethernet interfaces.
 
 Name\|Version\|Service name\|Other Stratio
-Streaming\|{{site.projects`2].version}}\|stratio-streaming\|service
-streaming start Stratio Decision
-Shell\|{{site.projects`2].version}}\|-\|/opt/sds/streaming-shell/bin
+Decision\|{{site.projects`2].version}}\|decision\|service
+Decision start Stratio Decision
+Shell\|{{site.projects`2].version}}\|-\|/opt/sds/decision-shell/bin
 Apache Kafka\|0.8.1.1\|kafka\|service kafka start Apache
 Zookeeper\|3.4.6\|zookeeper\|service zookeeper start Stratio
 Cassandra\|2.1.05\|cassandra\|service cassandra start
@@ -71,7 +71,7 @@ Starting the Stratio Decision Shell and other useful commands
 From the sandbox (vagrant ssh):
 
 -  Starting the Stratio Decision Shell:
-   **/opt/sds/streaming-shell/bin/shell**
+   **/opt/sds/decision-shell/bin/shell**
 -  List all available commands: **help**
 -  Exit the Stratio Stratio Decision Shell: **exit**
 
@@ -155,7 +155,7 @@ Shell steps
 -----------
 
 -  vagrant ssh
--  /opt/sds/streaming-shell/bin/shell
+-  /opt/sds/decision-shell/bin/shell
 
 - Creation of a base stream, where we are going to insert all the sensor
 measures. A stream definition is similar to a table, with field
@@ -228,7 +228,7 @@ Sensor grid simulation steps
 fake but we are producing random variations on them, in order to
 simulate the behaviour of a real system::
 
-     sudo sh  /opt/sds/streaming-examples/bin/hardware-emulator 2 streaming.stratio.com:9092
+     sudo sh  /opt/sds/decision/examples/bin/hardware-emulator 2 streaming.stratio.com:9092
 
 - You can launch this tool as many times as you want.
 
@@ -243,7 +243,7 @@ Dashboard steps
  .. image:: /images/kibana-sensor-grid-dashboard.jpg
     :align: center
 
-Extra: Streaming metrics
+Extra: Decision metrics
 ------------------------
 
 Stratio Decision is the result of combining the power of Spark
@@ -255,22 +255,22 @@ panel. This way, we took advantage of the engine itself to take care of
 all the internal events produced by the engine. In order to get this
 dashboard working, please execute the following commands:
 
-- To start we need change some properties into streaming engine
+- To start we need change some properties into Decision engine
 configuration.::
 
-    sudo vi /etc/sds/streaming/config.conf
+    sudo vi /etc/sds/decision/config.conf
 - Set **statsEnabled** property to true.
-- Now, is necessary to restart streaming service.::
+- Now, is necessary to restart Decision service.::
 
-     sudo service streaming restart
+     sudo service decision restart
 
 - Using the shell, execute this commands::
 
-      /opt/sds/streaming-shell/bin/shell
+      /opt/sds/decision/decision-shell/bin/shell
 
 - You can execute into shell the list command and you should obtain this result::
 
-     stratio-streaming> list
+     stratio-decision> list
      Stream name                  User defined  Queries  Elements  Active actions
      ---------------------------  ------------  -------  --------  --------------
      streaming-gauge-metrics      false         0        3         []

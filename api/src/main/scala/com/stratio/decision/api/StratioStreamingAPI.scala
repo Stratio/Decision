@@ -48,27 +48,27 @@ class StratioStreamingAPI
   def createStream(streamName: String, columns: List[ColumnNameType]) = {
     checkStreamingStatus()
     val operation = DEFINITION.CREATE.toLowerCase
-    val creationStreamMessage = MessageBuilderWithColumns(sessionId, operation).build(streamName, columns)
+    val creationStreamMessage = new MessageBuilderWithColumns(sessionId, operation).build(streamName, columns)
     syncOperation.performSyncOperation(creationStreamMessage)
   }
 
   def alterStream(streamName: String, columns: List[ColumnNameType]) = {
     checkStreamingStatus()
     val operation = ALTER.toLowerCase
-    val alterStreamMessage = MessageBuilderWithColumns(sessionId, operation).build(streamName, columns)
+    val alterStreamMessage = new MessageBuilderWithColumns(sessionId, operation).build(streamName, columns)
     syncOperation.performSyncOperation(alterStreamMessage)
   }
 
   def insertData(streamName: String, data: List[ColumnNameValue]) = {
     checkStreamingStatus()
-    val insertStreamMessage = InsertMessageBuilder(sessionId).build(streamName, data)
+    val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
     asyncOperation.performAsyncOperation(insertStreamMessage)
   }
 
   def addQuery(streamName: String, query: String): String = {
     checkStreamingStatus()
     val operation = ADD_QUERY.toLowerCase
-    val addQueryStreamMessage = QueryMessageBuilder(sessionId).build(streamName, query, operation)
+    val addQueryStreamMessage = new QueryMessageBuilder(sessionId).build(streamName, query, operation)
     syncOperation.performSyncOperation(addQueryStreamMessage)
     getQueryId(streamName, query)
   }
@@ -85,21 +85,21 @@ class StratioStreamingAPI
   def removeQuery(streamName: String, queryId: String) = {
     checkStreamingStatus()
     val operation = REMOVE_QUERY.toLowerCase
-    val removeQueryMessage = QueryMessageBuilder(sessionId).build(streamName, queryId, operation)
+    val removeQueryMessage = new QueryMessageBuilder(sessionId).build(streamName, queryId, operation)
     syncOperation.performSyncOperation(removeQueryMessage)
   }
 
   def dropStream(streamName: String) = {
     checkStreamingStatus()
     val operation = DROP.toLowerCase
-    val dropStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val dropStreamMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(dropStreamMessage)
   }
 
   def listenStream(streamName: String) = {
     checkStreamingStatus()
     val operation = LISTEN.toLowerCase
-    val listenStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val listenStreamMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(listenStreamMessage)
     val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster, readFromStartOfStream = false)
     streamingListeners.put(streamName, kafkaConsumer)
@@ -109,7 +109,7 @@ class StratioStreamingAPI
   def stopListenStream(streamName: String) = {
     checkStreamingStatus()
     val operation = STOP_LISTEN.toLowerCase
-    val stopListenStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val stopListenStreamMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     shutdownKafkaConsumerAndRemoveStreamingListener(streamName)
     syncOperation.performSyncOperation(stopListenStreamMessage)
   }
@@ -153,56 +153,56 @@ class StratioStreamingAPI
   def saveToCassandra(streamName: String) = {
     checkStreamingStatus()
     val operation = SAVETO_CASSANDRA.toLowerCase
-    val saveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val saveToCassandraMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(saveToCassandraMessage)
   }
 
   def stopSaveToCassandra(streamName: String) = {
     checkStreamingStatus()
     val operation = STOP_SAVETO_CASSANDRA.toLowerCase
-    val stopSaveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val stopSaveToCassandraMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(stopSaveToCassandraMessage)
   }
 
   def saveToMongo(streamName: String) = {
     checkStreamingStatus()
     val operation = SAVETO_MONGO.toLowerCase
-    val saveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val saveToCassandraMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(saveToCassandraMessage)
   }
 
   def stopSaveToMongo(streamName: String) = {
     checkStreamingStatus()
     val operation = STOP_SAVETO_MONGO.toLowerCase
-    val stopSaveToCassandraMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val stopSaveToCassandraMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(stopSaveToCassandraMessage)
   }
 
   def saveToSolr(streamName: String) = {
     checkStreamingStatus()
     val operation = SAVETO_SOLR.toLowerCase
-    val saveToSolrMEssage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val saveToSolrMEssage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(saveToSolrMEssage)
   }
 
   def stopSaveToSolr(streamName: String) = {
     checkStreamingStatus()
     val operation = STOP_SAVETO_SOLR.toLowerCase
-    val stopSaveToSolrMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val stopSaveToSolrMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(stopSaveToSolrMessage)
   }
 
   def indexStream(streamName: String) = {
     checkStreamingStatus()
     val operation = INDEX.toLowerCase
-    val indexStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val indexStreamMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(indexStreamMessage)
   }
 
   def stopIndexStream(streamName: String) = {
     checkStreamingStatus()
     val operation = STOP_INDEX.toLowerCase
-    val indexStreamMessage = StreamMessageBuilder(sessionId).build(streamName, operation)
+    val indexStreamMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(indexStreamMessage)
   }
 
@@ -223,7 +223,7 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-      case ex => throw new StratioEngineConnectionException("Unable to connect to stratio streaming. " + ex.getMessage)
+      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
     }
   }
 
@@ -242,7 +242,7 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-      case ex => throw new StratioEngineConnectionException("Unable to connect to stratio streaming. " + ex.getMessage)
+      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
     }
   }
 
@@ -271,7 +271,7 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-      case ex => throw new StratioEngineConnectionException("Unable to connect to stratio streaming. " + ex.getMessage)
+      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
     }
   }
 
@@ -316,7 +316,7 @@ class StratioStreamingAPI
   var ackTimeOut = 8000
   lazy val zookeeperConsumer = {
     zookeeperClient.start()
-    ZookeeperConsumer(zookeeperClient)
+    new ZookeeperConsumer(zookeeperClient)
   }
   private var _syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
   private var _asyncOperation = new StreamingAPIAsyncOperation(kafkaDataProducer)
@@ -334,7 +334,7 @@ class StratioStreamingAPI
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_STATUS_PATH
     if (!zookeeperConsumer.zNodeExists(ephemeralNodePath)) {
       log.warn("Ephemeral node does not exist")
-      throw new StratioEngineStatusException("Can't connect. Check if Stratio streaming is down or connection to " +
+      throw new StratioEngineStatusException("Can't connect. Check if Stratio Decision is down or connection to " +
         "Zookeeper")
     } else {
       val streamingStatus = zookeeperConsumer.getZNodeData(ZK_EPHEMERAL_NODE_STATUS_PATH).get

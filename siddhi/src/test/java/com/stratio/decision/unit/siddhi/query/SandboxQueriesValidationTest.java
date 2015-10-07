@@ -50,7 +50,7 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
 
     @Test
     public void testStreamsExist() throws Exception {
-        LOGGER.info("Checking if Streams has been created properly");
+        LOGGER.debug("Checking if Streams has been created properly");
         assertNotNull(sm.getStreamDefinition(SandboxQueries.STREAM_SENSORS));
 
     }
@@ -59,7 +59,7 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
     public void testQueriesExist() throws Exception {
         createSandboxQueries();
 
-        LOGGER.info("Checking if Queries has been registered properly");
+        LOGGER.debug("Checking if Queries has been registered properly");
         assertNotNull(sm.getQuery(SENSORS_QUERY1_ID));
         assertNotNull(sm.getQuery(SENSORS_QUERY2_ID));
         assertNotNull(sm.getQuery(SENSORS_QUERY3_ID));
@@ -70,7 +70,7 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
         assertNotNull(sm.getStreamDefinition(SandboxQueries.STREAM_SENSORS_GRID_AVG));
         assertNotNull(sm.getStreamDefinition(SandboxQueries.STREAM_SENSORS_GRID_ALARMS));
 
-        LOGGER.info("Checking if Queries has been deleted properly");
+        LOGGER.debug("Checking if Queries has been deleted properly");
         deleteSandboxQueries();
 
         try {
@@ -80,7 +80,7 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
             assertNull(sm.getQuery(SENSORS_QUERY4_ID));
 
         } catch (NullPointerException ex)   {
-            LOGGER.info("Shiddhi Manager raise a NullPointerException if you ask for a " +
+            LOGGER.debug("Shiddhi Manager raise a NullPointerException if you ask for a " +
                     "non existing query so if you read this message all works fine!!");
         }
     }
@@ -89,8 +89,8 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
     @Test
     public void testAvgLast250() throws Exception {
         count.set(0);
-        LOGGER.info("[AVG] Getting last events");
-        LOGGER.info("--> Creating Sandbox Queries and Loading dataset");
+        LOGGER.debug("[AVG] Getting last events");
+        LOGGER.debug("--> Creating Sandbox Queries and Loading dataset");
         SENSORS_QUERY1_ID= sm.addQuery(SandboxQueries.QUERY_250_AVG);
 
         sm.addCallback(SandboxQueries.STREAM_SENSORS_GRID_AVG, new StreamCallback() {
@@ -100,7 +100,7 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
                 for (Event event : events) {
                     if (event instanceof InEvent) {
                         count.getAndIncrement();
-                        LOGGER.info("Found event: " + event.toString());
+                        LOGGER.debug("Found event: " + event.toString());
                     }
                 }
             }
@@ -119,8 +119,8 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
     @Test
     public void testAvgCpuHigherThan80() throws Exception {
         count.set(0);
-        LOGGER.info("[AVG] Raising alarm if AVG(CPU) > 80% ");
-        LOGGER.info("--> Creating Sandbox Queries and Loading dataset");
+        LOGGER.debug("[AVG] Raising alarm if AVG(CPU) > 80% ");
+        LOGGER.debug("--> Creating Sandbox Queries and Loading dataset");
         SENSORS_QUERY1_ID= sm.addQuery(SandboxQueries.QUERY_250_AVG);
         SENSORS_QUERY2_ID= sm.addQuery(SandboxQueries.QUERY_AVG_CPU_HIGHER_80);
 
@@ -131,7 +131,7 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
                 for (Event event : events) {
                     if (event instanceof InEvent && event.getData(2).toString().equals("Alarm_intensive_CPU_load")) {
                         count.getAndIncrement();
-                        LOGGER.info("Found event: " + event.toString());
+                        LOGGER.debug("Found event: " + event.toString());
                     }
                 }
             }
@@ -151,8 +151,8 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
     @Test
     public void testAvgMemoryHigherThan75() throws Exception {
         count.set(0);
-        LOGGER.info("[AVG] Raising alarm if AVG(MEMORY) > 75% ");
-        LOGGER.info("--> Creating Sandbox Queries and Loading dataset");
+        LOGGER.debug("[AVG] Raising alarm if AVG(MEMORY) > 75% ");
+        LOGGER.debug("--> Creating Sandbox Queries and Loading dataset");
         SENSORS_QUERY1_ID= sm.addQuery(SandboxQueries.QUERY_250_AVG);
         SENSORS_QUERY2_ID= sm.addQuery(SandboxQueries.QUERY_AVG_CPU_HIGHER_80);
         SENSORS_QUERY3_ID= sm.addQuery(SandboxQueries.QUERY_AVG_MEMORY_HIGHER_75);
@@ -164,7 +164,7 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
                 for (Event event : events) {
                     if (event instanceof InEvent && event.getData(2).toString().equals("Alarm_intensive_MEMORY_load")) {
                         count.getAndIncrement();
-                        LOGGER.info("Found event: " + event.toString());
+                        LOGGER.debug("Found event: " + event.toString());
                     }
                 }
             }
@@ -184,8 +184,8 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
     @Test
     public void testAvgHighCpuAndMemory() throws Exception {
         count.set(0);
-        LOGGER.info("[AVG] Raising alarm if AVG(CPU) > 90 % and AVG(MEMORY) > 80% ");
-        LOGGER.info("--> Creating Sandbox Queries and Loading dataset");
+        LOGGER.debug("[AVG] Raising alarm if AVG(CPU) > 90 % and AVG(MEMORY) > 80% ");
+        LOGGER.debug("--> Creating Sandbox Queries and Loading dataset");
         createSandboxQueries();
 
         sm.addCallback(SandboxQueries.STREAM_SENSORS_GRID_ALARMS, new StreamCallback() {
@@ -195,7 +195,7 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
                 for (Event event : events) {
                     if (event instanceof InEvent && event.getData(2).toString().equals("Alarm_inminent_shutdown")) {
                         count.getAndIncrement();
-                        LOGGER.info("Found event: " + event.toString());
+                        LOGGER.debug("Found event: " + event.toString());
                     }
                 }
             }
@@ -213,12 +213,12 @@ public class SandboxQueriesValidationTest extends SiddhiQueryHelper {
     // SUPPORT METHODS
 
     public static void loadSensorsData(String dataSetPath) throws Exception {
-        LOGGER.info("Loading sensors data from file: " + dataSetPath);
+        LOGGER.debug("Loading sensors data from file: " + dataSetPath);
         List<String[]> sensors= ResourcesLoader.loadData(dataSetPath, ',', '\0', 1);
         List<SandboxStream> listSensors= SandboxStream.getFromList(sensors);
 
         for (SandboxStream sensor: listSensors) {
-            LOGGER.info("Loading data [" + SandboxQueries.STREAM_SENSORS + "]: " + sensor.name() + "=" + sensor.data());
+            LOGGER.debug("Loading data [" + SandboxQueries.STREAM_SENSORS + "]: " + sensor.name() + "=" + sensor.data());
             sm.getInputHandler(SandboxQueries.STREAM_SENSORS).send(getSandboxStreamAdapted(sensor));
         }
 

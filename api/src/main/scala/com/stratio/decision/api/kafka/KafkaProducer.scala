@@ -21,7 +21,7 @@ import java.util.{Properties, UUID}
 import kafka.producer._
 import org.slf4j.LoggerFactory
 
-case class KafkaProducer(topic: String,
+class KafkaProducer(topic: String,
                          brokerList: String,
                          clientId: String = UUID.randomUUID().toString,
                          synchronously: Boolean = true,

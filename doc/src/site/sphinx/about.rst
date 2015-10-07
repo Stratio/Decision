@@ -109,7 +109,7 @@ way than SQL:
    - Stream persistence, i.e. write stream to Cassandra.
 -  Built-in functions:
 
-   -  Auditing all the request in the streaming engine.
+   -  Auditing all the request in the Decision engine.
    -  Statistics (request per operation, request per stream …).
 
 Architecture

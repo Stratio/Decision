@@ -18,31 +18,31 @@ package com.stratio.decision.commons.constants;
 public interface STREAM_OPERATIONS {
     // DDL
     public interface DEFINITION {
-        public static final String CREATE = "CREATE";
-        public static final String ADD_QUERY = "ADD_QUERY";
-        public static final String REMOVE_QUERY = "REMOVE_QUERY";
-        public static final String DROP = "DROP";
-        public static final String ALTER = "ALTER";
+        String CREATE = "CREATE";
+        String ADD_QUERY = "ADD_QUERY";
+        String REMOVE_QUERY = "REMOVE_QUERY";
+        String DROP = "DROP";
+        String ALTER = "ALTER";
     }
 
     // DML
     public interface MANIPULATION {
-        public static final String INSERT = "INSERT";
-        public static final String LIST = "LIST";
+        String INSERT = "INSERT";
+        String LIST = "LIST";
     }
 
     // DAL
     public interface ACTION {
-        public static final String LISTEN = "LISTEN";
-        public static final String STOP_LISTEN = "STOP_LISTEN";
-        public static final String SAVETO_SOLR = "SAVETO_SOLR";
-        public static final String STOP_SAVETO_SOLR = "STOP_SAVETO_SOLR";
-        public static final String SAVETO_CASSANDRA = "SAVETO_CASSANDRA";
-        public static final String STOP_SAVETO_CASSANDRA = "STOP_SAVETO_CASSANDRA";
-        public static final String SAVETO_MONGO = "SAVETO_MONGO";
-        public static final String STOP_SAVETO_MONGO = "STOP_SAVETO_MONGO";
-        public static final String INDEX = "INDEX";
-        public static final String STOP_INDEX = "STOP_INDEX";
+        String LISTEN = "LISTEN";
+        String STOP_LISTEN = "STOP_LISTEN";
+        String SAVETO_SOLR = "SAVETO_SOLR";
+        String STOP_SAVETO_SOLR = "STOP_SAVETO_SOLR";
+        String SAVETO_CASSANDRA = "SAVETO_CASSANDRA";
+        String STOP_SAVETO_CASSANDRA = "STOP_SAVETO_CASSANDRA";
+        String SAVETO_MONGO = "SAVETO_MONGO";
+        String STOP_SAVETO_MONGO = "STOP_SAVETO_MONGO";
+        String INDEX = "INDEX";
+        String STOP_INDEX = "STOP_INDEX";
     }
 
 }
