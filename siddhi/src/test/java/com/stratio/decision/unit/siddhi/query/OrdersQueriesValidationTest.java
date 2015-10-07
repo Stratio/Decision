@@ -58,7 +58,7 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
 
     @Test
     public void testStreamsExist() throws Exception {
-        LOGGER.info("Checking if Streams has been created properly");
+        LOGGER.debug("Checking if Streams has been created properly");
         assertNotNull(sm.getStreamDefinition(OrdersQueries.STREAM_ORDERS));
         assertNotNull(sm.getStreamDefinition(OrdersQueries.STREAM_LINES));
 
@@ -68,7 +68,7 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
     public void testQueriesExist() throws Exception {
         createOrdersQueries();
         createLinesQueries();
-        LOGGER.info("Checking if Queries has been registered properly");
+        LOGGER.debug("Checking if Queries has been registered properly");
         assertNotNull(sm.getQuery(ORDER_QUERY1_ID));
         assertNotNull(sm.getQuery(ORDER_QUERY2_ID));
         assertNotNull(sm.getQuery(ORDER_QUERY3_ID));
@@ -80,7 +80,7 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
         assertNotNull(sm.getStreamDefinition(OrdersQueries.STREAM_FRAUD));
         assertNotNull(sm.getStreamDefinition(OrdersQueries.STREAM_ALERTS));
 
-        LOGGER.info("Checking if Queries has been deleted properly");
+        LOGGER.debug("Checking if Queries has been deleted properly");
         deleteOrdersQueries();
         deleteLinesQueries();
         try {
@@ -91,7 +91,7 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
             assertNull(sm.getQuery(LINES_QUERY1_ID));
             assertNull(sm.getQuery(LINES_QUERY2_ID));
         } catch (NullPointerException ex)   {
-            LOGGER.info("Shiddhi Manager raise a NullPointerException if you ask for a " +
+            LOGGER.debug("Shiddhi Manager raise a NullPointerException if you ask for a " +
                     "non existing query so if you read this message all works fine!!");
         }
     }
@@ -100,8 +100,8 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
     @Test
     public void testFraudMoreThanOneOrderIn5Minutes() throws Exception {
         count.set(0);
-        LOGGER.info("[Fraud] Checking if there are more than one order in 5 minutes");
-        LOGGER.info("--> Creating Order Queries and Loading dataset");
+        LOGGER.debug("[Fraud] Checking if there are more than one order in 5 minutes");
+        LOGGER.debug("--> Creating Order Queries and Loading dataset");
         //createOrdersQueries();
         ORDER_QUERY1_ID= sm.addQuery(OrdersQueries.QUERY_MORE_1ORDER_IN_5M);
 
@@ -112,7 +112,7 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
                 for (Event event : events) {
                     if (event instanceof InEvent && event.getData(6).toString().equals("orders-1")) {
                         count.getAndIncrement();
-                        LOGGER.info("Found event: " + event.toString());
+                        LOGGER.debug("Found event: " + event.toString());
                     }
                 }
             }
@@ -130,8 +130,9 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
     @Test
     public void testFraudMoreThanOneOrderIn5MinutesWithSameCard() throws Exception {
         count.set(0);
-        LOGGER.info("[Fraud] Checking if there are more than one order in 5 minutes with same credit cards in different cities");
-        LOGGER.info("--> Creating Order Queries and Loading dataset");
+        LOGGER.debug(
+                "[Fraud] Checking if there are more than one order in 5 minutes with same credit cards in different cities");
+        LOGGER.debug("--> Creating Order Queries and Loading dataset");
         //createOrdersQueries();
         ORDER_QUERY2_ID= sm.addQuery(OrdersQueries.QUERY_MORE_1ORDER_IN_5M_SAME_CARD);
 
@@ -142,7 +143,7 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
                 for (Event event : events) {
                     if (event instanceof InEvent && event.getData(6).toString().equals("orders-2")) {
                         count.getAndIncrement();
-                        LOGGER.info("Found event: " + event.toString());
+                        LOGGER.debug("Found event: " + event.toString());
                     }
                 }
             }
@@ -159,8 +160,8 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
     @Test
     public void testFraudMoreThanOneOrderIn10MinutesWithDifferentCards() throws Exception {
         count.set(0);
-        LOGGER.info("[Fraud] Checking if there are more than one order in 10 minutes with different credit cards");
-        LOGGER.info("--> Creating Order Queries and Loading dataset");
+        LOGGER.debug("[Fraud] Checking if there are more than one order in 10 minutes with different credit cards");
+        LOGGER.debug("--> Creating Order Queries and Loading dataset");
         //createOrdersQueries();
         ORDER_QUERY3_ID= sm.addQuery(OrdersQueries.QUERY_MORE_1_ORDER_IN_10M);
 
@@ -171,7 +172,7 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
                 for (Event event : events) {
                     if (event instanceof InEvent && event.getData(6).toString().equals("orders-3")) {
                         count.getAndIncrement();
-                        LOGGER.info("Found event: " + event.toString());
+                        LOGGER.debug("Found event: " + event.toString());
                     }
                 }
             }
@@ -191,8 +192,8 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
     @Ignore
     public void testFraudMoreThanTwoSalesMore10ProdIn20Min() throws Exception {
         count.set(0);
-        LOGGER.info("[Fraud] Checking if there are more than two sales in 20 minutes with 10 products");
-        LOGGER.info("--> Creating Order Queries and Loading dataset");
+        LOGGER.debug("[Fraud] Checking if there are more than two sales in 20 minutes with 10 products");
+        LOGGER.debug("--> Creating Order Queries and Loading dataset");
         //createOrdersQueries();
         ORDER_QUERY4_ID= sm.addQuery(OrdersQueries.QUERY_MORE_2_SALES_10P_IN_20M);
 
@@ -203,7 +204,7 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
                 for (Event event : events) {
                     if (event instanceof InEvent) { //&& event.getData(6).toString().equals("orders-3")) {
                         count.getAndIncrement();
-                        LOGGER.info("Found event: " + event.toString());
+                        LOGGER.debug("Found event: " + event.toString());
                     }
                 }
             }
@@ -222,8 +223,9 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
     @Test
     public void testLinesFraudMoreThan3SalesBelow20() throws Exception {
         count.set(0);
-        LOGGER.info("[Fraud] Checking if there are More than 3 sales with total amount below 20€ in less than 10 minutes");
-        LOGGER.info("--> Creating Lines Queries and Loading dataset");
+        LOGGER.debug(
+                "[Fraud] Checking if there are More than 3 sales with total amount below 20€ in less than 10 minutes");
+        LOGGER.debug("--> Creating Lines Queries and Loading dataset");
         //createOrdersQueries();
         LINES_QUERY1_ID= sm.addQuery(OrdersQueries.QUERY_MORE_3SALES_BELOW20_10MIN);
 
@@ -234,7 +236,7 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
                 for (Event event : events) {
                     if (event instanceof InEvent && event.getData(6).toString().equals("lines-1")) {
                         count.getAndIncrement();
-                        LOGGER.info("Found event: " + event.toString());
+                        LOGGER.debug("Found event: " + event.toString());
                     }
                 }
             }
@@ -251,8 +253,9 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
     @Test
     public void testLinesAlertMore15PercentQuantity() throws Exception {
         count.set(0);
-        LOGGER.info("[Alert] Checking if there are alerts about purchases with 15% higher of a same product average purchase");
-        LOGGER.info("--> Creating Lines Queries and Loading dataset");
+        LOGGER.debug(
+                "[Alert] Checking if there are alerts about purchases with 15% higher of a same product average purchase");
+        LOGGER.debug("--> Creating Lines Queries and Loading dataset");
         //createOrdersQueries();
         LINES_QUERY2_ID= sm.addQuery(OrdersQueries.QUERY_AVG_QUANTITY_HIGHER_15P_10MIN);
 
@@ -263,7 +266,7 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
                 for (Event event : events) {
                     if (event instanceof InEvent && event.getData(6).toString().equals("lines-2")) {
                         count.getAndIncrement();
-                        LOGGER.info("Found event: " + event.toString());
+                        LOGGER.debug("Found event: " + event.toString());
                     }
                 }
             }
@@ -281,24 +284,24 @@ public class OrdersQueriesValidationTest extends SiddhiQueryHelper {
     // SUPPORT METHODS
 
     public static void loadOrders(String dataSetPath) throws Exception {
-        LOGGER.info("Loading orders from file: " + dataSetPath);
+        LOGGER.debug("Loading orders from file: " + dataSetPath);
         List<String[]> orders= ResourcesLoader.loadData(dataSetPath, ',', '\0', 1);
         List<OrderStream> listOrders= OrderStream.getFromList(orders);
 
         for (OrderStream order: listOrders) {
-            LOGGER.info("Loading data [" + OrdersQueries.STREAM_ORDERS + "]: " + order.order_id());
+            LOGGER.debug("Loading data [" + OrdersQueries.STREAM_ORDERS + "]: " + order.order_id());
             sm.getInputHandler(OrdersQueries.STREAM_ORDERS).send(getOrderStreamAdapted(order));
         }
 
     }
 
     public static void loadLines(String dataSetPath) throws Exception {
-        LOGGER.info("Loading lines from file: " + dataSetPath);
+        LOGGER.debug("Loading lines from file: " + dataSetPath);
         List<String[]> lines= ResourcesLoader.loadData(dataSetPath, ',', '\0', 1);
         List<LineStream> listLines= LineStream.getFromList(lines);
 
         for (LineStream line: listLines) {
-            LOGGER.info("Loading data [" + OrdersQueries.STREAM_LINES + "]: " + line.order().order_id());
+            LOGGER.debug("Loading data [" + OrdersQueries.STREAM_LINES + "]: " + line.order().order_id());
             sm.getInputHandler(OrdersQueries.STREAM_LINES).send(getLineStreamAdapted(line));
         }
 
