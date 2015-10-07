@@ -113,7 +113,6 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
     }
 
     @Test
-    @Ignore
     public void testActionBaseFunctionCall() throws Exception {
 
         List<StratioStreamingMessage> list= new ArrayList<StratioStreamingMessage>();
