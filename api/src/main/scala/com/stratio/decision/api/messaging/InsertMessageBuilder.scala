@@ -23,7 +23,7 @@ import com.stratio.decision.commons.messages.ColumnNameTypeValue
 
 import scala.collection.JavaConversions._
 
-case class InsertMessageBuilder(sessionId: String) {
+class InsertMessageBuilder(sessionId: String) {
   val operation = INSERT.toLowerCase
 
   def build(streamName: String, data: List[ColumnNameValue]) = {

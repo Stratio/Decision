@@ -96,7 +96,8 @@ trait IStratioStreamingAPI {
   /**
    * Check if stratio decision is running
    */
-  def isConnected():Boolean
+  def isConnected(): Boolean
+
   /**
    * Creates a new stream.
    * @param streamName

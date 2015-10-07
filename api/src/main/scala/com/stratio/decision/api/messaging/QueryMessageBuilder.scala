@@ -17,7 +17,7 @@ package com.stratio.decision.api.messaging
 
 import com.stratio.decision.api.messaging.MessageBuilder._
 
-case class QueryMessageBuilder(sessionId: String) {
+class QueryMessageBuilder(sessionId: String) {
   def build(streamName: String, query: String, operation: String) = {
     builder.withOperation(operation)
       .withStreamName(streamName)
