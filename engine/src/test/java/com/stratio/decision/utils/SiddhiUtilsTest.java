@@ -15,6 +15,8 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import com.stratio.decision.commons.constants.ColumnType;
+import com.stratio.decision.commons.constants.STREAMING;
+import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 
 /**
@@ -83,4 +85,29 @@ public class SiddhiUtilsTest {
         assertEquals("Unexpected result", 22L, SiddhiUtils.decodeSiddhiValue(d, Attribute.Type.LONG));
         assertEquals("Unexpected result", 22f, SiddhiUtils.decodeSiddhiValue(d, Attribute.Type.FLOAT));
     }
+
+    @Test(expected = RuntimeException.class)
+    public void testDecodeException() throws Exception {
+        assertEquals("Exception expected", "text", SiddhiUtils.decodeSiddhiValue("text", null));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testDecodeExceptionDouble() throws Exception {
+        assertEquals("Exception expected", 22d, SiddhiUtils.decodeSiddhiValue(22d, null));
+    }
+
+    @Test
+    public void testIsStreamAllowedOperation() throws Exception {
+        String streamName= "myStream";
+        assertTrue("True value expected", SiddhiUtils.isStreamAllowedForThisOperation(
+                streamName, STREAM_OPERATIONS.ACTION.LISTEN));
+        assertFalse("False value expected", SiddhiUtils.isStreamAllowedForThisOperation(
+                streamName, "DASDSADASDSADAS"));
+        assertTrue("True value expected", SiddhiUtils.isStreamAllowedForThisOperation(
+                streamName, STREAM_OPERATIONS.MANIPULATION.INSERT));
+        assertFalse("False value expected", SiddhiUtils.isStreamAllowedForThisOperation(
+                STREAMING.STATS_NAMES.STATS_STREAMS[0], STREAM_OPERATIONS.MANIPULATION.INSERT));
+
+    }
+
 }
