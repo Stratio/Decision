@@ -90,7 +90,7 @@ class StratioStreamingAPIUnitTest
         api.streamingRunning = true
         val stratioStreamMock = mock[StratioStream]
 
-        api.statusOperation = streamingAPIListOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
 
         when(
           streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
@@ -133,7 +133,7 @@ class StratioStreamingAPIUnitTest
         api.streamingUp = true
         api.streamingRunning = true
         val stratioStreamMock = mock[StratioStream]
-        api.statusOperation = streamingAPIListOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
 
         when(stratioStreamMock.getStreamName).thenReturn(streamsList)
         val streamQueryMock = mock[StreamQuery]
@@ -157,7 +157,7 @@ class StratioStreamingAPIUnitTest
         api.streamingRunning = true
         val stratioStreamMock = mock[StratioStream]
 
-        api.statusOperation = streamingAPIListOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
 
         when(
           streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
@@ -175,7 +175,7 @@ class StratioStreamingAPIUnitTest
         api.streamingUp = true
         api.streamingRunning = true
 
-        api.statusOperation = streamingAPIListOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
 
         when(
           streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
@@ -218,7 +218,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
@@ -255,7 +255,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
@@ -294,7 +294,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
@@ -333,7 +333,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
@@ -372,7 +372,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setAsyncOperation(streamingAPIAsyncOperationMock)
 
         doNothing().when(streamingAPIAsyncOperationMock).performAsyncOperation(any[StratioStreamingMessage])
 
@@ -410,7 +410,7 @@ class StratioStreamingAPIUnitTest
         api.streamingUp = true
         api.streamingRunning = true
         val stratioStreamMock = mock[StratioStream]
-        api.statusOperation = streamingAPIListOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
 
         when(stratioStreamMock.getStreamName).thenReturn(streamName)
         val streamQueryMock = mock[StreamQuery]
@@ -429,7 +429,7 @@ class StratioStreamingAPIUnitTest
         api.streamingUp = true
         api.streamingRunning = true
         val stratioStreamMock = mock[StratioStream]
-        api.statusOperation = streamingAPIListOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
 
         when(stratioStreamMock.getStreamName).thenReturn(streamName)
         val streamQueryMock = mock[StreamQuery]
@@ -448,7 +448,7 @@ class StratioStreamingAPIUnitTest
         api.streamingRunning = true
         val stratioStreamMock = mock[StratioStream]
 
-        api.statusOperation = streamingAPIListOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
 
         when(
           streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
@@ -466,7 +466,7 @@ class StratioStreamingAPIUnitTest
         api.streamingUp = true
         api.streamingRunning = true
 
-        api.statusOperation = streamingAPIListOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
 
         when(
           streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
@@ -510,8 +510,8 @@ class StratioStreamingAPIUnitTest
         api.streamingUp = true
         api.streamingRunning = true
         val stratioStreamMock = mock[StratioStream]
-        api.statusOperation = streamingAPIListOperationMock
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         when(stratioStreamMock.getStreamName).thenReturn(streamName)
         val streamQueryMock = mock[StreamQuery]
@@ -532,8 +532,8 @@ class StratioStreamingAPIUnitTest
         api.streamingUp = true
         api.streamingRunning = true
         val stratioStreamMock = mock[StratioStream]
-        api.statusOperation = streamingAPIListOperationMock
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         when(stratioStreamMock.getStreamName).thenReturn(streamName)
         val streamQueryMock = mock[StreamQuery]
@@ -553,8 +553,8 @@ class StratioStreamingAPIUnitTest
         api.streamingUp = true
         api.streamingRunning = true
         val stratioStreamMock = mock[StratioStream]
-        api.statusOperation = streamingAPIListOperationMock
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         when(
           streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
@@ -574,8 +574,8 @@ class StratioStreamingAPIUnitTest
         api.streamingUp = true
         api.streamingRunning = true
 
-        api.statusOperation = streamingAPIListOperationMock
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setStatusOperation(streamingAPIListOperationMock)
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         when(
           streamingAPIListOperationMock.getListStreams(any[StratioStreamingMessage])
@@ -621,7 +621,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
@@ -658,7 +658,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
@@ -695,7 +695,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
@@ -732,7 +732,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
@@ -769,7 +769,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
@@ -806,7 +806,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
@@ -843,7 +843,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
-        api.syncOperation = streamingAPISyncOperationMock
+        api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
 
