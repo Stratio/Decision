@@ -318,17 +318,33 @@ class StratioStreamingAPI
     zookeeperClient.start()
     new ZookeeperConsumer(zookeeperClient)
   }
-  private var _syncOperation = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
-  private var _asyncOperation = new StreamingAPIAsyncOperation(kafkaDataProducer)
-  private var _statusOperation = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
+  private var _syncOperation: Option[StreamingAPISyncOperation] = None
+  private var _asyncOperation: Option[StreamingAPIAsyncOperation] = None
+  private var _statusOperation: Option[StreamingAPIListOperation] = None
 
-  def syncOperation = _syncOperation
-  def syncOperation_= (value:StreamingAPISyncOperation):Unit = _syncOperation = value
-  def asyncOperation = _asyncOperation
-  def asyncOperation_= (value:StreamingAPIAsyncOperation):Unit = _asyncOperation = value
-  def statusOperation = _statusOperation
-  def statusOperation_= (value:StreamingAPIListOperation):Unit = _statusOperation = value
+  def syncOperation: StreamingAPISyncOperation =
+    _syncOperation.getOrElse {
+      val initialized = new StreamingAPISyncOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
+      setSyncOperation(initialized)
+      initialized
+    }
+  def setSyncOperation(value:StreamingAPISyncOperation):Unit = _syncOperation = Option(value)
 
+  def asyncOperation: StreamingAPIAsyncOperation =
+    _asyncOperation.getOrElse {
+      val initialized = new StreamingAPIAsyncOperation(kafkaDataProducer)
+      setAsyncOperation(initialized)
+      initialized
+    }
+  def setAsyncOperation(value:StreamingAPIAsyncOperation):Unit = _asyncOperation = Option(value)
+
+  def statusOperation: StreamingAPIListOperation =
+    _statusOperation.getOrElse {
+      val initialized = new StreamingAPIListOperation(kafkaProducer, zookeeperConsumer, ackTimeOut)
+      setStatusOperation(initialized)
+      initialized
+    }
+  def setStatusOperation(value:StreamingAPIListOperation):Unit = _statusOperation = Option(value)
 
   private def checkEphemeralNode() {
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_STATUS_PATH
