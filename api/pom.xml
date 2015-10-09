@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>com.stratio.decision</groupId>
 		<artifactId>stratio-decision</artifactId>
-		<version>0.9.0</version>
+		<version>0.9.1-RC1-SNAPSHOT</version>
 	</parent>
 	<artifactId>api</artifactId>
 	<packaging>jar</packaging>
