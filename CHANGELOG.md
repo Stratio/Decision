@@ -2,7 +2,14 @@
 
 Only listing significant user-visible, not internal code cleanups and minor bug fixes.
 
-## 0.9.0 (upcoming)
+## 0.10.0 (Upcoming)
+
+## 0.9.0 (October 2015)
+
+* Product name changed to Stratio Decision
+* CEP syntax documentation added
+* Minor bugs fixed
+* Multiple Integration and unit tests added
 
 ## 0.8.1 (September 2015)
 
