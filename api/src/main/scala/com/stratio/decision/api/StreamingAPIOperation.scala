@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent._
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class StreamingAPIOperation
   extends StratioStreamingAPIConfig {
