@@ -28,8 +28,8 @@ Shell management commands
 You can get a list of all the available actions by running the command **help**. Also, you can quit the shell at any time
 with the command **exit** or **quit**.
 
-The **script** command allows you to load a file with predefined commands. There are other typical commands like **version**
- (for showing the current shell version), **system properties** (displays the shell's properties), **cls** (for clearing the console)
+The **script** command allows you to load a file with predefined commands. There are other typical commands like
+**version** (for showing the current shell version), **system properties** (displays the shell's properties), **cls** (for clearing the console)
  and **date** (displays the current local time). You can also add commands with **//** or **;** at the start of a line, and execute OS native
 commands adding **!** at the start.
 

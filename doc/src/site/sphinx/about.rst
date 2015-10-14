@@ -54,8 +54,8 @@ You can see streams as SQL tables in a relational database, but streams
 are created in an ephemeral environment and no relationship or
 constraint rules are applied on them.
 
-**Stratio Decision lets you *create, alter or drop streams* on the
-fly.**
+Stratio Decision lets you **create, alter or drop streams** on the
+fly.
 
 Queries on streams:
 -------------------
@@ -122,7 +122,7 @@ Stratio Decision is composed of three main elements:
 -  A Streaming and CEP engine `Apache Spark Streaming <http://spark.apache.org>`_ and `Siddhi CEP <http://siddhi.sourceforge.net>`_.
 
  .. image:: images/about-overview.jpg
-    :width: 70%
+:width: 70%
     :align: center
 
 Where to go from here
@@ -131,6 +131,6 @@ Where to go from here
 To explore and play with Stratio Decision, we recommend to visit the
 following:
 
--  :ref:`basic-application`: a step by step tutorial to write an application using Stratio Decision API.
 -  :ref:`using-stratio-streaming-api`: snippets in Java and Scala.
+-  :ref:`basic-application`: a step by step tutorial to write an application using Stratio Decision API.
 -  :ref:`stratio-streaming-sandbox`

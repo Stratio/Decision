@@ -11,4 +11,7 @@ Contents:
    basic-application.rst
    using-sandbox.rst
    cep-query-syntax.rst
+   production-checklist.rst
+   faqs.rst
+   release-notes.rst
 
