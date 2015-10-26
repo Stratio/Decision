@@ -37,7 +37,8 @@ object StreamsParser {
       )
       stratioStreams
     } catch {
-        case _ => throw new StratioAPIGenericException("Decision API error: unable to parse the json response")
+        case _: Throwable =>
+          throw new StratioAPIGenericException("Decision API error: unable to parse the json response")
     }
 
   }

@@ -135,6 +135,7 @@
 		<dependency>
 			<groupId>com.netflix.curator</groupId>
 			<artifactId>curator-test</artifactId>
+			<scope>test</scope>
 			<version>1.3.3</version>
 		</dependency>
 		<dependency>
@@ -156,9 +157,10 @@
 			<plugin>
 				<groupId>net.alchim31.maven</groupId>
 				<artifactId>scala-maven-plugin</artifactId>
-				<version>3.1.6</version>
+				<version>3.2.2</version>
 				<configuration>
 					<checkMultipleScalaVersions>false</checkMultipleScalaVersions>
+					<recompileMode>incremental</recompileMode>
 				</configuration>
 				<executions>
 					<execution>
@@ -196,68 +198,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>compile</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
-	<profiles>
-		<profile>
-			<id>build</id>
-			<build>
-				<plugins>					
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<executions>
-							<execution>
-								<configuration>
-									<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-									<repositoryId>sonatype-nexus-staging</repositoryId>
-									<pomFile>pom.xml</pomFile>
-									<files>
-										<file>target/decision-api-${project.version}.jar</file>
-										<file>target/decision-api-${project.version}-javadoc.jar</file>
-										<file>target/decision-api-${project.version}-sources.jar</file>
-									</files>
-								</configuration>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
