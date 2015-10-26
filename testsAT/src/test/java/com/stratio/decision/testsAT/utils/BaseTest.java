@@ -1,20 +1,19 @@
 package com.stratio.decision.testsAT.utils;
 
-import java.lang.reflect.Method;
-
-import org.testng.ITestContext;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
+/**
+ * Created by mpenate on 26/10/15.
+ */
 
 import com.stratio.tests.utils.BaseGTest;
+import com.stratio.tests.utils.ThreadProperty;
+import org.testng.ITestContext;
+import org.testng.annotations.*;
+
+import java.lang.reflect.Method;
 
 abstract public class BaseTest extends BaseGTest {
 
-    String operacion;
+    protected String browser = "";
 
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite(ITestContext context) {
@@ -30,6 +29,7 @@ abstract public class BaseTest extends BaseGTest {
 
     @BeforeMethod(alwaysRun = true)
     public void beforeMethod(Method method) {
+        ThreadProperty.set("browser", this.browser);
     }
 
     @AfterMethod(alwaysRun = true)
