@@ -1,0 +1,7 @@
+<suite name="Decision" verbose="10" parallel="instances" thread-count="1">
+    <test name="decision acceptance tests">
+        <packages>
+            <package name="com.stratio.decision.testsAT.*"/>
+        </packages>
+    </test>
+</suite>
