@@ -1,5 +1,5 @@
-Stratio Decision Architecture
-*****************************
+Architecture Guide
+******************
 
 Stratio Decision is composed of three main elements:
 

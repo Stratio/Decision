@@ -1,5 +1,5 @@
-Features
-********
+Feature Guide
+*************
 
 Operations on streams:
 ----------------------
@@ -68,4 +68,4 @@ way than SQL:
 -  Built-in functions:
 
    -  Auditing all the request in the Decision engine.
-   -  Statistics (request per operation, request per stream …).
+   -  Statistics (request per operation, request per stream ???).
