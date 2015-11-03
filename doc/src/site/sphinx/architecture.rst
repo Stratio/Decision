@@ -10,3 +10,8 @@ Stratio Decision is composed of three main elements:
  .. image:: images/about-overview.jpg
     :width: 70%
     :align: center
+
+
+ .. image:: images/decision-sql.jpg
+    :width: 70%
+    :align: center

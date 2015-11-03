@@ -67,3 +67,28 @@ There are several actions you can perform over available streams (user created o
     -**save mongo start/stop**: starts/stops saving the given stream in MongoDB, using the database **stratio_streaming** and a collection with the stream name.
 
     -**save solr start/stop**: starts/stops indexing the given stream in Solr, creating and using a core with the stream name.
+
+
+List of API's
+-------------
+
+-   com.stratio.decision
+    -   API     custom api in Scala for Stratio Decision
+-   com.stratio.decision
+    -   Siddhi  Siddhi CEP is a lightweight, easy-to-use Open Source Complex Event Processing Engine (CEP) under Apache Software License v2.0. Siddhi CEP processes events which are triggered by various event sources and notifies appropriate complex events according to the user specified queries.
+-   com.datastax.cassandra
+    -   cassandra-driver-core   driver of Datastax to connect to Cassandra database
+-   org.apache.kafka
+    -   kafka_2.10  driver of Apache to connect to Kafka
+-   org.mongodb
+    -   mongo-java-driver   driver of MongoDB to connect java with a mongoDB database
+-   org.apache.solr
+    -   solr-solrj  Java client to access solr. It offers a java interface to add, update, and query the solr index.
+-   com.codahale.metrics
+    -   metrics-core    A Go library which provides light-weight instrumentation for your application.
+-   com.ryantenney.metrics
+    -   metrics-spring  The metrics-spring module integrates Dropwizard Metrics library with Spring, and provides XML and Java configuration.
+-   org.mockito
+    -   mockito-all Mockito is a mocking framework for unit tests in Java and has an automated release system
+-   junit
+    -   junit 4.10  JUnit is a simple framework to write repeatable tests. It is an instance of the xUnit architecture for unit testing frameworks.

@@ -12,6 +12,9 @@ Contents:
    apis-custom-transformations.rst
    cep-query-syntax.rst
    quick-reference.rst
+   recommendation.rst
+   stratio_platform.rst
+   benchmarks.rst
    checklist.rst
    faq.rst
    using-sandbox.rst

@@ -4,7 +4,8 @@ Configuration
 Configuring the Engine
 ======================
 
-Before starting the Stratio Decision Engine, you must review the configuration to adapt it to Kafka and Zookeeper. On a standard installation, you should find the configuration file in /opt/sds/decision/config
+Before starting the Stratio Decision Engine, you must review the configuration to adapt it to Kafka and Zookeeper. In
+ the installation, you should find the configuration file in /opt/sds/decision/config
 
 Print Streams Configuration
 ---------------------------
@@ -144,7 +145,7 @@ Example::
 Starting the Engine
 ===================
 
-On a standard installation you can start Stratio Decision Engine by executing the command:
+In the installation you can start Stratio Decision Engine by executing the command:
 
 ::
 
