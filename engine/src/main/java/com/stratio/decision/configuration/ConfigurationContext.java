@@ -15,12 +15,13 @@
  */
 package com.stratio.decision.configuration;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 public class ConfigurationContext {
 
@@ -66,6 +67,13 @@ public class ConfigurationContext {
     private final String mongoUsername;
     private final String mongoPassword;
 
+    private final String droolsHost;
+    private final String droolsUsername;
+    private final String droolsPassword;
+    private final int droolsBatchSize;
+    private final String droolsMappingLibraryDir;
+
+
     public enum ConfigurationKeys {
         CASSANDRA_HOSTS("cassandra.hosts"),
         KAFKA_HOSTS("kafka.hosts"),
@@ -90,7 +98,15 @@ public class ConfigurationContext {
         SOLR_DATADIR("solr.dataDir"),
         MONGO_HOST("mongo.hosts"),
         MONGO_USER("mongo.user"),
-        MONGO_PASSWORD("mongo.password");
+        MONGO_PASSWORD("mongo.password")
+
+        // Drools Config
+        ,DROOLS_HOST("drools.host"),
+        DROOLS_USER("drools.username"),
+        DROOLS_PASSWORD("drools.password"),
+        DROOLS_BATCHSIZE("drools.batchSize"),
+        DROOLS_MAPPINGDIR("drools.mappingLibraryDir")
+        ;
 
         private final String key;
 
@@ -141,6 +157,13 @@ public class ConfigurationContext {
         this.mongoHosts = (List<String>) this.getListOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
         this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
+
+        // Adding Drools config
+        this.droolsHost= (String) this.getValueOrNull(ConfigurationKeys.DROOLS_HOST.getKey(), config);
+        this.droolsUsername= (String) this.getValueOrNull(ConfigurationKeys.DROOLS_USER.getKey(), config);
+        this.droolsPassword= (String) this.getValueOrNull(ConfigurationKeys.DROOLS_PASSWORD.getKey(), config);
+        this.droolsBatchSize= (int) this.getValueOrNull(ConfigurationKeys.DROOLS_BATCHSIZE.getKey(), config);
+        this.droolsMappingLibraryDir= (String) this.getValueOrNull(ConfigurationKeys.DROOLS_MAPPINGDIR.getKey(), config);
 
     }
 
@@ -251,6 +274,27 @@ public class ConfigurationContext {
     public String getMongoPassword() {
         return mongoPassword;
     }
+
+    public String getDroolsHost() {
+        return droolsHost;
+    }
+
+    public String getDroolsUsername() {
+        return droolsUsername;
+    }
+
+    public String getDroolsPassword() {
+        return droolsPassword;
+    }
+
+    public int getDroolsBatchSize() {
+        return droolsBatchSize;
+    }
+
+    public String getDroolsMappingLibraryDir() {
+        return droolsMappingLibraryDir;
+    }
+
 
     public long getInternalStreamingBatchTime() {
         return internalStreamingBatchTime;

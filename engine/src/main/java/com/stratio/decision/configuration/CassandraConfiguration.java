@@ -15,12 +15,13 @@
  */
 package com.stratio.decision.configuration;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Session;
 
 @Configuration
 public class CassandraConfiguration {

@@ -15,24 +15,11 @@
  */
 package com.stratio.decision.configuration;
 
-import com.datastax.driver.core.ProtocolOptions;
-import com.stratio.decision.StreamingEngine;
-import com.stratio.decision.commons.constants.InternalTopic;
-import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
-import com.stratio.decision.commons.constants.StreamAction;
-import com.stratio.decision.commons.kafka.service.KafkaTopicService;
-import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.functions.*;
-import com.stratio.decision.functions.dal.*;
-import com.stratio.decision.functions.ddl.AddQueryToStreamFunction;
-import com.stratio.decision.functions.ddl.AlterStreamFunction;
-import com.stratio.decision.functions.ddl.CreateStreamFunction;
-import com.stratio.decision.functions.dml.InsertIntoStreamFunction;
-import com.stratio.decision.functions.dml.ListStreamsFunction;
-import com.stratio.decision.functions.messages.FilterMessagesByOperationFunction;
-import com.stratio.decision.functions.messages.KeepPayloadFromMessageFunction;
-import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
-import com.stratio.decision.service.StreamOperationService;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
@@ -46,9 +33,35 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
+import com.datastax.driver.core.ProtocolOptions;
+import com.stratio.decision.StreamingEngine;
+import com.stratio.decision.commons.constants.InternalTopic;
+import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
+import com.stratio.decision.commons.constants.StreamAction;
+import com.stratio.decision.commons.kafka.service.KafkaTopicService;
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.functions.FilterDataFunction;
+import com.stratio.decision.functions.PairDataFunction;
+import com.stratio.decision.functions.SaveToCassandraActionExecutionFunction;
+import com.stratio.decision.functions.SaveToElasticSearchActionExecutionFunction;
+import com.stratio.decision.functions.SaveToMongoActionExecutionFunction;
+import com.stratio.decision.functions.SaveToSolrActionExecutionFunction;
+import com.stratio.decision.functions.SendToKafkaActionExecutionFunction;
+import com.stratio.decision.functions.SerializerFunction;
+import com.stratio.decision.functions.dal.IndexStreamFunction;
+import com.stratio.decision.functions.dal.ListenStreamFunction;
+import com.stratio.decision.functions.dal.SaveToCassandraStreamFunction;
+import com.stratio.decision.functions.dal.SaveToMongoStreamFunction;
+import com.stratio.decision.functions.dal.SaveToSolrStreamFunction;
+import com.stratio.decision.functions.ddl.AddQueryToStreamFunction;
+import com.stratio.decision.functions.ddl.AlterStreamFunction;
+import com.stratio.decision.functions.ddl.CreateStreamFunction;
+import com.stratio.decision.functions.dml.InsertIntoStreamFunction;
+import com.stratio.decision.functions.dml.ListStreamsFunction;
+import com.stratio.decision.functions.messages.FilterMessagesByOperationFunction;
+import com.stratio.decision.functions.messages.KeepPayloadFromMessageFunction;
+import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
+import com.stratio.decision.service.StreamOperationService;
 
 @Configuration
 @Import(ServiceConfiguration.class)
@@ -288,6 +301,10 @@ public class StreamingContextConfiguration {
                 new SaveToSolrActionExecutionFunction(configurationContext.getSolrHosts(), configurationContext.getSolrCloud(), configurationContext.getSolrDataDir()));
 
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
+                new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));
+
+
+        groupedDataDstream.filter(new FilterDataFunction(StreamAction.FIRE_RULES)).foreachRDD(
                 new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));
 
     }

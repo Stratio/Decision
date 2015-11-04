@@ -15,26 +15,16 @@
  */
 package com.stratio.decision.functions;
 
-import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.factory.GsonFactory;
-import com.stratio.decision.serializer.Serializer;
-import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
-import kafka.javaapi.producer.Producer;
-import kafka.producer.KeyedMessage;
-import kafka.producer.ProducerConfig;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
-public class SendToKafkaActionExecutionFunction extends BaseActionExecutionFunction {
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
+
+import kafka.producer.KeyedMessage;
+
+public class SendToKafkaActionExecutionFunction extends KafkaBaseExecutionFunction {
 
     private static final long serialVersionUID = -1661238643911306344L;
-
-    private Producer<String, String> producer;
-    private KafkaToJavaSerializer kafkaToJavaSerializer;
-
-    private final String kafkaQuorum;
 
     public SendToKafkaActionExecutionFunction(String kafkaQuorum) {
         this.kafkaQuorum = kafkaQuorum;
@@ -50,21 +40,4 @@ public class SendToKafkaActionExecutionFunction extends BaseActionExecutionFunct
         getProducer().send(kafkaMessages);
     }
 
-    private Serializer<String, StratioStreamingMessage> getSerializer() {
-        if (kafkaToJavaSerializer == null) {
-            kafkaToJavaSerializer = new KafkaToJavaSerializer(GsonFactory.getInstance());
-        }
-        return kafkaToJavaSerializer;
-    }
-
-    private Producer<String, String> getProducer() {
-        if (producer == null) {
-            Properties properties = new Properties();
-            properties.put("serializer.class", "kafka.serializer.StringEncoder");
-            properties.put("metadata.broker.list", kafkaQuorum);
-            properties.put("producer.type", "async");
-            producer = new Producer<String, String>(new ProducerConfig(properties));
-        }
-        return producer;
-    }
 }
