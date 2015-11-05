@@ -21,4 +21,5 @@ public class ConfigurationConstants {
     public static String INPUT_MODEL_LIST = BASE + "." + VARIABLE + ".input.model.list";
     public static String RESULT_TYPE= BASE + "." + VARIABLE + ".result.type";
 
+
 }

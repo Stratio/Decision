@@ -1,6 +1,5 @@
 package com.stratio.decision.dto.drools.configuration.model;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,50 +10,61 @@ import java.util.Map;
  */
 public class DroolsConfiguration {
 
-    private String urlBase;
-    private String userName;
-    private String userPass;
+    private String host;
+    private String username;
+    private String password;
+    private int batchSize;
+    private String mappingLibraryDir;
     private Map<String,DroolsConfigurationGroup> groups;
 
-    public String getUrlBase() {
-        return urlBase;
+
+    public String getHost() {
+        return host;
     }
 
-    public void setUrlBase(String urlBase) {
-        this.urlBase = urlBase;
+    public void setHost(String host) {
+        this.host = host;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String userName) {
+        this.username = username;
     }
 
-    public String getUserPass() {
-        return userPass;
+    public String getPassword() {
+        return password;
     }
 
-    public void setUserPass(String userPass) {
-        this.userPass = userPass;
+    public void setPassword(String password) {
+        this.password = password;
     }
+
+    public int getBatchSize() {
+        return batchSize;
+    }
+
+    public void setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+    }
+
+    public String getMappingLibraryDir() {
+        return mappingLibraryDir;
+    }
+
+    public void setMappingLibraryDir(String mappingLibraryDir) {
+        this.mappingLibraryDir = mappingLibraryDir;
+    }
+
 
     public Map<String, DroolsConfigurationGroup> getGroups() {
         return groups;
     }
 
-    public void setGroups(
-            Map<String, DroolsConfigurationGroup> groups) {
+    public void setGroups(Map<String, DroolsConfigurationGroup> groups) {
         this.groups = groups;
-    }
-
-    public String getUrlWorkbenchGroup(String group) {
-        return urlBase+ File.separator + groups.get(group).getUrlWorkBench();
-    }
-
-    public List<String> getModelListGroup(String group){
-        return groups.get(group).getModelList();
     }
 
     public String getQueryNameGroup(String group){
@@ -68,10 +78,6 @@ public class DroolsConfiguration {
             keys.add(ite.next());
         }
         return keys;
-    }
-
-    public String getResultTypeGroup(String group){
-        return groups.get(group).getResultType();
     }
 
     public DroolsConfigurationGroup getGroup(String group){
