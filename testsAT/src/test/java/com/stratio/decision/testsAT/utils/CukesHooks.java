@@ -1,18 +1,29 @@
 package com.stratio.decision.testsAT.utils;
 
+import gherkin.formatter.model.Background;
+import gherkin.formatter.model.Examples;
+import gherkin.formatter.model.Feature;
+import gherkin.formatter.model.Match;
+import gherkin.formatter.model.Result;
+import gherkin.formatter.model.Scenario;
+import gherkin.formatter.model.ScenarioOutline;
+import gherkin.formatter.model.Step;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.stratio.cucumber.testng.ICucumberFormatter;
 import com.stratio.cucumber.testng.ICucumberReporter;
 import com.stratio.decision.testsAT.specs.BaseSpec;
 import com.stratio.decision.testsAT.specs.Common;
-import gherkin.formatter.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.List;
+public class CukesHooks extends BaseSpec implements ICucumberReporter,
+        ICucumberFormatter {
 
-public class CukesHooks extends BaseSpec implements ICucumberReporter, ICucumberFormatter {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass()
+            .getCanonicalName());
 
     Background background;
     Feature feature;
@@ -27,27 +38,36 @@ public class CukesHooks extends BaseSpec implements ICucumberReporter, ICucumber
     }
 
     @Override
-    public void syntaxError(String state, String event, List<String> legalEvents, String uri, Integer line) {
+    public void syntaxError(String state, String event,
+            List<String> legalEvents, String uri, Integer line) {
+        // TODO Auto-generated method stub
     }
 
     @Override
     public void uri(String uri) {
+        // TODO Auto-generated method stub
     }
 
     @Override
     public void examples(Examples examples) {
+        // logger.info("Got to examples {} table", examples.getName());
     }
 
     @Override
     public void startOfScenarioLifeCycle(Scenario scenario) {
+        // logger.info("Got to scenario {} life cycle start",
+        // scenario.getName());
+
     }
 
     @Override
     public void done() {
+        // TODO Auto-generated method stub
     }
 
     @Override
     public void close() {
+        // TODO Auto-generated method stub
     }
 
     @Override
@@ -86,10 +106,13 @@ public class CukesHooks extends BaseSpec implements ICucumberReporter, ICucumber
 
     @Override
     public void endOfScenarioLifeCycle(Scenario scenario) {
+        // logger.info("Got to scenario {} life cycle end", scenario.getName());
     }
 
     @Override
     public void before(Match match, Result result) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
@@ -100,18 +123,22 @@ public class CukesHooks extends BaseSpec implements ICucumberReporter, ICucumber
 
     @Override
     public void after(Match match, Result result) {
+        // TODO Auto-generated method stub
     }
 
     @Override
     public void match(Match match) {
+        // TODO Auto-generated method stub
     }
 
     @Override
     public void embedding(String mimeType, byte[] data) {
+        // TODO Auto-generated method stub
     }
 
     @Override
-    public void write(String text) {        
+    public void write(String text) {
+        // TODO Auto-generated method stub
     }
 
 }

@@ -4,8 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.stratio</groupId>
+        <artifactId>parent</artifactId>
+        <version>0.5.0</version>
+    </parent>
+
     <properties>
         <stratio-test-bdd.version>0.2.0-SNAPSHOT</stratio-test-bdd.version>
+        <decision.version>0.9.0</decision.version>
     </properties>
 
     <groupId>com.stratio.decision</groupId>
@@ -27,7 +34,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
                 <configuration>
                     <skipTests>true</skipTests>
                 </configuration>
@@ -35,7 +41,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.17</version>
                 <executions>
                     <execution>
                         <id>acceptance-test</id>
@@ -72,6 +77,22 @@
             <groupId>com.stratio.qa</groupId>
             <artifactId>bdt-lib</artifactId>
             <version>${stratio-test-bdd.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.expectit</groupId>
+            <artifactId>expectit-core</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.decision</groupId>
+            <artifactId>api</artifactId>
+            <version>${decision.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
