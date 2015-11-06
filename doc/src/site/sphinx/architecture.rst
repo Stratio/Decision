@@ -13,7 +13,8 @@ different commands and help making easy to the users work with Decision. Decisio
 interact with the Engine.
 
 -  A publish-subscribe messaging system `Apache Kafka <http://kafka.apache.org/>`_. Decision uses Kafka and Zookeeper
- as tools to communicate and keep configuration.
+ as tools to communicate and keep configuration. Decision reads the streaming information from Kafka in real time, and build failover capabilities storing configuration in Zookeeper.
+
 
 
  .. image:: images/about-overview.jpg
