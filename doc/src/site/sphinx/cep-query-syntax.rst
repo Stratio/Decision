@@ -63,6 +63,8 @@ Each Siddhi query can consume one or more event streams and create a new event s
     select <attribute name>, <attribute name>, ...
     insert into <output stream name>
 
+Siddhi receives as input an stream of events. An event is similar to a database row, so it's like an array including
+event values in the fields.
 Using our previous example if we want to send only the temperature to the output stream the query can be defined as follows:
 
 ::
