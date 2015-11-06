@@ -47,17 +47,16 @@ Stream Query Language
 
 **3 Stream Action Language (SAL)**
 
-* Listen to a stream (kafka), save the stream to Cassandra or mongoDB (auto-creation of tables), index the stream to ElasticSearch or Solr… here you should find useful operations ready to use.
+* Listen to a stream (kafka), save the stream to Cassandra or MongoDB (auto-creation of tables), index the stream to ElasticSearch or Solr… here you should find useful operations ready to use.
 
 * Start & Stop each action on-demand
 
 
 **4 Built-in functions**
 
-
 * Auditing all the requests in the decision engine (Cassandra or MongoDB)
 * Statistics (requests per operation, requests per stream…)
-* Failover system (recovering windows, streams and queries from Cassandra or MongoDB)
+* Failover system (recovering windows, streams and queries from Zookeeper)
 
 
 Decision Cep Engine: API
