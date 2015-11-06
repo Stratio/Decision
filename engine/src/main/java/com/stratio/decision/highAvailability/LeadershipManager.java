@@ -15,6 +15,7 @@
  */
 package com.stratio.decision.highAvailability;
 
+import com.stratio.decision.commons.constants.STREAMING;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
@@ -29,7 +30,6 @@ import java.util.Random;
 public class LeadershipManager {
 
     private static LeadershipManager self;
-    private static final String PATH = "/latch";
 
     private CuratorFramework client;
     private String latchpath;
@@ -47,7 +47,7 @@ public class LeadershipManager {
             Random r = new Random();
             RandomNameGenerator rnd = new RandomNameGenerator(r.nextInt());
 
-            self = new LeadershipManager(zookeeperCluster, PATH, rnd.next());
+            self = new LeadershipManager(zookeeperCluster, STREAMING.ZK_HIGH_AVAILABILITY_PATH, rnd.next());
         }
         return self;
     }
