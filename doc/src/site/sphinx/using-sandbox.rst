@@ -228,7 +228,7 @@ Sensor grid simulation steps
 fake but we are producing random variations on them, in order to
 simulate the behaviour of a real system::
 
-     sudo sh  /opt/sds/decision/examples/bin/hardware-emulator 2 streaming.stratio.com:9092
+     sudo sh  /opt/sds/decision/examples/bin/hardware-emulator 2 decision.stratio.com:9092
 
 - You can launch this tool as many times as you want.
 
@@ -266,7 +266,7 @@ configuration.::
 
 - Using the shell, execute this commands::
 
-      /opt/sds/decision/decision-shell/bin/shell
+      /opt/sds/decision-shell/bin/shell
 
 - You can execute into shell the list command and you should obtain this result::
 
