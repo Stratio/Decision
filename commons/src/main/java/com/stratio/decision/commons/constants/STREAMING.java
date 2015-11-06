@@ -24,6 +24,10 @@ public interface STREAMING {
     String ZK_EPHEMERAL_NODE_STATUS_CONNECTED = "connected";
     String ZK_EPHEMERAL_NODE_STATUS_INITIALIZED = "initialized";
     String STREAMING_KEYSPACE_NAME = "stratio_streaming";
+    String ZK_PERSISTENCE_NODE = "/failoverStorage";
+    String ZK_PERSISTENCE_STORE_PATH = ZK_BASE_PATH + ZK_PERSISTENCE_NODE;
+    String ZK_HIGH_AVAILABILITY_NODE = "/latch";
+    String ZK_HIGH_AVAILABILITY_PATH = ZK_BASE_PATH + ZK_HIGH_AVAILABILITY_NODE;
 
     public interface STATS_NAMES {
         String SINK_STREAM_PREFIX = "VOID_";
