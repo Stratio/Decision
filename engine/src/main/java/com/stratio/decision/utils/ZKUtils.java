@@ -137,18 +137,19 @@ public class ZKUtils {
             while (children.hasNext()) {
 
                 String childrenPath = children.next();
+                if (!STREAMING.ZK_HIGH_AVAILABILITY_NODE.equals('/'+childrenPath) && !STREAMING.ZK_PERSISTENCE_NODE.equals('/'+childrenPath)) {
+                    if (client.getChildren().forPath(path + "/" + childrenPath).size() > 0) {
+                        counter += removeOldChildZnodes(path + "/" + childrenPath);
+                    } else {
 
-                if (client.getChildren().forPath(path + "/" + childrenPath).size() > 0) {
-                    counter += removeOldChildZnodes(path + "/" + childrenPath);
-                } else {
+                        Stat znode = client.checkExists().forPath(path + "/" + childrenPath);
+                        // avoid nulls and ephemeral znodes
+                        if (znode != null && znode.getEphemeralOwner() == 0) {
+                            client.delete().deletingChildrenIfNeeded().forPath(path + "/" + childrenPath);
+                            counter++;
+                        }
 
-                    Stat znode = client.checkExists().forPath(path + "/" + childrenPath);
-                    // avoid nulls and ephemeral znodes
-                    if (znode != null && znode.getEphemeralOwner() == 0) {
-                        client.delete().deletingChildrenIfNeeded().forPath(path + "/" + childrenPath);
-                        counter++;
                     }
-
                 }
             }
 
