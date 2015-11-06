@@ -1,6 +1,21 @@
 Using Stratio Decision API
 **************************
 
+API Maven Dependency
+====================
+
+If you want to use the Stratio Decision API you can use the `existing Maven dependency <http://search.maven.org/#search%7Cga%7C1%7Ccom.stratio.decision.api>`_. You can add to your pom.xml the following dependency (take into
+ account you should set the proper version):
+::
+
+
+    <dependency>
+        <groupId>com.stratio.decision</groupId>
+        <artifactId>api</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+
+
 Creating and initializing the API
 ===========================================================
 
