@@ -4,6 +4,9 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 ## 0.10.0 (Upcoming)
 
+* Various documentation improvements
+* Removed transitive dependencies because licenses
+
 ## 0.9.0 (October 2015)
 
 * Product name changed to Stratio Decision
