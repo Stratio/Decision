@@ -59,6 +59,9 @@ class StreamingAPIOperation
         log.error("Ack timeout expired for: " + message.getRequest)
         throw new StratioEngineOperationException("Acknowledge timeout expired" + message.getRequest)
       }
+      case _ => {
+        throw new StratioEngineOperationException("Error connecting with engine")
+      }
     }
   }
 }
