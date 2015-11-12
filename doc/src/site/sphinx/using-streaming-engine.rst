@@ -133,7 +133,7 @@ Example::
 
 Solr Configuration
 ------------------
-If you want to save any stream in Solr, you must configure its settings selecting true or false in "cloud" depending on your installation (Solr Cloud or Standalone). If your installation is in cloud you must indicate in "hosts" the Zookeeper connection, if your installation is standalone you must indicate in "hosts" the IP and port of your machine. In dataDir you have to set the path where Solr will save the index data (make sure that you have read/write permissions)
+If you want to save any stream in Solr, you must configure its settings selecting true or false in "cloud" depending on your installation (Solr Cloud or Standalone). If your installation is in cloud you must indicate in "hosts" the Zookeeper connection, if your installation is standalone you must indicate in "hosts" the IP and port of your machine. In dataDir you have to set the path where Solr will save the index data (make sure that you have read/write permissions to this path). Decision will create automatically a field "stratio_decision_id" as a unique id in order to persist the documents.
 
 Example::
 
