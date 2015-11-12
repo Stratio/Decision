@@ -21,17 +21,15 @@ import java.util.{Properties, UUID}
 import kafka.producer._
 import org.slf4j.LoggerFactory
 
-import scala.util.Try
-
 class KafkaProducer(topic: String,
-                         brokerList: String,
-                         clientId: String = UUID.randomUUID().toString,
-                         synchronously: Boolean = true,
-                         compress: Boolean = true,
-                         batchSize: Integer = 200,
-                         messageSendMaxRetries: Integer = 3,
-                         requestRequiredAcks: Integer = -1
-                          ) extends Closeable {
+                    brokerList: String,
+                    clientId: String = UUID.randomUUID().toString,
+                    synchronously: Boolean = true,
+                    compress: Boolean = true,
+                    batchSize: Integer = 200,
+                    messageSendMaxRetries: Integer = 3,
+                    requestRequiredAcks: Integer = -1
+                     ) extends Closeable {
 
   val props = new Properties()
   val log = LoggerFactory.getLogger(getClass)
@@ -43,7 +41,7 @@ class KafkaProducer(topic: String,
 
   val producer = new Producer[AnyRef, AnyRef](new ProducerConfig(props))
 
-  override def close(): Try[Unit] = Try {
+  override def close(): Unit = {
     producer.close
   }
 
