@@ -289,11 +289,17 @@ class StratioStreamingAPI
   }
 
   override def close: Unit = {
-    kafkaProducer.close() match {
+    Try {
+      kafkaProducer.close()
+    }
+    match {
       case Failure(e: Throwable) => throw new StratioStreamingException("Error trying to close kafkaProducer.")
       case _ => ()
     }
-    kafkaDataProducer.close() match {
+    Try {
+      kafkaDataProducer.close()
+    }
+    match {
       case Failure(e: Throwable) => throw new StratioStreamingException("Error trying to close kafkaDataProducer.")
       case _ => ()
     }
