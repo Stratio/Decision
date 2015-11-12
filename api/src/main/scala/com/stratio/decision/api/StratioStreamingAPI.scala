@@ -28,7 +28,7 @@ import com.stratio.decision.commons.constants.STREAM_OPERATIONS.ACTION.{INDEX, L
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.DEFINITION
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.DEFINITION.{ADD_QUERY, ALTER, DROP, REMOVE_QUERY}
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.MANIPULATION.LIST
-import com.stratio.decision.commons.exceptions.{StratioEngineConnectionException, StratioEngineOperationException, StratioEngineStatusException}
+import com.stratio.decision.commons.exceptions.{StratioStreamingException, StratioEngineConnectionException, StratioEngineOperationException, StratioEngineStatusException}
 import com.stratio.decision.commons.kafka.service.{KafkaTopicService, TopicService}
 import com.stratio.decision.commons.messages.ColumnNameTypeValue
 import com.stratio.decision.commons.streams.StratioStream
@@ -39,6 +39,7 @@ import org.apache.curator.retry.RetryOneTime
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConversions.{asScalaBuffer, bufferAsJavaList}
+import scala.util.{Failure, Try}
 
 class StratioStreamingAPI
   extends IStratioStreamingAPI {
@@ -290,10 +291,27 @@ class StratioStreamingAPI
   }
 
   override def close: Unit = {
-    kafkaProducer.close()
-    kafkaDataProducer.close()
-    topicService.close()
-    zookeeperClient.close()
+    kafkaProducer.close() match {
+      case Failure(e: Throwable) => throw new StratioStreamingException("Error trying to close kafkaProducer.")
+      case _ => ()
+    }
+    kafkaDataProducer.close() match {
+      case Failure(e: Throwable) => throw new StratioStreamingException("Error trying to close kafkaDataProducer.")
+      case _ => ()
+    }
+    Try {
+      topicService.close()
+    } match {
+      case Failure(e: Throwable) => throw new StratioStreamingException("Error trying to close topicService.")
+      case _ => ()
+    }
+    Try {
+      zookeeperClient.close()
+    } match {
+      case Failure(e: Throwable) => throw new StratioStreamingException("Error trying to close zookeeper.")
+      case _ => ()
+    }
+
   }
 
   val streamingTopicName = InternalTopic.TOPIC_REQUEST.getTopicName();
@@ -331,7 +349,8 @@ class StratioStreamingAPI
       setSyncOperation(initialized)
       initialized
     }
-  def setSyncOperation(value:StreamingAPISyncOperation):Unit = _syncOperation = Option(value)
+
+  def setSyncOperation(value: StreamingAPISyncOperation): Unit = _syncOperation = Option(value)
 
   def asyncOperation: StreamingAPIAsyncOperation =
     _asyncOperation.getOrElse {
@@ -339,7 +358,8 @@ class StratioStreamingAPI
       setAsyncOperation(initialized)
       initialized
     }
-  def setAsyncOperation(value:StreamingAPIAsyncOperation):Unit = _asyncOperation = Option(value)
+
+  def setAsyncOperation(value: StreamingAPIAsyncOperation): Unit = _asyncOperation = Option(value)
 
   def statusOperation: StreamingAPIListOperation =
     _statusOperation.getOrElse {
@@ -347,7 +367,8 @@ class StratioStreamingAPI
       setStatusOperation(initialized)
       initialized
     }
-  def setStatusOperation(value:StreamingAPIListOperation):Unit = _statusOperation = Option(value)
+
+  def setStatusOperation(value: StreamingAPIListOperation): Unit = _statusOperation = Option(value)
 
   private def checkEphemeralNode() {
     val ephemeralNodePath = ZK_EPHEMERAL_NODE_STATUS_PATH

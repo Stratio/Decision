@@ -21,6 +21,8 @@ import java.util.{Properties, UUID}
 import kafka.producer._
 import org.slf4j.LoggerFactory
 
+import scala.util.Try
+
 class KafkaProducer(topic: String,
                          brokerList: String,
                          clientId: String = UUID.randomUUID().toString,
@@ -41,7 +43,7 @@ class KafkaProducer(topic: String,
 
   val producer = new Producer[AnyRef, AnyRef](new ProducerConfig(props))
 
-  override def close(): Unit = {
+  override def close(): Try[Unit] = Try {
     producer.close
   }
 
