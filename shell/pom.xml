@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.stratio.decision</groupId>
         <artifactId>stratio-decision</artifactId>
-        <version>0.9.1-RC2</version>
+        <version>0.9.1-RC3-SNAPSHOT</version>
     </parent>
     <artifactId>shell</artifactId>
     <name>Decision shell</name>
