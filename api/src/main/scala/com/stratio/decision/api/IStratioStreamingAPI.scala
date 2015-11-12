@@ -196,6 +196,7 @@ trait IStratioStreamingAPI {
    */
   @throws(classOf[StratioEngineStatusException])
   @throws(classOf[StratioAPIGenericException])
+  @throws(classOf[StratioEngineOperationException])
   def listStreams(): List[StratioStream]
 
   /**

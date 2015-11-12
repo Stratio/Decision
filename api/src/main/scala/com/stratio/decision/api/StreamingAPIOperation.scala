@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent._
 import scala.concurrent.duration._
-import scala.language.postfixOps
 
 class StreamingAPIOperation
   extends StratioStreamingAPIConfig {
@@ -59,6 +58,9 @@ class StreamingAPIOperation
       case e: TimeoutException => {
         log.error("Ack timeout expired for: " + message.getRequest)
         throw new StratioEngineOperationException("Acknowledge timeout expired" + message.getRequest)
+      }
+      case _ => {
+        throw new StratioEngineOperationException("Error connecting with engine")
       }
     }
   }

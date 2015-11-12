@@ -224,8 +224,7 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-      case ex: Throwable =>
-        throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
+      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
     }
   }
 
@@ -244,8 +243,7 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-      case ex: Throwable =>
-        throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
+      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
     }
   }
 
@@ -274,8 +272,8 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-      case ex: Throwable =>
-        throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
+      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex
+        .getMessage)
     }
   }
 

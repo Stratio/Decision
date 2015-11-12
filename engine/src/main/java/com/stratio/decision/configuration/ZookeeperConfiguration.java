@@ -31,7 +31,7 @@ public class ZookeeperConfiguration {
     @PostConstruct
     public void startUp() throws Exception {
         ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum()).createEphemeralZNode(
-                STREAMING.ZK_BASE_PATH + "/" + "engine", String.valueOf(System.currentTimeMillis()).getBytes());
+                STREAMING.ZK_EPHEMERAL_NODE_PATH, String.valueOf(System.currentTimeMillis()).getBytes());
     }
 
 }

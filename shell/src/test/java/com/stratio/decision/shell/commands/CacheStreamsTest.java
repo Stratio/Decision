@@ -19,6 +19,7 @@ import com.stratio.decision.commons.constants.ColumnType;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.exceptions.StratioAPIGenericException;
 import com.stratio.decision.commons.exceptions.StratioEngineConnectionException;
+import com.stratio.decision.commons.exceptions.StratioEngineOperationException;
 import com.stratio.decision.commons.exceptions.StratioEngineStatusException;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StreamQuery;
@@ -51,7 +52,7 @@ public class CacheStreamsTest extends BaseShellTest {
     }
 
     @Test
-    public void listOneElementCached() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException {
+    public void listOneElementCached() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException, StratioEngineOperationException {
         String streamName = "testStream";
         List<ColumnNameTypeValue> values = new ArrayList<>();
         values.add(new ColumnNameTypeValue("column1", ColumnType.STRING, null));
@@ -74,7 +75,7 @@ public class CacheStreamsTest extends BaseShellTest {
     }
 
     @Test
-    public void listOneElementCachedAndRefreshed() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException {
+    public void listOneElementCachedAndRefreshed() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException, StratioEngineOperationException, StratioEngineOperationException {
         String streamName = "testStream";
         List<ColumnNameTypeValue> values = new ArrayList<>();
         values.add(new ColumnNameTypeValue("column1", ColumnType.STRING, null));
