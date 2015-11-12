@@ -43,7 +43,7 @@ public class StreamCommandTest extends BaseShellTest {
 
     @Test
     public void listWith0StreamsTest() throws StratioEngineStatusException, StratioAPIGenericException, IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("list");
         assertEquals(true, cr.isSuccess());

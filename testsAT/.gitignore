@@ -1,0 +1,12 @@
+*.project
+*.settings/*
+*stratio-streaming-0.3.3.pom
+*stratio-streaming-0.3.3.pom.asc
+*target/*
+#IntellijIDEA files
+*.idea
+*.iml
+*.ipr
+*.iws
+shell.log
+decision.log

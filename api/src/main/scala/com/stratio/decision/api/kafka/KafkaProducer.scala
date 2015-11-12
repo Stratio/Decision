@@ -22,14 +22,14 @@ import kafka.producer._
 import org.slf4j.LoggerFactory
 
 class KafkaProducer(topic: String,
-                         brokerList: String,
-                         clientId: String = UUID.randomUUID().toString,
-                         synchronously: Boolean = true,
-                         compress: Boolean = true,
-                         batchSize: Integer = 200,
-                         messageSendMaxRetries: Integer = 3,
-                         requestRequiredAcks: Integer = -1
-                          ) extends Closeable {
+                    brokerList: String,
+                    clientId: String = UUID.randomUUID().toString,
+                    synchronously: Boolean = true,
+                    compress: Boolean = true,
+                    batchSize: Integer = 200,
+                    messageSendMaxRetries: Integer = 3,
+                    requestRequiredAcks: Integer = -1
+                     ) extends Closeable {
 
   val props = new Properties()
   val log = LoggerFactory.getLogger(getClass)

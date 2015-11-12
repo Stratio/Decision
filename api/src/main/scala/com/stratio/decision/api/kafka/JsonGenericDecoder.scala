@@ -26,8 +26,7 @@ class JsonGenericDecoder extends Decoder[StratioStreamingMessage] {
     try {
       jsonParser.fromJson(new String(bytes), classOf[StratioStreamingMessage])
     } catch {
-      case _: Throwable =>
-        throw new StratioAPIGenericException("Decision API error: unable to decode the engine message")
+      case _ => throw new StratioAPIGenericException("Decision API error: unable to decode the engine message")
     }
   }
 }

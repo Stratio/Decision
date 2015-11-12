@@ -23,7 +23,7 @@ import java.util.List;
 
 public interface CachedStreamsDAO {
 
-    List<StratioStream> listStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException;
+    List<StratioStream> listStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException, StratioEngineOperationException;
 
     void newStream(String name, List<ColumnNameType> columns) throws StratioEngineStatusException,
             StratioAPISecurityException, StratioEngineOperationException, StratioEngineConnectionException;
@@ -31,6 +31,6 @@ public interface CachedStreamsDAO {
     void dropStream(String name) throws StratioEngineStatusException, StratioAPISecurityException,
             StratioEngineOperationException, StratioEngineConnectionException;
 
-    List<StratioStream> listUncachedStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException;
+    List<StratioStream> listUncachedStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException, StratioEngineOperationException;
 
 }

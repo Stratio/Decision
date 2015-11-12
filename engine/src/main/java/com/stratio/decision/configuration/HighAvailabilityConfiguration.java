@@ -24,8 +24,6 @@ import javax.annotation.PostConstruct;
 @Configuration
 public class HighAvailabilityConfiguration {
 
-    private static final String PATH = "/latch";
-
     @Autowired
     private ConfigurationContext configurationContext;
 

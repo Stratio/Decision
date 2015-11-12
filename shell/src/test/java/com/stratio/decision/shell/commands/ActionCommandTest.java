@@ -17,6 +17,7 @@ package com.stratio.decision.shell.commands;
 
 import com.stratio.decision.commons.exceptions.StratioAPIGenericException;
 import com.stratio.decision.commons.exceptions.StratioEngineConnectionException;
+import com.stratio.decision.commons.exceptions.StratioEngineOperationException;
 import com.stratio.decision.commons.exceptions.StratioEngineStatusException;
 import com.stratio.decision.commons.streams.StratioStream;
 import org.junit.Before;
@@ -38,7 +39,7 @@ public class ActionCommandTest extends BaseShellTest {
 
     @Test
     public void indexStreamStartTest() throws StratioEngineStatusException, StratioAPIGenericException, IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("index start --stream testStream");
         assertEquals(true, cr.isSuccess());
@@ -47,7 +48,7 @@ public class ActionCommandTest extends BaseShellTest {
 
     @Test
     public void indexStreamStopTest() throws StratioEngineStatusException, StratioAPIGenericException, IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("index stop --stream testStream");
         assertEquals(true, cr.isSuccess());
@@ -56,7 +57,7 @@ public class ActionCommandTest extends BaseShellTest {
 
     @Test
     public void listenStreamStartTest() throws StratioEngineStatusException, StratioAPIGenericException, IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("listen start --stream testStream");
         assertEquals(true, cr.isSuccess());
@@ -65,7 +66,7 @@ public class ActionCommandTest extends BaseShellTest {
 
     @Test
     public void listenStreamStopTest() throws StratioEngineStatusException, StratioAPIGenericException, IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("listen stop --stream testStream");
         assertEquals(true, cr.isSuccess());
@@ -75,7 +76,7 @@ public class ActionCommandTest extends BaseShellTest {
     @Test
     public void saveCassandraStreamStartTest() throws StratioEngineStatusException, StratioAPIGenericException,
             IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("save cassandra start --stream testStream");
         assertEquals(true, cr.isSuccess());
@@ -85,7 +86,7 @@ public class ActionCommandTest extends BaseShellTest {
     @Test
     public void saveCassandraStreamStopTest() throws StratioEngineStatusException, StratioAPIGenericException,
             IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("save cassandra stop --stream testStream");
         assertEquals(true, cr.isSuccess());
@@ -95,7 +96,7 @@ public class ActionCommandTest extends BaseShellTest {
     @Test
     public void saveMongoStreamStartTest() throws StratioEngineStatusException, StratioAPIGenericException,
             IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("save mongo start --stream testStream");
         assertEquals(true, cr.isSuccess());
@@ -105,7 +106,7 @@ public class ActionCommandTest extends BaseShellTest {
     @Test
     public void saveMongoStreamStopTest() throws StratioEngineStatusException, StratioAPIGenericException,
             IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("save mongo stop --stream testStream");
         assertEquals(true, cr.isSuccess());
@@ -115,7 +116,7 @@ public class ActionCommandTest extends BaseShellTest {
     @Test
     public void saveSolrStreamStartTest() throws StratioEngineStatusException, StratioAPIGenericException,
             IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("save solr start --stream testStream");
         assertEquals(true, cr.isSuccess());
@@ -125,7 +126,7 @@ public class ActionCommandTest extends BaseShellTest {
     @Test
     public void saveSolrStreamStopTest() throws StratioEngineStatusException, StratioAPIGenericException,
             IOException,
-            StratioEngineConnectionException {
+            StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
         CommandResult cr = shell.executeCommand("save solr stop --stream testStream");
         assertEquals(true, cr.isSuccess());

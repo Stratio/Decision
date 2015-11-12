@@ -36,13 +36,13 @@ public class CachedStreamsDAOImpl implements CachedStreamsDAO {
 
     @Cacheable(value = "streams")
     @Override
-    public List<StratioStream> listStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException {
+    public List<StratioStream> listStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException, StratioEngineOperationException {
         return ssaw.api().listStreams();
     }
 
     @Override
     @Caching(evict = @CacheEvict(value = "streams", allEntries = true, beforeInvocation = true), cacheable = @Cacheable(value = "streams"))
-    public List<StratioStream> listUncachedStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException {
+    public List<StratioStream> listUncachedStreams() throws StratioEngineStatusException, StratioAPIGenericException, StratioEngineConnectionException, StratioEngineOperationException {
         return ssaw.api().listStreams();
     }
 

@@ -83,7 +83,7 @@ class StreamingAPISyncOperation(
         case _ => Some(parsedResponse)
       }
     } catch {
-      case _: Throwable => None
+      case _ => None
     }
   }
 }
