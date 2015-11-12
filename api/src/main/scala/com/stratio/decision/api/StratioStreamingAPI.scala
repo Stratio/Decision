@@ -28,7 +28,7 @@ import com.stratio.decision.commons.constants.STREAM_OPERATIONS.ACTION.{INDEX, L
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.DEFINITION
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.DEFINITION.{ADD_QUERY, ALTER, DROP, REMOVE_QUERY}
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.MANIPULATION.LIST
-import com.stratio.decision.commons.exceptions.{StratioStreamingException, StratioEngineConnectionException, StratioEngineOperationException, StratioEngineStatusException}
+import com.stratio.decision.commons.exceptions.{StratioEngineConnectionException, StratioEngineOperationException, StratioEngineStatusException, StratioStreamingException}
 import com.stratio.decision.commons.kafka.service.{KafkaTopicService, TopicService}
 import com.stratio.decision.commons.messages.ColumnNameTypeValue
 import com.stratio.decision.commons.streams.StratioStream
@@ -272,7 +272,8 @@ class StratioStreamingAPI
       initializeTopic()
       this
     } catch {
-      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
+      case ex => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex
+        .getMessage)
     }
   }
 
