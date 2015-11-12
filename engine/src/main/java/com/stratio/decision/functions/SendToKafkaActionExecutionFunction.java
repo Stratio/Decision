@@ -50,6 +50,11 @@ public class SendToKafkaActionExecutionFunction extends BaseActionExecutionFunct
         getProducer().send(kafkaMessages);
     }
 
+    @Override
+    public Boolean check() throws Exception {
+        return null;
+    }
+
     private Serializer<String, StratioStreamingMessage> getSerializer() {
         if (kafkaToJavaSerializer == null) {
             kafkaToJavaSerializer = new KafkaToJavaSerializer(GsonFactory.getInstance());
