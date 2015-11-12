@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2014 Stratio (http://stratio.com)
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -271,24 +271,53 @@ public class StreamingContextConfiguration {
         JavaPairDStream<StreamAction, Iterable<StratioStreamingMessage>> groupedDataDstream = pairedDataDstream
                 .groupByKey();
 
-        groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
-                new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
-                        ProtocolOptions.DEFAULT_PORT));
+        try {
 
-        groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(
-                new SaveToMongoActionExecutionFunction(configurationContext.getMongoHosts(),
-                        configurationContext.getMongoUsername(), configurationContext
-                        .getMongoPassword()));
+            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
+                    ProtocolOptions.DEFAULT_PORT);
+            if (saveToCassandraActionExecutionFunction.check()) {
+                log.info("Cassandra is configured properly");
+                groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
+                        saveToCassandraActionExecutionFunction);
+            } else {
+                log.error("Cassandra is NOT configured properly");
+            }
 
-        groupedDataDstream.filter(new FilterDataFunction(StreamAction.INDEXED)).foreachRDD(
-                new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHosts(),
-                        configurationContext.getElasticSearchClusterName()));
+            SaveToMongoActionExecutionFunction saveToMongoActionExecutionFunction = new SaveToMongoActionExecutionFunction(configurationContext.getMongoHosts(),
+                    configurationContext.getMongoUsername(), configurationContext
+                    .getMongoPassword());
+            if (saveToMongoActionExecutionFunction.check()) {
+                log.info("MongoDB is configured properly");
+                groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(
+                        saveToMongoActionExecutionFunction);
+            } else {
+                log.error("MongoDB is NOT configured properly");
+            }
 
-        groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_SOLR)).foreachRDD(
-                new SaveToSolrActionExecutionFunction(configurationContext.getSolrHosts(), configurationContext.getSolrCloud(), configurationContext.getSolrDataDir()));
+            SaveToElasticSearchActionExecutionFunction saveToElasticSearchActionExecutionFunction = new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHosts(),
+                    configurationContext.getElasticSearchClusterName());
+            if (saveToElasticSearchActionExecutionFunction.check()) {
+                log.info("ElasticSearch is configured properly");
+                groupedDataDstream.filter(new FilterDataFunction(StreamAction.INDEXED)).foreachRDD(saveToElasticSearchActionExecutionFunction);
+            } else {
+                log.error("ElasticSearch is NOT configured properly");
+            }
 
-        groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
-                new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));
+            SaveToSolrActionExecutionFunction saveToSolrActionExecutionFunction = new SaveToSolrActionExecutionFunction(configurationContext.getSolrHosts(), configurationContext.getSolrCloud(),
+                    configurationContext.getSolrDataDir());
+            if (saveToSolrActionExecutionFunction.check()) {
+                log.info("Solr is configured properly");
+                groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_SOLR)).foreachRDD(
+                        saveToSolrActionExecutionFunction);
+            } else {
+                log.error("Solr is NOT configured properly");
+            }
+
+            groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
+                    new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

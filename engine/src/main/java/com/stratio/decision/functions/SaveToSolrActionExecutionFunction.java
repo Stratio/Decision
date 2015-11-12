@@ -61,13 +61,23 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
     }
 
     @Override
+    public Boolean check() throws Exception {
+        try {
+            solrOperationsService.getCoreList();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
         Map<String, Collection<SolrInputDocument>> elemntsToInsert = new HashMap<String, Collection<SolrInputDocument>>();
         int count = 0;
         for (StratioStreamingMessage stratioStreamingMessage : messages) {
             count += 1;
             SolrInputDocument document = new SolrInputDocument();
-            document.addField("stratio_streaming_id", System.nanoTime() + "-" + count);
+            document.addField("stratio_decision_id", System.nanoTime() + "-" + count);
             for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
                 document.addField(column.getColumn(), column.getValue());
             }
@@ -90,9 +100,9 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
                     log.error("Solr cloud status not yet properly initialized, retrying");
                     retryStrategy.errorOccured();
                 } catch (RuntimeException ex) {
-                    throw new RuntimeException("Error while initializing Solr Cloud core", ex);
+                    log.error("Error while initializing Solr Cloud core ", ex.getMessage());
                 } catch (Exception ex) {
-                    throw new RuntimeException(ex);
+                    log.error("Error in Solr: " + ex.getMessage());
                 }
             }
         }

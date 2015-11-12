@@ -52,6 +52,16 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
     }
 
     @Override
+    public Boolean check() throws Exception {
+        try {
+            getClient().admin().indices().prepareExists(elasticSearchClusterName).execute();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
 
         BulkRequestBuilder bulkBuilder = getClient().prepareBulk();
@@ -77,7 +87,11 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
 
         }
 
-        bulkBuilder.execute().actionGet();
+        try {
+            bulkBuilder.execute().actionGet();
+        } catch (Exception e) {
+            log.error("Error in ElasticSearch: " + e.getMessage());
+        }
 
     }
 
