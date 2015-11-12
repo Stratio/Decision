@@ -20,12 +20,16 @@ import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.service.SaveToCassandraOperationsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionFunction {
 
     private static final long serialVersionUID = -3116164624590830333L;
+
+    private static final Logger log = LoggerFactory.getLogger(SaveToCassandraActionExecutionFunction.class);
 
     private Session cassandraSession;
 
@@ -39,6 +43,15 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
     public SaveToCassandraActionExecutionFunction(String cassandraQuorum, int cassandraPort) {
         this.cassandraQuorum = cassandraQuorum;
         this.cassandraPort = cassandraPort;
+    }
+
+    @Override
+    public Boolean check() throws Exception {
+        try {
+            return getSession().getState().getConnectedHosts().size()>0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -61,7 +74,11 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
                     stratioStreamingMessage.getStreamName(), stratioStreamingMessage.getColumns(), TIMESTAMP_FIELD));
         }
 
-        getSession().execute(batch);
+        try {
+            getSession().execute(batch);
+        } catch (Exception e) {
+            log.error("Error in Cassandra: " + e.getMessage());
+        }
     }
 
     private SaveToCassandraOperationsService getCassandraTableOperationsService() {

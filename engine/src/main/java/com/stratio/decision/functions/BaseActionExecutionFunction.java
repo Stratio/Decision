@@ -41,4 +41,6 @@ public abstract class BaseActionExecutionFunction implements
     }
 
     public abstract void process(Iterable<StratioStreamingMessage> messages) throws Exception;
+
+    public abstract Boolean check() throws Exception;
 }
