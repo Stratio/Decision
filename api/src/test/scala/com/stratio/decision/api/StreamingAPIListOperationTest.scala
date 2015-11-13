@@ -17,7 +17,6 @@ package com.stratio.decision.api
 
 import java.util.concurrent.TimeoutException
 
-import com.stratio.decision.api.StreamingAPIListOperation
 import com.stratio.decision.api.kafka.KafkaProducer
 import com.stratio.decision.api.zookeeper.ZookeeperConsumer
 import com.stratio.decision.commons.exceptions.{StratioAPIGenericException, StratioEngineOperationException}
@@ -64,7 +63,7 @@ class StreamingAPIListOperationTest extends FunSpec
       try {
         stratioStreamingAPIListOperation.getListStreams(stratioStreamingMessage)
       } catch {
-        case _ => fail()
+        case _: Throwable => fail()
       }
     }
 

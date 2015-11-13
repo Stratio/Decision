@@ -15,7 +15,6 @@
  */
 package com.stratio.decision.api
 
-import com.stratio.decision.api.StreamingAPISyncOperation
 import com.stratio.decision.api.kafka.KafkaProducer
 import com.stratio.decision.api.zookeeper.ZookeeperConsumer
 import com.stratio.decision.commons.constants.ReplyCode._
@@ -64,7 +63,7 @@ class StreamingAPISyncOperationTest extends FunSpec
       try {
         stratioStreamingAPISyncOperation.performSyncOperation(stratioStreamingMessage)
       } catch {
-        case _ => fail()
+        case _: Throwable => fail()
       }
     }
 
