@@ -49,30 +49,32 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
         Map<String, BulkWriteOperation> elementsToInsert = new HashMap<String, BulkWriteOperation>();
 
-        for (StratioStreamingMessage event : messages) {
-            BasicDBObject object = new BasicDBObject(TIMESTAMP_FIELD, event.getTimestamp());
-            for (ColumnNameTypeValue columnNameTypeValue : event.getColumns()) {
-                object.append(columnNameTypeValue.getColumn(), columnNameTypeValue.getValue());
+        try {
+
+            for (StratioStreamingMessage event : messages) {
+                BasicDBObject object = new BasicDBObject(TIMESTAMP_FIELD, event.getTimestamp());
+                for (ColumnNameTypeValue columnNameTypeValue : event.getColumns()) {
+                    object.append(columnNameTypeValue.getColumn(), columnNameTypeValue.getValue());
+                }
+
+                BulkWriteOperation bulkInsertOperation = elementsToInsert.get(event.getStreamName());
+
+                if (bulkInsertOperation == null) {
+                    bulkInsertOperation = getDB().getCollection(event.getStreamName()).initializeUnorderedBulkOperation();
+
+                    elementsToInsert.put(event.getStreamName(), bulkInsertOperation);
+                    getDB().getCollection(event.getStreamName()).createIndex(new BasicDBObject(TIMESTAMP_FIELD, -1));
+                }
+
+                bulkInsertOperation.insert(object);
             }
 
-            BulkWriteOperation bulkInsertOperation = elementsToInsert.get(event.getStreamName());
-
-            if (bulkInsertOperation == null) {
-                bulkInsertOperation = getDB().getCollection(event.getStreamName()).initializeUnorderedBulkOperation();
-
-                elementsToInsert.put(event.getStreamName(), bulkInsertOperation);
-                getDB().getCollection(event.getStreamName()).createIndex(new BasicDBObject(TIMESTAMP_FIELD, -1));
-            }
-
-            bulkInsertOperation.insert(object);
-        }
-
-        for (Entry<String, BulkWriteOperation> stratioStreamingMessage : elementsToInsert.entrySet()) {
-            try {
+            for (Entry<String, BulkWriteOperation> stratioStreamingMessage : elementsToInsert.entrySet()) {
                 stratioStreamingMessage.getValue().execute();
-            } catch (Exception e) {
-                log.error("Error in Mongo: " + e.getMessage());
             }
+
+        } catch (Exception e) {
+            log.error("Error saving in Mongo: " + e.getMessage());
         }
     }
 

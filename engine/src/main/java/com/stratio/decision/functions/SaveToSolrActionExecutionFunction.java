@@ -72,41 +72,43 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
 
     @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
-        Map<String, Collection<SolrInputDocument>> elemntsToInsert = new HashMap<String, Collection<SolrInputDocument>>();
-        int count = 0;
-        for (StratioStreamingMessage stratioStreamingMessage : messages) {
-            count += 1;
-            SolrInputDocument document = new SolrInputDocument();
-            document.addField("stratio_decision_id", System.nanoTime() + "-" + count);
-            for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
-                document.addField(column.getColumn(), column.getValue());
-            }
-            checkCore(stratioStreamingMessage);
-            Collection<SolrInputDocument> collection = elemntsToInsert.get(stratioStreamingMessage.getStreamName());
-            if(collection == null) {
-                collection = new HashSet<>();
-            }
-            collection.add(document);
-            elemntsToInsert.put(stratioStreamingMessage.getStreamName(), collection);
-        }
-        while(retryStrategy.shouldRetry()) {
-            try {
-                for (Map.Entry<String, Collection<SolrInputDocument>> elem : elemntsToInsert.entrySet()) {
-                    getSolrclient(elem.getKey()).add(elem.getValue());
+        try {
+            Map<String, Collection<SolrInputDocument>> elemntsToInsert = new HashMap<String, Collection<SolrInputDocument>>();
+            int count = 0;
+            for (StratioStreamingMessage stratioStreamingMessage : messages) {
+                count += 1;
+                SolrInputDocument document = new SolrInputDocument();
+                document.addField("stratio_decision_id", System.nanoTime() + "-" + count);
+                for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
+                    document.addField(column.getColumn(), column.getValue());
                 }
-                break;
-            } catch(SolrException e) {
+                checkCore(stratioStreamingMessage);
+                Collection<SolrInputDocument> collection = elemntsToInsert.get(stratioStreamingMessage.getStreamName());
+                if (collection == null) {
+                    collection = new HashSet<>();
+                }
+                collection.add(document);
+                elemntsToInsert.put(stratioStreamingMessage.getStreamName(), collection);
+            }
+            while (retryStrategy.shouldRetry()) {
                 try {
-                    log.error("Solr cloud status not yet properly initialized, retrying");
-                    retryStrategy.errorOccured();
-                } catch (RuntimeException ex) {
-                    log.error("Error while initializing Solr Cloud core ", ex.getMessage());
-                } catch (Exception ex) {
-                    log.error("Error in Solr: " + ex.getMessage());
+                    for (Map.Entry<String, Collection<SolrInputDocument>> elem : elemntsToInsert.entrySet()) {
+                        getSolrclient(elem.getKey()).add(elem.getValue());
+                    }
+                    break;
+                } catch (SolrException e) {
+                    try {
+                        log.error("Solr cloud status not yet properly initialized, retrying");
+                        retryStrategy.errorOccured();
+                    } catch (RuntimeException ex) {
+                        log.error("Error while initializing Solr Cloud core ", ex.getMessage());
+                    }
                 }
             }
+            flushClients();
+        } catch (Exception ex) {
+            log.error("Error in Solr: " + ex.getMessage());
         }
-        flushClients();
     }
 
     private void checkCore(StratioStreamingMessage message) throws IOException, SolrServerException, ParserConfigurationException, TransformerException, SAXException, URISyntaxException, InterruptedException {
@@ -151,7 +153,7 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
         } else {
             if (isCloud) {
                 solrClient = new CloudSolrClient(solrHosts);
-                ((CloudSolrClient)solrClient).setDefaultCollection(core);
+                ((CloudSolrClient) solrClient).setDefaultCollection(core);
             } else {
                 solrClient = new HttpSolrClient("http://" + solrHosts + "/solr/" + core);
             }
@@ -159,7 +161,6 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
         }
         return solrClient;
     }
-
 
 
 }
