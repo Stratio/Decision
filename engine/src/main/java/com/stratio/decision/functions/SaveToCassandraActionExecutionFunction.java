@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2014 Stratio (http://stratio.com)
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,7 +48,7 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
     @Override
     public Boolean check() throws Exception {
         try {
-            return getSession().getState().getConnectedHosts().size()>0;
+            return getSession().getState().getConnectedHosts().size() > 0;
         } catch (Exception e) {
             return false;
         }
@@ -56,26 +56,28 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
     @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
-        BatchStatement batch = new BatchStatement();
-        for (StratioStreamingMessage stratioStreamingMessage : messages) {
-            Set<String> columns = getColumnSet(stratioStreamingMessage.getColumns());
-            if (tablenames.get(stratioStreamingMessage.getStreamName()) == null) {
-                getCassandraTableOperationsService().createTable(stratioStreamingMessage.getStreamName(),
-                        stratioStreamingMessage.getColumns(), TIMESTAMP_FIELD);
-                refreshTablenames();
-            }
-            if (tablenames.get(stratioStreamingMessage.getStreamName()) != columns.hashCode()) {
-                getCassandraTableOperationsService().alterTable(stratioStreamingMessage.getStreamName(), columns,
-                        stratioStreamingMessage.getColumns());
-                refreshTablenames();
-            }
-
-            batch.add(getCassandraTableOperationsService().createInsertStatement(
-                    stratioStreamingMessage.getStreamName(), stratioStreamingMessage.getColumns(), TIMESTAMP_FIELD));
-        }
-
         try {
+
+            BatchStatement batch = new BatchStatement();
+            for (StratioStreamingMessage stratioStreamingMessage : messages) {
+                Set<String> columns = getColumnSet(stratioStreamingMessage.getColumns());
+                if (tablenames.get(stratioStreamingMessage.getStreamName()) == null) {
+                    getCassandraTableOperationsService().createTable(stratioStreamingMessage.getStreamName(),
+                            stratioStreamingMessage.getColumns(), TIMESTAMP_FIELD);
+                    refreshTablenames();
+                }
+                if (tablenames.get(stratioStreamingMessage.getStreamName()) != columns.hashCode()) {
+                    getCassandraTableOperationsService().alterTable(stratioStreamingMessage.getStreamName(), columns,
+                            stratioStreamingMessage.getColumns());
+                    refreshTablenames();
+                }
+
+                batch.add(getCassandraTableOperationsService().createInsertStatement(
+                        stratioStreamingMessage.getStreamName(), stratioStreamingMessage.getColumns(), TIMESTAMP_FIELD));
+            }
+
             getSession().execute(batch);
+
         } catch (Exception e) {
             log.error("Error in Cassandra: " + e.getMessage());
         }

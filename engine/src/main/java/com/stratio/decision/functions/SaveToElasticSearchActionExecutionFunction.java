@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2014 Stratio (http://stratio.com)
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,32 +63,33 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
 
     @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
+        try {
 
-        BulkRequestBuilder bulkBuilder = getClient().prepareBulk();
-        for (StratioStreamingMessage stratioStreamingMessage : messages) {
-            try {
-                XContentBuilder contentBuilder = XContentFactory.jsonBuilder().startObject();
+            BulkRequestBuilder bulkBuilder = getClient().prepareBulk();
+            for (StratioStreamingMessage stratioStreamingMessage : messages) {
+                try {
+                    XContentBuilder contentBuilder = XContentFactory.jsonBuilder().startObject();
 
-                for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
-                    contentBuilder = contentBuilder.field(column.getColumn(), column.getValue());
+                    for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
+                        contentBuilder = contentBuilder.field(column.getColumn(), column.getValue());
+                    }
+                    contentBuilder = contentBuilder.field("@timestamp",
+                            elasicSearchTimestampFormat.format(stratioStreamingMessage.getTimestamp()));
+
+                    contentBuilder = contentBuilder.endObject();
+                    IndexRequestBuilder request = getClient().prepareIndex("stratiostreaming",
+                            stratioStreamingMessage.getStreamName()).setSource(contentBuilder);
+                    bulkBuilder.add(request);
+
+                } catch (IOException e) {
+                    log.error("Error generating a index to event element into stream {}",
+                            stratioStreamingMessage.getStreamName(), e);
                 }
-                contentBuilder = contentBuilder.field("@timestamp",
-                        elasicSearchTimestampFormat.format(stratioStreamingMessage.getTimestamp()));
 
-                contentBuilder = contentBuilder.endObject();
-                IndexRequestBuilder request = getClient().prepareIndex("stratiostreaming",
-                        stratioStreamingMessage.getStreamName()).setSource(contentBuilder);
-                bulkBuilder.add(request);
-
-            } catch (IOException e) {
-                log.error("Error generating a index to event element into stream {}",
-                        stratioStreamingMessage.getStreamName(), e);
             }
 
-        }
-
-        try {
             bulkBuilder.execute().actionGet();
+
         } catch (Exception e) {
             log.error("Error in ElasticSearch: " + e.getMessage());
         }
