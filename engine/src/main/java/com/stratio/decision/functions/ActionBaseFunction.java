@@ -15,22 +15,24 @@
  */
 package com.stratio.decision.functions;
 
-import com.stratio.decision.commons.constants.ReplyCode;
-import com.stratio.decision.commons.dto.ActionCallbackDto;
-import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.exception.RequestValidationException;
-import com.stratio.decision.functions.validator.RequestValidation;
-import com.stratio.decision.functions.validator.StreamAllowedValidation;
-import com.stratio.decision.functions.validator.StreamNameNotNullValidation;
-import com.stratio.decision.service.StreamOperationService;
-import com.stratio.decision.utils.ZKUtils;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import com.stratio.decision.commons.constants.ReplyCode;
+import com.stratio.decision.commons.dto.ActionCallbackDto;
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.exception.RequestValidationException;
+import com.stratio.decision.exception.StreamExistsException;
+import com.stratio.decision.functions.validator.RequestValidation;
+import com.stratio.decision.functions.validator.StreamAllowedValidation;
+import com.stratio.decision.functions.validator.StreamNameNotNullValidation;
+import com.stratio.decision.service.StreamOperationService;
+import com.stratio.decision.utils.ZKUtils;
 
 public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStreamingMessage>, Void> {
 
@@ -98,6 +100,10 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
         for (RequestValidation validation : validators) {
             try {
                 validation.validate(request);
+            } catch (StreamExistsException e)  {
+                log.warn("Stream already exists: " + e.getMessage());
+                ackStreamingOperation(request, new ActionCallbackDto(e.getCode(), e.getMessage()));
+                return false;
             } catch (RequestValidationException e) {
                 log.error("Action validation error", e);
                 ackStreamingOperation(request, new ActionCallbackDto(e.getCode(), e.getMessage()));
