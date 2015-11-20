@@ -62,6 +62,9 @@ class StreamingAPISyncOperation(
             createLogError(replyCode, replyDescription)
             throw new StratioAPISecurityException(replyDescription)
           }
+          case s if s == KO_STREAM_ALREADY_EXISTS.getCode() => {
+            log.warn("Stream already exists")
+          }
           case _ => {
             createLogError(replyCode, replyDescription)
             throw new StratioEngineOperationException("StratioEngine error: " + replyDescription)
@@ -83,7 +86,7 @@ class StreamingAPISyncOperation(
         case _ => Some(parsedResponse)
       }
     } catch {
-      case _ => None
+      case _: Throwable => None
     }
   }
 }

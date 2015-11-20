@@ -17,7 +17,7 @@ package com.stratio.decision.functions.validator;
 
 import com.stratio.decision.commons.constants.ReplyCode;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.exception.RequestValidationException;
+import com.stratio.decision.exception.StreamExistsException;
 import com.stratio.decision.service.StreamOperationService;
 
 public class StreamExistsValidation extends BaseSiddhiRequestValidation {
@@ -29,9 +29,9 @@ public class StreamExistsValidation extends BaseSiddhiRequestValidation {
     }
 
     @Override
-    public void validate(StratioStreamingMessage request) throws RequestValidationException {
+    public void validate(StratioStreamingMessage request) throws StreamExistsException {
         if (getStreamOperationService().streamExist(request.getStreamName())) {
-            throw new RequestValidationException(ReplyCode.KO_STREAM_ALREADY_EXISTS.getCode(), String.format(
+            throw new StreamExistsException(ReplyCode.KO_STREAM_ALREADY_EXISTS.getCode(), String.format(
                     STREAM_ALREADY_EXISTS_MESSAGE, request.getStreamName()));
         }
     }

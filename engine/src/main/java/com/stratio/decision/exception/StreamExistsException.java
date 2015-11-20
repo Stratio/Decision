@@ -13,14 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.functions.validator;
+package com.stratio.decision.exception;
 
-import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.exception.RequestValidationException;
-import com.stratio.decision.exception.StreamExistsException;
+public class StreamExistsException extends RequestValidationException {
 
-public interface RequestValidation {
+    private static final long serialVersionUID = 1191962540939323834L;
 
-    void validate(StratioStreamingMessage request) throws RequestValidationException, StreamExistsException;
+    private final int code;
+
+    public StreamExistsException(int code, String message, Throwable cause) {
+        super(code, message, cause);
+        this.code = code;
+    }
+
+    public StreamExistsException(int code, String message) {
+        super(code, message);
+        this.code = code;
+    }
+
+    public StreamExistsException(int code, Throwable cause) {
+        super(code, cause);
+        this.code = code;
+    }
 
 }

@@ -19,6 +19,7 @@ import com.stratio.decision.commons.constants.ReplyCode;
 import com.stratio.decision.commons.dto.ActionCallbackDto;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.exception.RequestValidationException;
+import com.stratio.decision.exception.StreamExistsException;
 import com.stratio.decision.functions.validator.RequestValidation;
 import com.stratio.decision.functions.validator.StreamAllowedValidation;
 import com.stratio.decision.functions.validator.StreamNameNotNullValidation;
@@ -98,6 +99,10 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
         for (RequestValidation validation : validators) {
             try {
                 validation.validate(request);
+            } catch (StreamExistsException e)  {
+                log.warn("Stream already exists: " + e.getMessage());
+                ackStreamingOperation(request, new ActionCallbackDto(e.getCode(), e.getMessage()));
+                return false;
             } catch (RequestValidationException e) {
                 log.error("Action validation error", e);
                 ackStreamingOperation(request, new ActionCallbackDto(e.getCode(), e.getMessage()));

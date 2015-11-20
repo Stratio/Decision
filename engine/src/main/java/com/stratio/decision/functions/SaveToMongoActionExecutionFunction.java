@@ -74,7 +74,7 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
             }
 
         } catch (Exception e) {
-            log.error("Error in Mongo: " + e.getMessage());
+            log.error("Error saving in Mongo: " + e.getMessage());
         }
     }
 
