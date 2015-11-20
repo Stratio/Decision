@@ -1,6 +1,5 @@
 package com.stratio.decision.api
 
-import com.stratio.decision.api.StreamingAPIAsyncOperation
 import com.stratio.decision.api.kafka.KafkaProducer
 import com.stratio.decision.commons.constants.ReplyCode._
 import com.stratio.decision.commons.messages.StratioStreamingMessage
@@ -31,7 +30,7 @@ with MockitoSugar {
       try {
         stratioStreamingAPIAsyncOperation.performAsyncOperation(stratioStreamingMessage)
       } catch {
-        case _ => fail()
+        case _: Throwable => fail()
       }
     }
   }
