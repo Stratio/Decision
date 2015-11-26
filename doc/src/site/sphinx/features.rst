@@ -12,7 +12,7 @@ You can see streams as SQL tables in a relational database, but streams
 are created in an ephemeral environment and no relationship or
 constraint rules are applied on them.
 
-**Stratio Decision lets you *create, alter or drop streams* on the
+**Stratio Decision lets you create, alter or drop streams on the
 fly.**
 
 Queries on streams:

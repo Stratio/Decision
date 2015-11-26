@@ -1,18 +1,18 @@
 .. _cep-query-syntax:
 
 Complex Event Processing Query Syntax
-**********************************
+*************************************
 
 Stratio Decision embedded the Siddhi Complex Event Processing Engine (Siddhi CEP). The Siddhi CEP uses the Siddhi Query Language (SiddhiQL), it is a declarative language designed for processing streams and identify complex event occurrences. The queries describe how to combine existing event streams information to create new event streams. When the queries are deployed in the Stratio Decision engine, those queries process incoming event streams filtering the data, and generates new output event streams if they don’t exist.
 
 Syntax
-=============
+======
 
 The Siddhi language includes the following constructs:
 
-- Event Definitions
-- Queries (Filters, Windows, Joins, Patterns, Sequences)
-- Calls to external functions
+- Event Definitions.
+- Queries (Filters, Windows, Joins, Patterns, Sequences).
+- Calls to external functions.
 
 Siddhi Query Language definition:
 ::
@@ -40,12 +40,12 @@ Siddhi Query Language definition:
 
 
 Event Definitions
-==========================
+=================
 
 The event stream definition defines the event stream schema. An event stream definition contains a unique name and a set of attributes assigned specific types, with uniquely identifiable names within the stream. Syntax:
 ::
 
-    create --stream <stream name> "<attribute name>.<attribute type>, <attribute name>.<attribute type>, ... "
+    create --stream <stream name> --definition "<attribute name>.<attribute type>, <attribute name>.<attribute type>, ... "
 
 Example:
 ::
@@ -53,15 +53,15 @@ Example:
     create --stream temperatureStream --definition "sensorId.long, name.string, temperature.double"
 
 Queries
-==========================
+=======
 
 Each Siddhi query can consume one or more event streams and create a new event stream from them. All queries contain an input section and an output section. A simple query with all three sections is as follows:
 ::
 
     add query --stream <output stream name> --definition
-    from <input stream name>
+    "from <input stream name>
     select <attribute name>, <attribute name>, ...
-    insert into <output stream name>
+    insert into <output stream name>"
 
 Siddhi receives as input an stream of events. An event is similar to a database row, so it's like an array including
 event values in the fields.
@@ -74,29 +74,28 @@ Using our previous example if we want to send only the temperature to the output
 
 In this case the resultsStream is a Inferred Stream. The resultsStream created can be used as an input query for another query without defining explicitly because the stream definition is inferred from the above query.
 
-The first line of the above example associates the
 
 Query types supported by Siddhi
-=====================================
+===============================
 
 Pass-through
-------------------------------------
+------------
 
 Pass-through query creates an output stream according to the projection defined and inserts any events from the input stream to the output stream.
 ::
 
-    add query --stream temperatureStream --definition "
-    from temperatureStream select name, temperature insert into passthroughStream
+    add query --stream temperatureStream --definition
+    "from temperatureStream select name, temperature insert into passthroughStream
     or
     from temperatureStream select name, temperature insert into passthroughStream *
     or
-    from temperatureStream insert into passthroughStream name, temperature
-    "
+    from temperatureStream insert into passthroughStream name, temperature"
 
 Filters
-------------------------------------
+-------
 
 Filter queries select data of given streams and insert the results in an output stream. Filter supports the following conditions:
+
 - >, <, ==, >=, <=, !=
 - contains, instanceof
 - and, or, not
@@ -104,31 +103,29 @@ Filter queries select data of given streams and insert the results in an output 
 Examples:
 ::
 
-    add query --stream temperatureStream --definition "
-    from temperatureStream[name == 'hall' and temperature > 35] insert into highTemperatureAlarm
+    add query --stream temperatureStream --definition
+    "from temperatureStream[name == 'hall' and temperature > 35] insert into highTemperatureAlarm
     or
     from temperatureStream[temperature < 10 or temperature > 35] insert into highTemperatureAlarm
     or
     from temperatureStream[temperature instanceof 'double'] insert into cleanTemperatureStream
     or
-    from temperatureStream[name contains 'room'] insert into roomsTemperatureStream
-    "
+    from temperatureStream[name contains 'room'] insert into roomsTemperatureStream"
 
 Other than that we can also use  instanceof condition for 'float', 'long' , 'integer', 'double' and 'boolean'.
-Contains condition can only be applied to strings
+Contains condition can only be applied to strings.
 
 
 Windows
------------------------------------
+-------
 
-A window is a limited subset of events from an event stream. Users can define windows and then use the events on the window calculations. A window has 2 types of output, current events and expired events. A window emits current events when new events arraives. Expired events are emitted whenever an existing event has expired from a window.
+A window is a limited subset of events from an event stream. Users can define windows and then use the events on the window calculations. A window has 2 types of output, current events and expired events. A window emits current events when new events arrives. Expired events are emitted whenever an existing event has expired from a window.
 
 CEP queries can have 3 different output types ("current-events", "expired-events", "all-events"). Users can define these output types by adding  the proper keyword in between "insert" and "into" in the query syntax:
 
 * **"current-events"** keyword. The output is only triggered when new events arrive at the window. Notifications will not be given when the expired events trigger the query from the window.
 * **"expired-events"** keyword. The query emits output only when the expired events trigger it from the window and not from new events.
-* **"all-events"** keyword. The query emits output when it is triggered by both newly-arrived and expired events from
- the window.
+* **"all-events"** keyword. The query emits output when it is triggered by both newly-arrived and expired events from the window.
 * No keyword is given. By default, the query assigns "current-events" to its output stream.
 
 

@@ -4,8 +4,7 @@ Configuration
 Configuring the Engine
 ======================
 
-Before starting the Stratio Decision Engine, you must review the configuration to adapt it to Kafka and Zookeeper. In
- the installation, you should find the configuration file in /opt/sds/decision/config
+Before starting the Stratio Decision Engine, you must review the configuration to adapt it to Kafka and Zookeeper. In the installation, you should find the configuration file in /etc/sds/decision/config.conf
 
 Print Streams Configuration
 ---------------------------
@@ -104,7 +103,7 @@ You can set the cassandra configuration by setting the hosts of cassandra with I
 Example::
 
     cassandra = {
-        hosts = ["localhost"]
+        hosts = ["localhost:9042"]
     }
 
 MongoDB Configuration
@@ -150,3 +149,4 @@ In the installation you can start Stratio Decision Engine by executing the comma
 ::
 
     ./opt/sds/decision/bin/run
+
