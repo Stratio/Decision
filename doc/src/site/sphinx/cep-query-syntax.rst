@@ -193,7 +193,7 @@ attribute.
 In the above example, from the events of the temperatureStream, output the "expired-events" of the unique window to the output stream. Here, the output event is the immediate previous event having the same name of the current event.
     Unique Window is mostly used in Join Queries.
 
-6. **First Unique Window**. Define a window that keeps the first event that are unque according to the given unique
+6. **First Unique Window**. Define a window that keeps the first event that are unique according to the given unique
 attribute.
 ::
 
@@ -219,7 +219,7 @@ The following units are supported when specifying the time for a time window. No
 
 
 Joins
------------------------------------
+-----
 
 Joins takes two streams as input associating both streams. Each stream must have associated a window, and generates the output events composed of ine event from each stream. Syntax:
 ::
@@ -244,7 +244,7 @@ Only inner join is supported in the current version of CEP. When we join two str
 
 
 Patterns
----------------------------------
+--------
 
 Patterns processing is based in one or more input streams. Pattern matches events or conditions about events from input streams against a series of happen before or after relationships. The input event streams of the query should be referenced in order to uniquely identify events of those streams. Any event in the output stream is a collection of events received from input streams which satisfy the given pattern. For the pattern, the output attribute should be named using the "as" keyword.
 ::
@@ -255,7 +255,7 @@ Patterns processing is based in one or more input streams. Pattern matches event
 
 In the above example, for the events of the temperatureStream with temperature >= to 30 followed by an event arrival having temperature higher than e1 temperature an output will be triggered via patternsStream stream.
 
-Without every keyword the query will only run once. If you have the "every" enclosing a patther, the the query runs for every occurrence of that pattern. Furthermore, if "within <time>" is used Siddhi triggers only the patterns where the first and the last events constituting to the pattern have arrived within the given time period.
+Without every keyword the query will only run once. If you have the "every" enclosing a pattern, then the query runs for every occurrence of that pattern. Furthermore, if "within <time>" is used Siddhi triggers only the patterns where the first and the last events constituting to the pattern have arrived within the given time period.
 ::
 
     add query --stream temperatureStream --definition "
@@ -276,7 +276,7 @@ You can combine streams in patterns using logical OR and AND logical operators.
 
 In the above example, for the events of the streams temperatureStream and temperatureStream2 with name equals to "hall", the mixTemperatureStream will be matched for events having temperature >= 30 followed with events with temperature >= 35
 
-Also you can count the number of event occurrences of the same event stream with the minimum and maximum limits. For example, <1:5> means 1 to 5 events, <2:> means 2 or more, and <3> means exactly 3 events. When referring to the resuts events matching the count pattern, square brackets should be used to access a specific occurrence of that event.
+Also you can count the number of event occurrences of the same event stream with the minimum and maximum limits. For example, <1:5> means 1 to 5 events, <2:> means 2 or more, and <3> means exactly 3 events. When referring to the results events matching the count pattern, square brackets should be used to access a specific occurrence of that event.
 ::
 
     add query --stream temperatureStream --definition "
@@ -290,7 +290,7 @@ In the above example, for 3 events in the temperatureStream with name "hall" the
 
 
 Sequences
--------------------------------------
+---------
 
 Sequences processing is based in one or more input streams. Sequences processing must exactly match the sequence of events without any other events in between. As input takes a sequence of conditions defined in a simple regular expression fashion. The events of the input streams should be assigned names in order to uniquely identify these events when constructing the query projection. It generates the output event stream such that any event in the output stream is a collection of events arrived from the input streams that exactly matches the order defined in the sequence. For a sequence, the output attribute must be named using the ‘as’ keyword, and it will be used as the output attribute name. When “within <time>” is used, just like with patterns, Siddhi will output only the events that are within that time of each other.
 
@@ -308,6 +308,6 @@ Following Regular Expressions are supported:
     select e1[0].name as name, o1[0].temperature as tempA, o2[0].temperature as tempB
     insert into temperatureSeqOutputStream"
 
-In the above example, for a sequence of one or more events with name equals to "garage", the query mathches temperatureSeqStream events with maximum of 1 event with temperature > 30 and one event with temperature >= 35.
+In the above example, for a sequence of one or more events with name equals to "garage", the query matches temperatureSeqStream events with maximum of 1 event with temperature > 30 and one event with temperature >= 35.
 
 
