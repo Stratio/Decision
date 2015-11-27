@@ -1,7 +1,7 @@
 .. _basic-application:
 
 Writing and Running a Basic Application for Stratio Decision
-*************************************************************
+************************************************************
 
 In this tutorial you will learn how to write a java or scala project for building Stratio Decision applications
 and how to run it on a local instance or a standalone cluster. Instructions are based on the Eclipse environment

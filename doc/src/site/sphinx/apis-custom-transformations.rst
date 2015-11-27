@@ -17,7 +17,7 @@ If you want to use the Stratio Decision API you can use the `existing Maven depe
 
 
 Creating and initializing the API
-===========================================================
+=================================
 
 Scala::
 

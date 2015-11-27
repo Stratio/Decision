@@ -1,7 +1,7 @@
-.. _stratio-streaming-sandbox:
+.. _using-sandbox:
 
 Stratio Decision sandbox and demo
-**********************************
+*********************************
 
 Vagrant Setup
 =============
@@ -66,14 +66,14 @@ Accessing the sandbox
 -  **\` vagrant ssh \`**
 
 Starting the Stratio Decision Shell and other useful commands
-==============================================================
+=============================================================
 
 From the sandbox (vagrant ssh):
 
 -  Starting the Stratio Decision Shell:
    **/opt/sds/decision-shell/bin/shell**
 -  List all available commands: **help**
--  Exit the Stratio Stratio Decision Shell: **exit**
+-  Exit the Stratio Decision Shell: **exit**
 
 F.A.Q about the sandbox
 =======================
@@ -108,7 +108,7 @@ You may need to configure port forwarding between your guest and hosts machines.
 Vagrant machine, and now you should be able to access Kibana on port 8081 through your browser.
 
 Stratio Decision Demos
-=======================
+======================
 
 Demo #1: Sensor Monitoring
 --------------------------
@@ -195,7 +195,7 @@ stream called “sensor\_grid” has an action enabled, INDEX.::
 
 - Now, working on the aggregated measures, we will launch two queries that use operators to filter and set thresholds on
 events. Furthermore, we will use time-based windows to fire alarms if these thresholds are reached only in an specific period of time. The
-output of these queries is sent to the same new stream, again infered by the engine.
+output of these queries is sent to the same new stream, again inferred by the engine.
 
 - Query #1::
 
