@@ -1,24 +1,28 @@
 package com.stratio.decision.dto.drools.configuration.model;
 
+import java.util.List;
+
 /**
  * Created by jmartinmenor on 8/10/15.
  */
-public class DroolsConfigurationGroup {
+public class DroolsConfigurationGroupBean {
 
     private String sessionName;
     private int groupBatchSize;
     private String groupId;
     private String artifactId;
     private String version;
-    private long scanFrecuency;
+    private long scanFrequency;
     private String queryName;
     private String resultName;
     private String mappingFile;
 
-    //private List<String> urlWorkBench;
-    //private List<String> modelList;
-    //private String queryResultName;
-    //private String resultType;
+    private String name;
+
+    private List<String> urlWorkBench;
+    private List<String> modelList;
+    private String queryResultName;
+    private String resultType;
 
     public String getSessionName() {
         return sessionName;
@@ -60,12 +64,12 @@ public class DroolsConfigurationGroup {
         this.version = version;
     }
 
-    public long getScanFrecuency() {
-        return scanFrecuency;
+    public long getScanFrequency() {
+        return scanFrequency;
     }
 
-    public void setScanFrecuency(long scanFrecuency) {
-        this.scanFrecuency = scanFrecuency;
+    public void setScanFrequency(long scanFrequency) {
+        this.scanFrequency = scanFrequency;
     }
 
     public String getQueryName() {
@@ -92,7 +96,15 @@ public class DroolsConfigurationGroup {
         this.mappingFile = mappingFile;
     }
 
-    /*
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
     public List<String> getModelList() {
         return modelList;
     }
@@ -117,5 +129,5 @@ public class DroolsConfigurationGroup {
         this.urlWorkBench = urlWorkBench;
 
     }
-    */
+
 }

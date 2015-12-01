@@ -13,8 +13,8 @@ import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
 
-import com.stratio.decision.dto.drools.configuration.model.DroolsConfiguration;
-import com.stratio.decision.dto.drools.configuration.model.DroolsConfigurationGroup;
+import com.stratio.decision.dto.drools.configuration.model.DroolsConfigurationBean;
+import com.stratio.decision.dto.drools.configuration.model.DroolsConfigurationGroupBean;
 
 /**
  * Created by jmartinmenor on 13/10/15.
@@ -24,10 +24,10 @@ public class DroolsClientImpl<T> implements DroolsClient<T> {
     private static String AUTH_ENABLED = "enabled";
 
     private KieSession session;
-    private DroolsConfiguration conf;
-    private DroolsConfigurationGroup group;
+    private DroolsConfigurationBean conf;
+    private DroolsConfigurationGroupBean group;
 
-    public DroolsClientImpl(String groupName, DroolsConfiguration dc) throws IOException {
+    public DroolsClientImpl(String groupName, DroolsConfigurationBean dc) throws IOException {
 
         this.conf = dc;
         this.group = dc.getGroup(groupName);

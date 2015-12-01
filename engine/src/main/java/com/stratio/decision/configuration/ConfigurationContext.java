@@ -15,11 +15,15 @@
  */
 package com.stratio.decision.configuration;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.stratio.decision.dto.drools.configuration.model.DroolsConfigurationBean;
+import com.stratio.decision.dto.drools.configuration.model.DroolsConfigurationGroupBean;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -67,12 +71,7 @@ public class ConfigurationContext {
     private final String mongoUsername;
     private final String mongoPassword;
 
-    private final String droolsHost;
-    private final String droolsUsername;
-    private final String droolsPassword;
-    private final int droolsBatchSize;
-    private final String droolsMappingLibraryDir;
-
+    private final DroolsConfigurationBean droolsConfiguration;
 
     public enum ConfigurationKeys {
         CASSANDRA_HOSTS("cassandra.hosts"),
@@ -105,7 +104,14 @@ public class ConfigurationContext {
         DROOLS_USER("drools.username"),
         DROOLS_PASSWORD("drools.password"),
         DROOLS_BATCHSIZE("drools.batchSize"),
-        DROOLS_MAPPINGDIR("drools.mappingLibraryDir")
+        DROOLS_MAPPINGDIR("drools.mappingLibraryDir"),
+
+        DROOLS_GROUP_NAME("name"),
+        DROOLS_GROUP_SESSION("sessionName"),
+        DROOLS_GROUP_GROUP_ID("group_id"),
+        DROOLS_GROUP_ARTIFACT_ID("artifact_id"),
+        DROOLS_GROUP_VERSION("version"),
+        DROOLS_GROUP_SCAN_TIME("scanFrequency")
         ;
 
         private final String key;
@@ -159,12 +165,48 @@ public class ConfigurationContext {
         this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
 
         // Adding Drools config
-        this.droolsHost= (String) this.getValueOrNull(ConfigurationKeys.DROOLS_HOST.getKey(), config);
-        this.droolsUsername= (String) this.getValueOrNull(ConfigurationKeys.DROOLS_USER.getKey(), config);
-        this.droolsPassword= (String) this.getValueOrNull(ConfigurationKeys.DROOLS_PASSWORD.getKey(), config);
-        this.droolsBatchSize= (int) this.getValueOrNull(ConfigurationKeys.DROOLS_BATCHSIZE.getKey(), config);
-        this.droolsMappingLibraryDir= (String) this.getValueOrNull(ConfigurationKeys.DROOLS_MAPPINGDIR.getKey(), config);
+        this.droolsConfiguration = new DroolsConfigurationBean();
 
+        droolsConfiguration.setHost( (String) this.getValueOrNull(ConfigurationKeys.DROOLS_HOST.getKey(), config));
+        droolsConfiguration.setUsername( (String) this.getValueOrNull(ConfigurationKeys.DROOLS_USER.getKey(),  config));
+        droolsConfiguration.setPassword((String) this.getValueOrNull(ConfigurationKeys.DROOLS_PASSWORD.getKey(), config));
+        droolsConfiguration.setBatchSize((int) this.getValueOrNull(ConfigurationKeys.DROOLS_BATCHSIZE.getKey(), config));
+        droolsConfiguration.setMappingLibraryDir((String) this.getValueOrNull(ConfigurationKeys.DROOLS_MAPPINGDIR.getKey(), config));
+
+        Config droolsGroupsConfig = ConfigFactory.load("drools");
+        droolsConfiguration.setGroups(getDroolsConfigurationGroup(droolsGroupsConfig));
+
+    }
+
+    private Map<String, DroolsConfigurationGroupBean> getDroolsConfigurationGroup(Config droolsConfig)  {
+
+        Map<String, DroolsConfigurationGroupBean> groups= new HashMap<>();
+
+        List list = droolsConfig.getConfigList("drools.groups");
+        Config groupConfig;
+
+        for (int i=0; i<list.size(); i++){
+
+            groupConfig = (Config) list.get(i);
+
+            DroolsConfigurationGroupBean g= new DroolsConfigurationGroupBean();
+
+            g.setSessionName((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_SESSION.getKey(), groupConfig));
+            g.setGroupId((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_GROUP_ID.getKey(), groupConfig));
+            g.setArtifactId((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_ARTIFACT_ID.getKey(), groupConfig));
+            g.setVersion((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_VERSION.getKey(), groupConfig));
+
+            // TODO Cast Problems using getValueOrNull with Long
+            g.setScanFrequency(groupConfig.getLong(ConfigurationKeys.DROOLS_GROUP_SCAN_TIME.getKey()));
+
+            String groupName = (String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_NAME.getKey(), groupConfig);
+            g.setName(groupName);
+
+            groups.put(groupName, g);
+
+        }
+
+        return groups;
     }
 
     public List<String> getCassandraHosts() {
@@ -276,23 +318,27 @@ public class ConfigurationContext {
     }
 
     public String getDroolsHost() {
-        return droolsHost;
+        return getDroolsConfiguration().getHost();
     }
 
     public String getDroolsUsername() {
-        return droolsUsername;
+        return getDroolsConfiguration().getUsername();
     }
 
     public String getDroolsPassword() {
-        return droolsPassword;
+        return getDroolsConfiguration().getPassword();
     }
 
     public int getDroolsBatchSize() {
-        return droolsBatchSize;
+        return getDroolsConfiguration().getBatchSize();
     }
 
     public String getDroolsMappingLibraryDir() {
-        return droolsMappingLibraryDir;
+        return getDroolsConfiguration().getMappingLibraryDir();
+    }
+
+    public DroolsConfigurationBean getDroolsConfiguration() {
+        return droolsConfiguration;
     }
 
 

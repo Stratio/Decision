@@ -8,14 +8,15 @@ import java.util.Map;
 /**
  * Created by jmartinmenor on 8/10/15.
  */
-public class DroolsConfiguration {
+public class DroolsConfigurationBean {
 
     private String host;
     private String username;
     private String password;
     private int batchSize;
     private String mappingLibraryDir;
-    private Map<String,DroolsConfigurationGroup> groups;
+
+    private Map<String, DroolsConfigurationGroupBean> groups;
 
 
     public String getHost() {
@@ -59,11 +60,11 @@ public class DroolsConfiguration {
     }
 
 
-    public Map<String, DroolsConfigurationGroup> getGroups() {
+    public Map<String, DroolsConfigurationGroupBean> getGroups() {
         return groups;
     }
 
-    public void setGroups(Map<String, DroolsConfigurationGroup> groups) {
+    public void setGroups(Map<String, DroolsConfigurationGroupBean> groups) {
         this.groups = groups;
     }
 
@@ -80,7 +81,7 @@ public class DroolsConfiguration {
         return keys;
     }
 
-    public DroolsConfigurationGroup getGroup(String group){
+    public DroolsConfigurationGroupBean getGroup(String group){
         return groups.get(group);
     }
 }
