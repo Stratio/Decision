@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.stratio.decision.dto.drools.configuration.model.DroolsConfigurationBean;
-import com.stratio.decision.dto.drools.configuration.model.DroolsConfigurationGroupBean;
+import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
+import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -108,10 +108,11 @@ public class ConfigurationContext {
 
         DROOLS_GROUP_NAME("name"),
         DROOLS_GROUP_SESSION("sessionName"),
-        DROOLS_GROUP_GROUP_ID("group_id"),
-        DROOLS_GROUP_ARTIFACT_ID("artifact_id"),
+        DROOLS_GROUP_GROUP_ID("groupId"),
+        DROOLS_GROUP_ARTIFACT_ID("artifactId"),
         DROOLS_GROUP_VERSION("version"),
-        DROOLS_GROUP_SCAN_TIME("scanFrequency")
+        DROOLS_GROUP_SCAN_TIME("scanFrequency"),
+        DROOLS_GROUP_SESSION_TYPE("sessionType"),
         ;
 
         private final String key;
@@ -128,6 +129,7 @@ public class ConfigurationContext {
 
     public ConfigurationContext() {
         Config config = ConfigFactory.load("config");
+        Config c = ConfigFactory.load("drools");
 
         this.kafkaHosts = config.getStringList(ConfigurationKeys.KAFKA_HOSTS.getKey());
         this.kafkaConsumerBrokerHost = kafkaHosts.get(0).split(":")[0];
@@ -173,6 +175,10 @@ public class ConfigurationContext {
         droolsConfiguration.setBatchSize((int) this.getValueOrNull(ConfigurationKeys.DROOLS_BATCHSIZE.getKey(), config));
         droolsConfiguration.setMappingLibraryDir((String) this.getValueOrNull(ConfigurationKeys.DROOLS_MAPPINGDIR.getKey(), config));
 
+        // POC ONLY
+        droolsConfiguration.setPocGroupName((String)this.getValueOrNull("drools.poc_group_name", config));
+        droolsConfiguration.setPocStreamName((String)this.getValueOrNull("drools.poc_stream_name", config));
+
         Config droolsGroupsConfig = ConfigFactory.load("drools");
         droolsConfiguration.setGroups(getDroolsConfigurationGroup(droolsGroupsConfig));
 
@@ -195,6 +201,8 @@ public class ConfigurationContext {
             g.setGroupId((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_GROUP_ID.getKey(), groupConfig));
             g.setArtifactId((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_ARTIFACT_ID.getKey(), groupConfig));
             g.setVersion((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_VERSION.getKey(), groupConfig));
+            g.setSessionType((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_SESSION_TYPE.getKey(),
+                    groupConfig));
 
             // TODO Cast Problems using getValueOrNull with Long
             g.setScanFrequency(groupConfig.getLong(ConfigurationKeys.DROOLS_GROUP_SCAN_TIME.getKey()));

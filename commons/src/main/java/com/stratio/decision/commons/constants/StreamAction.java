@@ -16,5 +16,5 @@
 package com.stratio.decision.commons.constants;
 
 public enum StreamAction {
-    LISTEN, SAVE_TO_CASSANDRA, SAVE_TO_MONGO, SAVE_TO_SOLR, INDEXED, FIRE_RULES;
+    LISTEN, SAVE_TO_CASSANDRA, SAVE_TO_MONGO, SAVE_TO_SOLR, INDEXED;
 }
