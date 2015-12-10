@@ -1,4 +1,4 @@
-package com.stratio.decision.dto.drools.configuration.model;
+package com.stratio.decision.drools.configuration;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,6 +18,27 @@ public class DroolsConfigurationBean {
 
     private Map<String, DroolsConfigurationGroupBean> groups;
 
+    //PoC fields
+    private String pocStreamName;
+    private String pocGroupName;
+
+    public String getPocStreamName() {
+        return pocStreamName;
+    }
+
+    public void setPocStreamName(String pocStreamName) {
+        this.pocStreamName = pocStreamName;
+    }
+
+    //
+
+    public String getPocGroupName() {
+        return pocGroupName;
+    }
+
+    public void setPocGroupName(String pocGroupName) {
+        this.pocGroupName = pocGroupName;
+    }
 
     public String getHost() {
         return host;

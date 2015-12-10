@@ -1,4 +1,4 @@
-package com.stratio.decision.dto.drools.configuration.model;
+package com.stratio.decision.drools.configuration;
 
 import java.util.List;
 
@@ -18,6 +18,8 @@ public class DroolsConfigurationGroupBean {
     private String mappingFile;
 
     private String name;
+
+    private String sessionType; // stateless or stateful
 
     private List<String> urlWorkBench;
     private List<String> modelList;
@@ -104,6 +106,13 @@ public class DroolsConfigurationGroupBean {
         this.name = name;
     }
 
+    public String getSessionType() {
+        return sessionType;
+    }
+
+    public void setSessionType(String sessionType) {
+        this.sessionType = sessionType;
+    }
 
     public List<String> getModelList() {
         return modelList;
