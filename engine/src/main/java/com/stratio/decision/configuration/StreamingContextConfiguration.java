@@ -15,7 +15,9 @@
  */
 package com.stratio.decision.configuration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -32,14 +34,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.wso2.siddhi.core.SiddhiManager;
 
 import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.decision.StreamingEngine;
+import com.stratio.decision.commons.constants.ColumnType;
+import com.stratio.decision.commons.constants.EngineActionType;
 import com.stratio.decision.commons.constants.InternalTopic;
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.kafka.service.KafkaTopicService;
+import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.drools.DroolsConnectionContainer;
 import com.stratio.decision.functions.FilterDataFunction;
 import com.stratio.decision.functions.PairDataFunction;
 import com.stratio.decision.functions.SaveToCassandraActionExecutionFunction;
@@ -100,7 +107,34 @@ public class StreamingContextConfiguration {
         configureRequestContext(context);
         configureActionContext(context);
         configureDataContext(context);
+
+        createPocDroolsStream();
+
         return context;
+    }
+
+
+    /*
+     JPFM. Testing if it is possible to create a siddhi stream when the spark streaming context is starting
+
+     */
+    private void createPocDroolsStream() {
+
+        try {
+            List<ColumnNameTypeValue> columns = new ArrayList<>();
+            columns.add(new ColumnNameTypeValue("col1", ColumnType.INTEGER, 1));
+            columns.add(new ColumnNameTypeValue("col2", ColumnType.STRING, "test string"));
+
+            String streamName = configurationContext.getDroolsConfiguration().getPocStreamName();
+            String engineActionParameters[] = { configurationContext.getDroolsConfiguration().getPocGroupName() };
+
+            streamOperationService.createStream(streamName, columns);
+            streamOperationService.enableEngineAction(streamName, EngineActionType.FIRE_RULES, engineActionParameters);
+        }
+        catch (Exception e) {
+            log.error("Exception {}", e.getMessage());
+        }
+
     }
 
     private void configureRequestContext(JavaStreamingContext context) {
@@ -303,10 +337,10 @@ public class StreamingContextConfiguration {
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
                 new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));
 
-
+/*
         groupedDataDstream.filter(new FilterDataFunction(StreamAction.FIRE_RULES)).foreachRDD(
                 new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));
-
+*/
     }
 
     private void configureDataContext(JavaStreamingContext context) {

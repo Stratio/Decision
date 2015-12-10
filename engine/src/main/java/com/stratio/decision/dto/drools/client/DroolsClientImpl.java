@@ -13,8 +13,8 @@ import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
 
-import com.stratio.decision.dto.drools.configuration.model.DroolsConfigurationBean;
-import com.stratio.decision.dto.drools.configuration.model.DroolsConfigurationGroupBean;
+import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
+import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
 
 /**
  * Created by jmartinmenor on 13/10/15.

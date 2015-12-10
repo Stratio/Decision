@@ -15,6 +15,7 @@
  */
 package com.stratio.decision.streams;
 
+import com.stratio.decision.commons.constants.EngineActionType;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 
@@ -33,12 +34,15 @@ public class StreamStatusDTO implements Serializable {
     private final Set<StreamAction> actionsEnabled;
     private final Map<String, QueryDTO> addedQueries;
 
+    private Map<EngineActionType, EngineActionDTO> engineActionsEnabled;
+
     public StreamStatusDTO(String streamName, Boolean userDefined, List<ColumnNameTypeValue> columns) {
         this.streamName = streamName;
         this.userDefined = userDefined;
         this.actionsEnabled = new HashSet<>();
         this.addedQueries = new HashMap<>();
         this.streamDefinition = columns;
+        this.engineActionsEnabled = new HashMap<>();
     }
 
     public String getStreamName() {
@@ -80,5 +84,10 @@ public class StreamStatusDTO implements Serializable {
     public Map<String, QueryDTO> getAddedQueries() {
         return addedQueries;
     }
+
+    public Map<EngineActionType, EngineActionDTO> getEngineActionsEnabled() {
+        return engineActionsEnabled;
+    }
+
 
 }

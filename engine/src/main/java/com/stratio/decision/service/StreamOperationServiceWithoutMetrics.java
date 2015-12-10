@@ -1,16 +1,22 @@
 package com.stratio.decision.service;
 
 import com.stratio.decision.commons.constants.ColumnType;
+import com.stratio.decision.commons.constants.EngineActionType;
 import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.commons.messages.StreamQuery;
 import com.stratio.decision.dao.StreamStatusDao;
+import com.stratio.decision.drools.DroolsConnectionContainer;
 import com.stratio.decision.exception.ServiceException;
+import com.stratio.decision.functions.engine.BaseEngineAction;
+import com.stratio.decision.functions.engine.DroolsEngineAction;
 import com.stratio.decision.streams.QueryDTO;
 import com.stratio.decision.streams.StreamStatusDTO;
 import com.stratio.decision.utils.SiddhiUtils;
+
+import org.kie.api.runtime.KieContainer;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.QueryFactory;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -31,11 +37,21 @@ public class StreamOperationServiceWithoutMetrics {
 
     private final CallbackService callbackService;
 
+    private  DroolsConnectionContainer droolsConnectionContainer;
+
     public StreamOperationServiceWithoutMetrics(SiddhiManager siddhiManager, StreamStatusDao streamStatusDao,
                                                 CallbackService callbackService) {
         this.siddhiManager = siddhiManager;
         this.streamStatusDao = streamStatusDao;
         this.callbackService = callbackService;
+    }
+
+    public StreamOperationServiceWithoutMetrics(SiddhiManager siddhiManager, StreamStatusDao streamStatusDao,
+            CallbackService callbackService, DroolsConnectionContainer droolsConnectionContainer) {
+        this.siddhiManager = siddhiManager;
+        this.streamStatusDao = streamStatusDao;
+        this.callbackService = callbackService;
+        this.droolsConnectionContainer = droolsConnectionContainer;
     }
 
     public void createInternalStream(String streamName, List<ColumnNameTypeValue> columns) {
@@ -172,6 +188,52 @@ public class StreamOperationServiceWithoutMetrics {
         return streamStatusDao.getEnabledActions(streamName).contains(action);
     }
 
+
+    public void enableEngineAction(String streamName, EngineActionType engineActionType, Object[] engineActionParams) {
+
+        // TODO mecanismo para modificar el engineActionParams de callback de accion ya existente
+        if ( !streamStatusDao.isEngineActionEnabled(streamName, engineActionType)){
+
+            String engineActionQueryId = siddhiManager.addQuery(QueryFactory.createQuery()
+                    .from(QueryFactory.inputStream(streamName))
+                    .insertInto(STREAMING.STATS_NAMES.SINK_STREAM_PREFIX.concat(streamName)));
+
+            BaseEngineAction engineAction = null;
+
+            if (engineActionType == EngineActionType.FIRE_RULES) {
+
+                engineAction = new DroolsEngineAction(droolsConnectionContainer, engineActionParams, siddhiManager);
+
+            }
+
+            siddhiManager.addCallback(engineActionQueryId,
+                    callbackService.addEngineCallback(streamName, engineActionType, engineAction));
+
+            streamStatusDao.enableEngineAction(streamName, engineActionType, engineActionParams, engineActionQueryId);
+
+        }
+
+
+    }
+
+
+    public void disableEngineAction(String streamName, EngineActionType engineActionType) {
+
+        if ( streamStatusDao.isEngineActionEnabled(streamName, engineActionType)){
+
+            String engineActionQueryId = streamStatusDao.getEngineActionQueryId(streamName, engineActionType);
+
+            if (engineActionQueryId != null){
+
+                siddhiManager.removeQuery(engineActionQueryId);
+            }
+
+            streamStatusDao.disableEngineAction(streamName, engineActionType);
+            callbackService.removeEngineAction(streamName, engineActionType);
+
+        }
+
+    }
 
     public List<StratioStreamingMessage> list() {
         List<StratioStreamingMessage> result = new ArrayList<>();

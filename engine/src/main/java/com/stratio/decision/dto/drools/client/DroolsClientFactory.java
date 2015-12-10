@@ -2,7 +2,7 @@ package com.stratio.decision.dto.drools.client;
 
 import java.io.IOException;
 
-import com.stratio.decision.dto.drools.configuration.model.DroolsConfigurationBean;
+import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
 
 /**
  * Created by jmartinmenor on 13/10/15.

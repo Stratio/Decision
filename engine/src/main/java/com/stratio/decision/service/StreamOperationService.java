@@ -21,6 +21,7 @@ import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.dao.StreamStatusDao;
+import com.stratio.decision.drools.DroolsConnectionContainer;
 import com.stratio.decision.exception.ServiceException;
 import org.wso2.siddhi.core.SiddhiManager;
 
@@ -30,6 +31,11 @@ public class StreamOperationService extends StreamOperationServiceWithoutMetrics
 
     public StreamOperationService(SiddhiManager siddhiManager, StreamStatusDao streamStatusDao, CallbackService callbackService) {
         super(siddhiManager, streamStatusDao, callbackService);
+    }
+
+    public StreamOperationService(SiddhiManager siddhiManager, StreamStatusDao streamStatusDao, CallbackService
+            callbackService, DroolsConnectionContainer droolsConnectionContainer) {
+        super(siddhiManager, streamStatusDao, callbackService, droolsConnectionContainer);
     }
 
     @Override
