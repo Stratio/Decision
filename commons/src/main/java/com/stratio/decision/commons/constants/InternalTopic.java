@@ -16,7 +16,7 @@
 package com.stratio.decision.commons.constants;
 
 public enum InternalTopic {
-    TOPIC_REQUEST("stratio_streaming_requests"), TOPIC_DATA("stratio_streaming_data"), TOPIC_ACTION(
+    TOPIC_REQUEST("stratio_streaming_requests"), TOPIC_DATA("stratio_decision_data"), TOPIC_ACTION(
             "stratio_streaming_action");
 
     private final String topicName;

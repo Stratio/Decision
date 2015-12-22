@@ -255,8 +255,10 @@ public class StreamingContextConfiguration {
     private void configureActionContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
 
+        // TODO Leer los data topics del config y añadirlos al mapa
         baseTopicMap.put(InternalTopic.TOPIC_ACTION.getTopicName(), 1);
 
+        // TODO Añadir metodo a kafkaTopicService para crear los topics a partir del mapa
         kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_ACTION.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
@@ -324,12 +326,24 @@ public class StreamingContextConfiguration {
     private void configureDataContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
 
+/*
         baseTopicMap.put(InternalTopic.TOPIC_DATA.getTopicName(), 1);
 
         kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_DATA.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_DATA.getTopicName(), baseTopicMap);
+        messages.cache();
+*/
+
+        configurationContext.getKafkaDataTopics().forEach( dataTopic -> baseTopicMap.put(dataTopic, 1));
+
+        kafkaTopicService.createTopicsIfNotExist(configurationContext.getKafkaDataTopics(), configurationContext
+                .getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
+
+        // TODO El groupId se establece como el clusterID. Comprobar que es apropiado
+        JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
+                configurationContext.getZookeeperHostsQuorum(),  configurationContext.getClusterId(), baseTopicMap);
         messages.cache();
 
 
