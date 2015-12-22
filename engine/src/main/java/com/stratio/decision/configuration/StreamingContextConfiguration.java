@@ -349,19 +349,9 @@ public class StreamingContextConfiguration {
 
         kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_DATA.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
-        /*
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_DATA.getTopicName(), baseTopicMap);
         messages.cache();
-        */
-
-        JavaPairDStream<String, String> allMessages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_DATA.getTopicName(), baseTopicMap);
-
-        String allowedStream = "kk";
-        JavaPairDStream<String, String> messages = allMessages.filter(new FilterMessagesByStream(allowedStream));
-        messages.cache();
-
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
 
