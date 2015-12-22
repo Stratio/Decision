@@ -255,8 +255,10 @@ public class StreamingContextConfiguration {
     private void configureActionContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
 
+        // TODO Leer los data topics del config y añadirlos al mapa
         baseTopicMap.put(InternalTopic.TOPIC_ACTION.getTopicName(), 1);
 
+        // TODO Añadir metodo a kafkaTopicService para crear los topics a partir del mapa
         kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_ACTION.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,

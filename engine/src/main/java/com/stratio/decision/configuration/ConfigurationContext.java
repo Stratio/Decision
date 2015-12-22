@@ -55,6 +55,8 @@ public class ConfigurationContext {
      * OPTIONAL PROPERTIES *
      */
 
+    private final List<String> kafkaDataTopics;
+
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
 
@@ -83,6 +85,7 @@ public class ConfigurationContext {
         KAFKA_PARTITIONS("kafka.partitions"),
         KAFKA_SESSION_TIMEOUT("kafka.sessionTimeout"),
         KAFKA_CONNECTION_TIMEOUT("kafka.connectionTimeout"),
+        KAFKA_DATA_TOPICS("kafka.dataTopics"),
         ELASTICSEARCH_HOST("elasticsearch.hosts"),
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
         SOLR_HOST("solr.hosts"),
@@ -110,6 +113,9 @@ public class ConfigurationContext {
         this.kafkaHosts = config.getStringList(ConfigurationKeys.KAFKA_HOSTS.getKey());
         this.kafkaConsumerBrokerHost = kafkaHosts.get(0).split(":")[0];
         this.kafkaConsumerBrokerPort = Integer.parseInt(kafkaHosts.get(0).split(":")[1]);
+
+        this.kafkaDataTopics = (List<String>) this.getListOrNull(ConfigurationKeys.KAFKA_DATA_TOPICS.getKey(), config);
+
         this.zookeeperHosts = config.getStringList(ConfigurationKeys.ZOOKEEPER_HOSTS.getKey());
         this.sparkHost = config.getString(ConfigurationKeys.SPARK_HOST.getKey());
         this.internalSparkHost = config.getString(ConfigurationKeys.INTERNAL_SPARK_HOST.getKey());
@@ -162,6 +168,10 @@ public class ConfigurationContext {
 
     public int getKafkaConsumerBrokerPort() {
         return kafkaConsumerBrokerPort;
+    }
+
+    public List<String> getKafkaDataTopics() {
+        return kafkaDataTopics;
     }
 
     public List<String> getZookeeperHosts() {
