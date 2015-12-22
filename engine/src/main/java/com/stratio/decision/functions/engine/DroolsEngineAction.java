@@ -1,8 +1,14 @@
 package com.stratio.decision.functions.engine;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.avro.generic.GenericData;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
@@ -20,6 +26,7 @@ import com.stratio.decision.drools.sessions.DroolsStatefulSession;
 import com.stratio.decision.drools.sessions.DroolsStatelessSession;
 import com.stratio.decision.drools.sessions.Results;
 import com.stratio.decision.serializer.Serializer;
+import com.stratio.decision.service.StreamOperationServiceWithoutMetrics;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -35,12 +42,9 @@ public class DroolsEngineAction extends BaseEngineAction {
     private List<String> groups;
 
     public DroolsEngineAction(DroolsConnectionContainer droolsConnectionContainer, Object[] actionParameters,
-            Producer<String, String> producer,
-            Serializer<String,
-            StratioStreamingMessage> kafkaToJavaSerializer,
-            Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer, SiddhiManager siddhiManager){
+            SiddhiManager siddhiManager,  StreamOperationServiceWithoutMetrics streamOperationService) {
 
-        super(actionParameters, producer, kafkaToJavaSerializer, javaToSiddhiSerializer, siddhiManager);
+        super(actionParameters, siddhiManager, streamOperationService);
 
         this.droolsConnectionContainer = droolsConnectionContainer;
         this.groups = new ArrayList<>();
@@ -49,24 +53,74 @@ public class DroolsEngineAction extends BaseEngineAction {
 
             groups.add((String) actionParameter);
         }
-
 
     }
 
 
-    public DroolsEngineAction(DroolsConnectionContainer droolsConnectionContainer, Object[] actionParameters,
-            SiddhiManager siddhiManager) {
+//    public DroolsEngineAction(DroolsConnectionContainer droolsConnectionContainer, Object[] actionParameters,
+//            SiddhiManager siddhiManager) {
+//
+//        super(actionParameters, siddhiManager);
+//
+//        this.droolsConnectionContainer = droolsConnectionContainer;
+//        this.groups = new ArrayList<>();
+//
+//        for (Object actionParameter : actionParameters) {
+//
+//            groups.add((String) actionParameter);
+//        }
+//
+//    }
 
-        super(actionParameters, siddhiManager);
 
-        this.droolsConnectionContainer = droolsConnectionContainer;
-        this.groups = new ArrayList<>();
+    private List<Map<String, Object>> formatInputEvents(Event[] events){
 
-        for (Object actionParameter : actionParameters) {
+        List<Map<String, Object>> inputList = new ArrayList<>();
 
-            groups.add((String) actionParameter);
+        for (Event event : events) {
+
+            Map<String, Object> inputMap = new HashMap<>();
+
+            StratioStreamingMessage messageObject = javaToSiddhiSerializer.deserialize(event);
+
+            for (ColumnNameTypeValue column : messageObject.getColumns()) {
+
+                inputMap.put(column.getColumn(), column.getValue());
+            }
+
+            inputList.add(inputMap);
+
         }
 
+        return inputList;
+
+    }
+
+    private List<Map<String, Object>> formatDroolsResults(Results results){
+
+        List<Map<String, Object>> outputList = new ArrayList<>();
+
+        for (Object singleResult : results.getResults()) {
+
+            Map<String, Object> outputMap = null;
+
+            try {
+
+                Object propertyObject = PropertyUtils.getProperty(singleResult, "result");
+                //outputMap = PropertyUtils.describe(singleResult);
+                outputMap = PropertyUtils.describe(propertyObject);
+
+
+            } catch (IllegalAccessException|InvocationTargetException|NoSuchMethodException e) {
+                //e.printStackTrace();
+                // TODO log exception
+            }
+
+            outputList.add(outputMap);
+
+        }
+
+        return outputList;
 
     }
 
@@ -112,28 +166,25 @@ public class DroolsEngineAction extends BaseEngineAction {
 
             if (session != null) {
 
-                // TODO Inject Facts into the session
-                // TODO  Mapping Event[] events to List
+                List<Map<String, Object>> inputData = this.formatInputEvents(inEvents);
+                Results results = session.fireRules(inputData);
 
-                /*
-                for (Event event : inEvents) {
+                if (results.getResults().size()== 0) {
 
-                    StratioStreamingMessage messageObject = javaToSiddhiSerializer.deserialize(event);
+                    log.info("No Results from Drool. Check your rules!!");
 
-                    List<ColumnNameTypeValue> columnNameTypeValues = messageObject.getColumns();
-                    for ( ColumnNameTypeValue column : columnNameTypeValues){
-                        column.getColumn();
-                        column.getType();
+                } else {
+
+                    List<Map<String, Object>> formattedResults = this.formatDroolsResults(results);
+
+                    // TODO Read from api/shell the output stream name
+                    Boolean sendToCep = true;
+                    String cepOutputStreamName = "drools_result";
+
+                    if (sendToCep) {
+                        this.handleCepRedirection(cepOutputStreamName, formattedResults);
                     }
                 }
-                */
-
-
-                List data = new ArrayList();
-                data.add("comienzo test");
-
-                Results results = session.fireRules(data);
-
             } else {
 
                 if (log.isDebugEnabled()) {
@@ -143,19 +194,14 @@ public class DroolsEngineAction extends BaseEngineAction {
 
             }
 
-            // TODO Handler for output facts
-            // Collection<FactHandle> factHandles = session.getFactHandles();
-
         }
-
-
 
         if (log.isDebugEnabled()) {
 
             log.debug("Finished rules processing for stream {}", streamName);
         }
 
-
-
     }
+
+
 }

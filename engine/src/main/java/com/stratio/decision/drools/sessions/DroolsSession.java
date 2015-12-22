@@ -7,10 +7,8 @@ import java.util.List;
  */
 public interface DroolsSession {
 
-    public static final String QUERY_CEP_NAME= "cepresult";
-    public static final String QUERY_KAFKA_NAME= "kafkaresult";
-    public static final String QUERY_CEP_RESULT = "cres";
-    public static final String QUERY_KAFKA_RESULT = "kres";
+    public static final String QUERY_NAME= "result";
+    public static final String QUERY_RESULT = "res";
 
     public Results fireRules(List data);
 

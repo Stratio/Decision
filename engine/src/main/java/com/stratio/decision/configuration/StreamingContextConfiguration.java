@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.wso2.siddhi.core.SiddhiManager;
 
 import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.decision.StreamingEngine;
@@ -46,7 +45,6 @@ import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.kafka.service.KafkaTopicService;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.drools.DroolsConnectionContainer;
 import com.stratio.decision.functions.FilterDataFunction;
 import com.stratio.decision.functions.PairDataFunction;
 import com.stratio.decision.functions.SaveToCassandraActionExecutionFunction;
@@ -66,6 +64,7 @@ import com.stratio.decision.functions.ddl.CreateStreamFunction;
 import com.stratio.decision.functions.dml.InsertIntoStreamFunction;
 import com.stratio.decision.functions.dml.ListStreamsFunction;
 import com.stratio.decision.functions.messages.FilterMessagesByOperationFunction;
+import com.stratio.decision.functions.messages.FilterMessagesByStream;
 import com.stratio.decision.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
 import com.stratio.decision.service.StreamOperationService;
@@ -350,8 +349,17 @@ public class StreamingContextConfiguration {
 
         kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_DATA.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
+        /*
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_DATA.getTopicName(), baseTopicMap);
+        messages.cache();
+        */
+
+        JavaPairDStream<String, String> allMessages = KafkaUtils.createStream(context,
+                configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_DATA.getTopicName(), baseTopicMap);
+
+        String allowedStream = "kk";
+        JavaPairDStream<String, String> messages = allMessages.filter(new FilterMessagesByStream(allowedStream));
         messages.cache();
 
 

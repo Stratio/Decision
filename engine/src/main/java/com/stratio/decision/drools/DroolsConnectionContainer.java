@@ -27,7 +27,6 @@ public class DroolsConnectionContainer {
 
     public DroolsConnectionContainer(DroolsConfigurationBean droolsConfigurationBean) {
 
-       // this.groupContainers = configGroupsContainers(droolsConfigurationBean);
         this.groupContainers = configGroupsContainers(droolsConfigurationBean);
         this.groupConfigurations = droolsConfigurationBean.getGroups();
     }

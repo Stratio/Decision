@@ -192,4 +192,21 @@ public class StreamStatusDao {
         }
 
     }
+
+    public void addColumn(String streamName, ColumnNameTypeValue column){
+
+        streamStatuses.get(streamName).getStreamDefinition().add(column);
+        streamStatuses.get(streamName).getStreamColumns().put(column.getColumn(), column);
+
+    }
+
+    public Boolean existsColumnDefinition(String streamName, String columnName){
+
+        if (streamStatuses.get(streamName).getStreamColumns().containsKey(columnName))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

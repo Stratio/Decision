@@ -8,27 +8,20 @@ import java.util.List;
  */
 public class Results {
 
-    private List cepResults;
-    private List kafkaResults;
+    private List results;
 
     public Results(){
-        cepResults = new ArrayList();
-        kafkaResults = new ArrayList();
+
+        results = new ArrayList();
     }
 
-    public List getCepResults() {
-        return cepResults;
+
+    public List getResults() {
+        return results;
     }
 
-    public List getKafkaResults() {
-        return kafkaResults;
+    public boolean addResults(Object o){
+        return results.add(o);
     }
 
-    public boolean addCepResults(Object o) {
-        return cepResults.add(o);
-    }
-
-    public boolean addKafkaResults(Object o) {
-        return kafkaResults.add(o);
-    }
 }

@@ -38,13 +38,11 @@ public class DroolsStatelessSession implements DroolsSession {
 
         cmds.add(commands.newInsertElements(data));
         cmds.add(CommandFactory.newFireAllRules());
-        cmds.add(commands.newQuery(QUERY_KAFKA_RESULT,QUERY_KAFKA_NAME));
-        cmds.add(CommandFactory.newQuery(QUERY_CEP_RESULT,QUERY_CEP_NAME));
+        cmds.add(CommandFactory.newQuery(QUERY_RESULT, QUERY_NAME));
 
         ExecutionResults er = session.execute(commands.newBatchExecution(cmds));
 
-        this.addResults(res.getKafkaResults(),er, QUERY_KAFKA_RESULT);
-        this.addResults(res.getCepResults(),er, QUERY_CEP_RESULT);
+        this.addResults(res.getResults(), er, QUERY_RESULT);
 
         return res;
     }

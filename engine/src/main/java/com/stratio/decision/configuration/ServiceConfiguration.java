@@ -34,7 +34,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 
 @Configuration
-@Import({ DaoConfiguration.class, StreamingSiddhiConfiguration.class, DroolsConfiguration.class })
+@Import({ DaoConfiguration.class, StreamingSiddhiConfiguration.class, DroolsConfiguration.class})
 public class ServiceConfiguration {
 
     @Autowired
@@ -89,4 +89,6 @@ public class ServiceConfiguration {
     public StreamingFailoverService streamingFailoverService() {
         return new StreamingFailoverService(streamStatusDao, streamMetadataService(), streamingFailoverDao);
     }
+
+
 }
