@@ -16,12 +16,17 @@
 package com.stratio.decision.commons.kafka.service;
 
 import java.io.Closeable;
+import java.util.List;
 
 public interface TopicService extends Closeable {
 
     void createTopicIfNotExist(String topic, int replicationFactor, int partitions);
 
+    void createTopicsIfNotExist(List<String> topics, int replicationFactor, int partitions);
+
     void createOrUpdateTopic(String topic, int replicationFactor, int partitions);
+
+    Boolean existsTopic(String topic);
 
     Integer getNumPartitionsForTopic(String topic);
 

@@ -17,6 +17,7 @@ package com.stratio.decision.commons.kafka.service;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
@@ -52,6 +53,10 @@ public class KafkaTopicService implements TopicService {
                 CONSUMER_CLIENT_ID);
     }
 
+    public Boolean existsTopic(String topic) {
+        return AdminUtils.topicExists(zkClient, topic);
+    }
+
     @Override
     public void createTopicIfNotExist(String topic, int replicationFactor, int partitions) {
         if (!AdminUtils.topicExists(zkClient, topic)) {
@@ -59,6 +64,11 @@ public class KafkaTopicService implements TopicService {
         } else {
             logger.info("Topic {} already exists", topic);
         }
+    }
+
+    @Override
+    public void createTopicsIfNotExist(List<String> topics, int replicationFactor, int partitions){
+        topics.forEach(topic -> createTopicIfNotExist(topic, replicationFactor, partitions));
     }
 
     @Override
