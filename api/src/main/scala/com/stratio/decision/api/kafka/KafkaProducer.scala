@@ -45,18 +45,18 @@ class KafkaProducer(topic: String,
     producer.close
   }
 
-//  def send(message: String, key: String) = {
-//    try {
-//      log.info("Sending KeyedMessage[key, value]: [" + key + "," + message + "]")
-//      producer.send(new KeyedMessage(topic, key, message))
-//    } catch {
-//      case e: Exception =>
-//        log.error("Error sending KeyedMessage[key, value]: [" + key + "," + message + "]")
-//        log.error("Exception: " + e.getMessage)
-//    }
-//  }
+  def send(message: String, key: String) = {
+    try {
+      log.info("Sending KeyedMessage[key, value]: [" + key + "," + message + "]")
+      producer.send(new KeyedMessage(topic, key, message))
+    } catch {
+      case e: Exception =>
+        log.error("Error sending KeyedMessage[key, value]: [" + key + "," + message + "]")
+        log.error("Exception: " + e.getMessage)
+    }
+  }
 
-  def send(message: String, key: String, anotherTopic:String = null) = {
+  def send(message: String, key: String, anotherTopic:String) = {
 
     val destinationTopic:String = if (anotherTopic!=null) anotherTopic else topic
     try {
