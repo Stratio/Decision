@@ -60,8 +60,7 @@ class StratioStreamingAPI
     syncOperation.performSyncOperation(alterStreamMessage)
   }
 
-  def insertData(streamName: String, data: List[ColumnNameValue], topicName: String = null, checkTopicExists:Boolean
-  = false) = {
+  def insertData(streamName: String, data: List[ColumnNameValue], topicName: String, checkTopicExists:Boolean) = {
     checkStreamingStatus()
 
     if (checkTopicExists){
