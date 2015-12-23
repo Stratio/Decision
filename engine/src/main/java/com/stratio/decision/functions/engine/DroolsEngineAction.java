@@ -20,6 +20,7 @@ import com.stratio.decision.commons.constants.InternalTopic;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.drools.DroolsConnectionContainer;
+import com.stratio.decision.drools.DroolsInstace;
 import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
 import com.stratio.decision.drools.sessions.DroolsSession;
 import com.stratio.decision.drools.sessions.DroolsStatefulSession;
@@ -133,14 +134,15 @@ public class DroolsEngineAction extends BaseEngineAction {
             log.debug("Firing rules for stream {}", streamName);
         }
 
-        KieContainer kContainer;
+        DroolsInstace instance;
         DroolsSession session = null;
 
         for (String groupName : groups){
 
-            kContainer = droolsConnectionContainer.getGroupContainer(groupName);
+            instance = droolsConnectionContainer.getGroupContainer(groupName);
+            session = instance.getSession();
 
-            if (kContainer == null) {
+            if (instance == null) {
 
                 if (log.isDebugEnabled()) {
                     log.debug("EXECUTED for groupName {}", groupName);
@@ -148,19 +150,6 @@ public class DroolsEngineAction extends BaseEngineAction {
 
                 return;
 
-            }
-
-            DroolsConfigurationGroupBean groupConfiguration = droolsConnectionContainer.getGroupConfiguration
-                    (groupName);
-
-            String sessionType = groupConfiguration.getSessionType();
-            String sessionName = groupConfiguration.getSessionName();
-
-            switch (sessionType) {
-            case "stateful" : session = new DroolsStatefulSession(kContainer, sessionName);
-                              break;
-            case "stateless" : session = new DroolsStatelessSession(kContainer, sessionName);
-                               break;
             }
 
 

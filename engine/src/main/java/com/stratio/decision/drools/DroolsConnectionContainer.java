@@ -3,13 +3,18 @@ package com.stratio.decision.drools;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Server;
 import org.kie.api.KieServices;
+import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
 import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
+import com.stratio.decision.drools.sessions.DroolsStatefulSession;
+import com.stratio.decision.drools.sessions.DroolsStatelessSession;
 
 import scala.tools.cmd.gen.AnyVals;
 
@@ -21,7 +26,7 @@ public class DroolsConnectionContainer {
 
     private static final Logger log = LoggerFactory.getLogger(DroolsConnectionContainer.class);
 
-    private Map<String, KieContainer> groupContainers;
+    private Map<String, DroolsInstace> groupContainers;
     private Map<String, DroolsConfigurationGroupBean> groupConfigurations;
 
 
@@ -48,9 +53,9 @@ public class DroolsConnectionContainer {
         return groupSessionTypes;
     }
 
-    private Map<String, KieContainer> configGroupsContainers(DroolsConfigurationBean droolsConfigurationBean){
+    private Map<String, DroolsInstace> configGroupsContainers(DroolsConfigurationBean droolsConfigurationBean){
 
-        Map<String, KieContainer> groupContainers = new HashMap<>();
+        Map<String, DroolsInstace> groupContainers = new HashMap<>();
 
         if (droolsConfigurationBean != null) {
 
@@ -58,6 +63,7 @@ public class DroolsConnectionContainer {
 
             for (String groupName : droolsConfigurationBean.getListGroups()){
 
+                DroolsInstace instance = new DroolsInstace();
                 DroolsConfigurationGroupBean groupConfigBean = droolsConfigurationBean.getGroups().get(groupName);
 
                 KieContainer groupContainer = ks
@@ -67,7 +73,21 @@ public class DroolsConnectionContainer {
 
                 if (groupContainer != null) {
 
-                    groupContainers.put(groupName, groupContainer);
+                    instance.setKieContainer(groupContainer);
+
+                    instance.setkScanner(ks.newKieScanner(groupContainer));
+                    instance.getkScanner().start(groupConfigBean.getScanFrequency());
+
+                    switch (groupConfigBean.getSessionType()) {
+                    case "stateful" : instance.setSession(new DroolsStatefulSession(groupContainer, groupConfigBean
+                            .getSessionName()));
+                        break;
+                    case "stateless" : instance.setSession(new DroolsStatelessSession(groupContainer, groupConfigBean
+                            .getSessionName()));
+                        break;
+                    }
+
+                    groupContainers.put(groupName, instance);
 
                     // TODO Add Scanner to the container if it is required
 
@@ -86,12 +106,12 @@ public class DroolsConnectionContainer {
         return groupContainers;
     }
 
-    public Map<String, KieContainer> getGroupContainers() {
+    public Map<String, DroolsInstace> getGroupContainers() {
 
         return groupContainers;
     }
 
-    public KieContainer getGroupContainer(String groupName) {
+    public DroolsInstace getGroupContainer(String groupName) {
 
         return groupContainers.get(groupName);
     }
