@@ -72,6 +72,13 @@ class StratioStreamingAPI
     asyncOperation.performAsyncOperation(insertStreamMessage, topicName)
   }
 
+
+  def insertData(streamName: String, data: List[ColumnNameValue]) = {
+    checkStreamingStatus()
+    val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
+    asyncOperation.performAsyncOperation(insertStreamMessage)
+  }
+
   def addQuery(streamName: String, query: String): String = {
     checkStreamingStatus()
     val operation = ADD_QUERY.toLowerCase

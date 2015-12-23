@@ -47,7 +47,7 @@ class StreamingAPISyncOperation(
   private def manageStreamingResponse(response: String, message: StratioStreamingMessage) = {
     val responseDto = parseTheEngineResponse(response)
     responseDto match {
-      case None => throw new StratioAPIGenericException("StratioEngine error: Unable to parse the engine response")
+      case None => throw new StratioAPIGenericException("StratioEngine error: Unable to parse the engine respsonse")
       case Some(responseDto) =>
         val replyCode = responseDto.getErrorCode
         val replyDescription = responseDto.getDescription
