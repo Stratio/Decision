@@ -63,12 +63,14 @@ class StratioStreamingAPI
   def insertData(streamName: String, data: List[ColumnNameValue], topicName: String, checkTopicExists:Boolean) = {
     checkStreamingStatus()
 
+    val topic :String = InternalTopic.TOPIC_DATA.getTopicName.concat("_").concat(topicName)
+
     if (checkTopicExists){
-      topicService.createTopicIfNotExist(topicName, 1, 1)
+      topicService.createTopicIfNotExist(topic, 1, 1)
     }
 
     val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
-    asyncOperation.performAsyncOperation(insertStreamMessage, topicName)
+    asyncOperation.performAsyncOperation(insertStreamMessage, topic)
   }
 
 

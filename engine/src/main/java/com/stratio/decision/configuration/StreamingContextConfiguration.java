@@ -97,8 +97,16 @@ public class StreamingContextConfiguration {
 
         kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_REQUEST.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
+        /*
+        groupId must be the clusterId. Kafka assigns each partition of a topic to one, and one only, consumer of
+        the group.
+        Decision topics has only one partition (by default), so if we have two o more decision instances (consumers)
+        reading
+         the
+        same topic with the same groupId, only one instance will be able to read from the topic
+        */
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_REQUEST.getTopicName(), baseTopicMap);
+                configurationContext.getZookeeperHostsQuorum(), configurationContext.getClusterId(), baseTopicMap);
         messages.cache();
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
@@ -255,14 +263,18 @@ public class StreamingContextConfiguration {
     private void configureActionContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
 
-        // TODO Leer los data topics del config y añadirlos al mapa
         baseTopicMap.put(InternalTopic.TOPIC_ACTION.getTopicName(), 1);
 
-        // TODO Añadir metodo a kafkaTopicService para crear los topics a partir del mapa
         kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_ACTION.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
+        /*
+        groupId must be the clusterId. Kafka assigns each partition of a topic to one, and one only, consumer of
+        the group.
+        Decision topics has only one partition (by default), so if we have two o more decision instances (consumers) reading the
+        same topic with the same groupId, only one instance will be able to read from the topic
+        */
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_ACTION.getTopicName(), baseTopicMap);
+                configurationContext.getZookeeperHostsQuorum(), configurationContext.getClusterId(), baseTopicMap);
         messages.cache();
 
         JavaDStream<StratioStreamingMessage> parsedDataDstream = messages.map(new SerializerFunction());
@@ -341,7 +353,12 @@ public class StreamingContextConfiguration {
         kafkaTopicService.createTopicsIfNotExist(configurationContext.getKafkaDataTopics(), configurationContext
                 .getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
-        // TODO El groupId se establece como el clusterID. Comprobar que es apropiado
+        /*
+         groupId must be the clusterId. Kafka assigns each partition of a topic to one, and one only, consumer of
+          the group.
+         Decision topics has only one partition (by default), so if we have two o more decision instances (consumers) reading the
+         same topic with the same groupId, only one instance will be able to read from the topic
+         */
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(),  configurationContext.getClusterId(), baseTopicMap);
         messages.cache();

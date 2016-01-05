@@ -31,16 +31,23 @@ public class StreamingFailoverDao  {
 
     private Gson gson;
 
+    private String clusterId;
+
+    private String zkPath;
+
     public StreamingFailoverDao(ConfigurationContext configurationContext, Gson gson) throws Exception {
         this.gson = gson;
-        this.zkutils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum());
+        this.clusterId = configurationContext.getClusterId();
+        this.zkutils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(), clusterId);
+
+        zkPath = STREAMING.ZK_BASE_PATH.concat("/").concat(clusterId).concat(STREAMING.ZK_PERSISTENCE_NODE);
     }
 
 
     public FailoverPersistenceStoreModel load() throws Exception {
-        if (zkutils.existZNode(STREAMING.ZK_PERSISTENCE_STORE_PATH)) {
+        if (zkutils.existZNode(zkPath)) {
             log.info("Failover loading data...");
-            byte[] bytes = zkutils.getZNode(STREAMING.ZK_PERSISTENCE_STORE_PATH);
+            byte[] bytes = zkutils.getZNode(zkPath);
             return gson.fromJson(new String(bytes), FailoverPersistenceStoreModel.class);
 //            return new FailoverPersistenceStoreModel(bytes);
         } else {
@@ -51,8 +58,8 @@ public class StreamingFailoverDao  {
     public void save(FailoverPersistenceStoreModel failoverPersistenceStoreModel) throws Exception {
         log.info("Failover data to save. HASH {}, TOSTRING {} ", failoverPersistenceStoreModel.hashCode(),
                 failoverPersistenceStoreModel);
-        zkutils.createZNode(STREAMING.ZK_PERSISTENCE_STORE_PATH, gson.toJson(failoverPersistenceStoreModel).getBytes());
-//        zkutils.createZNode(PERSISTENCE_STORE_PATH, failoverPersistenceStoreModel.FailOverPersistenceModelToByte());
+//        zkutils.createZNode(STREAMING.ZK_PERSISTENCE_STORE_PATH, gson.toJson(failoverPersistenceStoreModel).getBytes());
+        zkutils.createZNode(zkPath, gson.toJson(failoverPersistenceStoreModel).getBytes());
     }
 
 }

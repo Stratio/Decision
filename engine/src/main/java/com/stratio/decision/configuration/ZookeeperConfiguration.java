@@ -30,8 +30,14 @@ public class ZookeeperConfiguration {
 
     @PostConstruct
     public void startUp() throws Exception {
-        ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum()).createEphemeralZNode(
-                STREAMING.ZK_EPHEMERAL_NODE_PATH, String.valueOf(System.currentTimeMillis()).getBytes());
+//        ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum()).createEphemeralZNode(
+//                STREAMING.ZK_EPHEMERAL_NODE_PATH, String.valueOf(System.currentTimeMillis()).getBytes());
+
+        String zkPath = STREAMING.ZK_BASE_PATH.concat("/").concat(configurationContext.getClusterId()).concat(STREAMING
+                .ZK_EPHEMERAL_NODE);
+
+        ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(), configurationContext.getClusterId()).createEphemeralZNode(
+                zkPath, String.valueOf(System.currentTimeMillis()).getBytes());
     }
 
 }

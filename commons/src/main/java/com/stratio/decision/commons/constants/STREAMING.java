@@ -20,6 +20,8 @@ public interface STREAMING {
     String STREAM_STATUS_MAP = "stratio_stream_map";
 
     String ZK_EPHEMERAL_NODE_PATH = "/stratio/streaming/engine";
+    String ZK_EPHEMERAL_NODE= "/engine";
+
     String ZK_EPHEMERAL_NODE_STATUS_PATH = "/stratio/streaming/status";
     String ZK_EPHEMERAL_NODE_STATUS_CONNECTED = "connected";
     String ZK_EPHEMERAL_NODE_STATUS_INITIALIZED = "initialized";
