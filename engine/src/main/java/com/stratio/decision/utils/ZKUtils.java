@@ -17,6 +17,7 @@ package com.stratio.decision.utils;
 
 import com.google.gson.Gson;
 import com.stratio.decision.commons.constants.STREAMING;
+import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -27,7 +28,9 @@ import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -137,7 +140,8 @@ public class ZKUtils {
         private CuratorFramework client;
         private String clusterId;
         private static final long ZNODES_TTL = 600000; // 10 minutes
-        private static final long CLEAN_INTERVAL = 30000; // 5 minutes
+        private static final long CLEAN_INTERVAL = 300000; // 5 minutes
+        private static final long MAX_LIVE_FOR_OPERATION_NODE = 60000; // 1 minute
 
         /**
          *
@@ -169,10 +173,23 @@ public class ZKUtils {
                     } else {
 
                         Stat znode = client.checkExists().forPath(path + "/" + childrenPath);
+                        Boolean deleteNode = true;
                         // avoid nulls and ephemeral znodes
                         if (znode != null && znode.getEphemeralOwner() == 0) {
-                            client.delete().deletingChildrenIfNeeded().forPath(path + "/" + childrenPath);
-                            counter++;
+
+                            String parentPath = path.substring(path.lastIndexOf("/") +1);
+
+                            if (STREAM_OPERATIONS.SyncOperations.getAckOperations().contains(parentPath)) {
+
+                                if ( new Date().getTime() - znode.getMtime() < MAX_LIVE_FOR_OPERATION_NODE) {
+                                    deleteNode = false;
+                                }
+                            }
+
+                            if (deleteNode) {
+                                client.delete().deletingChildrenIfNeeded().forPath(path + "/" + childrenPath);
+                                counter++;
+                            }
                         }
 
                     }
@@ -191,20 +208,18 @@ public class ZKUtils {
         public void run() {
 
             String zkPath = STREAMING.ZK_BASE_PATH;
-
+/*
             if (clusterId != null){
                 zkPath = zkPath.concat("/").concat(clusterId);
             }
-
+*/
             while (!Thread.currentThread().isInterrupted()) {
 
                 try {
 
                     if (client.getState().compareTo(CuratorFrameworkState.STARTED) == 0) {
 
-                       // int childsRemoved = removeOldChildZnodes(STREAMING.ZK_BASE_PATH);
                         int childsRemoved = removeOldChildZnodes(zkPath);
-
                         logger.debug(childsRemoved + " old zNodes removed from ZK");
                     }
 

@@ -15,6 +15,9 @@
  */
 package com.stratio.decision.commons.constants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface STREAM_OPERATIONS {
     // DDL
     public interface DEFINITION {
@@ -43,6 +46,35 @@ public interface STREAM_OPERATIONS {
         String STOP_SAVETO_MONGO = "STOP_SAVETO_MONGO";
         String INDEX = "INDEX";
         String STOP_INDEX = "STOP_INDEX";
+    }
+
+    public class SyncOperations {
+
+        public static List<String> getAckOperations() {
+
+            List<String> operations = new ArrayList<>();
+
+            operations.add(DEFINITION.CREATE.toLowerCase());
+            operations.add(DEFINITION.ADD_QUERY.toLowerCase());
+            operations.add(DEFINITION.REMOVE_QUERY.toLowerCase());
+            operations.add(DEFINITION.DROP.toLowerCase());
+            operations.add(DEFINITION.ALTER.toLowerCase());
+
+            operations.add(MANIPULATION.LIST.toLowerCase());
+
+            operations.add(ACTION.LISTEN.toLowerCase());
+            operations.add(ACTION.STOP_LISTEN.toLowerCase());
+            operations.add(ACTION.SAVETO_SOLR.toLowerCase());
+            operations.add(ACTION.STOP_SAVETO_SOLR.toLowerCase());
+            operations.add(ACTION.SAVETO_CASSANDRA.toLowerCase());
+            operations.add(ACTION.STOP_SAVETO_CASSANDRA.toLowerCase());
+            operations.add(ACTION.SAVETO_MONGO.toLowerCase());
+            operations.add(ACTION.STOP_SAVETO_MONGO.toLowerCase());
+            operations.add(ACTION.INDEX.toLowerCase());
+            operations.add(ACTION.STOP_INDEX.toLowerCase());
+
+            return operations;
+        }
     }
 
 }
