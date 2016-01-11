@@ -15,18 +15,22 @@
  */
 package com.stratio.decision.configuration;
 
+import com.stratio.decision.commons.constants.InternalTopic;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ConfigurationContext {
 
     /**
      * MANDATORY PROPERTIES *
      */
+    private final String clusterId;
 
     private final List<String> cassandraHosts;
     private final List<String> kafkaHosts;
@@ -55,6 +59,8 @@ public class ConfigurationContext {
      * OPTIONAL PROPERTIES *
      */
 
+    private final List<String> kafkaDataTopics;
+
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
 
@@ -67,6 +73,7 @@ public class ConfigurationContext {
     private final String mongoPassword;
 
     public enum ConfigurationKeys {
+        CLUSTER_ID("clusterId"),
         CASSANDRA_HOSTS("cassandra.hosts"),
         KAFKA_HOSTS("kafka.hosts"),
         ZOOKEEPER_HOSTS("zookeeper.hosts"),
@@ -83,6 +90,7 @@ public class ConfigurationContext {
         KAFKA_PARTITIONS("kafka.partitions"),
         KAFKA_SESSION_TIMEOUT("kafka.sessionTimeout"),
         KAFKA_CONNECTION_TIMEOUT("kafka.connectionTimeout"),
+        KAFKA_DATA_TOPICS("kafka.dataTopics"),
         ELASTICSEARCH_HOST("elasticsearch.hosts"),
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
         SOLR_HOST("solr.hosts"),
@@ -107,9 +115,30 @@ public class ConfigurationContext {
     public ConfigurationContext() {
         Config config = ConfigFactory.load("config");
 
+        this.clusterId =  config.getString(ConfigurationKeys.CLUSTER_ID.getKey());
+
         this.kafkaHosts = config.getStringList(ConfigurationKeys.KAFKA_HOSTS.getKey());
         this.kafkaConsumerBrokerHost = kafkaHosts.get(0).split(":")[0];
         this.kafkaConsumerBrokerPort = Integer.parseInt(kafkaHosts.get(0).split(":")[1]);
+
+        List<String> dataTopics = (List<String>) this.getListOrNull(ConfigurationKeys.KAFKA_DATA_TOPICS.getKey(),
+                config);
+
+        if (dataTopics != null) {
+
+            String separator = "_";
+
+            this.kafkaDataTopics = dataTopics.stream().map(topic -> InternalTopic.TOPIC_DATA.getTopicName().concat
+                    (separator).concat(topic))
+            .collect(Collectors.toList());
+
+        } else {
+            dataTopics = new ArrayList<>();
+            dataTopics.add(InternalTopic.TOPIC_DATA.getTopicName());
+            this.kafkaDataTopics = dataTopics;
+        }
+
+
         this.zookeeperHosts = config.getStringList(ConfigurationKeys.ZOOKEEPER_HOSTS.getKey());
         this.sparkHost = config.getString(ConfigurationKeys.SPARK_HOST.getKey());
         this.internalSparkHost = config.getString(ConfigurationKeys.INTERNAL_SPARK_HOST.getKey());
@@ -144,6 +173,10 @@ public class ConfigurationContext {
 
     }
 
+    public String getClusterId() {
+        return clusterId;
+    }
+
     public List<String> getCassandraHosts() {
         return cassandraHosts;
     }
@@ -162,6 +195,10 @@ public class ConfigurationContext {
 
     public int getKafkaConsumerBrokerPort() {
         return kafkaConsumerBrokerPort;
+    }
+
+    public List<String> getKafkaDataTopics() {
+        return kafkaDataTopics;
     }
 
     public List<String> getZookeeperHosts() {

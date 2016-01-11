@@ -34,6 +34,7 @@ public class StreamingEngine {
 
     public static void main(String[] args) throws IOException {
         try (AnnotationConfigApplicationContext annotationConfigApplicationContextFirst = new AnnotationConfigApplicationContext(FirstConfiguration.class)) {
+
             LeadershipManager node = LeadershipManager.getNode();
 
             node.start();
@@ -44,12 +45,13 @@ public class StreamingEngine {
                 try (AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(
                         BaseConfiguration.class)) {
                     ConfigurationContext configurationContext = annotationConfigApplicationContext.getBean("configurationContext", ConfigurationContext.class);
-                    ZKUtils zkUtils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum());
+                    ZKUtils zkUtils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(),
+                            configurationContext.getClusterId());
+
                     zkUtils.createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_CONNECTED.getBytes());
+
                     annotationConfigApplicationContext.registerShutdownHook();
-
                     JavaStreamingContext context = annotationConfigApplicationContext.getBean("streamingContext", JavaStreamingContext.class);
-
                     context.start();
 
                     zkUtils.createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());

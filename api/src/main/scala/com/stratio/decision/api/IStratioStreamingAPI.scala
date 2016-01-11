@@ -122,10 +122,17 @@ trait IStratioStreamingAPI {
    * Inserts new data into a stream.
    * @param streamName
    * @param data
+   * @param topicName
    */
   @throws(classOf[StratioEngineStatusException])
   @throws(classOf[StratioAPISecurityException])
+  def insertData(streamName: String, data: List[ColumnNameValue], topicName: String = null, checkTopicExists:Boolean
+  = false)
+
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPISecurityException])
   def insertData(streamName: String, data: List[ColumnNameValue])
+
 
   /**
    * Adds a query to a stream.

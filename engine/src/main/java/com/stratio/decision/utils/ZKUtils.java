@@ -17,6 +17,7 @@ package com.stratio.decision.utils;
 
 import com.google.gson.Gson;
 import com.stratio.decision.commons.constants.STREAMING;
+import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -27,7 +28,9 @@ import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,8 +41,16 @@ public class ZKUtils {
     private static ZKUtils self;
     private CuratorFramework client;
     private ExecutorService backgroundZookeeperCleanerTasks;
+    private String clusterId;
 
     private ZKUtils(String zookeeperCluster) throws Exception {
+
+        this(zookeeperCluster, null);
+    }
+
+    private ZKUtils(String zookeeperCluster, String clusterId) throws Exception {
+
+        this.clusterId = clusterId;
 
         // ZOOKEPER CONNECTION
         client = CuratorFrameworkFactory.newClient(zookeeperCluster, 25 * 1000, 10 * 1000, new ExponentialBackoffRetry(
@@ -51,8 +62,9 @@ public class ZKUtils {
             throw new Exception("Connection to Zookeeper timed out after seconds");
         } else {
             backgroundZookeeperCleanerTasks = Executors.newFixedThreadPool(1);
-            backgroundZookeeperCleanerTasks.submit(new ZookeeperBackgroundCleaner(client));
+            backgroundZookeeperCleanerTasks.submit(new ZookeeperBackgroundCleaner(client, clusterId));
         }
+
 
     }
 
@@ -62,6 +74,15 @@ public class ZKUtils {
         }
         return self;
     }
+
+    public static ZKUtils getZKUtils(String zookeeperCluster, String clusterId) throws Exception {
+        if (self == null) {
+            self = new ZKUtils(zookeeperCluster, clusterId);
+        }
+        return self;
+    }
+
+
 
     public static void shutdownZKUtils() {
         if (self != null) {
@@ -117,8 +138,10 @@ public class ZKUtils {
         private Logger logger = LoggerFactory.getLogger(ZookeeperBackgroundCleaner.class);
 
         private CuratorFramework client;
+        private String clusterId;
         private static final long ZNODES_TTL = 600000; // 10 minutes
-        private static final long CLEAN_INTERVAL = 30000; // 5 minutes
+        private static final long CLEAN_INTERVAL = 300000; // 5 minutes
+        private static final long MAX_LIVE_FOR_OPERATION_NODE = 60000; // 1 minute
 
         /**
          *
@@ -127,6 +150,13 @@ public class ZKUtils {
             this.client = client;
             logger.debug("Starting ZookeeperBackgroundCleaner...");
             logger.info("ZookeeperBackgroundCleaner BASE path " + STREAMING.ZK_BASE_PATH);
+        }
+
+        public ZookeeperBackgroundCleaner(CuratorFramework client, String clusterId) {
+
+            this(client);
+            this.clusterId = clusterId;
+
         }
 
         private int removeOldChildZnodes(String path) throws Exception {
@@ -143,10 +173,23 @@ public class ZKUtils {
                     } else {
 
                         Stat znode = client.checkExists().forPath(path + "/" + childrenPath);
+                        Boolean deleteNode = true;
                         // avoid nulls and ephemeral znodes
                         if (znode != null && znode.getEphemeralOwner() == 0) {
-                            client.delete().deletingChildrenIfNeeded().forPath(path + "/" + childrenPath);
-                            counter++;
+
+                            String parentPath = path.substring(path.lastIndexOf("/") +1);
+
+                            if (STREAM_OPERATIONS.SyncOperations.getAckOperations().contains(parentPath)) {
+
+                                if ( new Date().getTime() - znode.getMtime() < MAX_LIVE_FOR_OPERATION_NODE) {
+                                    deleteNode = false;
+                                }
+                            }
+
+                            if (deleteNode) {
+                                client.delete().deletingChildrenIfNeeded().forPath(path + "/" + childrenPath);
+                                counter++;
+                            }
                         }
 
                     }
@@ -164,13 +207,19 @@ public class ZKUtils {
         @Override
         public void run() {
 
+            String zkPath = STREAMING.ZK_BASE_PATH;
+/*
+            if (clusterId != null){
+                zkPath = zkPath.concat("/").concat(clusterId);
+            }
+*/
             while (!Thread.currentThread().isInterrupted()) {
 
                 try {
 
                     if (client.getState().compareTo(CuratorFrameworkState.STARTED) == 0) {
-                        int childsRemoved = removeOldChildZnodes(STREAMING.ZK_BASE_PATH);
 
+                        int childsRemoved = removeOldChildZnodes(zkPath);
                         logger.debug(childsRemoved + " old zNodes removed from ZK");
                     }
 

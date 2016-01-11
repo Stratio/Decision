@@ -53,8 +53,8 @@ Feature: Stream listen
 			 
 		Examples:
 			 | streamName 	              | 
-			 | stratio_streaming_data     |
-			 | stratio_streaming_requests |
+			 | stratio_decision_data     |
+			 | stratio_decision_requests |
 			 
 	Scenario Outline: Listen to an bad named stream
 		Given I drop every existing stream				

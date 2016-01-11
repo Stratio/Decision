@@ -60,6 +60,21 @@ class StratioStreamingAPI
     syncOperation.performSyncOperation(alterStreamMessage)
   }
 
+  def insertData(streamName: String, data: List[ColumnNameValue], topicName: String, checkTopicExists:Boolean) = {
+    checkStreamingStatus()
+
+
+    val topic :String = InternalTopic.TOPIC_DATA.getTopicName.concat("_").concat(topicName)
+
+    if (checkTopicExists){
+      topicService.createTopicIfNotExist(topic, 1, 1)
+    }
+
+    val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
+    asyncOperation.performAsyncOperation(insertStreamMessage, topic)
+  }
+
+
   def insertData(streamName: String, data: List[ColumnNameValue]) = {
     checkStreamingStatus()
     val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
@@ -220,6 +235,7 @@ class StratioStreamingAPI
       log.info("Establishing connection with the engine...")
       checkEphemeralNode()
       startEphemeralNodeWatch()
+
       log.info("Initializing kafka topic...")
       initializeTopic()
       this
@@ -247,7 +263,8 @@ class StratioStreamingAPI
     }
   }
 
-  override def withServerConfig(kafkaQuorum: String, zookeeperQuorum: String): IStratioStreamingAPI = {
+  override def withServerConfig(kafkaQuorum: String, zookeeperQuorum: String):
+  IStratioStreamingAPI = {
     kafkaCluster = kafkaQuorum
     zookeeperServer = zookeeperQuorum
     this
@@ -262,6 +279,7 @@ class StratioStreamingAPI
     zookeeperServer = s"$zookeeperHost:$zookeeperPort"
     this
   }
+
 
   override def init(): IStratioStreamingAPI = {
     try {

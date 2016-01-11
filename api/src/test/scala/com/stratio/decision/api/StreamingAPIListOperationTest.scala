@@ -19,7 +19,7 @@ import java.util.concurrent.TimeoutException
 
 import com.stratio.decision.api.kafka.KafkaProducer
 import com.stratio.decision.api.zookeeper.ZookeeperConsumer
-import com.stratio.decision.commons.exceptions.{StratioAPIGenericException, StratioEngineOperationException}
+import com.stratio.decision.commons.exceptions.{StratioEngineConnectionException, StratioAPIGenericException, StratioEngineOperationException}
 import com.stratio.decision.commons.messages.StratioStreamingMessage
 import org.junit.runner.RunWith
 import org.mockito.Matchers._
@@ -88,7 +88,7 @@ class StreamingAPIListOperationTest extends FunSpec
       org.mockito.Mockito.when(zookeeperConsumerMock.zNodeExists(anyString())).thenReturn(true)
       org.mockito.Mockito.when(zookeeperConsumerMock.readZNode(anyString())).thenReturn(Future.failed(new TimeoutException()))
       Then("we should get a StratioEngineOperationException")
-      intercept[StratioEngineOperationException] {
+      intercept[StratioEngineConnectionException] {
         stratioStreamingAPIListOperation.getListStreams(stratioStreamingMessage)
       }
     }

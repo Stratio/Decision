@@ -20,6 +20,16 @@ import com.stratio.decision.api.kafka.KafkaProducer
 import com.stratio.decision.commons.messages.StratioStreamingMessage
 
 class StreamingAPIAsyncOperation(tableProducer: KafkaProducer) {
+  def performAsyncOperation(message: StratioStreamingMessage, topicName:String) = {
+    addMessageToKafkaTopic(message, topicName)
+  }
+
+  def addMessageToKafkaTopic(message: StratioStreamingMessage, topicName:String) = {
+    val kafkaMessage = new Gson().toJson(message)
+    val operation = message.getOperation
+    tableProducer.send(kafkaMessage, operation, topicName)
+  }
+
   def performAsyncOperation(message: StratioStreamingMessage) = {
     addMessageToKafkaTopic(message)
   }
@@ -29,4 +39,5 @@ class StreamingAPIAsyncOperation(tableProducer: KafkaProducer) {
     val operation = message.getOperation
     tableProducer.send(kafkaMessage, operation)
   }
+
 }

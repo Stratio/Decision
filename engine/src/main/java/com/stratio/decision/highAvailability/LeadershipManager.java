@@ -42,12 +42,24 @@ public class LeadershipManager {
         this.id = id;
     }
 
-    public static LeadershipManager getLeadershipManager(String zookeeperCluster) throws Exception {
+
+//    public static LeadershipManager getLeadershipManager(String zookeeperCluster) throws Exception {
+//        if (self == null) {
+//            Random r = new Random();
+//            RandomNameGenerator rnd = new RandomNameGenerator(r.nextInt());
+//
+//            self = new LeadershipManager(zookeeperCluster, STREAMING.ZK_HIGH_AVAILABILITY_PATH, rnd.next());
+//        }
+//        return self;
+//    }
+
+    public static LeadershipManager getLeadershipManager(String zookeeperCluster, String clusterId) throws Exception {
         if (self == null) {
             Random r = new Random();
             RandomNameGenerator rnd = new RandomNameGenerator(r.nextInt());
 
-            self = new LeadershipManager(zookeeperCluster, STREAMING.ZK_HIGH_AVAILABILITY_PATH, rnd.next());
+            String zkPath = STREAMING.ZK_BASE_PATH.concat("/").concat(clusterId).concat(STREAMING.ZK_HIGH_AVAILABILITY_NODE);
+            self = new LeadershipManager(zookeeperCluster, zkPath, rnd.next());
         }
         return self;
     }
