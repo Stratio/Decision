@@ -21,5 +21,5 @@ package com.stratio.decision.commons.constants;
 @Deprecated
 public interface BUS {
     String STREAMING_GROUP_ID = "stratioStreaming";
-    String LIST_STREAMS_TOPIC = "stratio_streaming_list_streams";
+    String LIST_STREAMS_TOPIC = "stratio_decision_list_streams";
 }

@@ -63,6 +63,7 @@ class StratioStreamingAPI
   def insertData(streamName: String, data: List[ColumnNameValue], topicName: String, checkTopicExists:Boolean) = {
     checkStreamingStatus()
 
+
     val topic :String = InternalTopic.TOPIC_DATA.getTopicName.concat("_").concat(topicName)
 
     if (checkTopicExists){

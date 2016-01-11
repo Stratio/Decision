@@ -25,6 +25,8 @@ import com.stratio.decision.commons.dto.ActionCallbackDto
 import com.stratio.decision.commons.exceptions.{StratioAPIGenericException, StratioAPISecurityException, StratioEngineOperationException}
 import com.stratio.decision.commons.messages.StratioStreamingMessage
 
+import scala.concurrent.TimeoutException
+
 class StreamingAPISyncOperation(
   kafkaProducer: KafkaProducer,
   zookeeperConsumer: ZookeeperConsumer,
@@ -40,8 +42,17 @@ class StreamingAPISyncOperation(
   def performSyncOperation(message: StratioStreamingMessage) = {
     val zNodeUniqueId = UUID.randomUUID().toString
     addMessageToKafkaTopic(message, zNodeUniqueId, kafkaProducer)
-    val syncOperationResponse = waitForTheStreamingResponse(zookeeperConsumer, message, ackTimeOutInMs)
-    manageStreamingResponse(syncOperationResponse, message)
+    try {
+      val syncOperationResponse = waitForTheStreamingResponse(zookeeperConsumer, message, ackTimeOutInMs)
+      manageStreamingResponse(syncOperationResponse, message)
+    } catch {
+      case e: StratioEngineOperationException => {
+        log.error("Error connecting with engine in sync operation")
+      }
+/*      case e: TimeoutException => {
+        throw new StratioEngineOperationException("Acknowledge timeout expired" + e.getMessage)
+      }*/
+    }
   }
 
   private def manageStreamingResponse(response: String, message: StratioStreamingMessage) = {

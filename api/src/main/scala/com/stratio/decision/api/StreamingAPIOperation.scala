@@ -19,7 +19,7 @@ import com.google.gson.Gson
 import com.stratio.decision.api.kafka.KafkaProducer
 import com.stratio.decision.api.zookeeper.ZookeeperConsumer
 import com.stratio.decision.commons.constants.STREAMING._
-import com.stratio.decision.commons.exceptions.StratioEngineOperationException
+import com.stratio.decision.commons.exceptions.{StratioEngineConnectionException, StratioEngineOperationException}
 import com.stratio.decision.commons.messages.StratioStreamingMessage
 import org.slf4j.LoggerFactory
 
@@ -50,6 +50,7 @@ class StreamingAPIOperation
     val zNodeFullPath = getOperationZNodeFullPath(
       message.getOperation.toLowerCase,
       message.getRequest_id)
+    log.info("zNodeFullPath= " + zNodeFullPath)
     try {
       Await.result(zookeeperConsumer.readZNode(zNodeFullPath), ackTimeOutInMs milliseconds)
       val response = zookeeperConsumer.getZNodeData(zNodeFullPath)
@@ -58,7 +59,7 @@ class StreamingAPIOperation
     } catch {
       case e: TimeoutException => {
         log.error("Ack timeout expired for: " + message.getRequest)
-        throw new StratioEngineOperationException("Acknowledge timeout expired" + message.getRequest)
+        throw new StratioEngineConnectionException("Acknowledge timeout expired" + message.getRequest)
       }
       case _: Throwable => {
         throw new StratioEngineOperationException("Error connecting with engine")
