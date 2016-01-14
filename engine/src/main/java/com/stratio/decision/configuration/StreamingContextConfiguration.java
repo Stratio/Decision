@@ -108,40 +108,9 @@ public class StreamingContextConfiguration {
         configureActionContext(context);
         configureDataContext(context);
 
-    // TODO DELETE WHEN API/SHELL ARE READY
-   //  createPocDroolsStream();
-
         return context;
     }
 
-
-    /*
-     JPFM. Testing if it is possible to create a siddhi stream when the spark streaming context is starting
-TODO DELETE
-     */
-    private void createPocDroolsStream() {
-
-        try {
-            List<ColumnNameTypeValue> columns = new ArrayList<>();
-            columns.add(new ColumnNameTypeValue("col1", ColumnType.INTEGER, 1));
-            columns.add(new ColumnNameTypeValue("col2", ColumnType.STRING, "test string"));
-
-            String streamName = configurationContext.getDroolsConfiguration().getPocStreamName();
-            //String engineActionParameters[] = { configurationContext.getDroolsConfiguration().getPocGroupName() };
-
-            Map<String, Object> engineActionParameters = new HashMap<>();
-            engineActionParameters.put("groupName", configurationContext.getDroolsConfiguration().getPocGroupName());
-            engineActionParameters.put("outputStream", "drools_result");
-
-            streamOperationService.createStream(streamName, columns);
-            streamOperationService.enableEngineAction(streamName, EngineActionType.FIRE_RULES, engineActionParameters);
-        }
-        catch (Exception e) {
-            log.error("Exception {}", e.getMessage());
-    }
-
-
-    }
 
     private void configureRequestContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
