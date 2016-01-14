@@ -16,6 +16,7 @@
 package com.stratio.decision.utils;
 
 import com.google.gson.Gson;
+import com.stratio.decision.clustering.ClusterManager;
 import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
@@ -102,17 +103,21 @@ public class ZKUtils {
 
     public void createZNodeJsonReply(StratioStreamingMessage request, Object reply) throws Exception {
 
-        String path = STREAMING.ZK_BASE_PATH + "/" + request.getOperation().toLowerCase() + "/"
-                + request.getRequest_id();
+        ClusterManager node = ClusterManager.getNode();
+        if (node.isLeader()) {
 
-        if (client.checkExists().forPath(path) != null) {
-            client.delete().deletingChildrenIfNeeded().forPath(path);
+            String path = STREAMING.ZK_BASE_PATH + "/" + request.getOperation().toLowerCase() + "/"
+                    + request.getRequest_id();
+
+            if (client.checkExists().forPath(path) != null) {
+                client.delete().deletingChildrenIfNeeded().forPath(path);
+            }
+
+            client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
+
+            logger.info("**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
+                    + path);
         }
-
-        client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
-
-        logger.info("**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
-                + path);
 
     }
 
