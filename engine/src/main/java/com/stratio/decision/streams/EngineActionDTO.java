@@ -1,6 +1,7 @@
 package com.stratio.decision.streams;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import com.stratio.decision.commons.constants.EngineActionType;
 
@@ -12,10 +13,10 @@ public class EngineActionDTO implements Serializable {
 
 
     private EngineActionType engineActionType;
-    private Object[] engineActionParameters;
+    private Map<String, Object> engineActionParameters;
     private String engineActionQueryId;
 
-    public EngineActionDTO(EngineActionType engineActionType, Object[] engineActionParameters, String
+    public EngineActionDTO(EngineActionType engineActionType, Map<String, Object> engineActionParameters, String
             engineActionQueryId) {
 
         this.engineActionType = engineActionType;
@@ -32,11 +33,11 @@ public class EngineActionDTO implements Serializable {
         this.engineActionType = engineActionType;
     }
 
-    public Object[] getEngineActionParameters() {
+    public Map<String, Object> getEngineActionParameters() {
         return engineActionParameters;
     }
 
-    public void setEngineActionParameters(Object[] engineActionParameters) {
+    public void setEngineActionParameters(Map<String, Object> engineActionParameters) {
         this.engineActionParameters = engineActionParameters;
     }
 

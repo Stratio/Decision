@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
 import org.kie.api.KieServices;
-import org.kie.api.builder.KieScanner;
+//import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +75,10 @@ public class DroolsConnectionContainer {
 
                     instance.setKieContainer(groupContainer);
 
-                    instance.setkScanner(ks.newKieScanner(groupContainer));
-                    instance.getkScanner().start(groupConfigBean.getScanFrequency());
+                    // TODO Add Scanner to the container if it is required
+
+                  //  instance.setkScanner(ks.newKieScanner(groupContainer));
+                   // instance.getkScanner().start(groupConfigBean.getScanFrequency());
 
                     switch (groupConfigBean.getSessionType()) {
                     case "stateful" : instance.setSession(new DroolsStatefulSession(groupContainer, groupConfigBean
@@ -89,7 +91,7 @@ public class DroolsConnectionContainer {
 
                     groupContainers.put(groupName, instance);
 
-                    // TODO Add Scanner to the container if it is required
+
 
                 } else {
 

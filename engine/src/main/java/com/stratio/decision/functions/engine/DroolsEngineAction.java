@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 
+import com.stratio.decision.commons.constants.ENGINE_ACTIONS_PARAMETERS;
 import com.stratio.decision.commons.constants.InternalTopic;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
@@ -41,8 +42,10 @@ public class DroolsEngineAction extends BaseEngineAction {
 
     private DroolsConnectionContainer droolsConnectionContainer;
     private List<String> groups;
+    private String cepOutputStreamName = null;
+    private String outputKafkaTopic = null;
 
-    public DroolsEngineAction(DroolsConnectionContainer droolsConnectionContainer, Object[] actionParameters,
+    public DroolsEngineAction(DroolsConnectionContainer droolsConnectionContainer, Map<String, Object> actionParameters,
             SiddhiManager siddhiManager,  StreamOperationServiceWithoutMetrics streamOperationService) {
 
         super(actionParameters, siddhiManager, streamOperationService);
@@ -50,28 +53,19 @@ public class DroolsEngineAction extends BaseEngineAction {
         this.droolsConnectionContainer = droolsConnectionContainer;
         this.groups = new ArrayList<>();
 
-        for (Object actionParameter : actionParameters) {
+        if (actionParameters.containsKey(ENGINE_ACTIONS_PARAMETERS.DROOLS.GROUP)) {
+            groups.add((String)actionParameters.get(ENGINE_ACTIONS_PARAMETERS.DROOLS.GROUP));
+        }
 
-            groups.add((String) actionParameter);
+        if (actionParameters.containsKey(ENGINE_ACTIONS_PARAMETERS.DROOLS.CEP_OUTPUT_STREAM)) {
+            cepOutputStreamName = (String)actionParameters.get(ENGINE_ACTIONS_PARAMETERS.DROOLS.CEP_OUTPUT_STREAM);
+        }
+
+        if (actionParameters.containsKey(ENGINE_ACTIONS_PARAMETERS.DROOLS.KAFKA_OUTPUT_TOPIC)) {
+            outputKafkaTopic = (String)actionParameters.get(ENGINE_ACTIONS_PARAMETERS.DROOLS.KAFKA_OUTPUT_TOPIC);
         }
 
     }
-
-
-//    public DroolsEngineAction(DroolsConnectionContainer droolsConnectionContainer, Object[] actionParameters,
-//            SiddhiManager siddhiManager) {
-//
-//        super(actionParameters, siddhiManager);
-//
-//        this.droolsConnectionContainer = droolsConnectionContainer;
-//        this.groups = new ArrayList<>();
-//
-//        for (Object actionParameter : actionParameters) {
-//
-//            groups.add((String) actionParameter);
-//        }
-//
-//    }
 
 
     private List<Map<String, Object>> formatInputEvents(Event[] events){
@@ -166,11 +160,7 @@ public class DroolsEngineAction extends BaseEngineAction {
 
                     List<Map<String, Object>> formattedResults = this.formatDroolsResults(results);
 
-                    // TODO Read from api/shell the output stream name
-                    Boolean sendToCep = true;
-                    String cepOutputStreamName = "drools_result";
-
-                    if (sendToCep) {
+                    if (cepOutputStreamName!=null) {
                         this.handleCepRedirection(cepOutputStreamName, formattedResults);
                     }
                 }

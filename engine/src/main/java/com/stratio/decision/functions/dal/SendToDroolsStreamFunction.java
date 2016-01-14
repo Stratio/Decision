@@ -37,8 +37,7 @@ public class SendToDroolsStreamFunction extends ActionBaseFunction  {
     @Override
     protected boolean startAction(StratioStreamingMessage message) {
 
-        // TODO PARAMETERS
-        getStreamOperationService().enableEngineAction(message.getStreamName(), EngineActionType.FIRE_RULES, null);
+        getStreamOperationService().enableEngineAction(message.getStreamName(), EngineActionType.FIRE_RULES, message.getAdditionalParameters());
         return true;
     }
 

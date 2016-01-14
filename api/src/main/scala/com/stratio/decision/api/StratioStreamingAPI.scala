@@ -213,11 +213,8 @@ class StratioStreamingAPI
   def startSendToDrools(streamName: String, groupName: String, outputStream: String = null, kafkaTopic: String = null) = {
     checkStreamingStatus()
     val operation = START_SENDTODROOLS.toLowerCase
-
-    val startSendToDroolsMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
+    val startSendToDroolsMessage = new DroolsMessageBuilder(streamName, operation).build(groupName, outputStream, kafkaTopic)
     syncOperation.performSyncOperation(startSendToDroolsMessage)
-
-
   }
 
   def stopSendToDrools(streamName:String) = {

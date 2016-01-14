@@ -204,4 +204,12 @@ public class StratioStreamingMessage implements Serializable {
     public void setActiveActions(Set<StreamAction> activeActions) {
         this.activeActions = activeActions;
     }
+
+    public Map<String, Object> getAdditionalParameters() {
+        return additionalParameters;
+    }
+
+    public void setAdditionalParameters(Map<String, Object> additionalParameters) {
+        this.additionalParameters = additionalParameters;
+    }
 }

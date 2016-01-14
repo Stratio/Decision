@@ -122,7 +122,8 @@ public class StreamStatusDao {
         streamStatus.setActionQueryId(queryId);
     }
 
-    public void enableEngineAction(String streamName, EngineActionType engineActionType, Object[] engineActionParams,
+    public void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams,
       String engineActionQueryId ){
 
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
@@ -177,7 +178,7 @@ public class StreamStatusDao {
     }
 
 
-    public void updateEngineActionParameters(String streamName, EngineActionType engineActionType, Object[]
+    public void updateEngineActionParameters(String streamName, EngineActionType engineActionType, Map<String, Object>
             engineActionParams){
 
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);

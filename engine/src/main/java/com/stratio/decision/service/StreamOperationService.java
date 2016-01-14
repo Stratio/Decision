@@ -28,6 +28,7 @@ import com.stratio.decision.exception.ServiceException;
 import org.wso2.siddhi.core.SiddhiManager;
 
 import java.util.List;
+import java.util.Map;
 
 public class StreamOperationService extends StreamOperationServiceWithoutMetrics {
 
@@ -118,7 +119,8 @@ public class StreamOperationService extends StreamOperationServiceWithoutMetrics
     }
 
     @Override
-    public void enableEngineAction(String streamName, EngineActionType engineActionType, Object[] engineActionParams) {
+    public void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams) {
         super.enableEngineAction(streamName, engineActionType, engineActionParams, this);
     }
 

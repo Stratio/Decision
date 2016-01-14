@@ -222,11 +222,13 @@ public class StreamOperationServiceWithoutMetrics {
     }
 
 
-    public void enableEngineAction(String streamName, EngineActionType engineActionType, Object[] engineActionParams) {
+    public void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams) {
         this.enableEngineAction(streamName, engineActionType, engineActionParams, this);
     }
 
-    protected void enableEngineAction(String streamName, EngineActionType engineActionType, Object[] engineActionParams,
+    protected void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams,
      StreamOperationServiceWithoutMetrics streamOperationService) {
 
         // TODO mecanismo para modificar el engineActionParams de callback de accion ya existente

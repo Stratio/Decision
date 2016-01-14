@@ -58,6 +58,7 @@ import com.stratio.decision.functions.dal.ListenStreamFunction;
 import com.stratio.decision.functions.dal.SaveToCassandraStreamFunction;
 import com.stratio.decision.functions.dal.SaveToMongoStreamFunction;
 import com.stratio.decision.functions.dal.SaveToSolrStreamFunction;
+import com.stratio.decision.functions.dal.SendToDroolsStreamFunction;
 import com.stratio.decision.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.decision.functions.ddl.AlterStreamFunction;
 import com.stratio.decision.functions.ddl.CreateStreamFunction;
@@ -107,7 +108,8 @@ public class StreamingContextConfiguration {
         configureActionContext(context);
         configureDataContext(context);
 
-        createPocDroolsStream();
+    // TODO DELETE WHEN API/SHELL ARE READY
+   //  createPocDroolsStream();
 
         return context;
     }
@@ -115,7 +117,7 @@ public class StreamingContextConfiguration {
 
     /*
      JPFM. Testing if it is possible to create a siddhi stream when the spark streaming context is starting
-
+TODO DELETE
      */
     private void createPocDroolsStream() {
 
@@ -125,14 +127,19 @@ public class StreamingContextConfiguration {
             columns.add(new ColumnNameTypeValue("col2", ColumnType.STRING, "test string"));
 
             String streamName = configurationContext.getDroolsConfiguration().getPocStreamName();
-            String engineActionParameters[] = { configurationContext.getDroolsConfiguration().getPocGroupName() };
+            //String engineActionParameters[] = { configurationContext.getDroolsConfiguration().getPocGroupName() };
+
+            Map<String, Object> engineActionParameters = new HashMap<>();
+            engineActionParameters.put("groupName", configurationContext.getDroolsConfiguration().getPocGroupName());
+            engineActionParameters.put("outputStream", "drools_result");
 
             streamOperationService.createStream(streamName, columns);
             streamOperationService.enableEngineAction(streamName, EngineActionType.FIRE_RULES, engineActionParameters);
         }
         catch (Exception e) {
             log.error("Exception {}", e.getMessage());
-        }
+    }
+
 
     }
 
@@ -158,6 +165,29 @@ public class StreamingContextConfiguration {
                 configurationContext.getZookeeperHostsQuorum());
         ListStreamsFunction listStreamsFunction = new ListStreamsFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorum());
+
+
+        if (configurationContext.getDroolsConfiguration() != null) {
+
+            SendToDroolsStreamFunction sendToDroolsStreamFunction = new SendToDroolsStreamFunction
+                    (streamOperationService, configurationContext.getZookeeperHostsQuorum());
+
+            JavaDStream<StratioStreamingMessage> sendToDroolsRequests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.START_SENDTODROOLS)).map(
+                    keepPayloadFromMessageFunction);
+
+            JavaDStream<StratioStreamingMessage> stopSendToDroolsRequests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SENDTODROOLS)).map(
+                    keepPayloadFromMessageFunction);
+
+            sendToDroolsRequests.foreachRDD(sendToDroolsStreamFunction);
+
+            stopSendToDroolsRequests.foreachRDD(sendToDroolsStreamFunction);
+
+        } else {
+            log.warn("Drools configuration not found.");
+        }
+
 
         if (configurationContext.getCassandraHosts() != null) {
             SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(

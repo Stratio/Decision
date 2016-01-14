@@ -27,7 +27,7 @@ public abstract class BaseEngineAction  implements EngineAction {
     protected  Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer;
     protected  SiddhiManager siddhiManager;
 
-    private Object[] engineParameters;
+    private Map<String, Object> engineParameters;
 
     private StreamOperationServiceWithoutMetrics streamOperationService;
 
@@ -55,7 +55,7 @@ public abstract class BaseEngineAction  implements EngineAction {
 //
 //    }
 
-    public BaseEngineAction(Object[] engineParameters, SiddhiManager siddhiManager,
+    public BaseEngineAction(Map<String, Object> engineParameters, SiddhiManager siddhiManager,
             StreamOperationServiceWithoutMetrics streamOperationService) {
 
         this.siddhiManager = siddhiManager;
@@ -142,11 +142,11 @@ public abstract class BaseEngineAction  implements EngineAction {
         );
     }
 
-    public Object[] getEngineParameters() {
+    public Map<String, Object> getEngineParameters() {
         return engineParameters;
     }
 
-    public void setEngineParameters(Object[] engineParameters) {
+    public void setEngineParameters(Map<String, Object> engineParameters) {
         this.engineParameters = engineParameters;
     }
 

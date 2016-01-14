@@ -5,10 +5,6 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.stratio.decision.dto.drools.client.DroolsClient;
-import com.stratio.decision.dto.drools.client.DroolsClientFactory;
-//import com.stratio.decision.dto.drools.configuration.DroolsHoconConfiguration;
 import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
 
 /**
