@@ -17,15 +17,18 @@ package com.stratio.decision.service;
 
 import com.codahale.metrics.annotation.Timed;
 import com.ryantenney.metrics.annotation.Counted;
+import com.stratio.decision.commons.constants.EngineActionType;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.dao.StreamStatusDao;
 import com.stratio.decision.drools.DroolsConnectionContainer;
 import com.stratio.decision.exception.ServiceException;
+
 import org.wso2.siddhi.core.SiddhiManager;
 
 import java.util.List;
+import java.util.Map;
 
 public class StreamOperationService extends StreamOperationServiceWithoutMetrics {
 
@@ -114,4 +117,11 @@ public class StreamOperationService extends StreamOperationServiceWithoutMetrics
     public void send(String streamName, List<ColumnNameTypeValue> columns) throws ServiceException {
         super.send(streamName, columns);
     }
+
+    @Override
+    public void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams) {
+        super.enableEngineAction(streamName, engineActionType, engineActionParams, this);
+    }
+
 }

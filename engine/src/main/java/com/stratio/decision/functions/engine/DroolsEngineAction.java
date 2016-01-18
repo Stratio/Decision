@@ -1,8 +1,14 @@
 package com.stratio.decision.functions.engine;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.avro.generic.GenericData;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
@@ -10,16 +16,19 @@ import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 
+import com.stratio.decision.commons.constants.ENGINE_ACTIONS_PARAMETERS;
 import com.stratio.decision.commons.constants.InternalTopic;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.drools.DroolsConnectionContainer;
+import com.stratio.decision.drools.DroolsInstace;
 import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
 import com.stratio.decision.drools.sessions.DroolsSession;
 import com.stratio.decision.drools.sessions.DroolsStatefulSession;
 import com.stratio.decision.drools.sessions.DroolsStatelessSession;
 import com.stratio.decision.drools.sessions.Results;
 import com.stratio.decision.serializer.Serializer;
+import com.stratio.decision.service.StreamOperationServiceWithoutMetrics;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -33,40 +42,80 @@ public class DroolsEngineAction extends BaseEngineAction {
 
     private DroolsConnectionContainer droolsConnectionContainer;
     private List<String> groups;
+    private String cepOutputStreamName = null;
+    private String outputKafkaTopic = null;
 
-    public DroolsEngineAction(DroolsConnectionContainer droolsConnectionContainer, Object[] actionParameters,
-            Producer<String, String> producer,
-            Serializer<String,
-            StratioStreamingMessage> kafkaToJavaSerializer,
-            Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer, SiddhiManager siddhiManager){
+    public DroolsEngineAction(DroolsConnectionContainer droolsConnectionContainer, Map<String, Object> actionParameters,
+            SiddhiManager siddhiManager,  StreamOperationServiceWithoutMetrics streamOperationService) {
 
-        super(actionParameters, producer, kafkaToJavaSerializer, javaToSiddhiSerializer, siddhiManager);
+        super(actionParameters, siddhiManager, streamOperationService);
 
         this.droolsConnectionContainer = droolsConnectionContainer;
         this.groups = new ArrayList<>();
 
-        for (Object actionParameter : actionParameters) {
-
-            groups.add((String) actionParameter);
+        if (actionParameters.containsKey(ENGINE_ACTIONS_PARAMETERS.DROOLS.GROUP)) {
+            groups.add((String)actionParameters.get(ENGINE_ACTIONS_PARAMETERS.DROOLS.GROUP));
         }
 
+        if (actionParameters.containsKey(ENGINE_ACTIONS_PARAMETERS.DROOLS.CEP_OUTPUT_STREAM)) {
+            cepOutputStreamName = (String)actionParameters.get(ENGINE_ACTIONS_PARAMETERS.DROOLS.CEP_OUTPUT_STREAM);
+        }
+
+        if (actionParameters.containsKey(ENGINE_ACTIONS_PARAMETERS.DROOLS.KAFKA_OUTPUT_TOPIC)) {
+            outputKafkaTopic = (String)actionParameters.get(ENGINE_ACTIONS_PARAMETERS.DROOLS.KAFKA_OUTPUT_TOPIC);
+        }
 
     }
 
 
-    public DroolsEngineAction(DroolsConnectionContainer droolsConnectionContainer, Object[] actionParameters,
-            SiddhiManager siddhiManager) {
+    private List<Map<String, Object>> formatInputEvents(Event[] events){
 
-        super(actionParameters, siddhiManager);
+        List<Map<String, Object>> inputList = new ArrayList<>();
 
-        this.droolsConnectionContainer = droolsConnectionContainer;
-        this.groups = new ArrayList<>();
+        for (Event event : events) {
 
-        for (Object actionParameter : actionParameters) {
+            Map<String, Object> inputMap = new HashMap<>();
 
-            groups.add((String) actionParameter);
+            StratioStreamingMessage messageObject = javaToSiddhiSerializer.deserialize(event);
+
+            for (ColumnNameTypeValue column : messageObject.getColumns()) {
+
+                inputMap.put(column.getColumn(), column.getValue());
+            }
+
+            inputList.add(inputMap);
+
         }
 
+        return inputList;
+
+    }
+
+    private List<Map<String, Object>> formatDroolsResults(Results results){
+
+        List<Map<String, Object>> outputList = new ArrayList<>();
+
+        for (Object singleResult : results.getResults()) {
+
+            Map<String, Object> outputMap = null;
+
+            try {
+
+                Object propertyObject = PropertyUtils.getProperty(singleResult, "result");
+                //outputMap = PropertyUtils.describe(singleResult);
+                outputMap = PropertyUtils.describe(propertyObject);
+
+
+            } catch (IllegalAccessException|InvocationTargetException|NoSuchMethodException e) {
+                //e.printStackTrace();
+                // TODO log exception
+            }
+
+            outputList.add(outputMap);
+
+        }
+
+        return outputList;
 
     }
 
@@ -79,14 +128,15 @@ public class DroolsEngineAction extends BaseEngineAction {
             log.debug("Firing rules for stream {}", streamName);
         }
 
-        KieContainer kContainer;
+        DroolsInstace instance;
         DroolsSession session = null;
 
         for (String groupName : groups){
 
-            kContainer = droolsConnectionContainer.getGroupContainer(groupName);
+            instance = droolsConnectionContainer.getGroupContainer(groupName);
+            session = instance.getSession();
 
-            if (kContainer == null) {
+            if (instance == null) {
 
                 if (log.isDebugEnabled()) {
                     log.debug("EXECUTED for groupName {}", groupName);
@@ -96,44 +146,24 @@ public class DroolsEngineAction extends BaseEngineAction {
 
             }
 
-            DroolsConfigurationGroupBean groupConfiguration = droolsConnectionContainer.getGroupConfiguration
-                    (groupName);
-
-            String sessionType = groupConfiguration.getSessionType();
-            String sessionName = groupConfiguration.getSessionName();
-
-            switch (sessionType) {
-            case "stateful" : session = new DroolsStatefulSession(kContainer, sessionName);
-                              break;
-            case "stateless" : session = new DroolsStatelessSession(kContainer, sessionName);
-                               break;
-            }
-
 
             if (session != null) {
 
-                // TODO Inject Facts into the session
-                // TODO  Mapping Event[] events to List
+                List<Map<String, Object>> inputData = this.formatInputEvents(inEvents);
+                Results results = session.fireRules(inputData);
 
-                /*
-                for (Event event : inEvents) {
+                if (results.getResults().size()== 0) {
 
-                    StratioStreamingMessage messageObject = javaToSiddhiSerializer.deserialize(event);
+                    log.info("No Results from Drool. Check your rules!!");
 
-                    List<ColumnNameTypeValue> columnNameTypeValues = messageObject.getColumns();
-                    for ( ColumnNameTypeValue column : columnNameTypeValues){
-                        column.getColumn();
-                        column.getType();
+                } else {
+
+                    List<Map<String, Object>> formattedResults = this.formatDroolsResults(results);
+
+                    if (cepOutputStreamName!=null) {
+                        this.handleCepRedirection(cepOutputStreamName, formattedResults);
                     }
                 }
-                */
-
-
-                List data = new ArrayList();
-                data.add("comienzo test");
-
-                Results results = session.fireRules(data);
-
             } else {
 
                 if (log.isDebugEnabled()) {
@@ -143,19 +173,14 @@ public class DroolsEngineAction extends BaseEngineAction {
 
             }
 
-            // TODO Handler for output facts
-            // Collection<FactHandle> factHandles = session.getFactHandles();
-
         }
-
-
 
         if (log.isDebugEnabled()) {
 
             log.debug("Finished rules processing for stream {}", streamName);
         }
 
-
-
     }
+
+
 }

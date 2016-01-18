@@ -21,6 +21,7 @@ import com.stratio.decision.commons.constants.StreamAction;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class StratioStreamingMessage implements Serializable {
@@ -37,6 +38,7 @@ public class StratioStreamingMessage implements Serializable {
     private final List<StreamQuery> queries;
     private Set<StreamAction> activeActions;
     private Boolean userDefined;
+    private Map<String, Object> additionalParameters;
 
     public StratioStreamingMessage() {
         this.queries = new ArrayList<>();
@@ -67,6 +69,27 @@ public class StratioStreamingMessage implements Serializable {
         this.columns = columns;
         this.queries = queries;
         this.userDefined = userDefined;
+    }
+
+    /**
+     * Used in the API MessageBuilder
+     *
+     * @param operation
+     * @param streamName
+     * @param sessionId
+     * @param requestId
+     * @param request
+     * @param timeStamp
+     * @param columns
+     * @param queries
+     * @param userDefined
+     * @param additionalParameters
+     */
+    public StratioStreamingMessage(String operation, String streamName, String sessionId, String requestId,
+            String request, Long timeStamp, List<ColumnNameTypeValue> columns, List<StreamQuery> queries,
+            Boolean userDefined, Map<String, Object> additionalParameters) {
+        this(operation, streamName, sessionId, requestId, request, timeStamp, columns, queries,userDefined);
+        this.additionalParameters = additionalParameters;
     }
 
     /**
@@ -180,5 +203,13 @@ public class StratioStreamingMessage implements Serializable {
 
     public void setActiveActions(Set<StreamAction> activeActions) {
         this.activeActions = activeActions;
+    }
+
+    public Map<String, Object> getAdditionalParameters() {
+        return additionalParameters;
+    }
+
+    public void setAdditionalParameters(Map<String, Object> additionalParameters) {
+        this.additionalParameters = additionalParameters;
     }
 }

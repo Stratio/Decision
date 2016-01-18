@@ -18,7 +18,6 @@ public class DroolsStatefulSession implements DroolsSession {
     public DroolsStatefulSession(KieContainer kContainer, String sessionName){
         this.kContainer = kContainer;
         this.session = this.kContainer.newKieSession(sessionName);
-        //this.kServices = KieServices.Factory.get();
     }
 
 
@@ -31,8 +30,7 @@ public class DroolsStatefulSession implements DroolsSession {
 
         int n = session.fireAllRules();
 
-        this.addResults(res.getCepResults(), QUERY_CEP_NAME, QUERY_CEP_RESULT);
-        this.addResults(res.getKafkaResults(), QUERY_KAFKA_NAME, QUERY_KAFKA_RESULT);
+        this.addResults(res.getResults(),  QUERY_NAME, QUERY_RESULT);
 
         return res;
     }

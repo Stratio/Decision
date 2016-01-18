@@ -65,8 +65,10 @@ public class StreamOperationServiceWithoutMetrics {
 
     public void createStream(String streamName, List<ColumnNameTypeValue> columns) {
         StreamDefinition newStream = QueryFactory.createStreamDefinition().name(streamName);
-        for (ColumnNameTypeValue column : columns) {
-            newStream.attribute(column.getColumn(), getSiddhiType(column.getType()));
+        if (columns!=null) {
+            for (ColumnNameTypeValue column : columns) {
+                newStream.attribute(column.getColumn(), getSiddhiType(column.getType()));
+            }
         }
         siddhiManager.defineStream(newStream);
         streamStatusDao.create(streamName, columns);
@@ -82,15 +84,39 @@ public class StreamOperationServiceWithoutMetrics {
     }
 
     public int enlargeStream(String streamName, List<ColumnNameTypeValue> columns) throws ServiceException {
+//        int addedColumns = 0;
+//        StreamDefinition streamMetaData = siddhiManager.getStreamDefinition(streamName);
+//        for (ColumnNameTypeValue columnNameTypeValue : columns) {
+//            if (!SiddhiUtils.columnAlreadyExistsInStream(columnNameTypeValue.getColumn(), streamMetaData)) {
+//                addedColumns++;
+//                streamMetaData.attribute(columnNameTypeValue.getColumn(), getSiddhiType(columnNameTypeValue.getType()));
+//            } else {
+//                throw new ServiceException(String.format("Alter stream error, Column %s already exists.",
+//                        columnNameTypeValue.getColumn()));
+//            }
+//        }
+//
+//        return addedColumns;
+
+        return enlargeStream(streamName, columns, true);
+    }
+
+    public int enlargeStream(String streamName, List<ColumnNameTypeValue> columns, Boolean raiseException) throws
+            ServiceException {
         int addedColumns = 0;
         StreamDefinition streamMetaData = siddhiManager.getStreamDefinition(streamName);
         for (ColumnNameTypeValue columnNameTypeValue : columns) {
             if (!SiddhiUtils.columnAlreadyExistsInStream(columnNameTypeValue.getColumn(), streamMetaData)) {
                 addedColumns++;
+                // JPFM -- Updating the columns in streamStatusDao
+                streamStatusDao.addColumn(streamName, columnNameTypeValue);
                 streamMetaData.attribute(columnNameTypeValue.getColumn(), getSiddhiType(columnNameTypeValue.getType()));
             } else {
-                throw new ServiceException(String.format("Alter stream error, Column %s already exists.",
-                        columnNameTypeValue.getColumn()));
+                if (raiseException) {
+                    throw new ServiceException(String.format("Alter stream error, Column %s already "
+                                    + "exists.",
+                            columnNameTypeValue.getColumn()));
+                }
             }
         }
 
@@ -156,6 +182,13 @@ public class StreamOperationServiceWithoutMetrics {
         }
     }
 
+
+    public Boolean columnExists(String streamName, String columnName){
+
+        return streamStatusDao.existsColumnDefinition(streamName, columnName);
+
+    }
+
     public void enableAction(String streamName, StreamAction action) {
 
         if (streamStatusDao.getEnabledActions(streamName).size() == 0) {
@@ -189,7 +222,14 @@ public class StreamOperationServiceWithoutMetrics {
     }
 
 
-    public void enableEngineAction(String streamName, EngineActionType engineActionType, Object[] engineActionParams) {
+    public void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams) {
+        this.enableEngineAction(streamName, engineActionType, engineActionParams, this);
+    }
+
+    protected void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams,
+     StreamOperationServiceWithoutMetrics streamOperationService) {
 
         // TODO mecanismo para modificar el engineActionParams de callback de accion ya existente
         if ( !streamStatusDao.isEngineActionEnabled(streamName, engineActionType)){
@@ -202,7 +242,7 @@ public class StreamOperationServiceWithoutMetrics {
 
             if (engineActionType == EngineActionType.FIRE_RULES) {
 
-                engineAction = new DroolsEngineAction(droolsConnectionContainer, engineActionParams, siddhiManager);
+                engineAction = new DroolsEngineAction(droolsConnectionContainer, engineActionParams, siddhiManager, streamOperationService);
 
             }
 

@@ -122,7 +122,8 @@ public class StreamStatusDao {
         streamStatus.setActionQueryId(queryId);
     }
 
-    public void enableEngineAction(String streamName, EngineActionType engineActionType, Object[] engineActionParams,
+    public void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams,
       String engineActionQueryId ){
 
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
@@ -177,7 +178,7 @@ public class StreamStatusDao {
     }
 
 
-    public void updateEngineActionParameters(String streamName, EngineActionType engineActionType, Object[]
+    public void updateEngineActionParameters(String streamName, EngineActionType engineActionType, Map<String, Object>
             engineActionParams){
 
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
@@ -191,5 +192,22 @@ public class StreamStatusDao {
             engineActionsEnabled.put(engineActionType, engineActionDTO);
         }
 
+    }
+
+    public void addColumn(String streamName, ColumnNameTypeValue column){
+
+        streamStatuses.get(streamName).getStreamDefinition().add(column);
+        streamStatuses.get(streamName).getStreamColumns().put(column.getColumn(), column);
+
+    }
+
+    public Boolean existsColumnDefinition(String streamName, String columnName){
+
+        if (streamStatuses.get(streamName).getStreamColumns().containsKey(columnName))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

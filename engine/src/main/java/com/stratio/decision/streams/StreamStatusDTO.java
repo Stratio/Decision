@@ -28,6 +28,7 @@ public class StreamStatusDTO implements Serializable {
 
     private String streamName;
     private List<ColumnNameTypeValue> streamDefinition;
+    private Map<String, ColumnNameTypeValue> streamColumns;
     private String actionQueryId;
 
     private Boolean userDefined;
@@ -41,8 +42,12 @@ public class StreamStatusDTO implements Serializable {
         this.userDefined = userDefined;
         this.actionsEnabled = new HashSet<>();
         this.addedQueries = new HashMap<>();
-        this.streamDefinition = columns;
+        this.streamDefinition = columns!=null?columns:new ArrayList<>();
         this.engineActionsEnabled = new HashMap<>();
+
+        this.streamColumns = new HashMap();
+        streamDefinition.forEach( column -> streamColumns.put(column.getColumn(), column));
+
     }
 
     public String getStreamName() {
@@ -89,5 +94,7 @@ public class StreamStatusDTO implements Serializable {
         return engineActionsEnabled;
     }
 
-
+    public Map<String, ColumnNameTypeValue> getStreamColumns() {
+        return streamColumns;
+    }
 }

@@ -24,7 +24,9 @@ import com.stratio.decision.api.messaging.{ColumnNameType, _}
 import com.stratio.decision.api.zookeeper.ZookeeperConsumer
 import com.stratio.decision.commons.constants.InternalTopic
 import com.stratio.decision.commons.constants.STREAMING.{ZK_EPHEMERAL_NODE_STATUS_CONNECTED, ZK_EPHEMERAL_NODE_STATUS_INITIALIZED, ZK_EPHEMERAL_NODE_STATUS_PATH}
-import com.stratio.decision.commons.constants.STREAM_OPERATIONS.ACTION.{INDEX, LISTEN, SAVETO_CASSANDRA, SAVETO_MONGO, SAVETO_SOLR, STOP_INDEX, STOP_LISTEN, STOP_SAVETO_CASSANDRA, STOP_SAVETO_MONGO, STOP_SAVETO_SOLR}
+import com.stratio.decision.commons.constants.STREAM_OPERATIONS.ACTION.{INDEX, LISTEN, SAVETO_CASSANDRA,
+SAVETO_MONGO, SAVETO_SOLR, STOP_INDEX, STOP_LISTEN, STOP_SAVETO_CASSANDRA, STOP_SAVETO_MONGO, STOP_SAVETO_SOLR,
+STOP_SENDTODROOLS, START_SENDTODROOLS}
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.DEFINITION
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.DEFINITION.{ADD_QUERY, ALTER, DROP, REMOVE_QUERY}
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.MANIPULATION.LIST
@@ -204,6 +206,24 @@ class StratioStreamingAPI
     val operation = STOP_INDEX.toLowerCase
     val indexStreamMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(indexStreamMessage)
+  }
+
+
+
+  def startSendToDrools(streamName: String, groupName: String, outputStream: String = null, kafkaTopic: String = null) = {
+    checkStreamingStatus()
+    val operation = START_SENDTODROOLS.toLowerCase
+    val startSendToDroolsMessage = new DroolsMessageBuilder(streamName, operation).build(groupName, outputStream, kafkaTopic)
+    syncOperation.performSyncOperation(startSendToDroolsMessage)
+  }
+
+  def stopSendToDrools(streamName:String) = {
+    checkStreamingStatus()
+    val operation = STOP_SENDTODROOLS.toLowerCase
+
+    val stopSendToDroolsMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
+    syncOperation.performSyncOperation(stopSendToDroolsMessage)
+
   }
 
   def initialize() = {

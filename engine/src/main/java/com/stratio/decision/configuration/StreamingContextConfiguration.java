@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.wso2.siddhi.core.SiddhiManager;
 
 import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.decision.StreamingEngine;
@@ -46,7 +45,6 @@ import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.kafka.service.KafkaTopicService;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.drools.DroolsConnectionContainer;
 import com.stratio.decision.functions.FilterDataFunction;
 import com.stratio.decision.functions.PairDataFunction;
 import com.stratio.decision.functions.SaveToCassandraActionExecutionFunction;
@@ -60,12 +58,14 @@ import com.stratio.decision.functions.dal.ListenStreamFunction;
 import com.stratio.decision.functions.dal.SaveToCassandraStreamFunction;
 import com.stratio.decision.functions.dal.SaveToMongoStreamFunction;
 import com.stratio.decision.functions.dal.SaveToSolrStreamFunction;
+import com.stratio.decision.functions.dal.SendToDroolsStreamFunction;
 import com.stratio.decision.functions.ddl.AddQueryToStreamFunction;
 import com.stratio.decision.functions.ddl.AlterStreamFunction;
 import com.stratio.decision.functions.ddl.CreateStreamFunction;
 import com.stratio.decision.functions.dml.InsertIntoStreamFunction;
 import com.stratio.decision.functions.dml.ListStreamsFunction;
 import com.stratio.decision.functions.messages.FilterMessagesByOperationFunction;
+import com.stratio.decision.functions.messages.FilterMessagesByStream;
 import com.stratio.decision.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
 import com.stratio.decision.service.StreamOperationService;
@@ -108,34 +108,9 @@ public class StreamingContextConfiguration {
         configureActionContext(context);
         configureDataContext(context);
 
-        createPocDroolsStream();
-
         return context;
     }
 
-
-    /*
-     JPFM. Testing if it is possible to create a siddhi stream when the spark streaming context is starting
-
-     */
-    private void createPocDroolsStream() {
-
-        try {
-            List<ColumnNameTypeValue> columns = new ArrayList<>();
-            columns.add(new ColumnNameTypeValue("col1", ColumnType.INTEGER, 1));
-            columns.add(new ColumnNameTypeValue("col2", ColumnType.STRING, "test string"));
-
-            String streamName = configurationContext.getDroolsConfiguration().getPocStreamName();
-            String engineActionParameters[] = { configurationContext.getDroolsConfiguration().getPocGroupName() };
-
-            streamOperationService.createStream(streamName, columns);
-            streamOperationService.enableEngineAction(streamName, EngineActionType.FIRE_RULES, engineActionParameters);
-        }
-        catch (Exception e) {
-            log.error("Exception {}", e.getMessage());
-        }
-
-    }
 
     private void configureRequestContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
@@ -159,6 +134,29 @@ public class StreamingContextConfiguration {
                 configurationContext.getZookeeperHostsQuorum());
         ListStreamsFunction listStreamsFunction = new ListStreamsFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorum());
+
+
+        if (configurationContext.getDroolsConfiguration() != null) {
+
+            SendToDroolsStreamFunction sendToDroolsStreamFunction = new SendToDroolsStreamFunction
+                    (streamOperationService, configurationContext.getZookeeperHostsQuorum());
+
+            JavaDStream<StratioStreamingMessage> sendToDroolsRequests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.START_SENDTODROOLS)).map(
+                    keepPayloadFromMessageFunction);
+
+            JavaDStream<StratioStreamingMessage> stopSendToDroolsRequests = messages.filter(
+                    new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.STOP_SENDTODROOLS)).map(
+                    keepPayloadFromMessageFunction);
+
+            sendToDroolsRequests.foreachRDD(sendToDroolsStreamFunction);
+
+            stopSendToDroolsRequests.foreachRDD(sendToDroolsStreamFunction);
+
+        } else {
+            log.warn("Drools configuration not found.");
+        }
+
 
         if (configurationContext.getCassandraHosts() != null) {
             SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
@@ -353,7 +351,6 @@ public class StreamingContextConfiguration {
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_DATA.getTopicName(), baseTopicMap);
         messages.cache();
-
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
 
