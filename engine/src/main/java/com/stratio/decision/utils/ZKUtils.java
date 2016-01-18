@@ -105,6 +105,7 @@ public class ZKUtils {
         String path = STREAMING.ZK_BASE_PATH + "/" + request.getOperation().toLowerCase() + "/"
                 + request.getRequest_id();
 
+/*
         if (client.checkExists().forPath(path) != null) {
             client.delete().deletingChildrenIfNeeded().forPath(path);
         }
@@ -113,6 +114,18 @@ public class ZKUtils {
 
         logger.info("**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
                 + path);
+*/
+
+        // Workaround to avoid naming conflicts with several Decision instances
+        if (client.checkExists().forPath(path) == null) {
+
+            client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
+
+            logger.info("**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
+                    + path);
+        }
+
+
 
     }
 
