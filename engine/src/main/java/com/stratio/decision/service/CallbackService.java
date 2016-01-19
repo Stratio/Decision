@@ -58,6 +58,19 @@ public class CallbackService {
         return callback;
     }
 
+    public QueryCallback add(String streamName, Set<StreamAction> actions, String clusterId) {
+
+        ActionControllerCallback callback = referencedCallbacks.get(streamName);
+
+        if (callback == null) {
+            callback = new StreamToActionBusCallback(actions, streamName, producer, kafkaToJavaSerializer,
+                    javaToSiddhiSerializer, clusterId);
+            referencedCallbacks.put(streamName, callback);
+        }
+
+        return callback;
+    }
+
     public void remove(String streamName) {
         referencedCallbacks.remove(streamName);
     }

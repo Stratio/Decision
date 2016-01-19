@@ -263,9 +263,16 @@ public class StreamingContextConfiguration {
     private void configureActionContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
 
-        baseTopicMap.put(InternalTopic.TOPIC_ACTION.getTopicName(), 1);
 
-        kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_ACTION.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
+        String topicName = InternalTopic.TOPIC_ACTION.getTopicName();
+        if (configurationContext.getClusterId()!=null){
+            topicName = topicName.concat("_").concat(configurationContext.getClusterId());
+        }
+
+        baseTopicMap.put(topicName, 1);
+
+        kafkaTopicService.createTopicIfNotExist(topicName, configurationContext.getKafkaReplicationFactor(),
+                configurationContext.getKafkaPartitions());
 
         /*
         groupId must be the clusterId. Kafka assigns each partition of a topic to one, and one only, consumer of

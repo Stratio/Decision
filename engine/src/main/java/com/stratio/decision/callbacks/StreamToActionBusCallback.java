@@ -40,6 +40,8 @@ public class StreamToActionBusCallback extends ActionControllerCallback {
     private final Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer;
     private final Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer;
 
+    private String clusterId;
+
     public StreamToActionBusCallback(Set<StreamAction> activeActions, String streamName,
             Producer<String, String> producer, Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer,
             Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer) {
@@ -48,6 +50,14 @@ public class StreamToActionBusCallback extends ActionControllerCallback {
         this.producer = producer;
         this.kafkaToJavaSerializer = kafkaToJavaSerializer;
         this.javaToSiddhiSerializer = javaToSiddhiSerializer;
+    }
+
+    public StreamToActionBusCallback(Set<StreamAction> activeActions, String streamName,
+            Producer<String, String> producer, Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer,
+            Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer, String clusterId) {
+
+        this(activeActions, streamName,producer, kafkaToJavaSerializer, javaToSiddhiSerializer);
+        this.clusterId = clusterId;
     }
 
     @Override
@@ -62,7 +72,13 @@ public class StreamToActionBusCallback extends ActionControllerCallback {
             messageObject.setStreamName(streamName);
             messageObject.setActiveActions(this.activeActions);
 
-            messages.add(new KeyedMessage<String, String>(InternalTopic.TOPIC_ACTION.getTopicName(),
+            String topicAction = InternalTopic.TOPIC_ACTION.getTopicName();
+
+            if (clusterId!=null){
+                topicAction = topicAction.concat("_").concat(clusterId);
+            }
+
+            messages.add(new KeyedMessage<String, String>(topicAction,
                     kafkaToJavaSerializer.deserialize(messageObject)));
         }
 

@@ -49,9 +49,12 @@ public class ServiceConfiguration {
     @Autowired
     private Producer<String, String> producer;
 
+    @Autowired
+    private ConfigurationContext configurationContext;
+
     @Bean
     public StreamOperationService streamOperationService() {
-        return new StreamOperationService(siddhiManager, streamStatusDao, callbackService());
+        return new StreamOperationService(siddhiManager, streamStatusDao, callbackService(), configurationContext);
     }
 
     @Bean

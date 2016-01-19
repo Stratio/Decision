@@ -68,6 +68,6 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter {
 
     @Bean
     public StreamOperationServiceWithoutMetrics streamOperationServiceWithoutMetrics() {
-        return new StreamOperationServiceWithoutMetrics(siddhiManager, streamStatusDao, callbackService);
+        return new StreamOperationServiceWithoutMetrics(siddhiManager, streamStatusDao, callbackService, configurationContext);
     }
 }

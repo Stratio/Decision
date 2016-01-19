@@ -6,6 +6,7 @@ import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.commons.messages.StreamQuery;
+import com.stratio.decision.configuration.ConfigurationContext;
 import com.stratio.decision.dao.StreamStatusDao;
 import com.stratio.decision.exception.ServiceException;
 import com.stratio.decision.streams.QueryDTO;
@@ -31,11 +32,19 @@ public class StreamOperationServiceWithoutMetrics {
 
     private final CallbackService callbackService;
 
+    private  ConfigurationContext configurationContext;
+
     public StreamOperationServiceWithoutMetrics(SiddhiManager siddhiManager, StreamStatusDao streamStatusDao,
                                                 CallbackService callbackService) {
         this.siddhiManager = siddhiManager;
         this.streamStatusDao = streamStatusDao;
         this.callbackService = callbackService;
+    }
+
+    public StreamOperationServiceWithoutMetrics(SiddhiManager siddhiManager, StreamStatusDao streamStatusDao,
+            CallbackService callbackService, ConfigurationContext configurationContext) {
+        this(siddhiManager, streamStatusDao,callbackService);
+        this.configurationContext = configurationContext;
     }
 
     public void createInternalStream(String streamName, List<ColumnNameTypeValue> columns) {
@@ -149,8 +158,14 @@ public class StreamOperationServiceWithoutMetrics {
 
             streamStatusDao.setActionQuery(streamName, actionQueryId);
 
+            String clusterId = null;
+
+            if (configurationContext!=null){
+                clusterId = configurationContext.getClusterId();
+            }
+
             siddhiManager.addCallback(actionQueryId,
-                    callbackService.add(streamName, streamStatusDao.getEnabledActions(streamName)));
+                    callbackService.add(streamName, streamStatusDao.getEnabledActions(streamName), clusterId));
         }
 
         streamStatusDao.enableAction(streamName, action);
