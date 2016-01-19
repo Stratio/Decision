@@ -165,8 +165,7 @@ public class StreamOperationServiceWithoutMetrics {
             }
 
             siddhiManager.addCallback(actionQueryId,
-                    callbackService.add(streamName, streamStatusDao.getEnabledActions(streamName),
-                           clusterId));
+                    callbackService.add(streamName, streamStatusDao.getEnabledActions(streamName), clusterId));
         }
 
         streamStatusDao.enableAction(streamName, action);

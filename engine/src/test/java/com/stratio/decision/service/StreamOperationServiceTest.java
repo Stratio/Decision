@@ -18,6 +18,7 @@ package com.stratio.decision.service;
 import com.stratio.decision.commons.constants.ColumnType;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
+import com.stratio.decision.configuration.ConfigurationContext;
 import com.stratio.decision.dao.StreamStatusDao;
 import com.stratio.decision.exception.ServiceException;
 import org.junit.Assert;
@@ -45,17 +46,22 @@ public class StreamOperationServiceTest {
 
     private StreamStatusDao streamStatusDao;
 
+    private ConfigurationContext configurationContext;
+
     private static final String STREAM_NAME_GOOD = "goodStreamName";
 
     private static final String INFERRED_STREAM_GOOD = "goodInferredStreamName";
+
+    private static final String CLUSTER_ID = "default";
 
     @Before
     public void setUp() {
         streamStatusDao = Mockito.mock(StreamStatusDao.class);
         callbackFactory = Mockito.mock(CallbackService.class);
+        configurationContext = Mockito.mock(ConfigurationContext.class);
 
         sm = new SiddhiManager();
-        streamOperationService = new StreamOperationService(sm, streamStatusDao, callbackFactory);
+        streamOperationService = new StreamOperationService(sm, streamStatusDao, callbackFactory, configurationContext);
     }
 
     @Test
@@ -108,13 +114,18 @@ public class StreamOperationServiceTest {
 
         QueryCallback callback = Mockito.mock(QueryCallback.class);
 
-        Mockito.when(callbackFactory.add(Mockito.anyString(), (Set<StreamAction>) Mockito.anyObject())).thenReturn(
+        Mockito.when(callbackFactory.add(Mockito.anyString(), (Set<StreamAction>) Mockito.anyObject(), Mockito
+                .anyString() )).thenReturn(
                 callback);
 
         Mockito.doNothing().when(streamStatusDao).enableAction(Mockito.eq(STREAM_NAME_GOOD), Mockito.eq(streamAction));
 
         Mockito.doNothing().when(streamStatusDao)
                 .setActionQuery(Mockito.eq(STREAM_NAME_GOOD), actionQueryIdArgumentCaptor.capture());
+
+
+        Mockito.when(configurationContext.getClusterId()).thenReturn(
+                CLUSTER_ID);
 
         createBaseStream();
 
