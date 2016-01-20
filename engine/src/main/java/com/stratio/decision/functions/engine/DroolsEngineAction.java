@@ -76,7 +76,7 @@ public class DroolsEngineAction extends BaseEngineAction {
     }
 
 
-    private List<Map<String, Object>> formatInputEvents(Event[] events){
+    private List<Map<String, Object>> formatInputEvents(Event[] events) throws Exception {
 
         List<Map<String, Object>> inputList = new ArrayList<>();
 
@@ -99,7 +99,7 @@ public class DroolsEngineAction extends BaseEngineAction {
 
     }
 
-    private List<Map<String, Object>> formatDroolsResults(Results results){
+    private List<Map<String, Object>> formatDroolsResults(Results results) throws Exception{
 
         List<Map<String, Object>> outputList = new ArrayList<>();
 
@@ -113,10 +113,8 @@ public class DroolsEngineAction extends BaseEngineAction {
                 //outputMap = PropertyUtils.describe(singleResult);
                 outputMap = PropertyUtils.describe(propertyObject);
 
-
             } catch (IllegalAccessException|InvocationTargetException|NoSuchMethodException e) {
-                //e.printStackTrace();
-                // TODO log exception
+                throw new Exception(e);
             }
 
             outputList.add(outputMap);
@@ -131,10 +129,6 @@ public class DroolsEngineAction extends BaseEngineAction {
     @Override
     public void execute(String streamName, Event[] inEvents) {
 
-        if (log.isDebugEnabled()) {
-
-            log.debug("Firing rules for stream {}", streamName);
-        }
 
         DroolsInstace instance;
         DroolsSession session = null;
@@ -150,16 +144,47 @@ public class DroolsEngineAction extends BaseEngineAction {
             session = instance.getSession();
             if (session != null) {
 
-                List<Map<String, Object>> inputData = this.formatInputEvents(inEvents);
-                Results results = session.fireRules(inputData);
+                List<Map<String, Object>> inputData = null;
+                Results results = null;
+
+                try {
+
+                    inputData = this.formatInputEvents(inEvents);
+                }
+                catch (Exception e){
+                    log.error("Error formatting the input data for Send to Drools Action for group {} and stream {}: "
+                            + "{}", groupName, streamName, e.getMessage());
+                }
+
+                try {
+
+                    results = session.fireRules(inputData);
+
+                }catch (Exception e){
+                    log.error("Error firing Rules in Send to Drools Action for group {} and stream {}: "
+                            + "{}", groupName, streamName, e.getMessage());
+                }
+
 
                 if (results.getResults().size()== 0) {
 
-                    log.info("No Results from Drool. Check your rules!!");
+                    if (log.isInfoEnabled())
+                        log.info("No Results returned from Drools for group {} and stream {}. Check your rules!!",
+                                groupName, streamName);
 
                 } else {
 
-                    List<Map<String, Object>> formattedResults = this.formatDroolsResults(results);
+                    List<Map<String, Object>> formattedResults = null;
+
+                    try {
+
+                        formattedResults = this.formatDroolsResults(results);
+
+                    }catch(Exception e){
+
+                        log.error("Error formatting Drools Results in Send to Drools Action for group {} and stream "
+                                + "{}: {}", groupName, streamName, e.getMessage());
+                    }
 
                     if (cepOutputStreamName!=null) {
                         this.handleCepRedirection(cepOutputStreamName, formattedResults);
