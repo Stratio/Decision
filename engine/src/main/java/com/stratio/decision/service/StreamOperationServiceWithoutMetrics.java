@@ -228,10 +228,8 @@ public class StreamOperationServiceWithoutMetrics {
     }
 
     protected void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
-            engineActionParams,
-     StreamOperationServiceWithoutMetrics streamOperationService) {
+            engineActionParams,  StreamOperationServiceWithoutMetrics streamOperationService) {
 
-        // TODO mecanismo para modificar el engineActionParams de callback de accion ya existente
         if ( !streamStatusDao.isEngineActionEnabled(streamName, engineActionType)){
 
             String engineActionQueryId = siddhiManager.addQuery(QueryFactory.createQuery()
