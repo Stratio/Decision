@@ -54,7 +54,15 @@ public class DroolsEngineAction extends BaseEngineAction {
         this.groups = new ArrayList<>();
 
         if (actionParameters.containsKey(ENGINE_ACTIONS_PARAMETERS.DROOLS.GROUP)) {
-            groups.add((String)actionParameters.get(ENGINE_ACTIONS_PARAMETERS.DROOLS.GROUP));
+
+            String groupName = (String)actionParameters.get(ENGINE_ACTIONS_PARAMETERS.DROOLS.GROUP);
+
+            groups.add(groupName);
+            if (!droolsConnectionContainer.getGroupConfigurations().containsKey(groupName)) {
+
+                log.error("The group {} is not configured in Drools configuration", groupName);
+
+            }
         }
 
         if (actionParameters.containsKey(ENGINE_ACTIONS_PARAMETERS.DROOLS.CEP_OUTPUT_STREAM)) {
@@ -134,19 +142,12 @@ public class DroolsEngineAction extends BaseEngineAction {
         for (String groupName : groups){
 
             instance = droolsConnectionContainer.getGroupContainer(groupName);
-            session = instance.getSession();
-
             if (instance == null) {
-
-                if (log.isDebugEnabled()) {
-                    log.debug("EXECUTED for groupName {}", groupName);
-                }
-
+                log.error("Error executing Send to Drools Action. No Drools instance found for group {}", groupName);
                 return;
-
             }
 
-
+            session = instance.getSession();
             if (session != null) {
 
                 List<Map<String, Object>> inputData = this.formatInputEvents(inEvents);
@@ -166,11 +167,8 @@ public class DroolsEngineAction extends BaseEngineAction {
                 }
             } else {
 
-                if (log.isDebugEnabled()) {
-
-                    log.debug("No Drools Session instance for stream {}", streamName);
-                }
-
+                    log.error("Error executing Send to Drools Action. No Drools Session instance for group {}",
+                            groupName);
             }
 
         }
