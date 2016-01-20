@@ -24,6 +24,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,10 +120,14 @@ public class ZKUtils {
         // Workaround to avoid naming conflicts with several Decision instances
         if (client.checkExists().forPath(path) == null) {
 
-            client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
-
-            logger.info("**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
-                    + path);
+            try {
+                client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
+                logger.info(
+                        "**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
+                                + path);
+            }catch(KeeperException.NodeExistsException e){
+                logger.info( "**** ZKUTILS. Path already exists:  " + path);
+            }
         }
 
 
