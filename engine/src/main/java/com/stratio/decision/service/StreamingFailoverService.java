@@ -60,7 +60,6 @@ public class StreamingFailoverService {
                 }
 
                 // Enable engine actions
-                // TODO TESTING!!!!!
                 for (Map.Entry<EngineActionType, EngineActionDTO> engineAction : stream.getEngineActionsEnabled()
                         .entrySet()) {
 

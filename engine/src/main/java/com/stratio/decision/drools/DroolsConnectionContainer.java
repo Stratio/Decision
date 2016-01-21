@@ -24,7 +24,7 @@ import scala.tools.cmd.gen.AnyVals;
 public class DroolsConnectionContainer {
 
 
-    private static final Logger log = LoggerFactory.getLogger(DroolsConnectionContainer.class);
+    private static final Logger logger = LoggerFactory.getLogger(DroolsConnectionContainer.class);
 
     private Map<String, DroolsInstace> groupContainers;
     private Map<String, DroolsConfigurationGroupBean> groupConfigurations;
@@ -59,51 +59,56 @@ public class DroolsConnectionContainer {
 
         if (droolsConfigurationBean != null) {
 
+            if (droolsConfigurationBean.getListGroups() == null){
+
+                logger.warn("Drools Configuration is not found. Please, check your configuration if you want to use "
+                        + "the send to drools action");
+
+                return groupContainers;
+            }
+
             KieServices ks = KieServices.Factory.get();
 
             for (String groupName : droolsConfigurationBean.getListGroups()){
 
-                DroolsInstace instance = new DroolsInstace();
+
                 DroolsConfigurationGroupBean groupConfigBean = droolsConfigurationBean.getGroups().get(groupName);
 
-                KieContainer groupContainer = ks
-                        .newKieContainer(
-                           ks.newReleaseId(groupConfigBean.getGroupId(), groupConfigBean.getArtifactId(), groupConfigBean.getVersion())
-                        );
+                KieContainer groupContainer = null;
+
+                try {
+                    groupContainer = ks
+                            .newKieContainer(
+                                    ks.newReleaseId(groupConfigBean.getGroupId(), groupConfigBean.getArtifactId(),
+                                            groupConfigBean.getVersion())
+                            );
+                }catch (Exception e){
+                   logger.error("Error creating Drools KieContainer: " + e.getMessage());
+                   logger.error("Please, check your Drools Configuration if you want to use the send to drools action"
+                           + ".");
+                }
 
                 if (groupContainer != null) {
 
-                    instance.setKieContainer(groupContainer);
+                    DroolsInstace instance = new DroolsInstace(groupContainer, groupConfigBean.getSessionName(),
+                            groupConfigBean.getSessionType());
 
                     // TODO Add Scanner to the container if it is required
-
-                  //  instance.setkScanner(ks.newKieScanner(groupContainer));
-                   // instance.getkScanner().start(groupConfigBean.getScanFrequency());
-
-                    switch (groupConfigBean.getSessionType()) {
-                    case "stateful" : instance.setSession(new DroolsStatefulSession(groupContainer, groupConfigBean
-                            .getSessionName()));
-                        break;
-                    case "stateless" : instance.setSession(new DroolsStatelessSession(groupContainer, groupConfigBean
-                            .getSessionName()));
-                        break;
-                    }
+                    instance.setkScanner(ks.newKieScanner(groupContainer));
+                    instance.getkScanner().start(groupConfigBean.getScanFrequency());
 
                     groupContainers.put(groupName, instance);
 
-
-
                 } else {
 
-                    if (log.isDebugEnabled()){
-                        log.debug("It was not possible to create a KieContainer for group {}", groupName);
+                    if (logger.isDebugEnabled()){
+                        logger.debug("It was not possible to create a KieContainer for group {}", groupName);
                     }
                 }
 
             }
 
         }
-
 
         return groupContainers;
     }

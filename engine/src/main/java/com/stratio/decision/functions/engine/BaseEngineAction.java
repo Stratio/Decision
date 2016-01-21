@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 
@@ -22,6 +24,8 @@ import kafka.javaapi.producer.Producer;
  */
 public abstract class BaseEngineAction  implements EngineAction {
 
+    private static final Logger logger = LoggerFactory.getLogger(BaseEngineAction.class);
+
     protected  Producer<String, String> producer;
     protected  Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer;
     protected  Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer;
@@ -30,30 +34,6 @@ public abstract class BaseEngineAction  implements EngineAction {
     private Map<String, Object> engineParameters;
 
     private StreamOperationServiceWithoutMetrics streamOperationService;
-
-//    public BaseEngineAction(Object[] engineParameters){
-//
-//        this.engineParameters = engineParameters;
-//    }
-//
-//    public BaseEngineAction(Object[] engineParameters, Producer<String, String> producer, Serializer<String,
-//            StratioStreamingMessage> kafkaToJavaSerializer,
-//            Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer, SiddhiManager siddhiManager) {
-//
-//        this.producer = producer;
-//        this.kafkaToJavaSerializer = kafkaToJavaSerializer;
-//        this.javaToSiddhiSerializer = javaToSiddhiSerializer;
-//        this.siddhiManager = siddhiManager;
-//        this.engineParameters = engineParameters;
-//
-//    }
-//
-//    public BaseEngineAction(Object[] engineParameters, SiddhiManager siddhiManager) {
-//
-//        this.siddhiManager = siddhiManager;
-//        this.engineParameters = engineParameters;
-//
-//    }
 
     public BaseEngineAction(Map<String, Object> engineParameters, SiddhiManager siddhiManager,
             StreamOperationServiceWithoutMetrics streamOperationService) {
@@ -98,48 +78,51 @@ public abstract class BaseEngineAction  implements EngineAction {
         return null;
     }
 
-    private void insertColumnsIntoStream(String streamName, List<ColumnNameTypeValue> columns) {
+    private void insertColumnsIntoStream(String streamName, List<ColumnNameTypeValue> columns) throws Exception {
 
        List<ColumnNameTypeValue> notCreatedColumns = columns.stream().filter (
                column -> !streamOperationService.columnExists(streamName, column.getColumn())
        ).collect(Collectors.toList());
 
-        try {
-            streamOperationService.enlargeStream(streamName, notCreatedColumns, false);
-            streamOperationService.send(streamName, columns);
-        }
-        catch (Exception e) {}// TODO
+       streamOperationService.enlargeStream(streamName, notCreatedColumns, false);
+       streamOperationService.send(streamName, columns);
 
     }
 
     protected void handleCepRedirection(String streamName, List<Map<String, Object>> formattedResults){
 
-        if (!streamOperationService.streamExist(streamName)){
-            streamOperationService.createStream(streamName, null);
-        }
 
-        formattedResults.stream().forEach(
+            if (!streamOperationService.streamExist(streamName)) {
+                streamOperationService.createStream(streamName, null);
+            }
 
-                result -> {
+            formattedResults.stream().forEach(
 
-                    List<ColumnNameTypeValue> columns = new ArrayList<>();
+                    result -> {
 
-                    result.forEach(
+                        try {
+                            List<ColumnNameTypeValue> columns = new ArrayList<>();
 
-                            (fieldName, fieldValue) -> {
+                            result.forEach(
 
-                                if (!fieldName.equals("class")){
-                                    ColumnNameTypeValue column = getColumnNameTypeValue(fieldName, fieldValue);
-                                    if (column!=null) {
-                                        columns.add(column);
+                                    (fieldName, fieldValue) -> {
+
+                                        if (!fieldName.equals("class")) {
+                                            ColumnNameTypeValue column = getColumnNameTypeValue(fieldName, fieldValue);
+                                            if (column != null) {
+                                                columns.add(column);
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                    );
-                    // insert values
-                    insertColumnsIntoStream(streamName, columns);
-                }
-        );
+                            );
+                            // insert values
+                            insertColumnsIntoStream(streamName, columns);
+                        }catch(Exception e){
+
+                            logger.error("Error handle cep redirection for stream name {}. {} ", streamName, e.getMessage());
+                        }
+                    }
+            );
     }
 
     public Map<String, Object> getEngineParameters() {

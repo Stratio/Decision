@@ -21,13 +21,13 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-
 import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
 import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 public class ConfigurationContext {
+
 
     /**
      * MANDATORY PROPERTIES *
@@ -97,15 +97,10 @@ public class ConfigurationContext {
         SOLR_DATADIR("solr.dataDir"),
         MONGO_HOST("mongo.hosts"),
         MONGO_USER("mongo.user"),
-        MONGO_PASSWORD("mongo.password")
+        MONGO_PASSWORD("mongo.password"),
 
         // Drools Config
-        ,DROOLS_HOST("drools.host"),
-        DROOLS_USER("drools.username"),
-        DROOLS_PASSWORD("drools.password"),
-        DROOLS_BATCHSIZE("drools.batchSize"),
-        DROOLS_MAPPINGDIR("drools.mappingLibraryDir"),
-
+        DROOLS_GROUP("drools.groups"),
         DROOLS_GROUP_NAME("name"),
         DROOLS_GROUP_SESSION("sessionName"),
         DROOLS_GROUP_GROUP_ID("groupId"),
@@ -168,17 +163,6 @@ public class ConfigurationContext {
 
         // Adding Drools config
         this.droolsConfiguration = new DroolsConfigurationBean();
-
-        droolsConfiguration.setHost( (String) this.getValueOrNull(ConfigurationKeys.DROOLS_HOST.getKey(), config));
-        droolsConfiguration.setUsername( (String) this.getValueOrNull(ConfigurationKeys.DROOLS_USER.getKey(),  config));
-        droolsConfiguration.setPassword((String) this.getValueOrNull(ConfigurationKeys.DROOLS_PASSWORD.getKey(), config));
-        droolsConfiguration.setBatchSize((int) this.getValueOrNull(ConfigurationKeys.DROOLS_BATCHSIZE.getKey(), config));
-        droolsConfiguration.setMappingLibraryDir((String) this.getValueOrNull(ConfigurationKeys.DROOLS_MAPPINGDIR.getKey(), config));
-
-        // POC ONLY
-        droolsConfiguration.setPocGroupName((String)this.getValueOrNull("drools.poc_group_name", config));
-        droolsConfiguration.setPocStreamName((String)this.getValueOrNull("drools.poc_stream_name", config));
-
         Config droolsGroupsConfig = ConfigFactory.load("drools");
         droolsConfiguration.setGroups(getDroolsConfigurationGroup(droolsGroupsConfig));
 
@@ -188,7 +172,10 @@ public class ConfigurationContext {
 
         Map<String, DroolsConfigurationGroupBean> groups= new HashMap<>();
 
-        List list = droolsConfig.getConfigList("drools.groups");
+        if (!droolsConfig.hasPath(ConfigurationKeys.DROOLS_GROUP.getKey())){
+            return groups;
+        }
+        List list = droolsConfig.getConfigList(ConfigurationKeys.DROOLS_GROUP.getKey());
         Config groupConfig;
 
         for (int i=0; i<list.size(); i++){
@@ -325,30 +312,9 @@ public class ConfigurationContext {
         return mongoPassword;
     }
 
-    public String getDroolsHost() {
-        return getDroolsConfiguration().getHost();
-    }
-
-    public String getDroolsUsername() {
-        return getDroolsConfiguration().getUsername();
-    }
-
-    public String getDroolsPassword() {
-        return getDroolsConfiguration().getPassword();
-    }
-
-    public int getDroolsBatchSize() {
-        return getDroolsConfiguration().getBatchSize();
-    }
-
-    public String getDroolsMappingLibraryDir() {
-        return getDroolsConfiguration().getMappingLibraryDir();
-    }
-
     public DroolsConfigurationBean getDroolsConfiguration() {
         return droolsConfiguration;
     }
-
 
     public long getInternalStreamingBatchTime() {
         return internalStreamingBatchTime;
