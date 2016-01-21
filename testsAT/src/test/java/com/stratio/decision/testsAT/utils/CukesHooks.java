@@ -39,7 +39,7 @@ public class CukesHooks extends BaseSpec implements ICucumberReporter,
 
     @Override
     public void syntaxError(String state, String event,
-            List<String> legalEvents, String uri, Integer line) {
+                            List<String> legalEvents, String uri, Integer line) {
         // TODO Auto-generated method stub
     }
 
