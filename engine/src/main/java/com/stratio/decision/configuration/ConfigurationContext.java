@@ -55,6 +55,8 @@ public class ConfigurationContext {
     private final String sparkHost;
     private final String internalSparkHost;
 
+    private final boolean allAckEnabled;
+
     /**
      * OPTIONAL PROPERTIES *
      */
@@ -71,6 +73,8 @@ public class ConfigurationContext {
     private final List<String> mongoHosts;
     private final String mongoUsername;
     private final String mongoPassword;
+
+    private final List<String> clusterQuorum;
 
     public enum ConfigurationKeys {
         CLUSTER_ID("clusterId"),
@@ -98,7 +102,9 @@ public class ConfigurationContext {
         SOLR_DATADIR("solr.dataDir"),
         MONGO_HOST("mongo.hosts"),
         MONGO_USER("mongo.user"),
-        MONGO_PASSWORD("mongo.password");
+        MONGO_PASSWORD("mongo.password"),
+        CLUSTER_QUORUM("clusterQuorum"),
+        ALL_ACK_ENABLED("allAckEnabled");
 
         private final String key;
 
@@ -170,6 +176,11 @@ public class ConfigurationContext {
         this.mongoHosts = (List<String>) this.getListOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
         this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
+
+        this.clusterQuorum = (List<String>) this.getListOrNull(ConfigurationKeys.CLUSTER_QUORUM.getKey(),
+                config);
+
+        this.allAckEnabled = config.getBoolean(ConfigurationKeys.ALL_ACK_ENABLED.getKey());
 
     }
 
@@ -295,6 +306,14 @@ public class ConfigurationContext {
 
     public String getInternalSparkHost() {
         return internalSparkHost;
+    }
+
+    public List<String> getClusterQuorum() {
+        return clusterQuorum;
+    }
+
+    public boolean isAllAckEnabled() {
+        return allAckEnabled;
     }
 
     private Object getValueOrNull(String key, Config config) {

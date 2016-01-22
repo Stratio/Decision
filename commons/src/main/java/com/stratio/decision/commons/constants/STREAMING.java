@@ -31,6 +31,9 @@ public interface STREAMING {
     String ZK_HIGH_AVAILABILITY_NODE = "/latch";
     String ZK_HIGH_AVAILABILITY_PATH = ZK_BASE_PATH + ZK_HIGH_AVAILABILITY_NODE;
 
+    String ZK_CLUSTER_MANAGER_NODE = "/manager";
+    String ZK_CLUSTER_MANAGER_PATH = ZK_BASE_PATH + ZK_CLUSTER_MANAGER_NODE;
+
     public interface STATS_NAMES {
         String SINK_STREAM_PREFIX = "VOID_";
         String BASE = "stratio_stats_base";

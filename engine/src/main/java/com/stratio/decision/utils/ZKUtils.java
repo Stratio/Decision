@@ -16,6 +16,7 @@
 package com.stratio.decision.utils;
 
 import com.google.gson.Gson;
+import com.stratio.decision.clustering.ClusterSyncManager;
 import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
@@ -24,14 +25,12 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -103,36 +102,60 @@ public class ZKUtils {
 
     public void createZNodeJsonReply(StratioStreamingMessage request, Object reply) throws Exception {
 
+
+//        String path = STREAMING.ZK_BASE_PATH + "/" + request.getOperation().toLowerCase() + "/"
+//                    + request.getRequest_id();
+//
+//
+//        if (client.checkExists().forPath(path) != null) {
+//            client.delete().deletingChildrenIfNeeded().forPath(path);
+//        }
+//
+//        client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
+
         String path = STREAMING.ZK_BASE_PATH + "/" + request.getOperation().toLowerCase() + "/"
                 + request.getRequest_id();
 
-/*
+        createZNodeJsonReplyForPath(request, reply, path);
+
+
+        logger.info("**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
+                + path);
+
+    }
+
+
+
+    public String getTempZNodeJsonReplyPath(StratioStreamingMessage request){
+
+        return STREAMING.ZK_BASE_PATH + "/" + request.getOperation().toLowerCase() + "/ack" + "/"
+                + request.getRequest_id() ;
+
+    }
+
+    public void createTempZNodeJsonReply(StratioStreamingMessage request, Object reply, String clusterId) throws Exception {
+
+
+        String path = getTempZNodeJsonReplyPath(request) + "/" + clusterId;
+
+        createZNodeJsonReplyForPath(request, reply, path);
+
+        logger.info("**** ZKUTILS. Temporal ack Node " + request.getOperation() + "//" + request.getRequest_id() +
+                "//" + reply + "//" + path);
+
+    }
+
+
+    private void createZNodeJsonReplyForPath(StratioStreamingMessage request, Object reply, String path) throws
+            Exception {
+
         if (client.checkExists().forPath(path) != null) {
             client.delete().deletingChildrenIfNeeded().forPath(path);
         }
 
         client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
-
-        logger.info("**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
-                + path);
-*/
-
-        // Workaround to avoid naming conflicts with several Decision instances
-        if (client.checkExists().forPath(path) == null) {
-
-            try {
-                client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
-                logger.info(
-                        "**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
-                                + path);
-            }catch(KeeperException.NodeExistsException e){
-                logger.info( "**** ZKUTILS. Path already exists:  " + path);
-            }
-        }
-
-
-
     }
+
 
     public void createZNode(String path, byte[] data) throws Exception {
         if (client.checkExists().forPath(path) != null) {

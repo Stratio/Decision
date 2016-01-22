@@ -23,6 +23,7 @@ import org.apache.spark.api.java.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.stratio.decision.clustering.ClusterSyncManager;
 import com.stratio.decision.commons.constants.ReplyCode;
 import com.stratio.decision.commons.dto.ActionCallbackDto;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
@@ -114,7 +115,10 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
     }
 
     protected void ackStreamingOperation(StratioStreamingMessage message, ActionCallbackDto reply) throws Exception {
-        ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
+//        ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
+
+        ClusterSyncManager.getNode().manageAckStreamingOperation(message, reply);
+
     }
 
     public StreamOperationService getStreamOperationService() {

@@ -34,16 +34,18 @@ public class SchredulerConfiguration {
     @Autowired
     private StreamingFailoverService streamingFailoverService;
 
-    @Bean
-    public TaskScheduler taskScheduler() throws Exception {
-        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.initialize();
-        if (configurationContext.isFailOverEnabled()) {
-            taskScheduler.scheduleAtFixedRate(failOverTask(), configurationContext.getFailOverPeriod());
-        }
-        return taskScheduler;
-    }
+//  The failover thread will be initialized by the ClusterSync Lead
+//    @Bean
+//    public TaskScheduler taskScheduler() throws Exception {
+//        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+//        taskScheduler.initialize();
+//        if (configurationContext.isFailOverEnabled()) {
+//            taskScheduler.scheduleAtFixedRate(failOverTask(), configurationContext.getFailOverPeriod());
+//        }
+//        return taskScheduler;
+//    }
 
+    @Bean
     public FailOverTask failOverTask() throws Exception {
         return new FailOverTask(streamingFailoverService);
     }
