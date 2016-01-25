@@ -17,7 +17,7 @@
 
     <groupId>com.stratio.decision</groupId>
     <artifactId>decision-test</artifactId>
-    <version>0.10.0-RC1</version>
+    <version>0.10.0-RC2-SNAPSHOT</version>
     <name>decision-test</name>
 
     <build>
