@@ -33,7 +33,8 @@ public enum ReplyCode {
             "Output stream already exists and it´s definition is different."),
     KO_ACTION_ALREADY_ENABLED(14, "Action into stream already enabled."),
     KO_SOURCE_STREAM_DOES_NOT_EXIST(15, "Source stream in query does not exists."),
-    KO_STREAM_OPERATION_NOT_ALLOWED(17, "Stream operation not allowed.");
+    KO_STREAM_OPERATION_NOT_ALLOWED(17, "Stream operation not allowed."),
+    KO_NODE_NOT_REPLY(18, "Some node(s) of the cluster does not answer");
 
     private final Integer code;
     private final String message;

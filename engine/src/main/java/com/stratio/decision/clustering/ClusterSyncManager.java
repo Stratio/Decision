@@ -4,10 +4,12 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.barriers.DistributedDoubleBarrier;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
@@ -19,6 +21,7 @@ import org.kohsuke.randname.RandomNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.stratio.decision.commons.constants.ReplyCode;
 import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.dto.ActionCallbackDto;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
@@ -110,12 +113,27 @@ public class ClusterSyncManager {
                 else{
 
                     String path =  ZKUtils.getZKUtils(zookeeperHost).getTempZNodeJsonReplyPath(message);
-                    PathChildrenCache cache = new PathChildrenCache(client, path, true);
-                    cache.start();
+//                    PathChildrenCache cache = new PathChildrenCache(client, path, true);
+//                    cache.start();
+//
+//                    addListener(cache);
 
-                    addListener(cache);
+                    logger.error("Added barrier for path: {}", path);
+                    DistributedDoubleBarrier  barrier = new DistributedDoubleBarrier(client, path, nodesToCheck.size
+                            ()) ;
+
+                    boolean success = barrier.enter(3, TimeUnit.SECONDS);
+
+                    manageBarrierResults(message, reply, path, success);
+
+                    if (success) {
+                        logger.error("Leaving barrier for path: {} WITH SUCCESS", path);
+                    } else {
+                        logger.error("Leaving barrier for path: {} WITH NO SUCCESS", path);
+                    }
 
                 }
+
 
 
             }
@@ -124,48 +142,67 @@ public class ClusterSyncManager {
             }
 
         }catch (Exception e){
-            ;
+            ; //TODO
         }
 
 
     }
 
-    private static void addListener(PathChildrenCache cache)
-         {
-               // a PathChildrenCacheListener is optional. Here, it's used just to log changes
-                PathChildrenCacheListener listener = new PathChildrenCacheListener()
-                 {
-                         @Override
-                         public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception
-                         {
-                                 switch ( event.getType() )
-                                 {
-                                         case CHILD_ADDED:
-                                          {
-                                                 logger.error("Node added: " + ZKPaths
-                                                         .getNodeFromPath(event.getData().getPath()));
+    private void manageBarrierResults(StratioStreamingMessage message, ActionCallbackDto reply, String path, Boolean
+            success) throws Exception {
+
+         if (!success){
+             logger.error("Leaving barrier for path: {} WITH NO SUCCESS", path);
+             reply = new ActionCallbackDto(ReplyCode.KO_NODE_NOT_REPLY.getCode(), ReplyCode.KO_NODE_NOT_REPLY.getMessage());
+         } else {
+
+             // Procesar respuesta de todos los nodos
+         }
 
 
-                                                 break;
-                                             }
+        ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
 
-                                         case CHILD_UPDATED:
-                                             {
-                                                 logger.error("Node changed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
-                                                 break;
-                                             }
+        // Borrar nodos temporales
 
-                                         case CHILD_REMOVED:
-                                             {
-                                                 logger.error("Node removed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
-                                                 break;
 
-                                             }
-                                     }
-                             }
-                     };
-                 cache.getListenable().addListener(listener);
-             }
+    }
+
+//    private static void addListener(PathChildrenCache cache)
+//         {
+//               // a PathChildrenCacheListener is optional. Here, it's used just to log changes
+//                PathChildrenCacheListener listener = new PathChildrenCacheListener()
+//                 {
+//                         @Override
+//                         public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception
+//                         {
+//                                 switch ( event.getType() )
+//                                 {
+//                                         case CHILD_ADDED:
+//                                          {
+//                                                 logger.error("Node added: " + ZKPaths
+//                                                         .getNodeFromPath(event.getData().getPath()));
+//
+//
+//                                                 break;
+//                                             }
+//
+//                                         case CHILD_UPDATED:
+//                                             {
+//                                                 logger.error("Node changed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
+//                                                 break;
+//                                             }
+//
+//                                         case CHILD_REMOVED:
+//                                             {
+//                                                 logger.error("Node removed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
+//                                                 break;
+//
+//                                             }
+//                                     }
+//                             }
+//                     };
+//                 cache.getListenable().addListener(listener);
+//             }
 
 
     public boolean isLeader() {

@@ -143,6 +143,9 @@ public class ZKUtils {
         logger.info("**** ZKUTILS. Temporal ack Node " + request.getOperation() + "//" + request.getRequest_id() +
                 "//" + reply + "//" + path);
 
+        logger.error("**** ZKUTILS. Temporal ack Node " + request.getOperation() + "//" + request.getRequest_id() +
+                "//" + reply + "//" + path);
+
     }
 
 
