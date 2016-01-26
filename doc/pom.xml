@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.stratio.decision</groupId>
         <artifactId>stratio-decision</artifactId>
-        <version>0.10.0-RC2-SNAPSHOT</version>
+        <version>0.10.0</version>
     </parent>
     <properties>
         <jacoco.skip>true</jacoco.skip>
