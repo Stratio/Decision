@@ -55,7 +55,10 @@ public class ConfigurationContext {
     private final String sparkHost;
     private final String internalSparkHost;
 
+    private final boolean clusteringEnabled;
+    private final List<String> clusterQuorum;
     private final boolean allAckEnabled;
+    private final int ackTimeout;
 
     /**
      * OPTIONAL PROPERTIES *
@@ -74,7 +77,6 @@ public class ConfigurationContext {
     private final String mongoUsername;
     private final String mongoPassword;
 
-    private final List<String> clusterQuorum;
 
     public enum ConfigurationKeys {
         CLUSTER_ID("clusterId"),
@@ -103,8 +105,10 @@ public class ConfigurationContext {
         MONGO_HOST("mongo.hosts"),
         MONGO_USER("mongo.user"),
         MONGO_PASSWORD("mongo.password"),
-        CLUSTER_QUORUM("clusterQuorum"),
-        ALL_ACK_ENABLED("allAckEnabled");
+        CLUSTERING_ENABLED("clustering.enabled"),
+        CLUSTERING_QUORUM("clustering.clusterQuorum"),
+        CLUSTERING_ALL_ACK_ENABLED("clustering.allAckEnabled"),
+        CLUSTERING_ACK_TIMEOUT("clustering.ackTimeout");
 
         private final String key;
 
@@ -177,10 +181,11 @@ public class ConfigurationContext {
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
         this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
 
-        this.clusterQuorum = (List<String>) this.getListOrNull(ConfigurationKeys.CLUSTER_QUORUM.getKey(),
+        this.clusterQuorum = (List<String>) this.getListOrNull(ConfigurationKeys.CLUSTERING_QUORUM.getKey(),
                 config);
-
-        this.allAckEnabled = config.getBoolean(ConfigurationKeys.ALL_ACK_ENABLED.getKey());
+        this.allAckEnabled = config.getBoolean(ConfigurationKeys.CLUSTERING_ALL_ACK_ENABLED.getKey());
+        this.ackTimeout = config.getInt(ConfigurationKeys.CLUSTERING_ACK_TIMEOUT.getKey());
+        this.clusteringEnabled = config.getBoolean(ConfigurationKeys.CLUSTERING_ENABLED.getKey());
 
     }
 
@@ -314,6 +319,14 @@ public class ConfigurationContext {
 
     public boolean isAllAckEnabled() {
         return allAckEnabled;
+    }
+
+    public int getAckTimeout() {
+        return ackTimeout;
+    }
+
+    public boolean isClusteringEnabled() {
+        return clusteringEnabled;
     }
 
     private Object getValueOrNull(String key, Config config) {

@@ -21,6 +21,7 @@ import org.kohsuke.randname.RandomNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
 import com.stratio.decision.commons.constants.ReplyCode;
 import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.dto.ActionCallbackDto;
@@ -28,6 +29,7 @@ import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.configuration.ConfigurationContext;
 import com.stratio.decision.task.FailOverTask;
 import com.stratio.decision.utils.ZKUtils;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 /**
  * Created by josepablofernandez on 11/01/16.
@@ -37,6 +39,8 @@ public class ClusterSyncManager {
     private static Logger logger = LoggerFactory.getLogger(ZKUtils.class);
 
 
+    private static final String BARRIER_RELATIVE_PATH = "barrier";
+
     private static ClusterSyncManager self;
 
     private CuratorFramework client;
@@ -44,11 +48,13 @@ public class ClusterSyncManager {
     private String id;
     private LeaderLatch leaderLatch;
 
+    private Boolean clusteringEnabled;
     private List<String> clusterNodes;
     private List<String> nodesToCheck;
     private String clusterId;
     private FailOverTask failOverTask;
     private Boolean allAckEnabled;
+    private int ackTimeout;
 
     private String zookeeperHost;
 
@@ -60,9 +66,11 @@ public class ClusterSyncManager {
                 .newClient(zookeeperHost, 10000, 8000, new ExponentialBackoffRetry(1000, Integer.MAX_VALUE));
         this.latchpath = latchpath;
         this.id = id;
+        this.clusteringEnabled = configurationContext.isClusteringEnabled();
         this.clusterNodes = configurationContext.getClusterQuorum();
         this.clusterId = configurationContext.getClusterId();
         this.allAckEnabled = configurationContext.isAllAckEnabled();
+        this.ackTimeout = configurationContext.getAckTimeout();
         this.failOverTask = failOverTask;
 
         if (clusterNodes!= null && clusterNodes.size()>1){
@@ -100,71 +108,85 @@ public class ClusterSyncManager {
     }
 
 
+    //                    PathChildrenCache cache = new PathChildrenCache(client, path, true);
+    //                    cache.start();
+    //
+    //                    addListener(cache);
+
     public void manageAckStreamingOperation(StratioStreamingMessage message, ActionCallbackDto reply) {
 
         try {
 
-            if (isLeader()) {
+            // Single instance mode
+            if (!clusteringEnabled){
+                ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
+            } else {
+                // Sharding mode
+                if (allAckEnabled) {
 
-                if (!allAckEnabled) {
-                    ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
-                }
+                    ZKUtils.getZKUtils(zookeeperHost).createTempZNodeJsonReply(message, reply, clusterId);
 
-                else{
+                    String path = ZKUtils.getZKUtils(zookeeperHost).getTempZNodeJsonReplyPath(message);
+                    String barrierPath = path.concat("/").concat(BARRIER_RELATIVE_PATH);
 
-                    String path =  ZKUtils.getZKUtils(zookeeperHost).getTempZNodeJsonReplyPath(message);
-//                    PathChildrenCache cache = new PathChildrenCache(client, path, true);
-//                    cache.start();
-//
-//                    addListener(cache);
+                    DistributedDoubleBarrier barrier = new DistributedDoubleBarrier(client, barrierPath,
+                            clusterNodes.size());
+                    boolean success = barrier.enter(ackTimeout, TimeUnit.MILLISECONDS);
 
-                    logger.error("Added barrier for path: {}", path);
-                    DistributedDoubleBarrier  barrier = new DistributedDoubleBarrier(client, path, nodesToCheck.size
-                            ()) ;
-
-                    boolean success = barrier.enter(3, TimeUnit.SECONDS);
-
-                    manageBarrierResults(message, reply, path, success);
-
-                    if (success) {
-                        logger.error("Leaving barrier for path: {} WITH SUCCESS", path);
-                    } else {
-                        logger.error("Leaving barrier for path: {} WITH NO SUCCESS", path);
+                    if (isLeader()) {
+                        manageBarrierResults(message, reply, path, success);
                     }
 
+                } else {
+
+                    if (isLeader()) {
+                        ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
+                    }
                 }
-
-
-
-            }
-            else if (allAckEnabled){
-                ZKUtils.getZKUtils(zookeeperHost).createTempZNodeJsonReply(message, reply, clusterId);
             }
 
         }catch (Exception e){
-            ; //TODO
+            logger.error("Exception managing the ack of the node {} for the request {}: {}", clusterId, message.getRequest_id(), e
+                    .getMessage());
         }
 
-
     }
+
 
     private void manageBarrierResults(StratioStreamingMessage message, ActionCallbackDto reply, String path, Boolean
             success) throws Exception {
 
+        ActionCallbackDto clusterReply = reply;
+
          if (!success){
-             logger.error("Leaving barrier for path: {} WITH NO SUCCESS", path);
-             reply = new ActionCallbackDto(ReplyCode.KO_NODE_NOT_REPLY.getCode(), ReplyCode.KO_NODE_NOT_REPLY.getMessage());
+             logger.info("Leaving barrier for path: {} WITH NO SUCCESS", path);
+             clusterReply= new ActionCallbackDto(ReplyCode.KO_NODE_NOT_REPLY.getCode(), ReplyCode.KO_NODE_NOT_REPLY
+                      .getMessage());
          } else {
 
-             // Procesar respuesta de todos los nodos
+             logger.info("Leaving barrier for path: {} WITH SUCCESS", path);
+             if (reply.getErrorCode() == ReplyCode.OK.getCode()) {
+
+                 Gson gson = new Gson();
+                 Boolean koResponse = false;
+
+                 for (int i=0; i<nodesToCheck.size() && !koResponse; i++){
+
+                     String nodePath = path.concat("/").concat(nodesToCheck.get(i));
+                     String data = new String (client.getData().forPath(nodePath));
+
+                     ActionCallbackDto parsedResponse = gson.fromJson(data, ActionCallbackDto.class);
+                     if (parsedResponse.getErrorCode()!=  ReplyCode.OK.getCode()) {
+                         clusterReply = parsedResponse;
+                         koResponse = true;
+                     }
+                 }
+             }
+
          }
 
-
-        ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
-
-        // Borrar nodos temporales
-
-
+        ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, clusterReply);
+        client.delete().deletingChildrenIfNeeded().forPath(path);
     }
 
 //    private static void addListener(PathChildrenCache cache)
