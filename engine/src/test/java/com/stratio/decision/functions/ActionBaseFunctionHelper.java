@@ -1,6 +1,9 @@
 package com.stratio.decision.functions;
 
+import com.stratio.decision.clustering.ClusterSyncManager;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.configuration.ConfigurationContext;
+import com.stratio.decision.configuration.SchredulerConfiguration;
 import com.stratio.decision.configuration.ServiceConfiguration;
 import com.stratio.decision.configuration.StreamingSiddhiConfiguration;
 import com.stratio.decision.dao.StreamStatusDao;
@@ -8,7 +11,9 @@ import com.stratio.decision.functions.validator.RequestValidation;
 import com.stratio.decision.functions.validator.StreamNameNotEmptyValidation;
 import com.stratio.decision.service.CallbackService;
 import com.stratio.decision.service.StreamOperationService;
+import com.stratio.decision.service.StreamingFailoverService;
 import com.stratio.decision.service.StreamsHelper;
+import com.stratio.decision.task.FailOverTask;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.commons.collections.set.ListOrderedSet;
@@ -61,6 +66,13 @@ public abstract class ActionBaseFunctionHelper {
         validators= new ListOrderedSet();
         StreamNameNotEmptyValidation validation= new StreamNameNotEmptyValidation();
         validators.add(validation);
+
+        ConfigurationContext configurationContext = new ConfigurationContext();
+        try {
+            ClusterSyncManager.getClusterSyncManager(configurationContext, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     protected String getHostsStringFromList(List<String> hosts)  {

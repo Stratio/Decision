@@ -1,5 +1,6 @@
 package com.stratio.decision.utils;
 
+import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.service.StreamsHelper;
@@ -77,11 +78,11 @@ public class ZKUtilsTestIT {
 
     @Test
     public void testCreateZNodeJsonReply() throws Exception {
-        String basePath= "/stratio/streaming/";
+
         String reply= "myValue";
         String operation= STREAM_OPERATIONS.ACTION.LISTEN;
         String requestId= "requestId";
-        String path= basePath + operation.toLowerCase() + "/" + requestId;
+        String path= STREAMING.ZK_BASE_PATH + "/" + operation.toLowerCase() + "/" + requestId;
 
         StratioStreamingMessage message= StreamsHelper.getSampleMessage();
         message.setOperation(operation);
@@ -89,7 +90,6 @@ public class ZKUtilsTestIT {
 
         Exception ex= null;
         try {
-            zkUtils.createZNodeJsonReply(message, reply);
             zkUtils.createZNodeJsonReply(message, reply);
         } catch (Exception e)   { ex= e; }
 

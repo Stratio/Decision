@@ -40,6 +40,8 @@ public class KafkaTopicServiceTestIT {
         Exception ex = null;
         try {
 
+            func.deleteTopics();
+
             func.createOrUpdateTopic("firstTopic", 1, 1);
             func.createTopicIfNotExist("firstTopic", 1, 1);
             func.createTopicIfNotExist("secondTopic", 1, 1);
