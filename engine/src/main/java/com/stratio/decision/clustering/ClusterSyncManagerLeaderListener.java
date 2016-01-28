@@ -50,7 +50,7 @@ public class ClusterSyncManagerLeaderListener implements LeaderLatchListener {
 
         if (clusterSyncManagerInstance != null){
             try {
-                clusterSyncManagerInstance.initializedNodeStatusPathCache();
+                clusterSyncManagerInstance.initializedGroupStatusPathCache();
             } catch (Exception e) {
                 logger.error("Error initializing PathCache for Node Status Path: {}", e.getMessage());
             }

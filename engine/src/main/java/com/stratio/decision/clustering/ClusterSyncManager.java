@@ -176,12 +176,12 @@ public class ClusterSyncManager {
         ActionCallbackDto clusterReply = reply;
 
          if (!success){
-             logger.debug("Leaving barrier for path: {} WITH NO SUCCESS", path);
+             logger.debug("Leaving ACK barrier for path: {} WITH NO SUCCESS", path);
              clusterReply= new ActionCallbackDto(ReplyCode.KO_NODE_NOT_REPLY.getCode(), ReplyCode.KO_NODE_NOT_REPLY
                       .getMessage());
          } else {
 
-             logger.debug("Leaving barrier for path: {} WITH SUCCESS", path);
+             logger.debug("Leaving ACK barrier for path: {} WITH SUCCESS", path);
              if (reply.getErrorCode() == ReplyCode.OK.getCode()) {
 
                  Gson gson = new Gson();
@@ -224,7 +224,7 @@ public class ClusterSyncManager {
      * Called from ClusterSyncManagerLeaderListener
      * @throws Exception
      */
-    public void initializedNodeStatusPathCache() throws Exception {
+    public void initializedGroupStatusPathCache() throws Exception {
 
         if (isLeader() && clusteringEnabled) {
 
@@ -279,18 +279,15 @@ public class ClusterSyncManager {
                          switch ( event.getType() ){
 
                                  case CHILD_ADDED:
-                                         logger.error("Group added: " + ZKPaths
-                                                 .getNodeFromPath(event.getData().getPath()));
+                                         logger.info("STATUS - Group Initialized: {} ", nodeId);
                                         clusterNodesStatus.get(NODE_STATUS.INITIALIZED).add(nodeId);
                                         clusterNodesStatus.get(NODE_STATUS.STOPPED).remove(nodeId);
                                          break;
                                  case CHILD_UPDATED:
-                                         logger.error("Group changed: " + ZKPaths.getNodeFromPath(event.getData()
-                                                 .getPath()));
+                                         logger.info("STATUS - Group changed: {}",  nodeId);
                                          break;
                                  case CHILD_REMOVED:
-                                         logger.error("Group removed: " + ZKPaths.getNodeFromPath(event.getData()
-                                                 .getPath()));
+                                         logger.error("***** STATUS - Group {} are notified as DOWN *****", nodeId);
                                          clusterNodesStatus.get(NODE_STATUS.INITIALIZED).remove(nodeId);
                                          clusterNodesStatus.get(NODE_STATUS.STOPPED).add(nodeId);
                                          break;
@@ -303,15 +300,22 @@ public class ClusterSyncManager {
          cache.getListenable().addListener(listener);
      }
 
-    private void updateNodeStatus(){
+    private void updateNodeStatus() throws Exception {
 
-        if (clusterNodesStatus.get(NODE_STATUS.INITIALIZED).size()==0){
-            logger.error("All groups  stopped");
-        } else if (clusterNodesStatus.get(NODE_STATUS.STOPPED).size()==0){
-            logger.error("All groups Initialized");
+       if (clusterNodesStatus.get(NODE_STATUS.STOPPED).size() == 0){
+
+            logger.info("STATUS - All groups Initialized");
+            ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
+
         }else {
-            logger.error("Some groups are stopped");
-            clusterNodesStatus.get(NODE_STATUS.STOPPED).forEach( node -> logger.error("Stopped groupId: {}", node));
+
+            logger.error("**** STATUS - Some groups are DOWN");
+            clusterNodesStatus.get(NODE_STATUS.STOPPED).forEach( node -> logger.error("**** STATUS - groupId: {} is "
+                    + "DOWN", node));
+
+            ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING
+                    .ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN.getBytes());
+
         }
 
     }

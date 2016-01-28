@@ -59,18 +59,10 @@ public class StreamingEngine {
                     ClusterSyncManager
                             .getClusterSyncManager(configurationContext, failOverTask).start();
 
-
-                    ZKUtils zkUtils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(),
-                            configurationContext.getGroupId());
-
-//                    zkUtils.createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_CONNECTED.getBytes());
-//                    ClusterSyncManager.getNode().connectedNodeStatus();
-
                     annotationConfigApplicationContext.registerShutdownHook();
                     JavaStreamingContext context = annotationConfigApplicationContext.getBean("streamingContext", JavaStreamingContext.class);
                     context.start();
 
-//                    zkUtils.createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
                     ClusterSyncManager.getNode().initializedNodeStatus();
 
                     context.awaitTermination();

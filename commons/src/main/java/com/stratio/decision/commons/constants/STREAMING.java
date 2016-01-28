@@ -25,6 +25,7 @@ public interface STREAMING {
     String ZK_EPHEMERAL_NODE_STATUS_PATH = "/stratio/decision/status";
     String ZK_EPHEMERAL_NODE_STATUS_CONNECTED = "connected";
     String ZK_EPHEMERAL_NODE_STATUS_INITIALIZED = "initialized";
+    String ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN = "groups_down";
 
     String ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH = "/stratio/decision/groups_status";
     String GROUPS_STATUS_BASE_PREFIX = "group_";
