@@ -21,9 +21,11 @@ public class FailOverTask implements Runnable {
 
     private final StreamingFailoverService streamingFailoverService;
 
-    public FailOverTask(StreamingFailoverService streamingFailoverService) throws Exception {
+    public FailOverTask(StreamingFailoverService streamingFailoverService, Boolean failOverEnabled) throws Exception {
         this.streamingFailoverService = streamingFailoverService;
-        streamingFailoverService.load();
+        if (failOverEnabled) {
+            streamingFailoverService.load();
+        }
     }
 
     @Override

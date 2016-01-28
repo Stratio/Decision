@@ -47,6 +47,7 @@ public class SchredulerConfiguration {
 
     @Bean
     public FailOverTask failOverTask() throws Exception {
-        return new FailOverTask(streamingFailoverService);
+
+        return new FailOverTask(streamingFailoverService, configurationContext.isFailOverEnabled());
     }
 }
