@@ -2,7 +2,10 @@ package com.stratio.decision.clustering;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -20,6 +23,7 @@ import org.apache.curator.utils.ZKPaths;
 import org.kohsuke.randname.RandomNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.google.gson.Gson;
 import com.stratio.decision.commons.constants.ReplyCode;
@@ -36,7 +40,7 @@ import com.sun.org.apache.xpath.internal.operations.Bool;
  */
 public class ClusterSyncManager {
 
-    private static Logger logger = LoggerFactory.getLogger(ZKUtils.class);
+    private static Logger logger = LoggerFactory.getLogger(ClusterSyncManager.class);
 
 
     private static final String BARRIER_RELATIVE_PATH = "barrier";
@@ -51,12 +55,30 @@ public class ClusterSyncManager {
     private Boolean clusteringEnabled;
     private List<String> clusterNodes;
     private List<String> nodesToCheck;
+
+    private Map<NODE_STATUS, List<String>> clusterNodesStatus;
+
     private String clusterId;
     private FailOverTask failOverTask;
     private Boolean allAckEnabled;
     private int ackTimeout;
 
     private String zookeeperHost;
+
+    public enum NODE_STATUS{
+
+        STOPPED("stop"), INITIALIZED("initialized");
+
+        private final String status;
+
+        private NODE_STATUS(String status) {
+            this.status = status;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+    }
 
     public ClusterSyncManager(String latchpath, String id, ConfigurationContext
             configurationContext, FailOverTask failOverTask) {
@@ -73,8 +95,9 @@ public class ClusterSyncManager {
         this.ackTimeout = configurationContext.getAckTimeout();
         this.failOverTask = failOverTask;
 
-        if (clusterNodes!= null && clusterNodes.size()>1){
-            nodesToCheck = clusterNodes.stream().filter( name -> !name.equals(clusterId)).collect(Collectors.toList());
+        if (clusteringEnabled && clusterNodes!= null){
+
+            this.nodesToCheck = clusterNodes.stream().filter( name -> !name.equals(clusterId)).collect(Collectors.toList());
         }
     }
 
@@ -101,17 +124,12 @@ public class ClusterSyncManager {
         client.getZookeeperClient().blockUntilConnectedOrTimedOut();
         leaderLatch = new LeaderLatch(client, latchpath, id);
 
-        ClusterSyncManagerLeaderListener listener = new ClusterSyncManagerLeaderListener(failOverTask);
+        ClusterSyncManagerLeaderListener listener = new ClusterSyncManagerLeaderListener(failOverTask, getNode());
         leaderLatch.addListener(listener);
 
         leaderLatch.start();
     }
 
-
-    //                    PathChildrenCache cache = new PathChildrenCache(client, path, true);
-    //                    cache.start();
-    //
-    //                    addListener(cache);
 
     public void manageAckStreamingOperation(StratioStreamingMessage message, ActionCallbackDto reply) {
 
@@ -189,43 +207,113 @@ public class ClusterSyncManager {
         client.delete().deletingChildrenIfNeeded().forPath(path);
     }
 
-//    private static void addListener(PathChildrenCache cache)
-//         {
-//               // a PathChildrenCacheListener is optional. Here, it's used just to log changes
-//                PathChildrenCacheListener listener = new PathChildrenCacheListener()
-//                 {
-//                         @Override
-//                         public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception
-//                         {
-//                                 switch ( event.getType() )
-//                                 {
-//                                         case CHILD_ADDED:
-//                                          {
-//                                                 logger.error("Node added: " + ZKPaths
-//                                                         .getNodeFromPath(event.getData().getPath()));
-//
-//
-//                                                 break;
-//                                             }
-//
-//                                         case CHILD_UPDATED:
-//                                             {
-//                                                 logger.error("Node changed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
-//                                                 break;
-//                                             }
-//
-//                                         case CHILD_REMOVED:
-//                                             {
-//                                                 logger.error("Node removed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
-//                                                 break;
-//
-//                                             }
-//                                     }
-//                             }
-//                     };
-//                 cache.getListenable().addListener(listener);
-//             }
 
+    public void initializedNodeStatus() throws Exception {
+
+        if (!clusteringEnabled){
+            ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
+        }
+        else {
+            ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODES_STATUS_BASE_PATH
+                    .concat("/").concat(STREAMING.NODES_STATUS_BASE_PREFIX)
+                    .concat(clusterId), STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
+        }
+
+    }
+
+    /**
+     * Called from ClusterSyncManagerLeaderListener
+     * @throws Exception
+     */
+    public void initializedNodeStatusPathCache() throws Exception {
+
+        if (isLeader() && clusteringEnabled) {
+
+            PathChildrenCache cache = new PathChildrenCache(client, STREAMING.ZK_EPHEMERAL_NODES_STATUS_BASE_PATH,
+                    true);
+            cache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);
+            addNodeStatusListener(cache);
+            initClusterNodeStatus();
+            updateNodeStatus();
+        }
+    }
+
+    private void initClusterNodeStatus(){
+
+        this.clusterNodesStatus = new HashMap<>();
+        this.clusterNodesStatus.put(NODE_STATUS.INITIALIZED, new ArrayList<>());
+        this.clusterNodesStatus.put(NODE_STATUS.STOPPED, new ArrayList<>());
+
+        clusterNodes.forEach( node -> {
+
+            String zkPath = STREAMING.ZK_EPHEMERAL_NODES_STATUS_BASE_PATH.concat("/").concat(STREAMING.NODES_STATUS_BASE_PREFIX)
+                    .concat(node);
+
+            Boolean existsNode = false;
+            try {
+                existsNode = ZKUtils.getZKUtils(zookeeperHost).existZNode(zkPath);
+            }catch(Exception e){
+                logger.error("Error checking ZK path {}: {}", zkPath, e.getMessage());
+            }
+
+            if (existsNode){
+                clusterNodesStatus.get(NODE_STATUS.INITIALIZED).add(node);
+            }else{
+                clusterNodesStatus.get(NODE_STATUS.STOPPED).add(node);
+            }
+
+        });
+
+    }
+
+    private void addNodeStatusListener(PathChildrenCache cache){
+
+
+        PathChildrenCacheListener listener = new PathChildrenCacheListener(){
+
+                 @Override
+                 public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception
+                 {
+                     String node =  ZKPaths.getNodeFromPath(event.getData().getPath());
+                     String nodeId = node.substring(node.indexOf("_")+1);
+
+                         switch ( event.getType() ){
+
+                                 case CHILD_ADDED:
+                                         logger.error("Node added: " + ZKPaths
+                                                 .getNodeFromPath(event.getData().getPath()));
+                                        clusterNodesStatus.get(NODE_STATUS.INITIALIZED).add(nodeId);
+                                        clusterNodesStatus.get(NODE_STATUS.STOPPED).remove(nodeId);
+                                         break;
+                                 case CHILD_UPDATED:
+                                         logger.error("Node changed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
+                                         break;
+                                 case CHILD_REMOVED:
+                                         logger.error("Node removed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
+                                         clusterNodesStatus.get(NODE_STATUS.INITIALIZED).remove(nodeId);
+                                         clusterNodesStatus.get(NODE_STATUS.STOPPED).add(nodeId);
+                                         break;
+                         }
+
+                     updateNodeStatus();
+
+                     }
+             };
+         cache.getListenable().addListener(listener);
+     }
+
+    private void updateNodeStatus(){
+
+        if (clusterNodesStatus.get(NODE_STATUS.INITIALIZED).size()==0){
+            logger.error("All nodes stopped");
+        } else if (clusterNodesStatus.get(NODE_STATUS.STOPPED).size()==0){
+            logger.error("All nodes Initialized");
+        }else {
+            logger.error("Some nodes are stopped");
+            clusterNodesStatus.get(NODE_STATUS.STOPPED).forEach( node -> logger.error("Stopped NodeId: {}", node));
+        }
+
+    }
 
     public boolean isLeader() {
         return leaderLatch.hasLeadership();

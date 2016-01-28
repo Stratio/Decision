@@ -25,6 +25,10 @@ public interface STREAMING {
     String ZK_EPHEMERAL_NODE_STATUS_PATH = "/stratio/streaming/status";
     String ZK_EPHEMERAL_NODE_STATUS_CONNECTED = "connected";
     String ZK_EPHEMERAL_NODE_STATUS_INITIALIZED = "initialized";
+
+    String ZK_EPHEMERAL_NODES_STATUS_BASE_PATH = "/stratio/streaming/nodes_status";
+    String NODES_STATUS_BASE_PREFIX = "node_";
+
     String STREAMING_KEYSPACE_NAME = "stratio_streaming";
     String ZK_PERSISTENCE_NODE = "/failoverStorage";
     String ZK_PERSISTENCE_STORE_PATH = ZK_BASE_PATH + ZK_PERSISTENCE_NODE;
