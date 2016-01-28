@@ -16,7 +16,6 @@
 package com.stratio.decision;
 
 import com.stratio.decision.clustering.ClusterSyncManager;
-import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.configuration.BaseConfiguration;
 import com.stratio.decision.configuration.ConfigurationContext;
 import com.stratio.decision.configuration.FirstConfiguration;
@@ -29,8 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class StreamingEngine {
 
@@ -64,7 +61,7 @@ public class StreamingEngine {
 
 
                     ZKUtils zkUtils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(),
-                            configurationContext.getClusterId());
+                            configurationContext.getGroupId());
 
 //                    zkUtils.createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_CONNECTED.getBytes());
 //                    ClusterSyncManager.getNode().connectedNodeStatus();

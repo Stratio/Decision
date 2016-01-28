@@ -41,16 +41,16 @@ public class ZKUtils {
     private static ZKUtils self;
     private CuratorFramework client;
     private ExecutorService backgroundZookeeperCleanerTasks;
-    private String clusterId;
+    private String groupId;
 
     private ZKUtils(String zookeeperCluster) throws Exception {
 
         this(zookeeperCluster, null);
     }
 
-    private ZKUtils(String zookeeperCluster, String clusterId) throws Exception {
+    private ZKUtils(String zookeeperCluster, String groupId) throws Exception {
 
-        this.clusterId = clusterId;
+        this.groupId = groupId;
 
         // ZOOKEPER CONNECTION
         client = CuratorFrameworkFactory.newClient(zookeeperCluster, 25 * 1000, 10 * 1000, new ExponentialBackoffRetry(
@@ -62,7 +62,7 @@ public class ZKUtils {
             throw new Exception("Connection to Zookeeper timed out after seconds");
         } else {
             backgroundZookeeperCleanerTasks = Executors.newFixedThreadPool(1);
-            backgroundZookeeperCleanerTasks.submit(new ZookeeperBackgroundCleaner(client, clusterId));
+            backgroundZookeeperCleanerTasks.submit(new ZookeeperBackgroundCleaner(client, groupId));
         }
 
 
@@ -75,9 +75,9 @@ public class ZKUtils {
         return self;
     }
 
-    public static ZKUtils getZKUtils(String zookeeperCluster, String clusterId) throws Exception {
+    public static ZKUtils getZKUtils(String zookeeperCluster, String groupId) throws Exception {
         if (self == null) {
-            self = new ZKUtils(zookeeperCluster, clusterId);
+            self = new ZKUtils(zookeeperCluster, groupId);
         }
         return self;
     }
@@ -133,10 +133,10 @@ public class ZKUtils {
 
     }
 
-    public void createTempZNodeJsonReply(StratioStreamingMessage request, Object reply, String clusterId) throws Exception {
+    public void createTempZNodeJsonReply(StratioStreamingMessage request, Object reply, String groupId) throws Exception {
 
 
-        String path = getTempZNodeJsonReplyPath(request) + "/" + clusterId;
+        String path = getTempZNodeJsonReplyPath(request) + "/" + groupId;
 
         createZNodeJsonReplyForPath(request, reply, path);
 
@@ -179,7 +179,7 @@ public class ZKUtils {
         private Logger logger = LoggerFactory.getLogger(ZookeeperBackgroundCleaner.class);
 
         private CuratorFramework client;
-        private String clusterId;
+        private String groupId;
         private static final long ZNODES_TTL = 600000; // 10 minutes
         private static final long CLEAN_INTERVAL = 300000; // 5 minutes
         private static final long MAX_LIVE_FOR_OPERATION_NODE = 60000; // 1 minute
@@ -193,10 +193,10 @@ public class ZKUtils {
             logger.info("ZookeeperBackgroundCleaner BASE path " + STREAMING.ZK_BASE_PATH);
         }
 
-        public ZookeeperBackgroundCleaner(CuratorFramework client, String clusterId) {
+        public ZookeeperBackgroundCleaner(CuratorFramework client, String groupId) {
 
             this(client);
-            this.clusterId = clusterId;
+            this.groupId = groupId;
 
         }
 
@@ -250,8 +250,8 @@ public class ZKUtils {
 
             String zkPath = STREAMING.ZK_BASE_PATH;
 /*
-            if (clusterId != null){
-                zkPath = zkPath.concat("/").concat(clusterId);
+            if (groupId != null){
+                zkPath = zkPath.concat("/").concat(groupId);
             }
 */
             while (!Thread.currentThread().isInterrupted()) {

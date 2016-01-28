@@ -16,18 +16,18 @@
 package com.stratio.decision.commons.constants;
 
 public interface STREAMING {
-    String ZK_BASE_PATH = "/stratio/streaming";
+    String ZK_BASE_PATH = "/stratio/decision";
     String STREAM_STATUS_MAP = "stratio_stream_map";
 
-    String ZK_EPHEMERAL_NODE_PATH = "/stratio/streaming/engine";
+    String ZK_EPHEMERAL_NODE_PATH = "/stratio/decision/engine";
     String ZK_EPHEMERAL_NODE= "/engine";
 
-    String ZK_EPHEMERAL_NODE_STATUS_PATH = "/stratio/streaming/status";
+    String ZK_EPHEMERAL_NODE_STATUS_PATH = "/stratio/decision/status";
     String ZK_EPHEMERAL_NODE_STATUS_CONNECTED = "connected";
     String ZK_EPHEMERAL_NODE_STATUS_INITIALIZED = "initialized";
 
-    String ZK_EPHEMERAL_NODES_STATUS_BASE_PATH = "/stratio/streaming/nodes_status";
-    String NODES_STATUS_BASE_PREFIX = "node_";
+    String ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH = "/stratio/decision/groups_status";
+    String GROUPS_STATUS_BASE_PREFIX = "group_";
 
     String STREAMING_KEYSPACE_NAME = "stratio_streaming";
     String ZK_PERSISTENCE_NODE = "/failoverStorage";

@@ -30,7 +30,7 @@ public class ConfigurationContext {
     /**
      * MANDATORY PROPERTIES *
      */
-    private final String clusterId;
+    private final String groupId;
 
     private final List<String> cassandraHosts;
     private final List<String> kafkaHosts;
@@ -56,7 +56,7 @@ public class ConfigurationContext {
     private final String internalSparkHost;
 
     private final boolean clusteringEnabled;
-    private final List<String> clusterQuorum;
+    private final List<String> clusterGroups;
     private final boolean allAckEnabled;
     private final int ackTimeout;
 
@@ -64,7 +64,7 @@ public class ConfigurationContext {
      * OPTIONAL PROPERTIES *
      */
 
-    private final List<String> kafkaDataTopics;
+    private final List<String> dataTopics;
 
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
@@ -79,12 +79,11 @@ public class ConfigurationContext {
 
 
     public enum ConfigurationKeys {
-        CLUSTER_ID("clusterId"),
         CASSANDRA_HOSTS("cassandra.hosts"),
         KAFKA_HOSTS("kafka.hosts"),
         ZOOKEEPER_HOSTS("zookeeper.hosts"),
-        FAILOVER_ENABLED("failover.enabled"),
-        FAILOVER_PERIOD("failover.period"),
+        FAILOVER_ENABLED("clustering.failoverEnabled"),
+        FAILOVER_PERIOD("clustering.failoverPeriod"),
         AUDIT_ENABLED("auditEnabled"),
         STATS_ENABLED("statsEnabled"),
         PRINT_STREAMS("printStreams"),
@@ -96,7 +95,7 @@ public class ConfigurationContext {
         KAFKA_PARTITIONS("kafka.partitions"),
         KAFKA_SESSION_TIMEOUT("kafka.sessionTimeout"),
         KAFKA_CONNECTION_TIMEOUT("kafka.connectionTimeout"),
-        KAFKA_DATA_TOPICS("kafka.dataTopics"),
+        DATA_TOPICS("clustering.dataTopics"),
         ELASTICSEARCH_HOST("elasticsearch.hosts"),
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
         SOLR_HOST("solr.hosts"),
@@ -105,8 +104,9 @@ public class ConfigurationContext {
         MONGO_HOST("mongo.hosts"),
         MONGO_USER("mongo.user"),
         MONGO_PASSWORD("mongo.password"),
+        CLUSTERING_GROUP_ID("clustering.groupId"),
         CLUSTERING_ENABLED("clustering.enabled"),
-        CLUSTERING_QUORUM("clustering.clusterQuorum"),
+        CLUSTERING_GROUPS("clustering.clusterGroups"),
         CLUSTERING_ALL_ACK_ENABLED("clustering.allAckEnabled"),
         CLUSTERING_ACK_TIMEOUT("clustering.ackTimeout");
 
@@ -125,27 +125,27 @@ public class ConfigurationContext {
     public ConfigurationContext() {
         Config config = ConfigFactory.load("config");
 
-        this.clusterId =  config.getString(ConfigurationKeys.CLUSTER_ID.getKey());
+        this.groupId =  config.getString(ConfigurationKeys.CLUSTERING_GROUP_ID.getKey());
 
         this.kafkaHosts = config.getStringList(ConfigurationKeys.KAFKA_HOSTS.getKey());
         this.kafkaConsumerBrokerHost = kafkaHosts.get(0).split(":")[0];
         this.kafkaConsumerBrokerPort = Integer.parseInt(kafkaHosts.get(0).split(":")[1]);
 
-        List<String> dataTopics = (List<String>) this.getListOrNull(ConfigurationKeys.KAFKA_DATA_TOPICS.getKey(),
+        List<String> dataTopics = (List<String>) this.getListOrNull(ConfigurationKeys.DATA_TOPICS.getKey(),
                 config);
 
         if (dataTopics != null) {
 
             String separator = "_";
 
-            this.kafkaDataTopics = dataTopics.stream().map(topic -> InternalTopic.TOPIC_DATA.getTopicName().concat
+            this.dataTopics = dataTopics.stream().map(topic -> InternalTopic.TOPIC_DATA.getTopicName().concat
                     (separator).concat(topic))
             .collect(Collectors.toList());
 
         } else {
             dataTopics = new ArrayList<>();
             dataTopics.add(InternalTopic.TOPIC_DATA.getTopicName());
-            this.kafkaDataTopics = dataTopics;
+            this.dataTopics = dataTopics;
         }
 
 
@@ -181,7 +181,7 @@ public class ConfigurationContext {
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
         this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
 
-        this.clusterQuorum = (List<String>) this.getListOrNull(ConfigurationKeys.CLUSTERING_QUORUM.getKey(),
+        this.clusterGroups = (List<String>) this.getListOrNull(ConfigurationKeys.CLUSTERING_GROUPS.getKey(),
                 config);
         this.allAckEnabled = config.getBoolean(ConfigurationKeys.CLUSTERING_ALL_ACK_ENABLED.getKey());
         this.ackTimeout = config.getInt(ConfigurationKeys.CLUSTERING_ACK_TIMEOUT.getKey());
@@ -189,8 +189,8 @@ public class ConfigurationContext {
 
     }
 
-    public String getClusterId() {
-        return clusterId;
+    public String getGroupId() {
+        return groupId;
     }
 
     public List<String> getCassandraHosts() {
@@ -213,8 +213,8 @@ public class ConfigurationContext {
         return kafkaConsumerBrokerPort;
     }
 
-    public List<String> getKafkaDataTopics() {
-        return kafkaDataTopics;
+    public List<String> getDataTopics() {
+        return dataTopics;
     }
 
     public List<String> getZookeeperHosts() {
@@ -313,8 +313,8 @@ public class ConfigurationContext {
         return internalSparkHost;
     }
 
-    public List<String> getClusterQuorum() {
-        return clusterQuorum;
+    public List<String> getClusterGroups() {
+        return clusterGroups;
     }
 
     public boolean isAllAckEnabled() {

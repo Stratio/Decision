@@ -23,7 +23,6 @@ import org.apache.curator.utils.ZKPaths;
 import org.kohsuke.randname.RandomNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.google.gson.Gson;
 import com.stratio.decision.commons.constants.ReplyCode;
@@ -33,7 +32,6 @@ import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.configuration.ConfigurationContext;
 import com.stratio.decision.task.FailOverTask;
 import com.stratio.decision.utils.ZKUtils;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 /**
  * Created by josepablofernandez on 11/01/16.
@@ -58,7 +56,7 @@ public class ClusterSyncManager {
 
     private Map<NODE_STATUS, List<String>> clusterNodesStatus;
 
-    private String clusterId;
+    private String groupId;
     private FailOverTask failOverTask;
     private Boolean allAckEnabled;
     private int ackTimeout;
@@ -89,15 +87,15 @@ public class ClusterSyncManager {
         this.latchpath = latchpath;
         this.id = id;
         this.clusteringEnabled = configurationContext.isClusteringEnabled();
-        this.clusterNodes = configurationContext.getClusterQuorum();
-        this.clusterId = configurationContext.getClusterId();
+        this.clusterNodes = configurationContext.getClusterGroups();
+        this.groupId = configurationContext.getGroupId();
         this.allAckEnabled = configurationContext.isAllAckEnabled();
         this.ackTimeout = configurationContext.getAckTimeout();
         this.failOverTask = failOverTask;
 
         if (clusteringEnabled && clusterNodes!= null){
 
-            this.nodesToCheck = clusterNodes.stream().filter( name -> !name.equals(clusterId)).collect(Collectors.toList());
+            this.nodesToCheck = clusterNodes.stream().filter( name -> !name.equals(groupId)).collect(Collectors.toList());
         }
     }
 
@@ -142,7 +140,7 @@ public class ClusterSyncManager {
                 // Sharding mode
                 if (allAckEnabled) {
 
-                    ZKUtils.getZKUtils(zookeeperHost).createTempZNodeJsonReply(message, reply, clusterId);
+                    ZKUtils.getZKUtils(zookeeperHost).createTempZNodeJsonReply(message, reply, groupId);
 
                     String path = ZKUtils.getZKUtils(zookeeperHost).getTempZNodeJsonReplyPath(message);
                     String barrierPath = path.concat("/").concat(BARRIER_RELATIVE_PATH);
@@ -164,7 +162,8 @@ public class ClusterSyncManager {
             }
 
         }catch (Exception e){
-            logger.error("Exception managing the ack of the node {} for the request {}: {}", clusterId, message.getRequest_id(), e
+            logger.error("Exception managing the ack of the group {} for the request {}: {}", groupId, message
+                    .getRequest_id(), e
                     .getMessage());
         }
 
@@ -177,12 +176,12 @@ public class ClusterSyncManager {
         ActionCallbackDto clusterReply = reply;
 
          if (!success){
-             logger.info("Leaving barrier for path: {} WITH NO SUCCESS", path);
+             logger.debug("Leaving barrier for path: {} WITH NO SUCCESS", path);
              clusterReply= new ActionCallbackDto(ReplyCode.KO_NODE_NOT_REPLY.getCode(), ReplyCode.KO_NODE_NOT_REPLY
                       .getMessage());
          } else {
 
-             logger.info("Leaving barrier for path: {} WITH SUCCESS", path);
+             logger.debug("Leaving barrier for path: {} WITH SUCCESS", path);
              if (reply.getErrorCode() == ReplyCode.OK.getCode()) {
 
                  Gson gson = new Gson();
@@ -214,9 +213,9 @@ public class ClusterSyncManager {
             ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
         }
         else {
-            ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODES_STATUS_BASE_PATH
-                    .concat("/").concat(STREAMING.NODES_STATUS_BASE_PREFIX)
-                    .concat(clusterId), STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
+            ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH
+                    .concat("/").concat(STREAMING.GROUPS_STATUS_BASE_PREFIX)
+                    .concat(groupId), STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
         }
 
     }
@@ -229,7 +228,7 @@ public class ClusterSyncManager {
 
         if (isLeader() && clusteringEnabled) {
 
-            PathChildrenCache cache = new PathChildrenCache(client, STREAMING.ZK_EPHEMERAL_NODES_STATUS_BASE_PATH,
+            PathChildrenCache cache = new PathChildrenCache(client, STREAMING.ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH,
                     true);
             cache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);
             addNodeStatusListener(cache);
@@ -246,7 +245,7 @@ public class ClusterSyncManager {
 
         clusterNodes.forEach( node -> {
 
-            String zkPath = STREAMING.ZK_EPHEMERAL_NODES_STATUS_BASE_PATH.concat("/").concat(STREAMING.NODES_STATUS_BASE_PREFIX)
+            String zkPath = STREAMING.ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH.concat("/").concat(STREAMING.GROUPS_STATUS_BASE_PREFIX)
                     .concat(node);
 
             Boolean existsNode = false;
@@ -280,16 +279,18 @@ public class ClusterSyncManager {
                          switch ( event.getType() ){
 
                                  case CHILD_ADDED:
-                                         logger.error("Node added: " + ZKPaths
+                                         logger.error("Group added: " + ZKPaths
                                                  .getNodeFromPath(event.getData().getPath()));
                                         clusterNodesStatus.get(NODE_STATUS.INITIALIZED).add(nodeId);
                                         clusterNodesStatus.get(NODE_STATUS.STOPPED).remove(nodeId);
                                          break;
                                  case CHILD_UPDATED:
-                                         logger.error("Node changed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
+                                         logger.error("Group changed: " + ZKPaths.getNodeFromPath(event.getData()
+                                                 .getPath()));
                                          break;
                                  case CHILD_REMOVED:
-                                         logger.error("Node removed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
+                                         logger.error("Group removed: " + ZKPaths.getNodeFromPath(event.getData()
+                                                 .getPath()));
                                          clusterNodesStatus.get(NODE_STATUS.INITIALIZED).remove(nodeId);
                                          clusterNodesStatus.get(NODE_STATUS.STOPPED).add(nodeId);
                                          break;
@@ -305,12 +306,12 @@ public class ClusterSyncManager {
     private void updateNodeStatus(){
 
         if (clusterNodesStatus.get(NODE_STATUS.INITIALIZED).size()==0){
-            logger.error("All nodes stopped");
+            logger.error("All groups  stopped");
         } else if (clusterNodesStatus.get(NODE_STATUS.STOPPED).size()==0){
-            logger.error("All nodes Initialized");
+            logger.error("All groups Initialized");
         }else {
-            logger.error("Some nodes are stopped");
-            clusterNodesStatus.get(NODE_STATUS.STOPPED).forEach( node -> logger.error("Stopped NodeId: {}", node));
+            logger.error("Some groups are stopped");
+            clusterNodesStatus.get(NODE_STATUS.STOPPED).forEach( node -> logger.error("Stopped groupId: {}", node));
         }
 
     }
