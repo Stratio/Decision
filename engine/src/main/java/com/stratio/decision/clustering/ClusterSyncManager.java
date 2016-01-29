@@ -63,6 +63,8 @@ public class ClusterSyncManager {
 
     private String zookeeperHost;
 
+    private ZKUtils zkUtils;
+
     public enum NODE_STATUS{
 
         STOPPED("stop"), INITIALIZED("initialized");
@@ -97,6 +99,12 @@ public class ClusterSyncManager {
 
             this.nodesToCheck = clusterNodes.stream().filter( name -> !name.equals(groupId)).collect(Collectors.toList());
         }
+
+        try {
+            this.zkUtils = ZKUtils.getZKUtils(zookeeperHost);
+        } catch (Exception e) {
+            logger.error("Error connecting with ZK: {}", e.getMessage());
+        }
     }
 
 
@@ -128,21 +136,28 @@ public class ClusterSyncManager {
         leaderLatch.start();
     }
 
+    public boolean isStarted(){
+        return leaderLatch.getState() == LeaderLatch.State.STARTED;
+    }
 
-    public void manageAckStreamingOperation(StratioStreamingMessage message, ActionCallbackDto reply) {
+
+    public ActionCallbackDto manageAckStreamingOperation(StratioStreamingMessage message, ActionCallbackDto reply) {
+
+
+        ActionCallbackDto ackReply = reply;
 
         try {
 
             // Single instance mode
             if (!clusteringEnabled){
-                ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
+                zkUtils.createZNodeJsonReply(message, reply);
             } else {
                 // Sharding mode
                 if (allAckEnabled) {
 
-                    ZKUtils.getZKUtils(zookeeperHost).createTempZNodeJsonReply(message, reply, groupId);
+                    zkUtils.createTempZNodeJsonReply(message, reply, groupId);
 
-                    String path = ZKUtils.getZKUtils(zookeeperHost).getTempZNodeJsonReplyPath(message);
+                    String path = zkUtils.getTempZNodeJsonReplyPath(message);
                     String barrierPath = path.concat("/").concat(BARRIER_RELATIVE_PATH);
 
                     DistributedDoubleBarrier barrier = new DistributedDoubleBarrier(client, barrierPath,
@@ -150,13 +165,13 @@ public class ClusterSyncManager {
                     boolean success = barrier.enter(ackTimeout, TimeUnit.MILLISECONDS);
 
                     if (isLeader()) {
-                        manageBarrierResults(message, reply, path, success);
+                        ackReply = manageBarrierResults(message, reply, path, success);
                     }
 
                 } else {
 
                     if (isLeader()) {
-                        ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, reply);
+                        zkUtils.createZNodeJsonReply(message, reply);
                     }
                 }
             }
@@ -167,10 +182,12 @@ public class ClusterSyncManager {
                     .getMessage());
         }
 
+        return ackReply;
+
     }
 
 
-    private void manageBarrierResults(StratioStreamingMessage message, ActionCallbackDto reply, String path, Boolean
+    private ActionCallbackDto manageBarrierResults(StratioStreamingMessage message, ActionCallbackDto reply, String path, Boolean
             success) throws Exception {
 
         ActionCallbackDto clusterReply = reply;
@@ -202,21 +219,28 @@ public class ClusterSyncManager {
 
          }
 
-        ZKUtils.getZKUtils(zookeeperHost).createZNodeJsonReply(message, clusterReply);
+        zkUtils.createZNodeJsonReply(message, clusterReply);
         client.delete().deletingChildrenIfNeeded().forPath(path);
+
+        return clusterReply;
     }
 
 
-    public void initializedNodeStatus() throws Exception {
+    public String initializedNodeStatus() throws Exception {
+
+        String nodeStatusPath;
 
         if (!clusteringEnabled){
-            ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
+            nodeStatusPath = STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH;
         }
         else {
-            ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH
-                    .concat("/").concat(STREAMING.GROUPS_STATUS_BASE_PREFIX)
-                    .concat(groupId), STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
+            nodeStatusPath = STREAMING.ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH.concat("/").concat(STREAMING.GROUPS_STATUS_BASE_PREFIX)
+                    .concat(groupId);
         }
+
+        zkUtils.createEphemeralZNode(nodeStatusPath, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
+
+        return nodeStatusPath;
 
     }
 
@@ -224,7 +248,9 @@ public class ClusterSyncManager {
      * Called from ClusterSyncManagerLeaderListener
      * @throws Exception
      */
-    public void initializedGroupStatusPathCache() throws Exception {
+    public String initializedGroupStatusPathCache() throws Exception {
+
+        String status = null;
 
         if (isLeader() && clusteringEnabled) {
 
@@ -233,8 +259,10 @@ public class ClusterSyncManager {
             cache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);
             addNodeStatusListener(cache);
             initClusterNodeStatus();
-            updateNodeStatus();
+            status = updateNodeStatus();
         }
+
+        return status;
     }
 
     private void initClusterNodeStatus(){
@@ -250,7 +278,7 @@ public class ClusterSyncManager {
 
             Boolean existsNode = false;
             try {
-                existsNode = ZKUtils.getZKUtils(zookeeperHost).existZNode(zkPath);
+                existsNode = zkUtils.existZNode(zkPath);
             }catch(Exception e){
                 logger.error("Error checking ZK path {}: {}", zkPath, e.getMessage());
             }
@@ -300,23 +328,25 @@ public class ClusterSyncManager {
          cache.getListenable().addListener(listener);
      }
 
-    private void updateNodeStatus() throws Exception {
+    private String updateNodeStatus() throws Exception {
+
+        String clusterStatus = null;
 
        if (clusterNodesStatus.get(NODE_STATUS.STOPPED).size() == 0){
-
+            clusterStatus = STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED;
             logger.info("STATUS - All groups Initialized");
-            ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
-
         }else {
-
+            clusterStatus = STREAMING.ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN;
             logger.error("**** STATUS - Some groups are DOWN");
             clusterNodesStatus.get(NODE_STATUS.STOPPED).forEach( node -> logger.error("**** STATUS - groupId: {} is "
                     + "DOWN", node));
 
-            ZKUtils.getZKUtils(zookeeperHost).createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING
-                    .ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN.getBytes());
-
         }
+
+        zkUtils.createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, clusterStatus
+                .getBytes());
+
+        return clusterStatus;
 
     }
 

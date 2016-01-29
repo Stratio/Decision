@@ -160,7 +160,7 @@ public class StreamOperationServiceWithoutMetrics {
 
             String groupId = null;
 
-            if (configurationContext!=null){
+            if (configurationContext!=null && configurationContext.isClusteringEnabled()){
                 groupId = configurationContext.getGroupId();
             }
 

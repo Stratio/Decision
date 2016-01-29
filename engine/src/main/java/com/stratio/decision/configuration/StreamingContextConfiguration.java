@@ -265,7 +265,8 @@ public class StreamingContextConfiguration {
 
 
         String topicName = InternalTopic.TOPIC_ACTION.getTopicName();
-        if (configurationContext.getGroupId()!=null){
+
+        if (configurationContext.isClusteringEnabled() && configurationContext.getGroupId()!=null){
             topicName = topicName.concat("_").concat(configurationContext.getGroupId());
         }
 
