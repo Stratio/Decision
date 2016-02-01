@@ -81,11 +81,21 @@ public class ClusterSyncManager {
     }
 
     public ClusterSyncManager(String latchpath, String id, ConfigurationContext
+            configurationContext, FailOverTask failOverTask, CuratorFramework curatorClient, ZKUtils zkUtils) {
+
+        this(latchpath, id, configurationContext, failOverTask);
+        this.client = curatorClient;
+        this.zkUtils = zkUtils;
+
+        self = this;
+    }
+
+    public ClusterSyncManager(String latchpath, String id, ConfigurationContext
             configurationContext, FailOverTask failOverTask) {
 
         this.zookeeperHost = configurationContext.getZookeeperHostsQuorum();
         this.client = CuratorFrameworkFactory
-                .newClient(zookeeperHost, 10000, 8000, new ExponentialBackoffRetry(1000, Integer.MAX_VALUE));
+                    .newClient(zookeeperHost, 10000, 8000, new ExponentialBackoffRetry(1000, Integer.MAX_VALUE));
         this.latchpath = latchpath;
         this.id = id;
         this.clusteringEnabled = configurationContext.isClusteringEnabled();
@@ -101,10 +111,11 @@ public class ClusterSyncManager {
         }
 
         try {
-            this.zkUtils = ZKUtils.getZKUtils(zookeeperHost);
+            this.zkUtils =   ZKUtils.getZKUtils(zookeeperHost);
         } catch (Exception e) {
-            logger.error("Error connecting with ZK: {}", e.getMessage());
+            e.printStackTrace();
         }
+
     }
 
 
