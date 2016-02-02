@@ -259,22 +259,18 @@ public class ClusterSyncManager {
      * Called from ClusterSyncManagerLeaderListener
      * @throws Exception
      */
-    public String initializedGroupStatusPathCache() throws Exception {
+    public String initializedGroupStatus() throws Exception {
 
         String status = null;
 
-        if (isLeader() && clusteringEnabled) {
-
-            PathChildrenCache cache = new PathChildrenCache(client, STREAMING.ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH,
-                    true);
-            cache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);
-            addNodeStatusListener(cache);
+        if (clusteringEnabled) {
             initClusterNodeStatus();
             status = updateNodeStatus();
         }
 
         return status;
     }
+
 
     private void initClusterNodeStatus(){
 
@@ -304,40 +300,29 @@ public class ClusterSyncManager {
 
     }
 
-    private void addNodeStatusListener(PathChildrenCache cache){
+
+    public String updateNodeStatus(String nodeId, PathChildrenCacheEvent.Type eventType) throws Exception {
+
+        String clusterStatus = null;
+
+        switch (eventType){
+
+            case CHILD_ADDED:
+                logger.info("STATUS - Group Initialized: {} ", nodeId);
+                clusterNodesStatus.get(NODE_STATUS.INITIALIZED).add(nodeId);
+                clusterNodesStatus.get(NODE_STATUS.STOPPED).remove(nodeId);
+                break;
+            case CHILD_REMOVED:
+                logger.error("***** STATUS - Group {} are notified as DOWN *****", nodeId);
+                clusterNodesStatus.get(NODE_STATUS.INITIALIZED).remove(nodeId);
+                clusterNodesStatus.get(NODE_STATUS.STOPPED).add(nodeId);
+                break;
+        }
 
 
-        PathChildrenCacheListener listener = new PathChildrenCacheListener(){
+        return updateNodeStatus();
 
-                 @Override
-                 public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception
-                 {
-                     String node =  ZKPaths.getNodeFromPath(event.getData().getPath());
-                     String nodeId = node.substring(node.indexOf("_")+1);
-
-                         switch ( event.getType() ){
-
-                                 case CHILD_ADDED:
-                                         logger.info("STATUS - Group Initialized: {} ", nodeId);
-                                        clusterNodesStatus.get(NODE_STATUS.INITIALIZED).add(nodeId);
-                                        clusterNodesStatus.get(NODE_STATUS.STOPPED).remove(nodeId);
-                                         break;
-                                 case CHILD_UPDATED:
-                                         logger.info("STATUS - Group changed: {}",  nodeId);
-                                         break;
-                                 case CHILD_REMOVED:
-                                         logger.error("***** STATUS - Group {} are notified as DOWN *****", nodeId);
-                                         clusterNodesStatus.get(NODE_STATUS.INITIALIZED).remove(nodeId);
-                                         clusterNodesStatus.get(NODE_STATUS.STOPPED).add(nodeId);
-                                         break;
-                         }
-
-                     updateNodeStatus();
-
-                     }
-             };
-         cache.getListenable().addListener(listener);
-     }
+    }
 
     private String updateNodeStatus() throws Exception {
 
@@ -365,17 +350,39 @@ public class ClusterSyncManager {
         return leaderLatch.hasLeadership();
     }
 
-    public Participant currentLeader() throws Exception {
-        return leaderLatch.getLeader();
+    public CuratorFramework getClient() {
+        return client;
     }
 
-    public void close() throws IOException {
-        leaderLatch.close();
-        client.close();
+    public String getId() {
+        return id;
     }
 
-    public void waitForLeadership() throws InterruptedException, EOFException {
-        leaderLatch.await();
+    public Boolean getClusteringEnabled() {
+        return clusteringEnabled;
     }
 
+    public List<String> getClusterNodes() {
+        return clusterNodes;
+    }
+
+    public List<String> getNodesToCheck() {
+        return nodesToCheck;
+    }
+
+    public Map<NODE_STATUS, List<String>> getClusterNodesStatus() {
+        return clusterNodesStatus;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public Boolean getAllAckEnabled() {
+        return allAckEnabled;
+    }
+
+    public int getAckTimeout() {
+        return ackTimeout;
+    }
 }

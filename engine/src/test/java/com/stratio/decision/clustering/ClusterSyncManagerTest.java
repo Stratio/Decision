@@ -7,6 +7,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyVararg;
+import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -17,6 +18,7 @@ import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkImpl;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -71,21 +73,6 @@ public class ClusterSyncManagerTest {
 
         zkUtils = mock(ZKUtils.class);
         failOverTask = mock(FailOverTask.class);
-
-        //  doNothing().when(producer).send(Matchers.<List<KeyedMessage<String, String>>>any());
-        // mockedSession= mock(Session.class);
-        //   when(mockedDao.load()).thenReturn(new FailoverPersistenceStoreModel(streamStatuses, bytes));
-
-//
-//        StreamDefinition definition= Mockito.mock(StreamDefinition.class);
-//        when(definition.getAttributeList()).thenReturn(listAttributes);
-//        when(definition.getAttributePosition("myAttr")).thenReturn(0);
-//        when(definition.getAttributePosition("myAttr2")).thenReturn(1);
-//        when(definition.getAttributePosition("myAttr3")).thenReturn(2);
-//
-//        doReturn(Attribute.Type.STRING).when(definition).getAttributeType("myAttr");
-//        doReturn(Attribute.Type.BOOL).when(definition).getAttributeType("myAttr2");
-//        doReturn(Attribute.Type.DOUBLE).when(definition).getAttributeType("myAttr3");
 
     }
 
@@ -155,6 +142,72 @@ public class ClusterSyncManagerTest {
     }
 
 
+    @Test
+    public void testInitializedGroupStatusShouldBeInitilized() throws Exception {
+
+        doNothing().when(zkUtils).createEphemeralZNode(anyString(), any(byte[].class));
+        when(zkUtils.existZNode(contains("group1"))).thenReturn(true);
+        when(zkUtils.existZNode(contains("group2"))).thenReturn(true);
+
+        ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
+                configurationContext, failOverTask,curatorFramework, zkUtils);
+
+        assertEquals(clusterSyncManager.initializedGroupStatus(), STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED);
+
+    }
+
+    @Test
+    public void testInitializedGroupStatusShouldBeGroupsDown() throws Exception {
+
+        doNothing().when(zkUtils).createEphemeralZNode(anyString(), any(byte[].class));
+        when(zkUtils.existZNode(contains("group1"))).thenReturn(true);
+        when(zkUtils.existZNode(contains("group2"))).thenReturn(false);
+
+        ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
+                configurationContext, failOverTask,curatorFramework, zkUtils);
+
+        assertEquals(clusterSyncManager.initializedGroupStatus(),STREAMING.ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN);
+
+    }
+
+    @Test
+    public void testUpdateNodeStatusShouldBeInitialized() throws Exception {
+
+        doNothing().when(zkUtils).createEphemeralZNode(anyString(), any(byte[].class));
+        when(zkUtils.existZNode(contains("group1"))).thenReturn(false);
+        when(zkUtils.existZNode(contains("group2"))).thenReturn(false);
+
+        ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
+                configurationContext, failOverTask,curatorFramework, zkUtils);
+
+        clusterSyncManager.initializedGroupStatus();
+        clusterSyncManager.updateNodeStatus("group1", PathChildrenCacheEvent.Type.CHILD_ADDED);
+        String status = clusterSyncManager.updateNodeStatus("group2", PathChildrenCacheEvent.Type.CHILD_ADDED);
+
+        assertEquals(status, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED);
+
+    }
+
+
+    @Test
+    public void testUpdateNodeStatusShouldBeGroupsDown() throws Exception {
+
+        doNothing().when(zkUtils).createEphemeralZNode(anyString(), any(byte[].class));
+        when(zkUtils.existZNode(contains("group1"))).thenReturn(false);
+        when(zkUtils.existZNode(contains("group2"))).thenReturn(false);
+
+        ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
+                configurationContext, failOverTask,curatorFramework, zkUtils);
+
+        clusterSyncManager.initializedGroupStatus();
+        clusterSyncManager.updateNodeStatus("group1", PathChildrenCacheEvent.Type.CHILD_ADDED);
+        clusterSyncManager.updateNodeStatus("group2", PathChildrenCacheEvent.Type.CHILD_ADDED);
+
+        String status = clusterSyncManager.updateNodeStatus("group2", PathChildrenCacheEvent.Type.CHILD_REMOVED);
+
+        assertEquals(status, STREAMING.ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN);
+
+    }
 
 
 
