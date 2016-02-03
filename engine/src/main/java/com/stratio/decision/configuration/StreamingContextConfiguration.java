@@ -302,7 +302,7 @@ public class StreamingContextConfiguration {
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
                         saveToCassandraActionExecutionFunction);
             } else {
-                log.error("Cassandra is NOT configured properly");
+                log.warn("Cassandra is NOT configured properly");
             }
 
             SaveToMongoActionExecutionFunction saveToMongoActionExecutionFunction = new SaveToMongoActionExecutionFunction(configurationContext.getMongoHosts(),
@@ -313,7 +313,7 @@ public class StreamingContextConfiguration {
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(
                         saveToMongoActionExecutionFunction);
             } else {
-                log.error("MongoDB is NOT configured properly");
+                log.warn("MongoDB is NOT configured properly");
             }
 
             SaveToElasticSearchActionExecutionFunction saveToElasticSearchActionExecutionFunction = new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHosts(),
@@ -322,7 +322,7 @@ public class StreamingContextConfiguration {
                 log.info("ElasticSearch is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.INDEXED)).foreachRDD(saveToElasticSearchActionExecutionFunction);
             } else {
-                log.error("ElasticSearch is NOT configured properly");
+                log.warn("ElasticSearch is NOT configured properly");
             }
 
             SaveToSolrActionExecutionFunction saveToSolrActionExecutionFunction = new SaveToSolrActionExecutionFunction(configurationContext.getSolrHosts(), configurationContext.getSolrCloud(),
@@ -332,7 +332,7 @@ public class StreamingContextConfiguration {
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_SOLR)).foreachRDD(
                         saveToSolrActionExecutionFunction);
             } else {
-                log.error("Solr is NOT configured properly");
+                log.warn("Solr is NOT configured properly");
             }
 
             groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
