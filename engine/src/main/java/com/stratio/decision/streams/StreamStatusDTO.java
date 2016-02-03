@@ -42,11 +42,17 @@ public class StreamStatusDTO implements Serializable {
         this.userDefined = userDefined;
         this.actionsEnabled = new HashSet<>();
         this.addedQueries = new HashMap<>();
-        this.streamDefinition = columns!=null?columns:new ArrayList<>();
+
         this.engineActionsEnabled = new HashMap<>();
 
         this.streamColumns = new HashMap();
-        streamDefinition.forEach( column -> streamColumns.put(column.getColumn(), column));
+        this.streamDefinition = new ArrayList<>();
+
+        columns.forEach( column -> {
+            streamDefinition.add(column);
+            streamColumns.put(column.getColumn(), column);
+        });
+
 
     }
 
