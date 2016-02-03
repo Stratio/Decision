@@ -10,9 +10,9 @@ import org.apache.curator.framework.recipes.barriers.DistributedDoubleBarrier;
 public class ClusterBarrierManager {
 
     private ClusterSyncManager clusterSyncManagerInstance;
-    private Long ackTimeout;
+    private Integer ackTimeout;
 
-    public ClusterBarrierManager(ClusterSyncManager clusterSyncManagerInstance, Long ackTimeOut){
+    public ClusterBarrierManager(ClusterSyncManager clusterSyncManagerInstance, Integer ackTimeOut){
 
         this.clusterSyncManagerInstance = clusterSyncManagerInstance;
         this.ackTimeout = ackTimeOut;

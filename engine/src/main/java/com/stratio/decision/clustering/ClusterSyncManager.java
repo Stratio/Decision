@@ -65,6 +65,9 @@ public class ClusterSyncManager {
 
     private ZKUtils zkUtils;
 
+    private ClusterBarrierManager clusterBarrierManager;
+
+
     public enum NODE_STATUS{
 
         STOPPED("stop"), INITIALIZED("initialized");
@@ -81,11 +84,13 @@ public class ClusterSyncManager {
     }
 
     public ClusterSyncManager(String latchpath, String id, ConfigurationContext
-            configurationContext, FailOverTask failOverTask, CuratorFramework curatorClient, ZKUtils zkUtils) {
+            configurationContext, FailOverTask failOverTask, CuratorFramework curatorClient, ZKUtils zkUtils,
+            ClusterBarrierManager clusterBarrierManager) {
 
         this(latchpath, id, configurationContext, failOverTask);
         this.client = curatorClient;
         this.zkUtils = zkUtils;
+        this.clusterBarrierManager = clusterBarrierManager;
 
         self = this;
     }
@@ -171,9 +176,15 @@ public class ClusterSyncManager {
                     String path = zkUtils.getTempZNodeJsonReplyPath(message);
                     String barrierPath = path.concat("/").concat(BARRIER_RELATIVE_PATH);
 
-                    DistributedDoubleBarrier barrier = new DistributedDoubleBarrier(client, barrierPath,
-                            clusterNodes.size());
-                    boolean success = barrier.enter(ackTimeout, TimeUnit.MILLISECONDS);
+                    if (this.clusterBarrierManager==null){
+                        clusterBarrierManager = new ClusterBarrierManager(this, getAckTimeout());
+                    }
+
+//                    DistributedDoubleBarrier barrier = new DistributedDoubleBarrier(client, barrierPath,
+//                            clusterNodes.size());
+//                    boolean success = barrier.enter(ackTimeout, TimeUnit.MILLISECONDS);
+
+                    boolean success = clusterBarrierManager.manageAckBarrier(path, clusterNodes.size());
 
                     if (isLeader()) {
                         ackReply = manageBarrierResults(message, reply, path, success);

@@ -53,6 +53,9 @@ public class ClusterSyncManagerTest {
     @Mock
     CuratorFrameworkImpl curatorFramework;
 
+    @Mock
+    ClusterBarrierManager clusterBarrierManager;
+
     @Before
     public void setUp() throws Exception {
 
@@ -73,6 +76,7 @@ public class ClusterSyncManagerTest {
 
         zkUtils = mock(ZKUtils.class);
         failOverTask = mock(FailOverTask.class);
+        clusterBarrierManager = mock(ClusterBarrierManager.class);
 
     }
 
@@ -105,7 +109,7 @@ public class ClusterSyncManagerTest {
     public void testStart() throws InterruptedException {
 
         ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
-                configurationContext, failOverTask,curatorFramework, zkUtils);
+                configurationContext, failOverTask,curatorFramework, zkUtils, clusterBarrierManager);
 
         doNothing().when(curatorFramework).start();
         when(curatorFramework.getZookeeperClient().blockUntilConnectedOrTimedOut()).thenReturn(true);
@@ -119,7 +123,7 @@ public class ClusterSyncManagerTest {
         when(configurationContext.isClusteringEnabled()).thenReturn(false);
 
         ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
-                configurationContext, failOverTask,curatorFramework, zkUtils);
+                configurationContext, failOverTask,curatorFramework, zkUtils, clusterBarrierManager);
 
         String nodeStatusPath = clusterSyncManager.initializedNodeStatus();
         assertNotNull(nodeStatusPath);
@@ -132,7 +136,7 @@ public class ClusterSyncManagerTest {
 
 
         ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
-                configurationContext, failOverTask,curatorFramework, zkUtils);
+                configurationContext, failOverTask,curatorFramework, zkUtils, clusterBarrierManager);
 
         String nodeStatusPath = clusterSyncManager.initializedNodeStatus();
         assertNotNull(nodeStatusPath);
@@ -150,7 +154,7 @@ public class ClusterSyncManagerTest {
         when(zkUtils.existZNode(contains("group2"))).thenReturn(true);
 
         ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
-                configurationContext, failOverTask,curatorFramework, zkUtils);
+                configurationContext, failOverTask,curatorFramework, zkUtils, clusterBarrierManager);
 
         assertEquals(clusterSyncManager.initializedGroupStatus(), STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED);
 
@@ -164,7 +168,7 @@ public class ClusterSyncManagerTest {
         when(zkUtils.existZNode(contains("group2"))).thenReturn(false);
 
         ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
-                configurationContext, failOverTask,curatorFramework, zkUtils);
+                configurationContext, failOverTask,curatorFramework, zkUtils, clusterBarrierManager);
 
         assertEquals(clusterSyncManager.initializedGroupStatus(),STREAMING.ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN);
 
@@ -178,7 +182,7 @@ public class ClusterSyncManagerTest {
         when(zkUtils.existZNode(contains("group2"))).thenReturn(false);
 
         ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
-                configurationContext, failOverTask,curatorFramework, zkUtils);
+                configurationContext, failOverTask,curatorFramework, zkUtils, clusterBarrierManager);
 
         clusterSyncManager.initializedGroupStatus();
         clusterSyncManager.updateNodeStatus("group1", PathChildrenCacheEvent.Type.CHILD_ADDED);
@@ -197,7 +201,7 @@ public class ClusterSyncManagerTest {
         when(zkUtils.existZNode(contains("group2"))).thenReturn(false);
 
         ClusterSyncManager clusterSyncManager = new ClusterSyncManager(STREAMING.ZK_CLUSTER_MANAGER_PATH, "id",
-                configurationContext, failOverTask,curatorFramework, zkUtils);
+                configurationContext, failOverTask,curatorFramework, zkUtils, clusterBarrierManager);
 
         clusterSyncManager.initializedGroupStatus();
         clusterSyncManager.updateNodeStatus("group1", PathChildrenCacheEvent.Type.CHILD_ADDED);
