@@ -2,6 +2,7 @@ package com.stratio.decision.clustering;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.barriers.DistributedDoubleBarrier;
 
 /**
@@ -21,10 +22,15 @@ public class ClusterBarrierManager {
 
     public Boolean manageAckBarrier(String barrierPath, Integer nodesExpected) throws Exception {
 
-        DistributedDoubleBarrier barrier = new DistributedDoubleBarrier(clusterSyncManagerInstance.getClient(), barrierPath,
-                nodesExpected);
-
+        DistributedDoubleBarrier barrier =  getDistributedDoubleBarrier(barrierPath, nodesExpected);
         return barrier.enter(ackTimeout, TimeUnit.MILLISECONDS);
+
+    }
+
+    public DistributedDoubleBarrier getDistributedDoubleBarrier(String barrierPath, Integer nodesExpected) {
+
+        return new DistributedDoubleBarrier(clusterSyncManagerInstance.getClient(), barrierPath,
+                nodesExpected);
 
     }
 }

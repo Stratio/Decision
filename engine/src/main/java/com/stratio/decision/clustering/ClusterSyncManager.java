@@ -21,6 +21,7 @@ import org.apache.curator.framework.recipes.leader.Participant;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.ZKPaths;
 import org.kohsuke.randname.RandomNameGenerator;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,12 +178,8 @@ public class ClusterSyncManager {
                     String barrierPath = path.concat("/").concat(BARRIER_RELATIVE_PATH);
 
                     if (this.clusterBarrierManager==null){
-                        clusterBarrierManager = new ClusterBarrierManager(this, getAckTimeout());
+                        clusterBarrierManager = new ClusterBarrierManager(this,ackTimeout);
                     }
-
-//                    DistributedDoubleBarrier barrier = new DistributedDoubleBarrier(client, barrierPath,
-//                            clusterNodes.size());
-//                    boolean success = barrier.enter(ackTimeout, TimeUnit.MILLISECONDS);
 
                     boolean success = clusterBarrierManager.manageAckBarrier(path, clusterNodes.size());
 
@@ -230,8 +227,8 @@ public class ClusterSyncManager {
 
                      String nodePath = path.concat("/").concat(nodesToCheck.get(i));
                      String data = new String (client.getData().forPath(nodePath));
-
                      ActionCallbackDto parsedResponse = gson.fromJson(data, ActionCallbackDto.class);
+
                      if (parsedResponse.getErrorCode()!=  ReplyCode.OK.getCode()) {
                          clusterReply = parsedResponse;
                          koResponse = true;
@@ -363,37 +360,5 @@ public class ClusterSyncManager {
 
     public CuratorFramework getClient() {
         return client;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public Boolean getClusteringEnabled() {
-        return clusteringEnabled;
-    }
-
-    public List<String> getClusterNodes() {
-        return clusterNodes;
-    }
-
-    public List<String> getNodesToCheck() {
-        return nodesToCheck;
-    }
-
-    public Map<NODE_STATUS, List<String>> getClusterNodesStatus() {
-        return clusterNodesStatus;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public Boolean getAllAckEnabled() {
-        return allAckEnabled;
-    }
-
-    public int getAckTimeout() {
-        return ackTimeout;
     }
 }
