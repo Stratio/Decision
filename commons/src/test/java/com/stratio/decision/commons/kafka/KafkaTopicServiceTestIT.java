@@ -52,8 +52,13 @@ public class KafkaTopicServiceTestIT {
         }
 
         assertNull("Expected null value", ex);
-        func.deleteTopics();
-        func.close();
+
+        try {
+            func.deleteTopics();
+            func.close();
+        }catch(org.I0Itec.zkclient.exception.ZkException){
+            ;
+        }
     }
 
     @Test
