@@ -56,7 +56,7 @@ public class KafkaTopicServiceTestIT {
         try {
             func.deleteTopics();
             func.close();
-        }catch(org.I0Itec.zkclient.exception.ZkException){
+        }catch(org.I0Itec.zkclient.exception.ZkException e){
             ;
         }
     }
