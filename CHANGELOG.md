@@ -2,8 +2,10 @@
 
 Only listing significant user-visible, not internal code cleanups and minor bug fixes.
 
-## 0.10.0 (Upcoming)
+## 0.10.0 (January 2016)
 
+* Sharding with HA capabilities support
+* Minor bugs fixed
 * Various documentation improvements
 * Removed transitive dependencies because of licenses
 

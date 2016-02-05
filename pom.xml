@@ -28,7 +28,7 @@
 
     <groupId>com.stratio.decision</groupId>
     <artifactId>stratio-decision</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>Stratio Decision</name>
     <packaging>pom</packaging>
     <description>Stratio Decision is a real-time engine with Complex Event Processing capabilities
