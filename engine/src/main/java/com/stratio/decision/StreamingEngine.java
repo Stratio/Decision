@@ -15,11 +15,12 @@
  */
 package com.stratio.decision;
 
-import com.stratio.decision.commons.constants.STREAMING;
+import com.stratio.decision.clustering.ClusterSyncManager;
 import com.stratio.decision.configuration.BaseConfiguration;
 import com.stratio.decision.configuration.ConfigurationContext;
 import com.stratio.decision.configuration.FirstConfiguration;
 import com.stratio.decision.highAvailability.LeadershipManager;
+import com.stratio.decision.task.FailOverTask;
 import com.stratio.decision.utils.ZKUtils;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
@@ -45,16 +46,24 @@ public class StreamingEngine {
                 try (AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(
                         BaseConfiguration.class)) {
                     ConfigurationContext configurationContext = annotationConfigApplicationContext.getBean("configurationContext", ConfigurationContext.class);
-                    ZKUtils zkUtils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(),
-                            configurationContext.getClusterId());
 
-                    zkUtils.createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_CONNECTED.getBytes());
+                    /**
+                     * ClusterSyncManager Instance
+                     */
+                    FailOverTask failOverTask = null;
+                    if (configurationContext.isFailOverEnabled()){
+                        failOverTask = annotationConfigApplicationContext.getBean("failOverTask", FailOverTask
+                                .class);
+                    }
+
+                    ClusterSyncManager
+                            .getClusterSyncManager(configurationContext, failOverTask).start();
 
                     annotationConfigApplicationContext.registerShutdownHook();
                     JavaStreamingContext context = annotationConfigApplicationContext.getBean("streamingContext", JavaStreamingContext.class);
                     context.start();
 
-                    zkUtils.createEphemeralZNode(STREAMING.ZK_EPHEMERAL_NODE_STATUS_PATH, STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED.getBytes());
+                    ClusterSyncManager.getNode().initializedNodeStatus();
 
                     context.awaitTermination();
 

@@ -31,16 +31,13 @@ public class StreamingFailoverDao  {
 
     private Gson gson;
 
-    private String clusterId;
-
     private String zkPath;
 
     public StreamingFailoverDao(ConfigurationContext configurationContext, Gson gson) throws Exception {
         this.gson = gson;
-        this.clusterId = configurationContext.getClusterId();
-        this.zkutils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(), clusterId);
+        this.zkutils = ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum());
 
-        zkPath = STREAMING.ZK_BASE_PATH.concat("/").concat(clusterId).concat(STREAMING.ZK_PERSISTENCE_NODE);
+        zkPath = STREAMING.ZK_BASE_PATH.concat(STREAMING.ZK_PERSISTENCE_NODE);
     }
 
 

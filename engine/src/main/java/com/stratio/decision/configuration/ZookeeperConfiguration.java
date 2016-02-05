@@ -33,10 +33,10 @@ public class ZookeeperConfiguration {
 //        ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum()).createEphemeralZNode(
 //                STREAMING.ZK_EPHEMERAL_NODE_PATH, String.valueOf(System.currentTimeMillis()).getBytes());
 
-        String zkPath = STREAMING.ZK_BASE_PATH.concat("/").concat(configurationContext.getClusterId()).concat(STREAMING
+        String zkPath = STREAMING.ZK_BASE_PATH.concat("/").concat(configurationContext.getGroupId()).concat(STREAMING
                 .ZK_EPHEMERAL_NODE);
 
-        ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(), configurationContext.getClusterId()).createEphemeralZNode(
+        ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(), configurationContext.getGroupId()).createEphemeralZNode(
                 zkPath, String.valueOf(System.currentTimeMillis()).getBytes());
     }
 

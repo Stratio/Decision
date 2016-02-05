@@ -98,7 +98,7 @@ public class StreamingContextConfiguration {
         kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_REQUEST.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
         /*
-        groupId must be the clusterId. Kafka assigns each partition of a topic to one, and one only, consumer of
+        groupId must be the cluster groupId. Kafka assigns each partition of a topic to one, and one only, consumer of
         the group.
         Decision topics has only one partition (by default), so if we have two o more decision instances (consumers)
         reading
@@ -106,7 +106,7 @@ public class StreamingContextConfiguration {
         same topic with the same groupId, only one instance will be able to read from the topic
         */
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), configurationContext.getClusterId(), baseTopicMap);
+                configurationContext.getZookeeperHostsQuorum(), configurationContext.getGroupId(), baseTopicMap);
         messages.cache();
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
@@ -265,8 +265,9 @@ public class StreamingContextConfiguration {
 
 
         String topicName = InternalTopic.TOPIC_ACTION.getTopicName();
-        if (configurationContext.getClusterId()!=null){
-            topicName = topicName.concat("_").concat(configurationContext.getClusterId());
+
+        if (configurationContext.isClusteringEnabled() && configurationContext.getGroupId()!=null){
+            topicName = topicName.concat("_").concat(configurationContext.getGroupId());
         }
 
         baseTopicMap.put(topicName, 1);
@@ -275,13 +276,13 @@ public class StreamingContextConfiguration {
                 configurationContext.getKafkaPartitions());
 
         /*
-        groupId must be the clusterId. Kafka assigns each partition of a topic to one, and one only, consumer of
+        groupId must be the cluster groupId. Kafka assigns each partition of a topic to one, and one only, consumer of
         the group.
         Decision topics has only one partition (by default), so if we have two o more decision instances (consumers) reading the
         same topic with the same groupId, only one instance will be able to read from the topic
         */
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), configurationContext.getClusterId(), baseTopicMap);
+                configurationContext.getZookeeperHostsQuorum(), configurationContext.getGroupId(), baseTopicMap);
         messages.cache();
 
         JavaDStream<StratioStreamingMessage> parsedDataDstream = messages.map(new SerializerFunction());
@@ -301,7 +302,7 @@ public class StreamingContextConfiguration {
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
                         saveToCassandraActionExecutionFunction);
             } else {
-                log.error("Cassandra is NOT configured properly");
+                log.warn("Cassandra is NOT configured properly");
             }
 
             SaveToMongoActionExecutionFunction saveToMongoActionExecutionFunction = new SaveToMongoActionExecutionFunction(configurationContext.getMongoHosts(),
@@ -312,7 +313,7 @@ public class StreamingContextConfiguration {
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(
                         saveToMongoActionExecutionFunction);
             } else {
-                log.error("MongoDB is NOT configured properly");
+                log.warn("MongoDB is NOT configured properly");
             }
 
             SaveToElasticSearchActionExecutionFunction saveToElasticSearchActionExecutionFunction = new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHosts(),
@@ -321,7 +322,7 @@ public class StreamingContextConfiguration {
                 log.info("ElasticSearch is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.INDEXED)).foreachRDD(saveToElasticSearchActionExecutionFunction);
             } else {
-                log.error("ElasticSearch is NOT configured properly");
+                log.warn("ElasticSearch is NOT configured properly");
             }
 
             SaveToSolrActionExecutionFunction saveToSolrActionExecutionFunction = new SaveToSolrActionExecutionFunction(configurationContext.getSolrHosts(), configurationContext.getSolrCloud(),
@@ -331,7 +332,7 @@ public class StreamingContextConfiguration {
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_SOLR)).foreachRDD(
                         saveToSolrActionExecutionFunction);
             } else {
-                log.error("Solr is NOT configured properly");
+                log.warn("Solr is NOT configured properly");
             }
 
             groupedDataDstream.filter(new FilterDataFunction(StreamAction.LISTEN)).foreachRDD(
@@ -355,19 +356,19 @@ public class StreamingContextConfiguration {
         messages.cache();
 */
 
-        configurationContext.getKafkaDataTopics().forEach( dataTopic -> baseTopicMap.put(dataTopic, 1));
+        configurationContext.getDataTopics().forEach( dataTopic -> baseTopicMap.put(dataTopic, 1));
 
-        kafkaTopicService.createTopicsIfNotExist(configurationContext.getKafkaDataTopics(), configurationContext
+        kafkaTopicService.createTopicsIfNotExist(configurationContext.getDataTopics(), configurationContext
                 .getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
         /*
-         groupId must be the clusterId. Kafka assigns each partition of a topic to one, and one only, consumer of
+         groupId must be the cluster groupId. Kafka assigns each partition of a topic to one, and one only, consumer of
           the group.
          Decision topics has only one partition (by default), so if we have two o more decision instances (consumers) reading the
          same topic with the same groupId, only one instance will be able to read from the topic
          */
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(),  configurationContext.getClusterId(), baseTopicMap);
+                configurationContext.getZookeeperHostsQuorum(),  configurationContext.getGroupId(), baseTopicMap);
         messages.cache();
 
 

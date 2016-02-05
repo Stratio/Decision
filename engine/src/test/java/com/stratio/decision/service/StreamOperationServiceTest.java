@@ -124,7 +124,7 @@ public class StreamOperationServiceTest {
                 .setActionQuery(Mockito.eq(STREAM_NAME_GOOD), actionQueryIdArgumentCaptor.capture());
 
 
-        Mockito.when(configurationContext.getClusterId()).thenReturn(
+        Mockito.when(configurationContext.getGroupId()).thenReturn(
                 CLUSTER_ID);
 
         createBaseStream();

@@ -158,14 +158,14 @@ public class StreamOperationServiceWithoutMetrics {
 
             streamStatusDao.setActionQuery(streamName, actionQueryId);
 
-            String clusterId = null;
+            String groupId = null;
 
-            if (configurationContext!=null){
-                clusterId = configurationContext.getClusterId();
+            if (configurationContext!=null && configurationContext.isClusteringEnabled()){
+                groupId = configurationContext.getGroupId();
             }
 
             siddhiManager.addCallback(actionQueryId,
-                    callbackService.add(streamName, streamStatusDao.getEnabledActions(streamName), clusterId));
+                    callbackService.add(streamName, streamStatusDao.getEnabledActions(streamName), groupId));
         }
 
         streamStatusDao.enableAction(streamName, action);

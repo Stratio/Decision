@@ -30,7 +30,7 @@ public class HighAvailabilityConfiguration {
     @PostConstruct
     public void startUp() throws Exception {
         LeadershipManager.getLeadershipManager(configurationContext.getZookeeperHostsQuorum(), configurationContext
-                .getClusterId());
+                .getGroupId());
 
     }
 

@@ -53,12 +53,12 @@ public class LeadershipManager {
 //        return self;
 //    }
 
-    public static LeadershipManager getLeadershipManager(String zookeeperCluster, String clusterId) throws Exception {
+    public static LeadershipManager getLeadershipManager(String zookeeperCluster, String groupId) throws Exception {
         if (self == null) {
             Random r = new Random();
             RandomNameGenerator rnd = new RandomNameGenerator(r.nextInt());
 
-            String zkPath = STREAMING.ZK_BASE_PATH.concat("/").concat(clusterId).concat(STREAMING.ZK_HIGH_AVAILABILITY_NODE);
+            String zkPath = STREAMING.ZK_BASE_PATH.concat("/").concat(groupId).concat(STREAMING.ZK_HIGH_AVAILABILITY_NODE);
             self = new LeadershipManager(zookeeperCluster, zkPath, rnd.next());
         }
         return self;

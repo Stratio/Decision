@@ -23,7 +23,8 @@ import com.stratio.decision.api.messaging.MessageBuilder.builder
 import com.stratio.decision.api.messaging.{ColumnNameType, _}
 import com.stratio.decision.api.zookeeper.ZookeeperConsumer
 import com.stratio.decision.commons.constants.InternalTopic
-import com.stratio.decision.commons.constants.STREAMING.{ZK_EPHEMERAL_NODE_STATUS_CONNECTED, ZK_EPHEMERAL_NODE_STATUS_INITIALIZED, ZK_EPHEMERAL_NODE_STATUS_PATH}
+import com.stratio.decision.commons.constants.STREAMING.{ZK_EPHEMERAL_NODE_STATUS_CONNECTED,
+ZK_EPHEMERAL_NODE_STATUS_INITIALIZED, ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN, ZK_EPHEMERAL_NODE_STATUS_PATH}
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.ACTION.{INDEX, LISTEN, SAVETO_CASSANDRA, SAVETO_MONGO, SAVETO_SOLR, STOP_INDEX, STOP_LISTEN, STOP_SAVETO_CASSANDRA, STOP_SAVETO_MONGO, STOP_SAVETO_SOLR}
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.DEFINITION
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.DEFINITION.{ADD_QUERY, ALTER, DROP, REMOVE_QUERY}
@@ -407,6 +408,9 @@ class StratioStreamingAPI
         case ZK_EPHEMERAL_NODE_STATUS_INITIALIZED =>
           streamingUp = true
           streamingRunning = true
+        case ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN =>
+          streamingUp = true
+          streamingRunning = false
       }
     }
   }

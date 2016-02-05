@@ -16,20 +16,28 @@
 package com.stratio.decision.commons.constants;
 
 public interface STREAMING {
-    String ZK_BASE_PATH = "/stratio/streaming";
+    String ZK_BASE_PATH = "/stratio/decision";
     String STREAM_STATUS_MAP = "stratio_stream_map";
 
-    String ZK_EPHEMERAL_NODE_PATH = "/stratio/streaming/engine";
+    String ZK_EPHEMERAL_NODE_PATH = "/stratio/decision/engine";
     String ZK_EPHEMERAL_NODE= "/engine";
 
-    String ZK_EPHEMERAL_NODE_STATUS_PATH = "/stratio/streaming/status";
+    String ZK_EPHEMERAL_NODE_STATUS_PATH = "/stratio/decision/status";
     String ZK_EPHEMERAL_NODE_STATUS_CONNECTED = "connected";
     String ZK_EPHEMERAL_NODE_STATUS_INITIALIZED = "initialized";
+    String ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN = "groups_down";
+
+    String ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH = "/stratio/decision/groups_status";
+    String GROUPS_STATUS_BASE_PREFIX = "group_";
+
     String STREAMING_KEYSPACE_NAME = "stratio_streaming";
     String ZK_PERSISTENCE_NODE = "/failoverStorage";
     String ZK_PERSISTENCE_STORE_PATH = ZK_BASE_PATH + ZK_PERSISTENCE_NODE;
     String ZK_HIGH_AVAILABILITY_NODE = "/latch";
     String ZK_HIGH_AVAILABILITY_PATH = ZK_BASE_PATH + ZK_HIGH_AVAILABILITY_NODE;
+
+    String ZK_CLUSTER_MANAGER_NODE = "/manager";
+    String ZK_CLUSTER_MANAGER_PATH = ZK_BASE_PATH + ZK_CLUSTER_MANAGER_NODE;
 
     public interface STATS_NAMES {
         String SINK_STREAM_PREFIX = "VOID_";

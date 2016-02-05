@@ -15,6 +15,7 @@
  */
 package com.stratio.decision.functions.dml;
 
+import com.stratio.decision.clustering.ClusterSyncManager;
 import com.stratio.decision.commons.constants.ReplyCode;
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.messages.ListStreamsMessage;
@@ -51,8 +52,12 @@ public class ListStreamsFunction extends ActionBaseFunction {
     protected boolean startAction(StratioStreamingMessage message) throws RequestValidationException {
         List<StratioStreamingMessage> existingStreams = getStreamOperationService().list();
         try {
-            ZKUtils.getZKUtils(getZookeeperHost()).createZNodeJsonReply(message,
-                    new ListStreamsMessage(existingStreams.size(), System.currentTimeMillis(), existingStreams));
+
+            if (ClusterSyncManager.getNode().isLeader()) {
+
+                ZKUtils.getZKUtils(getZookeeperHost()).createZNodeJsonReply(message,
+                        new ListStreamsMessage(existingStreams.size(), System.currentTimeMillis(), existingStreams));
+            }
         } catch (Exception e) {
             throw new RequestValidationException(ReplyCode.KO_GENERAL_ERROR.getCode(), e.getMessage());
         }

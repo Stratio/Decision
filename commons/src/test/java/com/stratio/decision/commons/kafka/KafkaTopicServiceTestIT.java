@@ -40,6 +40,8 @@ public class KafkaTopicServiceTestIT {
         Exception ex = null;
         try {
 
+            func.deleteTopics();
+
             func.createOrUpdateTopic("firstTopic", 1, 1);
             func.createTopicIfNotExist("firstTopic", 1, 1);
             func.createTopicIfNotExist("secondTopic", 1, 1);
@@ -50,8 +52,13 @@ public class KafkaTopicServiceTestIT {
         }
 
         assertNull("Expected null value", ex);
-        func.deleteTopics();
-        func.close();
+
+        try {
+            func.deleteTopics();
+            func.close();
+        }catch(org.I0Itec.zkclient.exception.ZkException e){
+            ;
+        }
     }
 
     @Test

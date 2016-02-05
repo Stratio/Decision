@@ -16,6 +16,7 @@
 package com.stratio.decision.utils;
 
 import com.google.gson.Gson;
+import com.stratio.decision.clustering.ClusterSyncManager;
 import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
@@ -24,14 +25,12 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,16 +41,16 @@ public class ZKUtils {
     private static ZKUtils self;
     private CuratorFramework client;
     private ExecutorService backgroundZookeeperCleanerTasks;
-    private String clusterId;
+    private String groupId;
 
     private ZKUtils(String zookeeperCluster) throws Exception {
 
         this(zookeeperCluster, null);
     }
 
-    private ZKUtils(String zookeeperCluster, String clusterId) throws Exception {
+    private ZKUtils(String zookeeperCluster, String groupId) throws Exception {
 
-        this.clusterId = clusterId;
+        this.groupId = groupId;
 
         // ZOOKEPER CONNECTION
         client = CuratorFrameworkFactory.newClient(zookeeperCluster, 25 * 1000, 10 * 1000, new ExponentialBackoffRetry(
@@ -63,7 +62,7 @@ public class ZKUtils {
             throw new Exception("Connection to Zookeeper timed out after seconds");
         } else {
             backgroundZookeeperCleanerTasks = Executors.newFixedThreadPool(1);
-            backgroundZookeeperCleanerTasks.submit(new ZookeeperBackgroundCleaner(client, clusterId));
+            backgroundZookeeperCleanerTasks.submit(new ZookeeperBackgroundCleaner(client, groupId));
         }
 
 
@@ -76,9 +75,9 @@ public class ZKUtils {
         return self;
     }
 
-    public static ZKUtils getZKUtils(String zookeeperCluster, String clusterId) throws Exception {
+    public static ZKUtils getZKUtils(String zookeeperCluster, String groupId) throws Exception {
         if (self == null) {
-            self = new ZKUtils(zookeeperCluster, clusterId);
+            self = new ZKUtils(zookeeperCluster, groupId);
         }
         return self;
     }
@@ -103,36 +102,60 @@ public class ZKUtils {
 
     public void createZNodeJsonReply(StratioStreamingMessage request, Object reply) throws Exception {
 
+
+//        String path = STREAMING.ZK_BASE_PATH + "/" + request.getOperation().toLowerCase() + "/"
+//                    + request.getRequest_id();
+//
+//
+//        if (client.checkExists().forPath(path) != null) {
+//            client.delete().deletingChildrenIfNeeded().forPath(path);
+//        }
+//
+//        client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
+
         String path = STREAMING.ZK_BASE_PATH + "/" + request.getOperation().toLowerCase() + "/"
                 + request.getRequest_id();
 
-/*
+        createZNodeJsonReplyForPath(request, reply, path);
+
+
+        logger.info("**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
+                + path);
+
+    }
+
+
+
+    public String getTempZNodeJsonReplyPath(StratioStreamingMessage request){
+
+        return STREAMING.ZK_BASE_PATH + "/" + request.getOperation().toLowerCase() + "/ack" + "/"
+                + request.getRequest_id() ;
+
+    }
+
+    public void createTempZNodeJsonReply(StratioStreamingMessage request, Object reply, String groupId) throws Exception {
+
+
+        String path = getTempZNodeJsonReplyPath(request) + "/" + groupId;
+
+        createZNodeJsonReplyForPath(request, reply, path);
+
+        logger.info("**** ZKUTILS. Temporal ack Node " + request.getOperation() + "//" + request.getRequest_id() +
+                "//" + reply + "//" + path);
+
+    }
+
+
+    private void createZNodeJsonReplyForPath(StratioStreamingMessage request, Object reply, String path) throws
+            Exception {
+
         if (client.checkExists().forPath(path) != null) {
             client.delete().deletingChildrenIfNeeded().forPath(path);
         }
 
         client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
-
-        logger.info("**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
-                + path);
-*/
-
-        // Workaround to avoid naming conflicts with several Decision instances
-        if (client.checkExists().forPath(path) == null) {
-
-            try {
-                client.create().creatingParentsIfNeeded().forPath(path, new Gson().toJson(reply).getBytes());
-                logger.info(
-                        "**** ZKUTILS " + request.getOperation() + "//" + request.getRequest_id() + "//" + reply + "//"
-                                + path);
-            }catch(KeeperException.NodeExistsException e){
-                logger.info( "**** ZKUTILS. Path already exists:  " + path);
-            }
-        }
-
-
-
     }
+
 
     public void createZNode(String path, byte[] data) throws Exception {
         if (client.checkExists().forPath(path) != null) {
@@ -156,7 +179,7 @@ public class ZKUtils {
         private Logger logger = LoggerFactory.getLogger(ZookeeperBackgroundCleaner.class);
 
         private CuratorFramework client;
-        private String clusterId;
+        private String groupId;
         private static final long ZNODES_TTL = 600000; // 10 minutes
         private static final long CLEAN_INTERVAL = 300000; // 5 minutes
         private static final long MAX_LIVE_FOR_OPERATION_NODE = 60000; // 1 minute
@@ -170,10 +193,10 @@ public class ZKUtils {
             logger.info("ZookeeperBackgroundCleaner BASE path " + STREAMING.ZK_BASE_PATH);
         }
 
-        public ZookeeperBackgroundCleaner(CuratorFramework client, String clusterId) {
+        public ZookeeperBackgroundCleaner(CuratorFramework client, String groupId) {
 
             this(client);
-            this.clusterId = clusterId;
+            this.groupId = groupId;
 
         }
 
@@ -227,8 +250,8 @@ public class ZKUtils {
 
             String zkPath = STREAMING.ZK_BASE_PATH;
 /*
-            if (clusterId != null){
-                zkPath = zkPath.concat("/").concat(clusterId);
+            if (groupId != null){
+                zkPath = zkPath.concat("/").concat(groupId);
             }
 */
             while (!Thread.currentThread().isInterrupted()) {
