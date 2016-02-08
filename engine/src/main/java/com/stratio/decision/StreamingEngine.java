@@ -69,8 +69,6 @@ public class StreamingEngine {
 
                 } catch (Exception e) {
                     log.error("Fatal error", e);
-                    System.out.println(e.getMessage());
-                    e.printStackTrace();
                 }
             }
         } catch (Exception e) {

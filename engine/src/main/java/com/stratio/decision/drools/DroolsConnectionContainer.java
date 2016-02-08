@@ -93,7 +93,6 @@ public class DroolsConnectionContainer {
                     DroolsInstace instance = new DroolsInstace(groupContainer, groupConfigBean.getSessionName(),
                             groupConfigBean.getSessionType());
 
-                    // TODO Add Scanner to the container if it is required
                     instance.setkScanner(ks.newKieScanner(groupContainer));
                     instance.getkScanner().start(groupConfigBean.getScanFrequency());
 

@@ -277,7 +277,7 @@
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-core</artifactId>
-            <version>1.5.6</version>
+            <version>${powermock.version}</version>
         </dependency>
 
         <dependency>
