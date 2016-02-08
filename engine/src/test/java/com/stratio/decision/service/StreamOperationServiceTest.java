@@ -20,11 +20,13 @@ import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.configuration.ConfigurationContext;
 import com.stratio.decision.dao.StreamStatusDao;
+import com.stratio.decision.drools.DroolsConnectionContainer;
 import com.stratio.decision.exception.ServiceException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -48,6 +50,8 @@ public class StreamOperationServiceTest {
 
     private ConfigurationContext configurationContext;
 
+    private DroolsConnectionContainer droolsConnectionContainer;
+
     private static final String STREAM_NAME_GOOD = "goodStreamName";
 
     private static final String INFERRED_STREAM_GOOD = "goodInferredStreamName";
@@ -59,9 +63,11 @@ public class StreamOperationServiceTest {
         streamStatusDao = Mockito.mock(StreamStatusDao.class);
         callbackFactory = Mockito.mock(CallbackService.class);
         configurationContext = Mockito.mock(ConfigurationContext.class);
+        droolsConnectionContainer = Mockito.mock(DroolsConnectionContainer.class);
 
         sm = new SiddhiManager();
-        streamOperationService = new StreamOperationService(sm, streamStatusDao, callbackFactory, configurationContext);
+        streamOperationService = new StreamOperationService(sm, streamStatusDao, callbackFactory,
+                droolsConnectionContainer, configurationContext);
     }
 
     @Test

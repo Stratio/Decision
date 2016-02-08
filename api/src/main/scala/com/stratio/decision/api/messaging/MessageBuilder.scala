@@ -16,6 +16,7 @@
 package com.stratio.decision.api.messaging
 
 import java.util.List
+import java.util.Map
 
 import com.stratio.decision.commons.messages.{ColumnNameTypeValue, StratioStreamingMessage, StreamQuery}
 
@@ -29,7 +30,8 @@ object MessageBuilder {
     theTimeStamp: Long,
     theColumns: List[ColumnNameTypeValue],
     theQueries: List[StreamQuery],
-    theUserDefined: Boolean) {
+    theUserDefined: Boolean,
+    theAdditionalParameters: Map[String, Object]) {
 
     def build() = new StratioStreamingMessage(theOperation,
       theStreamName,
@@ -39,7 +41,8 @@ object MessageBuilder {
       theTimeStamp,
       theColumns,
       theQueries,
-      theUserDefined)
+      theUserDefined,
+      theAdditionalParameters)
 
     def withColumns(columns: List[ColumnNameTypeValue]) =
       new StratioStreamingMessageBuilder(theOperation,
@@ -50,7 +53,8 @@ object MessageBuilder {
         theTimeStamp,
         columns,
         theQueries,
-        theUserDefined)
+        theUserDefined,
+        theAdditionalParameters)
 
     def withOperation(operation: String) =
       new StratioStreamingMessageBuilder(operation,
@@ -61,7 +65,8 @@ object MessageBuilder {
         theTimeStamp,
         theColumns,
         theQueries,
-        theUserDefined)
+        theUserDefined,
+        theAdditionalParameters)
 
     def withStreamName(streamName: String) =
       new StratioStreamingMessageBuilder(theOperation,
@@ -72,7 +77,8 @@ object MessageBuilder {
         theTimeStamp,
         theColumns,
         theQueries,
-        theUserDefined)
+        theUserDefined,
+        theAdditionalParameters)
 
     def withSessionId(sessionId: String) =
       new StratioStreamingMessageBuilder(theOperation,
@@ -83,7 +89,8 @@ object MessageBuilder {
         theTimeStamp,
         theColumns,
         theQueries,
-        theUserDefined)
+        theUserDefined,
+        theAdditionalParameters)
 
     def withRequest(request: String) =
       new StratioStreamingMessageBuilder(theOperation,
@@ -94,7 +101,21 @@ object MessageBuilder {
         theTimeStamp,
         theColumns,
         theQueries,
-        theUserDefined)
+        theUserDefined,
+        theAdditionalParameters)
+
+    def withAdditionalParameters(additionalParameters : Map[String, Object]) =
+      new StratioStreamingMessageBuilder(theOperation,
+        theStreamName,
+        theSessionId,
+        theRequestId,
+        theRequest,
+        theTimeStamp,
+        theColumns,
+        theQueries,
+        theUserDefined,
+        additionalParameters)
+
   }
 
   def builder = new StratioStreamingMessageBuilder("",
@@ -105,6 +126,7 @@ object MessageBuilder {
     new java.lang.Long(System.currentTimeMillis),
     null,
     null,
-    true)
+    true,
+    null)
 
 }

@@ -1,6 +1,7 @@
 package com.stratio.decision.service;
 
 import com.stratio.decision.commons.constants.ColumnType;
+import com.stratio.decision.commons.constants.EngineActionType;
 import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
@@ -8,10 +9,15 @@ import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.commons.messages.StreamQuery;
 import com.stratio.decision.configuration.ConfigurationContext;
 import com.stratio.decision.dao.StreamStatusDao;
+import com.stratio.decision.drools.DroolsConnectionContainer;
 import com.stratio.decision.exception.ServiceException;
+import com.stratio.decision.functions.engine.BaseEngineAction;
+import com.stratio.decision.functions.engine.DroolsEngineAction;
 import com.stratio.decision.streams.QueryDTO;
 import com.stratio.decision.streams.StreamStatusDTO;
 import com.stratio.decision.utils.SiddhiUtils;
+
+import org.kie.api.runtime.KieContainer;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.QueryFactory;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -34,6 +40,8 @@ public class StreamOperationServiceWithoutMetrics {
 
     private  ConfigurationContext configurationContext;
 
+    private  DroolsConnectionContainer droolsConnectionContainer;
+
     public StreamOperationServiceWithoutMetrics(SiddhiManager siddhiManager, StreamStatusDao streamStatusDao,
                                                 CallbackService callbackService) {
         this.siddhiManager = siddhiManager;
@@ -41,11 +49,20 @@ public class StreamOperationServiceWithoutMetrics {
         this.callbackService = callbackService;
     }
 
+
     public StreamOperationServiceWithoutMetrics(SiddhiManager siddhiManager, StreamStatusDao streamStatusDao,
             CallbackService callbackService, ConfigurationContext configurationContext) {
         this(siddhiManager, streamStatusDao,callbackService);
         this.configurationContext = configurationContext;
     }
+
+
+    public StreamOperationServiceWithoutMetrics(SiddhiManager siddhiManager, StreamStatusDao streamStatusDao,
+        CallbackService callbackService, DroolsConnectionContainer droolsConnectionContainer, ConfigurationContext configurationContext) {
+        this(siddhiManager, streamStatusDao, callbackService, configurationContext);
+        this.droolsConnectionContainer = droolsConnectionContainer;
+    }
+
 
     public void createInternalStream(String streamName, List<ColumnNameTypeValue> columns) {
         StreamDefinition newStream = QueryFactory.createStreamDefinition().name(streamName);
@@ -54,12 +71,14 @@ public class StreamOperationServiceWithoutMetrics {
         }
         siddhiManager.defineStream(newStream);
         streamStatusDao.createInferredStream(streamName, columns);
-    }
+     }
 
     public void createStream(String streamName, List<ColumnNameTypeValue> columns) {
         StreamDefinition newStream = QueryFactory.createStreamDefinition().name(streamName);
-        for (ColumnNameTypeValue column : columns) {
-            newStream.attribute(column.getColumn(), getSiddhiType(column.getType()));
+        if (columns!=null) {
+            for (ColumnNameTypeValue column : columns) {
+                newStream.attribute(column.getColumn(), getSiddhiType(column.getType()));
+            }
         }
         siddhiManager.defineStream(newStream);
         streamStatusDao.create(streamName, columns);
@@ -75,15 +94,39 @@ public class StreamOperationServiceWithoutMetrics {
     }
 
     public int enlargeStream(String streamName, List<ColumnNameTypeValue> columns) throws ServiceException {
+//        int addedColumns = 0;
+//        StreamDefinition streamMetaData = siddhiManager.getStreamDefinition(streamName);
+//        for (ColumnNameTypeValue columnNameTypeValue : columns) {
+//            if (!SiddhiUtils.columnAlreadyExistsInStream(columnNameTypeValue.getColumn(), streamMetaData)) {
+//                addedColumns++;
+//                streamMetaData.attribute(columnNameTypeValue.getColumn(), getSiddhiType(columnNameTypeValue.getType()));
+//            } else {
+//                throw new ServiceException(String.format("Alter stream error, Column %s already exists.",
+//                        columnNameTypeValue.getColumn()));
+//            }
+//        }
+//
+//        return addedColumns;
+
+        return enlargeStream(streamName, columns, true);
+    }
+
+    public int enlargeStream(String streamName, List<ColumnNameTypeValue> columns, Boolean raiseException) throws
+            ServiceException {
         int addedColumns = 0;
         StreamDefinition streamMetaData = siddhiManager.getStreamDefinition(streamName);
         for (ColumnNameTypeValue columnNameTypeValue : columns) {
             if (!SiddhiUtils.columnAlreadyExistsInStream(columnNameTypeValue.getColumn(), streamMetaData)) {
                 addedColumns++;
+                // JPFM -- Updating the columns in streamStatusDao
+                streamStatusDao.addColumn(streamName, columnNameTypeValue);
                 streamMetaData.attribute(columnNameTypeValue.getColumn(), getSiddhiType(columnNameTypeValue.getType()));
             } else {
-                throw new ServiceException(String.format("Alter stream error, Column %s already exists.",
-                        columnNameTypeValue.getColumn()));
+                if (raiseException) {
+                    throw new ServiceException(String.format("Alter stream error, Column %s already "
+                                    + "exists.",
+                            columnNameTypeValue.getColumn()));
+                }
             }
         }
 
@@ -149,6 +192,13 @@ public class StreamOperationServiceWithoutMetrics {
         }
     }
 
+
+    public Boolean columnExists(String streamName, String columnName){
+
+        return streamStatusDao.existsColumnDefinition(streamName, columnName);
+
+    }
+
     public void enableAction(String streamName, StreamAction action) {
 
         if (streamStatusDao.getEnabledActions(streamName).size() == 0) {
@@ -187,6 +237,57 @@ public class StreamOperationServiceWithoutMetrics {
         return streamStatusDao.getEnabledActions(streamName).contains(action);
     }
 
+
+    public void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams) {
+        this.enableEngineAction(streamName, engineActionType, engineActionParams, this);
+    }
+
+    protected void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams,  StreamOperationServiceWithoutMetrics streamOperationService) {
+
+        if ( !streamStatusDao.isEngineActionEnabled(streamName, engineActionType)){
+
+            String engineActionQueryId = siddhiManager.addQuery(QueryFactory.createQuery()
+                    .from(QueryFactory.inputStream(streamName))
+                    .insertInto(STREAMING.STATS_NAMES.SINK_STREAM_PREFIX.concat(streamName)));
+
+            BaseEngineAction engineAction = null;
+
+            if (engineActionType == EngineActionType.FIRE_RULES) {
+
+                engineAction = new DroolsEngineAction(droolsConnectionContainer, engineActionParams, siddhiManager, streamOperationService);
+
+            }
+
+            siddhiManager.addCallback(engineActionQueryId,
+                    callbackService.addEngineCallback(streamName, engineActionType, engineAction));
+
+            streamStatusDao.enableEngineAction(streamName, engineActionType, engineActionParams, engineActionQueryId);
+
+        }
+
+
+    }
+
+
+    public void disableEngineAction(String streamName, EngineActionType engineActionType) {
+
+        if ( streamStatusDao.isEngineActionEnabled(streamName, engineActionType)){
+
+            String engineActionQueryId = streamStatusDao.getEngineActionQueryId(streamName, engineActionType);
+
+            if (engineActionQueryId != null){
+
+                siddhiManager.removeQuery(engineActionQueryId);
+            }
+
+            streamStatusDao.disableEngineAction(streamName, engineActionType);
+            callbackService.removeEngineAction(streamName, engineActionType);
+
+        }
+
+    }
 
     public List<StratioStreamingMessage> list() {
         List<StratioStreamingMessage> result = new ArrayList<>();

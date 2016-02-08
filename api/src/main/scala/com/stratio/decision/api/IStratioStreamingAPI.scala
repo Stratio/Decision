@@ -261,6 +261,25 @@ trait IStratioStreamingAPI {
   def stopSaveToSolr(streamName: String)
 
   /**
+    * Send the data of the stream to the Drools Engine
+    * @param streamName
+    * @param groupName
+    * @param outputStream (optional)
+    * @param kafkaTopic (optional)
+    * @throws com.stratio.decision.commons.exceptions.StratioEngineStatusException
+    */
+  @throws(classOf[StratioEngineStatusException])
+  def startSendToDrools(streamName: String, groupName: String, outputStream: String = null, kafkaTopic: String = null)
+
+  /**
+    * Stops sending the data to the Drools Engine
+    * @param streamName
+    * @throws com.stratio.decision.commons.exceptions.StratioEngineStatusException
+    */
+  @throws(classOf[StratioEngineStatusException])
+  def stopSendToDrools(streamName: String)
+
+  /**
    * Allows the client to define the time that the API
    * will wait for the engine responses.
    *

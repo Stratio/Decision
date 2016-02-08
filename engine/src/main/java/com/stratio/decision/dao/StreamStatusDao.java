@@ -15,8 +15,10 @@
  */
 package com.stratio.decision.dao;
 
+import com.stratio.decision.commons.constants.EngineActionType;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
+import com.stratio.decision.streams.EngineActionDTO;
 import com.stratio.decision.streams.QueryDTO;
 import com.stratio.decision.streams.StreamStatusDTO;
 import org.slf4j.Logger;
@@ -118,5 +120,94 @@ public class StreamStatusDao {
     public void setActionQuery(String streamName, String queryId) {
         StreamStatusDTO streamStatus = streamStatuses.get(streamName);
         streamStatus.setActionQueryId(queryId);
+    }
+
+    public void enableEngineAction(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams,
+      String engineActionQueryId ){
+
+        StreamStatusDTO streamStatus = streamStatuses.get(streamName);
+        Map<EngineActionType, EngineActionDTO> engineActionsEnabled = streamStatus.getEngineActionsEnabled();
+
+        EngineActionDTO engineActionDTO = new EngineActionDTO(engineActionType, engineActionParams,
+                engineActionQueryId);
+
+        engineActionsEnabled.put(engineActionType, engineActionDTO);
+
+    }
+
+    public void disableEngineAction(String streamName, EngineActionType engineActionType) {
+
+        StreamStatusDTO streamStatus = streamStatuses.get(streamName);
+        Map<EngineActionType, EngineActionDTO> engineActionsEnabled = streamStatus.getEngineActionsEnabled();
+
+        if (engineActionsEnabled.containsKey(engineActionType)) {
+
+            engineActionsEnabled.remove(engineActionType);
+        }
+
+    }
+
+    public Boolean isEngineActionEnabled(String streamName, EngineActionType engineActionType) {
+
+        StreamStatusDTO streamStatus = streamStatuses.get(streamName);
+        Map<EngineActionType, EngineActionDTO> engineActionsEnabled = streamStatus.getEngineActionsEnabled();
+
+        if (engineActionsEnabled.containsKey(engineActionType)) {
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    public String getEngineActionQueryId(String streamName, EngineActionType engineActionType) {
+
+        StreamStatusDTO streamStatus = streamStatuses.get(streamName);
+        Map<EngineActionType, EngineActionDTO> engineActionsEnabled = streamStatus.getEngineActionsEnabled();
+
+        if (engineActionsEnabled.containsKey(engineActionType)){
+
+            return engineActionsEnabled.get(engineActionType).getEngineActionQueryId();
+
+        }
+
+        return null;
+
+    }
+
+
+    public void updateEngineActionParameters(String streamName, EngineActionType engineActionType, Map<String, Object>
+            engineActionParams){
+
+        StreamStatusDTO streamStatus = streamStatuses.get(streamName);
+        Map<EngineActionType, EngineActionDTO> engineActionsEnabled = streamStatus.getEngineActionsEnabled();
+
+        if (engineActionsEnabled.containsKey(engineActionType)){
+
+            EngineActionDTO engineActionDTO = engineActionsEnabled.get(engineActionType);
+            engineActionDTO.setEngineActionParameters(engineActionParams);
+
+            engineActionsEnabled.put(engineActionType, engineActionDTO);
+        }
+
+    }
+
+    public void addColumn(String streamName, ColumnNameTypeValue column){
+
+        streamStatuses.get(streamName).getStreamDefinition().add(column);
+        streamStatuses.get(streamName).getStreamColumns().put(column.getColumn(), column);
+
+    }
+
+    public Boolean existsColumnDefinition(String streamName, String columnName){
+
+        if (streamStatuses.get(streamName).getStreamColumns().containsKey(columnName))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

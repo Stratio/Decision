@@ -871,6 +871,83 @@ class StratioStreamingAPIUnitTest
       }
     }
 
+    "send to Drools" should {
+
+      val streamName = "unitTestsStream"
+      val groupName = "unitTestsStream"
+      val outputStream = "outputStream"
+      val kafkaTopic = "outputTopic"
+
+      "sendToDrools" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+        api.setSyncOperation(streamingAPISyncOperationMock)
+
+        doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
+
+        api.startSendToDrools(streamName, groupName, outputStream, kafkaTopic)
+      }
+
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
+        api.streamingUp = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.startSendToDrools(streamName, groupName, outputStream, kafkaTopic)
+        }
+
+        thrown.getMessage should be("Stratio Decision is down")
+      }
+
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.startSendToDrools(streamName, groupName, outputStream, kafkaTopic)
+        }
+
+        thrown.getMessage should be("Stratio Decision not yet initialized")
+      }
+    }
+
+    "stop send to Drools" should {
+
+      val streamName = "unitTestsStream"
+
+      "stop send to Drools" in new DummyStratioStreamingAPI {
+
+        api.streamingUp = true
+        api.streamingRunning = true
+        api.setSyncOperation(streamingAPISyncOperationMock)
+
+        doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
+
+        api.stopSendToDrools(streamName)
+      }
+
+      "throw an exception if Decision is down" in new DummyStratioStreamingAPI {
+        api.streamingUp = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.stopSendToDrools(streamName)
+        }
+
+        thrown.getMessage should be("Stratio Decision is down")
+      }
+
+      "throw an exception if Decision is not running" in new DummyStratioStreamingAPI {
+        api.streamingUp = true
+        api.streamingRunning = false
+
+        val thrown = intercept[StratioEngineStatusException] {
+          api.stopSendToDrools(streamName)
+        }
+
+        thrown.getMessage should be("Stratio Decision not yet initialized")
+      }
+    }
+
     "check if the system is initialized" should {
       "return true if the system is up and running" in new DummyStratioStreamingAPI {
 

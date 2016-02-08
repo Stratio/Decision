@@ -15,10 +15,12 @@
  */
 package com.stratio.decision.service;
 
+import com.stratio.decision.commons.constants.EngineActionType;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.dao.StreamStatusDao;
 import com.stratio.decision.dao.StreamingFailoverDao;
 import com.stratio.decision.model.FailoverPersistenceStoreModel;
+import com.stratio.decision.streams.EngineActionDTO;
 import com.stratio.decision.streams.QueryDTO;
 import com.stratio.decision.streams.StreamStatusDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,16 @@ public class StreamingFailoverService {
                 for (StreamAction action : stream.getActionsEnabled()) {
                     streamOperationService.enableAction(entry.getKey(), action);
                 }
+
+                // Enable engine actions
+                for (Map.Entry<EngineActionType, EngineActionDTO> engineAction : stream.getEngineActionsEnabled()
+                        .entrySet()) {
+
+                    streamOperationService.enableEngineAction(stream.getStreamName(), engineAction.getKey(),
+                            engineAction.getValue().getEngineActionParameters());
+                }
+
+
             }
 //            streamMetadataService.setSnapshot(failoverPersistenceStoreModel.getSiddhiSnapshot());
         }
