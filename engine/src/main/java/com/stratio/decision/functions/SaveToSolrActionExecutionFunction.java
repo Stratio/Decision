@@ -49,14 +49,14 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
     private RetryStrategy retryStrategy;
 
     private final String dataDir;
-    private final String solrHosts;
+    private final String solrHost;
     private final Boolean isCloud;
 
-    public SaveToSolrActionExecutionFunction(String solrHosts, Boolean isCloud, String dataDir) {
-        this.solrHosts = solrHosts;
+    public SaveToSolrActionExecutionFunction(String solrHost, Boolean isCloud, String dataDir) {
+        this.solrHost = solrHost;
         this.dataDir = dataDir;
         this.isCloud = isCloud;
-        this.solrOperationsService = new SolrOperationsService(solrHosts, dataDir, isCloud);
+        this.solrOperationsService = new SolrOperationsService(solrHost, dataDir, isCloud);
         this.retryStrategy = new RetryStrategy();
     }
 
@@ -152,10 +152,10 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
             return solrClients.get(core);
         } else {
             if (isCloud) {
-                solrClient = new CloudSolrClient(solrHosts);
+                solrClient = new CloudSolrClient(solrHost);
                 ((CloudSolrClient) solrClient).setDefaultCollection(core);
             } else {
-                solrClient = new HttpSolrClient("http://" + solrHosts + "/solr/" + core);
+                solrClient = new HttpSolrClient("http://" + solrHost + "/solr/" + core);
             }
             solrClients.put(core, solrClient);
         }
