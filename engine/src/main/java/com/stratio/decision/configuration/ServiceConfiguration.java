@@ -18,6 +18,7 @@ package com.stratio.decision.configuration;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.dao.StreamStatusDao;
 import com.stratio.decision.dao.StreamingFailoverDao;
+import com.stratio.decision.drools.DroolsConnectionContainer;
 import com.stratio.decision.factory.GsonFactory;
 import com.stratio.decision.serializer.Serializer;
 import com.stratio.decision.serializer.impl.JavaToSiddhiSerializer;
@@ -33,7 +34,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 
 @Configuration
-@Import({ DaoConfiguration.class, StreamingSiddhiConfiguration.class })
+@Import({ DaoConfiguration.class, StreamingSiddhiConfiguration.class, DroolsConfiguration.class})
 public class ServiceConfiguration {
 
     @Autowired
@@ -52,9 +53,14 @@ public class ServiceConfiguration {
     @Autowired
     private ConfigurationContext configurationContext;
 
+    @Autowired
+    private DroolsConnectionContainer droolsConnectionContainer;
+
+
     @Bean
     public StreamOperationService streamOperationService() {
-        return new StreamOperationService(siddhiManager, streamStatusDao, callbackService(), configurationContext);
+        return new StreamOperationService(siddhiManager, streamStatusDao, callbackService(),
+                droolsConnectionContainer, configurationContext);
     }
 
     @Bean
@@ -87,4 +93,6 @@ public class ServiceConfiguration {
     public StreamingFailoverService streamingFailoverService() {
         return new StreamingFailoverService(streamStatusDao, streamMetadataService(), streamingFailoverDao);
     }
+
+
 }

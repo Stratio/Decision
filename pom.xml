@@ -70,6 +70,7 @@
         <kafka.driver>0.8.2.1</kafka.driver>
         <solr.driver>5.2.1</solr.driver>
         <metrics.version>3.0.1</metrics.version>
+        <guava.version>16.0.1</guava.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
@@ -223,6 +224,14 @@
                 <artifactId>solr-solrj</artifactId>
                 <version>${solr.driver}</version>
             </dependency>
+
+            <!-- GUAVA -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
             <!-- METRICS -->
             <dependency>
                 <groupId>com.codahale.metrics</groupId>

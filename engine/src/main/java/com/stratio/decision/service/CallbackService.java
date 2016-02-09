@@ -16,9 +16,12 @@
 package com.stratio.decision.service;
 
 import com.stratio.decision.callbacks.ActionControllerCallback;
+import com.stratio.decision.callbacks.EngineActionCallback;
 import com.stratio.decision.callbacks.StreamToActionBusCallback;
+import com.stratio.decision.commons.constants.EngineActionType;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.functions.engine.BaseEngineAction;
 import com.stratio.decision.serializer.Serializer;
 import kafka.javaapi.producer.Producer;
 import org.wso2.siddhi.core.event.Event;
@@ -35,6 +38,7 @@ public class CallbackService {
     private final Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer;
 
     private final Map<String, ActionControllerCallback> referencedCallbacks;
+    private final Map<String, EngineActionCallback> referencedEngineCallbacks;
 
     public CallbackService(Producer<String, String> producer,
             Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer,
@@ -43,6 +47,7 @@ public class CallbackService {
         this.kafkaToJavaSerializer = kafkaToJavaSerializer;
         this.javaToSiddhiSerializer = javaToSiddhiSerializer;
         this.referencedCallbacks = new HashMap<>();
+        this.referencedEngineCallbacks = new HashMap<>();
     }
 
     public QueryCallback add(String streamName, Set<StreamAction> actions) {
@@ -74,4 +79,30 @@ public class CallbackService {
     public void remove(String streamName) {
         referencedCallbacks.remove(streamName);
     }
+
+
+    public QueryCallback addEngineCallback(String streamName, EngineActionType action, BaseEngineAction engineAction) {
+
+        String key = streamName.concat("#").concat(action.toString());
+
+        EngineActionCallback callback = referencedEngineCallbacks.get(key);
+
+        if (callback == null) {
+
+            callback = new EngineActionCallback(streamName, engineAction, producer, kafkaToJavaSerializer,
+                    javaToSiddhiSerializer);
+
+            referencedEngineCallbacks.put(key, callback);
+        }
+
+        return callback;
+    }
+
+    public void removeEngineAction(String streamName, EngineActionType action) {
+
+        String key = streamName.concat("#").concat(action.toString());
+        referencedEngineCallbacks.remove(key);
+    }
+
+
 }

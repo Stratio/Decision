@@ -140,4 +140,40 @@ public class ActionCommands implements CommandMarker {
         }
     }
 
+/*
+send drools start --group myGroup --input_stream  myStream --output_stream out
+
+ */
+
+    @CliCommand(value = "send drools start", help = "start send to drools action")
+    public String sendToDroolsStart(
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final
+            String streamName,
+            @CliOption(key = {"group"}, help = "Drools Group Configuration", mandatory = true, optionContext = "group")
+            final String groupName,
+            @CliOption(key = {"output_stream"}, help = "CEP Stream to insert the results", mandatory = false) final
+            String outputStream,
+            @CliOption(key = {"kafkaTopic"}, help = "Name of a Kafka Topic to insert the results", mandatory = false)
+            final
+            String kafkaTopic ) {
+        try {
+            ssaw.api().startSendToDrools(streamName, groupName, outputStream, kafkaTopic);
+            return "Stream ".concat(streamName).concat(" attached to drools correctly");
+        } catch (StratioStreamingException e) {
+            throw new StreamingShellException(e);
+        }
+    }
+
+    @CliCommand(value = "send drools stop", help = "stop send to drools action")
+    public String sendToDroolsStop(
+            @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
+        try {
+            ssaw.api().stopSendToDrools(streamName);
+            return "Stream ".concat(streamName).concat(" de-attached from drools correctly");
+        } catch (StratioStreamingException e) {
+            throw new StreamingShellException(e);
+        }
+    }
+
+
 }

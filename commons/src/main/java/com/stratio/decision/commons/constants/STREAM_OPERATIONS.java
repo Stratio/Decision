@@ -46,6 +46,8 @@ public interface STREAM_OPERATIONS {
         String STOP_SAVETO_MONGO = "STOP_SAVETO_MONGO";
         String INDEX = "INDEX";
         String STOP_INDEX = "STOP_INDEX";
+        String START_SENDTODROOLS = "START_SENDTO_DROOLS";
+        String STOP_SENDTODROOLS = "STOP_SENDTO_DROOLS";
     }
 
     public class SyncOperations {

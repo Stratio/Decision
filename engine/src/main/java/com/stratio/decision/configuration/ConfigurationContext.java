@@ -15,17 +15,25 @@
  */
 package com.stratio.decision.configuration;
 
+
 import com.stratio.decision.commons.constants.InternalTopic;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
+import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 public class ConfigurationContext {
+
 
     /**
      * MANDATORY PROPERTIES *
@@ -77,6 +85,7 @@ public class ConfigurationContext {
     private final String mongoUsername;
     private final String mongoPassword;
 
+    private final DroolsConfigurationBean droolsConfiguration;
 
     public enum ConfigurationKeys {
         CASSANDRA_HOSTS("cassandra.hosts"),
@@ -108,7 +117,18 @@ public class ConfigurationContext {
         CLUSTERING_ENABLED("clustering.enabled"),
         CLUSTERING_GROUPS("clustering.clusterGroups"),
         CLUSTERING_ALL_ACK_ENABLED("clustering.allAckEnabled"),
-        CLUSTERING_ACK_TIMEOUT("clustering.ackTimeout");
+        CLUSTERING_ACK_TIMEOUT("clustering.ackTimeout"),
+
+        // Drools Config
+        DROOLS_GROUP("drools.groups"),
+        DROOLS_GROUP_NAME("name"),
+        DROOLS_GROUP_SESSION("sessionName"),
+        DROOLS_GROUP_GROUP_ID("groupId"),
+        DROOLS_GROUP_ARTIFACT_ID("artifactId"),
+        DROOLS_GROUP_VERSION("version"),
+        DROOLS_GROUP_SCAN_TIME("scanFrequency"),
+        DROOLS_GROUP_SESSION_TYPE("sessionType");
+
 
         private final String key;
 
@@ -124,6 +144,7 @@ public class ConfigurationContext {
 
     public ConfigurationContext() {
         Config config = ConfigFactory.load("config");
+        Config c = ConfigFactory.load("drools");
 
         this.groupId =  config.getString(ConfigurationKeys.CLUSTERING_GROUP_ID.getKey());
 
@@ -187,10 +208,50 @@ public class ConfigurationContext {
         this.ackTimeout = config.getInt(ConfigurationKeys.CLUSTERING_ACK_TIMEOUT.getKey());
         this.clusteringEnabled = config.getBoolean(ConfigurationKeys.CLUSTERING_ENABLED.getKey());
 
+        this.droolsConfiguration = new DroolsConfigurationBean();
+        Config droolsGroupsConfig = ConfigFactory.load("drools");
+        droolsConfiguration.setGroups(getDroolsConfigurationGroup(droolsGroupsConfig));
+
     }
 
     public String getGroupId() {
         return groupId;
+    }
+
+    private Map<String, DroolsConfigurationGroupBean> getDroolsConfigurationGroup(Config droolsConfig)  {
+
+        Map<String, DroolsConfigurationGroupBean> groups= new HashMap<>();
+
+        if (!droolsConfig.hasPath(ConfigurationKeys.DROOLS_GROUP.getKey())){
+            return groups;
+        }
+        List list = droolsConfig.getConfigList(ConfigurationKeys.DROOLS_GROUP.getKey());
+        Config groupConfig;
+
+        for (int i=0; i<list.size(); i++){
+
+            groupConfig = (Config) list.get(i);
+
+            DroolsConfigurationGroupBean g= new DroolsConfigurationGroupBean();
+
+            g.setSessionName((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_SESSION.getKey(), groupConfig));
+            g.setGroupId((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_GROUP_ID.getKey(), groupConfig));
+            g.setArtifactId((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_ARTIFACT_ID.getKey(), groupConfig));
+            g.setVersion((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_VERSION.getKey(), groupConfig));
+            g.setSessionType((String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_SESSION_TYPE.getKey(),
+                    groupConfig));
+
+            // TODO Cast Problems using getValueOrNull with Long
+            g.setScanFrequency(groupConfig.getLong(ConfigurationKeys.DROOLS_GROUP_SCAN_TIME.getKey()));
+
+            String groupName = (String) this.getValueOrNull(ConfigurationKeys.DROOLS_GROUP_NAME.getKey(), groupConfig);
+            g.setName(groupName);
+
+            groups.put(groupName, g);
+
+        }
+
+        return groups;
     }
 
     public List<String> getCassandraHosts() {
@@ -303,6 +364,10 @@ public class ConfigurationContext {
 
     public String getMongoPassword() {
         return mongoPassword;
+    }
+
+    public DroolsConfigurationBean getDroolsConfiguration() {
+        return droolsConfiguration;
     }
 
     public long getInternalStreamingBatchTime() {
