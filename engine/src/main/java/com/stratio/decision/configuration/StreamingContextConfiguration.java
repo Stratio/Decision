@@ -15,9 +15,7 @@
  */
 package com.stratio.decision.configuration;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -37,13 +35,10 @@ import org.springframework.context.annotation.Import;
 
 import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.decision.StreamingEngine;
-import com.stratio.decision.commons.constants.ColumnType;
-import com.stratio.decision.commons.constants.EngineActionType;
 import com.stratio.decision.commons.constants.InternalTopic;
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.kafka.service.KafkaTopicService;
-import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.functions.FilterDataFunction;
 import com.stratio.decision.functions.PairDataFunction;
@@ -204,7 +199,7 @@ public class StreamingContextConfiguration {
             log.warn("Elasticsearch configuration not found.");
         }
 
-        if (configurationContext.getSolrHosts() != null) {
+        if (configurationContext.getSolrHost() != null) {
             SaveToSolrStreamFunction solrStreamFunction = new SaveToSolrStreamFunction(streamOperationService,
                     configurationContext.getZookeeperHostsQuorum());
 
@@ -369,7 +364,7 @@ public class StreamingContextConfiguration {
                 log.warn("ElasticSearch is NOT configured properly");
             }
 
-            SaveToSolrActionExecutionFunction saveToSolrActionExecutionFunction = new SaveToSolrActionExecutionFunction(configurationContext.getSolrHosts(), configurationContext.getSolrCloud(),
+            SaveToSolrActionExecutionFunction saveToSolrActionExecutionFunction = new SaveToSolrActionExecutionFunction(configurationContext.getSolrHost(), configurationContext.getSolrCloud(),
                     configurationContext.getSolrDataDir());
             if (saveToSolrActionExecutionFunction.check()) {
                 log.info("Solr is configured properly");

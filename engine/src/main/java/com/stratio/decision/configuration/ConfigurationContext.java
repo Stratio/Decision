@@ -26,11 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
+
 import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
 import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 
 public class ConfigurationContext {
 
@@ -77,7 +75,7 @@ public class ConfigurationContext {
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
 
-    private final String solrHosts;
+    private final String solrHost;
     private final Boolean solrCloud;
     private final String solrDataDir;
 
@@ -107,7 +105,7 @@ public class ConfigurationContext {
         DATA_TOPICS("clustering.dataTopics"),
         ELASTICSEARCH_HOST("elasticsearch.hosts"),
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
-        SOLR_HOST("solr.hosts"),
+        SOLR_HOST("solr.host"),
         SOLR_CLOUD("solr.cloud"),
         SOLR_DATADIR("solr.dataDir"),
         MONGO_HOST("mongo.hosts"),
@@ -194,7 +192,7 @@ public class ConfigurationContext {
         this.elasticSearchHosts = (List<String>) this.getListOrNull(ConfigurationKeys.ELASTICSEARCH_HOST.getKey(), config);
         this.elasticSearchClusterName = (String) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_CLUSTER_NAME.getKey(), config);
 
-        this.solrHosts = (String) this.getValueOrNull(ConfigurationKeys.SOLR_HOST.getKey(), config);
+        this.solrHost = (String) this.getValueOrNull(ConfigurationKeys.SOLR_HOST.getKey(), config);
         this.solrCloud = (Boolean) this.getValueOrNull(ConfigurationKeys.SOLR_CLOUD.getKey(), config);
         this.solrDataDir = (String) this.getValueOrNull(ConfigurationKeys.SOLR_DATADIR.getKey(), config);
 
@@ -342,8 +340,8 @@ public class ConfigurationContext {
         return elasticSearchClusterName;
     }
 
-    public String getSolrHosts() {
-        return solrHosts;
+    public String getSolrHost() {
+        return solrHost;
     }
 
     public Boolean getSolrCloud() {
