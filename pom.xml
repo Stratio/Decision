@@ -65,7 +65,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <cassandra.driver>2.1.0</cassandra.driver>
+        <cassandra.driver>3.0.0</cassandra.driver>
         <mongo.driver>2.13.2</mongo.driver>
         <kafka.driver>0.8.2.1</kafka.driver>
         <solr.driver>5.2.1</solr.driver>

@@ -136,7 +136,7 @@ class CassandraServer {
         mkdirs();
         cleanup();
         mkdirs();
-        CommitLog.instance.resetUnsafe(); // cleanup screws w/ CommitLog, this
+        CommitLog.instance.resetUnsafe(true); // cleanup screws w/ CommitLog, this
         // brings it back to safe state
     }
 
