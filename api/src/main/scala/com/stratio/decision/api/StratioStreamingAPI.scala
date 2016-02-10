@@ -211,6 +211,14 @@ class StratioStreamingAPI
     syncOperation.performSyncOperation(stopSaveToSolrMessage)
   }
 
+  def saveToElasticsearch(streamName : String) = {
+    indexStream(streamName)
+  }
+
+  def stopSaveToElasticsearch(streamName : String) = {
+    stopIndexStream(streamName)
+  }
+
   def indexStream(streamName: String) = {
     checkStreamingStatus()
     val operation = INDEX.toLowerCase

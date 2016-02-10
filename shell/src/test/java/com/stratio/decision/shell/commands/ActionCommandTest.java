@@ -41,16 +41,16 @@ public class ActionCommandTest extends BaseShellTest {
     public void indexStreamStartTest() throws StratioEngineStatusException, StratioAPIGenericException, IOException,
             StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
-        CommandResult cr = shell.executeCommand("index start --stream testStream");
+        CommandResult cr = shell.executeCommand("save elasticsearch start --stream testStream");
         assertEquals(true, cr.isSuccess());
-        assertEquals("Stream testStream indexed correctly", cr.getResult());
+        assertEquals("Stream testStream indexed correctly into elasticsearch", cr.getResult());
     }
 
     @Test
     public void indexStreamStopTest() throws StratioEngineStatusException, StratioAPIGenericException, IOException,
             StratioEngineConnectionException, StratioEngineOperationException {
         Mockito.when(ssaw.api().listStreams()).thenReturn(new ArrayList<StratioStream>());
-        CommandResult cr = shell.executeCommand("index stop --stream testStream");
+        CommandResult cr = shell.executeCommand("save elasticsearch stop --stream testStream");
         assertEquals(true, cr.isSuccess());
         assertEquals("Stream testStream unindexed correctly", cr.getResult());
     }
