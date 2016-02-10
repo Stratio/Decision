@@ -30,7 +30,7 @@ public interface STREAMING {
     String ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH = "/stratio/decision/groups_status";
     String GROUPS_STATUS_BASE_PREFIX = "group_";
 
-    String STREAMING_KEYSPACE_NAME = "stratio_streaming";
+    String STREAMING_KEYSPACE_NAME = "stratio_decision";
     String ZK_PERSISTENCE_NODE = "/failoverStorage";
     String ZK_PERSISTENCE_STORE_PATH = ZK_BASE_PATH + ZK_PERSISTENCE_NODE;
     String ZK_HIGH_AVAILABILITY_NODE = "/latch";
