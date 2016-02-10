@@ -359,7 +359,7 @@ public class StreamingContextConfiguration {
                     configurationContext.getElasticSearchClusterName());
             if (saveToElasticSearchActionExecutionFunction.check()) {
                 log.info("ElasticSearch is configured properly");
-                groupedDataDstream.filter(new FilterDataFunction(StreamAction.INDEXED)).foreachRDD(saveToElasticSearchActionExecutionFunction);
+                groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_ELASTICSEARCH)).foreachRDD(saveToElasticSearchActionExecutionFunction);
             } else {
                 log.warn("ElasticSearch is NOT configured properly");
             }

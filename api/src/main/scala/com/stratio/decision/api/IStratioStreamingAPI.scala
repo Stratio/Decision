@@ -206,6 +206,19 @@ trait IStratioStreamingAPI {
   @throws(classOf[StratioEngineOperationException])
   def listStreams(): List[StratioStream]
 
+
+  /**
+    * Indexes the stream to the elasticsearch instance.
+    */
+  @throws(classOf[StratioEngineStatusException])
+  def saveToElasticsearch(streamName : String)
+
+  /**
+    * Stops indexing the stream.
+    */
+  @throws(classOf[StratioEngineStatusException])
+  def stopSaveToElasticsearch(streamName : String)
+
   /**
    * Indexes the stream to the elasticsearch instance.
    */
