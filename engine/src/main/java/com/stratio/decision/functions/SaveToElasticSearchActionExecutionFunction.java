@@ -46,6 +46,8 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
 
+    private static final String INDEX_NAME = "stratiodecision";
+
     public SaveToElasticSearchActionExecutionFunction(List<String> elasticSearchHosts, String elasticSearchClusterName) {
         this.elasticSearchHosts = elasticSearchHosts;
         this.elasticSearchClusterName = elasticSearchClusterName;
@@ -77,7 +79,7 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
                             elasicSearchTimestampFormat.format(stratioStreamingMessage.getTimestamp()));
 
                     contentBuilder = contentBuilder.endObject();
-                    IndexRequestBuilder request = getClient().prepareIndex("stratiostreaming",
+                    IndexRequestBuilder request = getClient().prepareIndex(INDEX_NAME,
                             stratioStreamingMessage.getStreamName()).setSource(contentBuilder);
                     bulkBuilder.add(request);
 
