@@ -203,7 +203,21 @@
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.sisu</groupId>
+                    <artifactId>org.eclipse.sisu.plexus</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.sisu</groupId>
+                    <artifactId>org.eclipse.sisu.inject</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.sisu</groupId>
+            <artifactId>org.eclipse.sisu.plexus</artifactId>
+            <version>0.3.2</version>
         </dependency>
 
         <!-- METRICS -->
@@ -253,6 +267,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>4.0.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.decision</groupId>
+            <artifactId>commons</artifactId>
+            <scope>system</scope>
+            <systemPath>${basedir}</systemPath>
         </dependency>
 
         <dependency>

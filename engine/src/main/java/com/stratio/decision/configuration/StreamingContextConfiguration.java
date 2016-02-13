@@ -64,7 +64,6 @@ import com.stratio.decision.functions.ddl.CreateStreamFunction;
 import com.stratio.decision.functions.dml.InsertIntoStreamFunction;
 import com.stratio.decision.functions.dml.ListStreamsFunction;
 import com.stratio.decision.functions.messages.FilterMessagesByOperationFunction;
-import com.stratio.decision.functions.messages.FilterMessagesByStream;
 import com.stratio.decision.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
 import com.stratio.decision.service.StreamOperationService;

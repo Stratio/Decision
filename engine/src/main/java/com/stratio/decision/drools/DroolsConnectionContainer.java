@@ -79,7 +79,7 @@ public class DroolsConnectionContainer {
                     instance.getkScanner().start(groupConfigBean.getScanFrequency());
 
                     switch (groupConfigBean.getSessionType()) {
-                    case "stateful" : instance.setSession(new DroolsStatefulSession(groupContainer, groupConfigBean
+                    case "statefull" : instance.setSession(new DroolsStatefulSession(groupContainer, groupConfigBean
                             .getSessionName()));
                         break;
                     case "stateless" : instance.setSession(new DroolsStatelessSession(groupContainer, groupConfigBean
