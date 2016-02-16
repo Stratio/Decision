@@ -58,7 +58,7 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
 
         Integer partitionSize = maxBatchSize;
 
-        if (partitionSize <= 0){
+        if (partitionSize == null || partitionSize <= 0){
             partitionSize = Iterables.size(messages);
         }
 
