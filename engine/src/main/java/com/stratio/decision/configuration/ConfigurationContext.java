@@ -86,6 +86,7 @@ public class ConfigurationContext {
     private final List<String> mongoHosts;
     private final String mongoUsername;
     private final String mongoPassword;
+    private final Integer mongoMaxBatchSize;
 
     private final Integer cassandraMaxBatchSize;
     private final BatchStatement.Type cassandraBatchType;
@@ -122,6 +123,7 @@ public class ConfigurationContext {
         MONGO_HOST("mongo.hosts"),
         MONGO_USER("mongo.user"),
         MONGO_PASSWORD("mongo.password"),
+        MONGO_MAX_BATCH_SIZE("mongo.maxBatchSize"),
         CLUSTERING_GROUP_ID("clustering.groupId"),
         CLUSTERING_ENABLED("clustering.enabled"),
         CLUSTERING_GROUPS("clustering.clusterGroups"),
@@ -223,6 +225,7 @@ public class ConfigurationContext {
         this.mongoHosts = (List<String>) this.getListOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
         this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
+        this.mongoMaxBatchSize = config.getInt(ConfigurationKeys.MONGO_MAX_BATCH_SIZE.getKey());
 
         this.clusterGroups = (List<String>) this.getListOrNull(ConfigurationKeys.CLUSTERING_GROUPS.getKey(),
                 config);
@@ -433,8 +436,13 @@ public class ConfigurationContext {
         return cassandraBatchType;
     }
 
+
     public Integer getElasticSearchMaxBatchSize() {
         return elasticSearchMaxBatchSize;
+    }
+
+    public Integer getMongoMaxBatchSize() {
+        return mongoMaxBatchSize;
     }
 
     private Object getValueOrNull(String key, Config config) {
