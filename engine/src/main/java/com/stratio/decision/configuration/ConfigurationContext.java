@@ -208,7 +208,7 @@ public class ConfigurationContext {
 
         this.elasticSearchHosts = (List<String>) this.getListOrNull(ConfigurationKeys.ELASTICSEARCH_HOST.getKey(), config);
         this.elasticSearchClusterName = (String) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_CLUSTER_NAME.getKey(), config);
-        this.elasticSearchMaxBatchSize = (Integer) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_CLUSTER_NAME
+        this.elasticSearchMaxBatchSize = (Integer) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_MAX_BATCH_SIZE
                 .getKey(), config);
 
 

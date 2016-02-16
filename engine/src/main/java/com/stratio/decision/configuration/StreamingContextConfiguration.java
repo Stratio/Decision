@@ -357,7 +357,7 @@ public class StreamingContextConfiguration {
             }
 
             SaveToElasticSearchActionExecutionFunction saveToElasticSearchActionExecutionFunction = new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHosts(),
-                    configurationContext.getElasticSearchClusterName());
+                    configurationContext.getElasticSearchClusterName(), configurationContext.getElasticSearchMaxBatchSize());
             if (saveToElasticSearchActionExecutionFunction.check()) {
                 log.info("ElasticSearch is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_ELASTICSEARCH)).foreachRDD(saveToElasticSearchActionExecutionFunction);
