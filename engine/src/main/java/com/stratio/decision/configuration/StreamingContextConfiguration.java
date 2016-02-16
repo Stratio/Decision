@@ -347,7 +347,7 @@ public class StreamingContextConfiguration {
 
             SaveToMongoActionExecutionFunction saveToMongoActionExecutionFunction = new SaveToMongoActionExecutionFunction(configurationContext.getMongoHosts(),
                     configurationContext.getMongoUsername(), configurationContext
-                    .getMongoPassword());
+                    .getMongoPassword(), configurationContext.getMongoMaxBatchSize());
             if (saveToMongoActionExecutionFunction.check()) {
                 log.info("MongoDB is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(

@@ -73,7 +73,7 @@ public class FunctionsTestIT extends ActionBaseFunctionHelper {
         LOGGER.debug("Connecting to MongoDB host: " + conf.getStringList("mongo.hosts").toString());
 
         SaveToMongoActionExecutionFunction func = new SaveToMongoActionExecutionFunction(
-                conf.getStringList("mongo.hosts"), null, null);
+                conf.getStringList("mongo.hosts"), null, null, 1000);
 
         List<StratioStreamingMessage> list = new ArrayList<StratioStreamingMessage>();
         list.add(message);
