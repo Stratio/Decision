@@ -225,7 +225,7 @@ public class ConfigurationContext {
         this.mongoHosts = (List<String>) this.getListOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
         this.mongoPassword = (String) this.getValueOrNull(ConfigurationKeys.MONGO_PASSWORD.getKey(), config);
-        this.mongoMaxBatchSize = config.getInt(ConfigurationKeys.MONGO_MAX_BATCH_SIZE.getKey());
+        this.mongoMaxBatchSize = (Integer) this.getValueOrNull(ConfigurationKeys.MONGO_MAX_BATCH_SIZE.getKey(), config);
 
         this.clusterGroups = (List<String>) this.getListOrNull(ConfigurationKeys.CLUSTERING_GROUPS.getKey(),
                 config);
