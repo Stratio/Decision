@@ -15,6 +15,7 @@
  */
 package com.stratio.decision.unit.engine.action;
 
+import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
@@ -43,7 +44,8 @@ public class SaveToCassandraActionTest {
     public void before() throws Exception {
         cassandraServer = new CassandraServer();
         cassandraServer.start();
-        saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction("localhost", 9042);
+        saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction("localhost", 9042, 50,
+                BatchStatement.Type.UNLOGGED);
     }
 
     @After

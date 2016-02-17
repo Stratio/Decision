@@ -16,6 +16,7 @@
 package com.stratio.decision.configuration;
 
 
+import com.datastax.driver.core.BatchStatement;
 import com.stratio.decision.commons.constants.InternalTopic;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -83,10 +84,15 @@ public class ConfigurationContext {
     private final String mongoUsername;
     private final String mongoPassword;
 
+    private final Integer cassandraMaxBatchSize;
+    private final BatchStatement.Type cassandraBatchType;
+
     private final DroolsConfigurationBean droolsConfiguration;
 
     public enum ConfigurationKeys {
         CASSANDRA_HOSTS("cassandra.hosts"),
+        CASSANDRA_MAX_BATCH_SIZE("cassandra.maxBatchSize"),
+        CASSANDRA_BATCH_TYPE("cassandra.batchType"),
         KAFKA_HOSTS("kafka.hosts"),
         ZOOKEEPER_HOSTS("zookeeper.hosts"),
         FAILOVER_ENABLED("clustering.failoverEnabled"),
@@ -188,6 +194,15 @@ public class ConfigurationContext {
         this.kafkaConnectionTimeout = config.getInt(ConfigurationKeys.KAFKA_CONNECTION_TIMEOUT.getKey());
 
         this.cassandraHosts = (List<String>) this.getListOrNull(ConfigurationKeys.CASSANDRA_HOSTS.getKey(), config);
+        this.cassandraMaxBatchSize = config.getInt(ConfigurationKeys.CASSANDRA_MAX_BATCH_SIZE.getKey());
+
+
+        String batchType = (String) this.getValueOrNull(ConfigurationKeys.CASSANDRA_BATCH_TYPE.getKey(), config);
+        if (batchType == null){
+            this.cassandraBatchType = BatchStatement.Type.LOGGED;
+        } else {
+            this.cassandraBatchType =  BatchStatement.Type.valueOf(batchType);
+        }
 
         this.elasticSearchHosts = (List<String>) this.getListOrNull(ConfigurationKeys.ELASTICSEARCH_HOST.getKey(), config);
         this.elasticSearchClusterName = (String) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_CLUSTER_NAME.getKey(), config);
@@ -390,6 +405,14 @@ public class ConfigurationContext {
 
     public boolean isClusteringEnabled() {
         return clusteringEnabled;
+    }
+
+    public Integer getCassandraMaxBatchSize() {
+        return cassandraMaxBatchSize;
+    }
+
+    public BatchStatement.Type getCassandraBatchType() {
+        return cassandraBatchType;
     }
 
     private Object getValueOrNull(String key, Config config) {

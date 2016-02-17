@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.functions.dal.ListenStreamFunction;
@@ -115,7 +116,7 @@ public class FunctionsTestIT extends ActionBaseFunctionHelper {
         LOGGER.debug("Connecting to Cassandra Quorum: " + conf.getStringList("cassandra.hosts").toString());
 
         SaveToCassandraActionExecutionFunction func = new SaveToCassandraActionExecutionFunction(
-                getHostsStringFromList(conf.getStringList("cassandra.hosts")), ProtocolOptions.DEFAULT_PORT);
+                getHostsStringFromList(conf.getStringList("cassandra.hosts")), ProtocolOptions.DEFAULT_PORT, 50,  BatchStatement.Type.UNLOGGED);
 
         List<StratioStreamingMessage> list = new ArrayList<StratioStreamingMessage>();
         message.setColumns(StreamsHelper.COLUMNS3);
