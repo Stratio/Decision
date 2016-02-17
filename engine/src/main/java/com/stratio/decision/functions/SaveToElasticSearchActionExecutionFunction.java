@@ -80,13 +80,13 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
              BulkProcessor bulkProcessor = BulkProcessor.builder(getClient(), new BulkProcessor.Listener(){
                  @Override
                  public void beforeBulk(long executionId, BulkRequest request) {
-                     log.error("Going to execute new elastic search bulk composed of {} actions",  request
+                     log.debug("Going to execute new elastic search bulk composed of {} actions",  request
                              .numberOfActions());
                  }
 
                  @Override
                  public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-                     log.error("Executed elastic search bulk composed of {} actions", request.numberOfActions());
+                     log.debug("Executed elastic search bulk composed of {} actions", request.numberOfActions());
                  }
 
                  @Override
@@ -119,7 +119,7 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
                             stratioStreamingMessage.getStreamName(), e);
                 }
 
-            }
+            }change
 
             bulkProcessor.close();
 
@@ -129,42 +129,6 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
         }
 
     }
-
-
-//    @Override
-//    public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
-//        try {
-//
-//            BulkRequestBuilder bulkBuilder = getClient().prepareBulk();
-//            for (StratioStreamingMessage stratioStreamingMessage : messages) {
-//                try {
-//                    XContentBuilder contentBuilder = XContentFactory.jsonBuilder().startObject();
-//
-//                    for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
-//                        contentBuilder = contentBuilder.field(column.getColumn(), column.getValue());
-//                    }
-//                    contentBuilder = contentBuilder.field("@timestamp",
-//                            elasicSearchTimestampFormat.format(stratioStreamingMessage.getTimestamp()));
-//
-//                    contentBuilder = contentBuilder.endObject();
-//                    IndexRequestBuilder request = getClient().prepareIndex(INDEX_NAME,
-//                            stratioStreamingMessage.getStreamName()).setSource(contentBuilder);
-//                    bulkBuilder.add(request);
-//
-//                } catch (IOException e) {
-//                    log.error("Error generating a index to event element into stream {}",
-//                            stratioStreamingMessage.getStreamName(), e);
-//                }
-//
-//            }
-//
-//            bulkBuilder.execute().actionGet();
-//
-//        } catch (Exception e) {
-//            log.error("Error in ElasticSearch: " + e.getMessage());
-//        }
-//
-//    }
 
     private Client getClient() {
         if (elasticSearchClient == null) {
