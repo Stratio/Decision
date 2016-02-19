@@ -431,6 +431,13 @@
                                 <group>stratio</group>
                             </attributes>
                         </mkdirs>
+                        <mkdirs>
+                            <path>/opt/sds/.m2</path>
+                            <attributes>
+                                <user>stratio</user>
+                                <group>stratio</group>
+                            </attributes>
+                        </mkdirs>
                         <copyDirectory>
                             <from>target/appassembler/bin</from>
                             <to>/opt/sds/decision/bin</to>
