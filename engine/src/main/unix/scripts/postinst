@@ -5,7 +5,7 @@ set -e
 #DEB
 
 GROUP='stratio'
-USER='stratio'
+USER='decision'
 DIR_INSTALL='/opt/sds/decision'
 DIR_CONF='/etc/sds/decision'
 DIR_CONF='/etc/sds/decision'
@@ -15,7 +15,7 @@ DIR_RUN='/var/run/sds'
 chmod 755 /etc/init.d/decision
 chmod 755 /opt/sds/decision/bin
 chmod +x /opt/sds/decision/bin/run
-chmod +x /etc/default/decision
+#chmod +x /etc/default/decision
 
 case "$1" in
   configure)

@@ -5,7 +5,7 @@ set -e
 #DEB
 
 GROUP='stratio'
-USER='stratio'
+USER='decision'
 
 case "$1" in
   configure)

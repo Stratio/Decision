@@ -345,13 +345,7 @@
 			        <includeConfigurationDirectoryInClasspath>true
 			        </includeConfigurationDirectoryInClasspath>
 			        <assembleDirectory>target/appassembler</assembleDirectory>
-			        <extraJvmArguments>$DECISION_OPTS -Xms512m -Xmx512m
-				    -Dcom.sun.management.jmxremote.port=7193
-				    -Dcom.sun.management.jmxremote.authenticate=false
-				    -Dcom.sun.management.jmxremote.ssl=false
-                    -Dkie.maven.settings.custom=/etc/sds/decision/workbench-settings.xml
-				    </extraJvmArguments>
-
+			        <extraJvmArguments>$DECISION_OPTS</extraJvmArguments>
 			        <filterConfigurationDirectory>true</filterConfigurationDirectory>
 			        <programs>
 				    <program>
@@ -414,21 +408,21 @@
                         <mkdirs>
                             <path>/opt/sds/decision</path>
                             <attributes>
-                                <user>stratio</user>
+                                <user>decision</user>
                                 <group>stratio</group>
                             </attributes>
                         </mkdirs>
                         <mkdirs>
                             <path>/var/run/sds</path>
                             <attributes>
-                                <user>stratio</user>
+                                <user>decision</user>
                                 <group>stratio</group>
                             </attributes>
                         </mkdirs>
                         <mkdirs>
                             <path>/var/log/sds/decision</path>
                             <attributes>
-                                <user>stratio</user>
+                                <user>decision</user>
                                 <group>stratio</group>
                             </attributes>
                         </mkdirs>
@@ -451,7 +445,7 @@
                             <from>target/appassembler/repo</from>
                             <to>/opt/sds/decision/repo</to>
                             <directoryAttributes>
-                                <user>stratio</user>
+                                <user>decision</user>
                                 <group>stratio</group>
                             </directoryAttributes>
                         </copyDirectory>
@@ -459,13 +453,13 @@
                             <from>target/appassembler/:/etc/sds/decision/conf</from>
                             <to>/etc/sds/decision</to>
                             <directoryAttributes>
-                                <user>stratio</user>
+                                <user>decision</user>
                                 <group>stratio</group>
                             </directoryAttributes>
                         </copyDirectory>
                         <copyFile>
-                            <path>src/main/unix/files_and_dirs/etc/default/decision</path>
-                            <toFile>/etc/default/decision</toFile>
+                            <path>src/main/unix/files_and_dirs/etc/default/decision-variables</path>
+                            <toFile>/etc/default/decision-variables</toFile>
                             <attributes>
                                 <user>root</user>
                                 <group>root</group>
