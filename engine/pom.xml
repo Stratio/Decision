@@ -429,7 +429,7 @@
                         <mkdirs>
                             <path>/opt/sds/.m2</path>
                             <attributes>
-                                <user>stratio</user>
+                                <user>decision</user>
                                 <group>stratio</group>
                             </attributes>
                         </mkdirs>
@@ -437,7 +437,7 @@
                             <from>target/appassembler/bin</from>
                             <to>/opt/sds/decision/bin</to>
                             <directoryAttributes>
-                                <user>stratio</user>
+                                <user>decision</user>
                                 <group>stratio</group>
                             </directoryAttributes>
                         </copyDirectory>
@@ -460,6 +460,15 @@
                         <copyFile>
                             <path>src/main/unix/files_and_dirs/etc/default/decision-variables</path>
                             <toFile>/etc/default/decision-variables</toFile>
+                            <attributes>
+                                <user>root</user>
+                                <group>root</group>
+                                <mode>755</mode>
+                            </attributes>
+                        </copyFile>
+                        <copyFile>
+                            <path>src/main/unix/files_and_dirs/etc/security/limits.d/decision.conf</path>
+                            <toFile>/etc/security/limits.d/decision.conf</toFile>
                             <attributes>
                                 <user>root</user>
                                 <group>root</group>
