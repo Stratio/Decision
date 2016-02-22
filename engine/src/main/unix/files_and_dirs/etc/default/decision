@@ -1,3 +1,6 @@
-export DECISION_CONF="/etc/sds/decision"
-export DECISION_HOME="/opt/sds/decision"
-export DECISION_LOGS="/var/logs/sds/decision"
+
+
+
+
+
+
