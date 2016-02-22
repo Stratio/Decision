@@ -7,4 +7,3 @@ export DECISION_OPTS="-Xms2048m -Xmx2048m -Dcom.sun.management.jmxremote.port=71
 export USER=decision
 export GROUP=stratio
 
-
