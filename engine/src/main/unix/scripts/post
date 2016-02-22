@@ -5,7 +5,7 @@
 set -e
 
 GROUP='stratio'
-USER='stratio'
+USER='decision'
 DIR_INSTALL='/opt/sds/decision'
 DIR_CONF='/etc/sds/decision'
 DIR_LOG='/var/log/sds/decision'
@@ -41,7 +41,7 @@ chown -R ${USER}:${GROUP} $DIR_RUN
 
 chmod 755 /etc/init.d/decision
 chmod 755 /opt/sds/decision/bin/run
-chmod +x /etc/default/decision
+#chmod +x /etc/default/decision
 
 sed -i 's!"$BASEDIR"/:/etc/sds/decision/conf!/etc/sds/decision!g' /opt/sds/decision/bin/run
 
