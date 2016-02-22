@@ -119,7 +119,7 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
                             stratioStreamingMessage.getStreamName(), e);
                 }
 
-            }change
+            }
 
             bulkProcessor.close();
 
