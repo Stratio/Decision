@@ -165,14 +165,14 @@
                                 <mkdirs>
                                     <path>/opt/sds/decision-shell</path>
                                     <attributes>
-                                        <user>stratio</user>
+                                        <user>decision</user>
                                         <group>stratio</group>
                                     </attributes>
                                 </mkdirs>
                                 <mkdirs>
                                     <path>/var/run/sds</path>
                                     <attributes>
-                                        <user>stratio</user>
+                                        <user>decision</user>
                                         <group>stratio</group>
                                     </attributes>
                                 </mkdirs>

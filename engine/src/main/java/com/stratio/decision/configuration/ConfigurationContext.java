@@ -16,11 +16,6 @@
 package com.stratio.decision.configuration;
 
 
-import com.datastax.driver.core.BatchStatement;
-import com.stratio.decision.commons.constants.InternalTopic;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +23,14 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.datastax.driver.core.BatchStatement;
+import com.stratio.decision.commons.constants.InternalTopic;
 import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
 import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 public class ConfigurationContext {
 
@@ -58,6 +59,7 @@ public class ConfigurationContext {
     private final int kafkaPartitions;
     private final int kafkaSessionTimeout;
     private final int kafkaConnectionTimeout;
+    private final String kafkaZookeeperPath;
 
     private final String sparkHost;
     private final String internalSparkHost;
@@ -109,6 +111,7 @@ public class ConfigurationContext {
         KAFKA_PARTITIONS("kafka.partitions"),
         KAFKA_SESSION_TIMEOUT("kafka.sessionTimeout"),
         KAFKA_CONNECTION_TIMEOUT("kafka.connectionTimeout"),
+        KAFKA_ZK_PATH("kafka.zookeeperPath"),
         DATA_TOPICS("clustering.dataTopics"),
         ELASTICSEARCH_HOST("elasticsearch.hosts"),
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
@@ -194,6 +197,7 @@ public class ConfigurationContext {
         this.kafkaPartitions = config.getInt(ConfigurationKeys.KAFKA_PARTITIONS.getKey());
         this.kafkaSessionTimeout = config.getInt(ConfigurationKeys.KAFKA_SESSION_TIMEOUT.getKey());
         this.kafkaConnectionTimeout = config.getInt(ConfigurationKeys.KAFKA_CONNECTION_TIMEOUT.getKey());
+        this.kafkaZookeeperPath = config.getString(ConfigurationKeys.KAFKA_ZK_PATH.getKey());
 
         this.cassandraHosts = (List<String>) this.getListOrNull(ConfigurationKeys.CASSANDRA_HOSTS.getKey(), config);
         this.cassandraMaxBatchSize = config.getInt(ConfigurationKeys.CASSANDRA_MAX_BATCH_SIZE.getKey());
@@ -304,6 +308,11 @@ public class ConfigurationContext {
         return StringUtils.join(zookeeperHosts, ",");
     }
 
+    public String getZookeeperHostsQuorumWithPath() {
+        return getZookeeperHostsQuorum().concat(getKafkaZookeeperPath());
+    }
+
+
     public String getKafkaHostsQuorum() {
         return StringUtils.join(kafkaHosts, ",");
     }
@@ -350,6 +359,10 @@ public class ConfigurationContext {
 
     public int getKafkaConnectionTimeout() {
         return kafkaConnectionTimeout;
+    }
+
+    public String getKafkaZookeeperPath() {
+        return kafkaZookeeperPath;
     }
 
     public List<String> getElasticSearchHosts() {

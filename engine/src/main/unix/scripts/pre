@@ -5,7 +5,7 @@
 set -e
 
 GROUP='stratio'
-USER='stratio'
+USER='decision'
 
 # Add stratio group if it doesn't already exists
 if ! getent group $GROUP >/dev/null 2>&1; then

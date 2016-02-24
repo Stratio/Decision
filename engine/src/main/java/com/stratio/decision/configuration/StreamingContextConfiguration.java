@@ -63,6 +63,7 @@ import com.stratio.decision.functions.messages.FilterMessagesByOperationFunction
 import com.stratio.decision.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
 import com.stratio.decision.service.StreamOperationService;
+import com.stratio.decision.utils.ZKUtils;
 
 @Configuration
 @Import(ServiceConfiguration.class)
@@ -121,27 +122,29 @@ public class StreamingContextConfiguration {
          the
         same topic with the same groupId, only one instance will be able to read from the topic
         */
+
+
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), configurationContext.getGroupId(), baseTopicMap);
+                configurationContext.getZookeeperHostsQuorumWithPath(), configurationContext.getGroupId(), baseTopicMap);
         messages.cache();
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
         CreateStreamFunction createStreamFunction = new CreateStreamFunction(streamOperationService,
-                configurationContext.getZookeeperHostsQuorum());
+                configurationContext.getZookeeperHostsQuorumWithPath());
         AlterStreamFunction alterStreamFunction = new AlterStreamFunction(streamOperationService,
-                configurationContext.getZookeeperHostsQuorum());
+                configurationContext.getZookeeperHostsQuorumWithPath());
         AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(streamOperationService,
-                configurationContext.getZookeeperHostsQuorum());
+                configurationContext.getZookeeperHostsQuorumWithPath());
         ListenStreamFunction listenStreamFunction = new ListenStreamFunction(streamOperationService,
-                configurationContext.getZookeeperHostsQuorum());
+                configurationContext.getZookeeperHostsQuorumWithPath());
         ListStreamsFunction listStreamsFunction = new ListStreamsFunction(streamOperationService,
-                configurationContext.getZookeeperHostsQuorum());
+                configurationContext.getZookeeperHostsQuorumWithPath());
 
 
         if (configurationContext.getDroolsConfiguration() != null) {
 
             SendToDroolsStreamFunction sendToDroolsStreamFunction = new SendToDroolsStreamFunction
-                    (streamOperationService, configurationContext.getZookeeperHostsQuorum());
+                    (streamOperationService, configurationContext.getZookeeperHostsQuorumWithPath());
 
             JavaDStream<StratioStreamingMessage> sendToDroolsRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.START_SENDTODROOLS)).map(
@@ -162,7 +165,7 @@ public class StreamingContextConfiguration {
 
         if (configurationContext.getCassandraHosts() != null) {
             SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
-                    streamOperationService, configurationContext.getZookeeperHostsQuorum());
+                    streamOperationService, configurationContext.getZookeeperHostsQuorumWithPath());
 
             JavaDStream<StratioStreamingMessage> saveToCassandraRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)).map(
@@ -182,7 +185,7 @@ public class StreamingContextConfiguration {
 
         if (configurationContext.getElasticSearchHosts() != null) {
             IndexStreamFunction indexStreamFunction = new IndexStreamFunction(streamOperationService,
-                    configurationContext.getZookeeperHostsQuorum());
+                    configurationContext.getZookeeperHostsQuorumWithPath());
 
             JavaDStream<StratioStreamingMessage> streamToIndexerRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.INDEX)).map(
@@ -201,7 +204,7 @@ public class StreamingContextConfiguration {
 
         if (configurationContext.getSolrHost() != null) {
             SaveToSolrStreamFunction solrStreamFunction = new SaveToSolrStreamFunction(streamOperationService,
-                    configurationContext.getZookeeperHostsQuorum());
+                    configurationContext.getZookeeperHostsQuorumWithPath());
 
             JavaDStream<StratioStreamingMessage> saveToSolrRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_SOLR)).map(
@@ -220,7 +223,7 @@ public class StreamingContextConfiguration {
 
         if (configurationContext.getMongoHosts() != null) {
             SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(streamOperationService,
-                    configurationContext.getZookeeperHostsQuorum());
+                    configurationContext.getZookeeperHostsQuorumWithPath());
 
             JavaDStream<StratioStreamingMessage> saveToMongoRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_MONGO)).map(
@@ -321,7 +324,7 @@ public class StreamingContextConfiguration {
         same topic with the same groupId, only one instance will be able to read from the topic
         */
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), configurationContext.getGroupId(), baseTopicMap);
+                configurationContext.getZookeeperHostsQuorumWithPath(), configurationContext.getGroupId(), baseTopicMap);
         messages.cache();
 
         JavaDStream<StratioStreamingMessage> parsedDataDstream = messages.map(new SerializerFunction());
@@ -412,7 +415,7 @@ public class StreamingContextConfiguration {
          same topic with the same groupId, only one instance will be able to read from the topic
          */
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(),  configurationContext.getGroupId(), baseTopicMap);
+                configurationContext.getZookeeperHostsQuorumWithPath(),  configurationContext.getGroupId(), baseTopicMap);
         messages.cache();
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
@@ -429,7 +432,7 @@ public class StreamingContextConfiguration {
 
     @PostConstruct
     private void initTopicService() {
-        kafkaTopicService = new KafkaTopicService(configurationContext.getZookeeperHostsQuorum(),
+        kafkaTopicService = new KafkaTopicService(configurationContext.getZookeeperHostsQuorumWithPath(),
                 configurationContext.getKafkaConsumerBrokerHost(), configurationContext.getKafkaConsumerBrokerPort(),
                 configurationContext.getKafkaConnectionTimeout(), configurationContext.getKafkaSessionTimeout());
     }

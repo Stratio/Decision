@@ -36,8 +36,16 @@ public class ZookeeperConfiguration {
         String zkPath = STREAMING.ZK_BASE_PATH.concat("/").concat(configurationContext.getGroupId()).concat(STREAMING
                 .ZK_EPHEMERAL_NODE);
 
-        ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(), configurationContext.getGroupId()).createEphemeralZNode(
+        ZKUtils zkUtils= ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum(), configurationContext
+                .getGroupId());
+        zkUtils.createEphemeralZNode(
                 zkPath, String.valueOf(System.currentTimeMillis()).getBytes());
+
+
+        if (!configurationContext.getKafkaZookeeperPath().isEmpty())    {
+            if (!zkUtils.existZNode(configurationContext.getKafkaZookeeperPath()))
+                zkUtils.createPath(configurationContext.getKafkaZookeeperPath());
+        }
     }
 
 }
