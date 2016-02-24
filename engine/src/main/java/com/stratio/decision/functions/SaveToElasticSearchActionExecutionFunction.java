@@ -17,7 +17,11 @@ package com.stratio.decision.functions;
 
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
+
+import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -45,12 +49,15 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
 
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
+    private final Integer maxBatchSize;
 
     private static final String INDEX_NAME = "stratiodecision";
 
-    public SaveToElasticSearchActionExecutionFunction(List<String> elasticSearchHosts, String elasticSearchClusterName) {
+    public SaveToElasticSearchActionExecutionFunction(List<String> elasticSearchHosts, String
+            elasticSearchClusterName, Integer maxBatchSize) {
         this.elasticSearchHosts = elasticSearchHosts;
         this.elasticSearchClusterName = elasticSearchClusterName;
+        this.maxBatchSize = maxBatchSize==null?1000:maxBatchSize;
     }
 
     @Override
@@ -63,13 +70,35 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
         }
     }
 
+
+
     @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
         try {
 
-            BulkRequestBuilder bulkBuilder = getClient().prepareBulk();
+
+             BulkProcessor bulkProcessor = BulkProcessor.builder(getClient(), new BulkProcessor.Listener(){
+                 @Override
+                 public void beforeBulk(long executionId, BulkRequest request) {
+                     log.debug("Going to execute new elastic search bulk composed of {} actions",  request
+                             .numberOfActions());
+                 }
+
+                 @Override
+                 public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
+                     log.debug("Executed elastic search bulk composed of {} actions", request.numberOfActions());
+                 }
+
+                 @Override
+                 public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+                     log.error("Error executing elastic search bulk: {}", failure);
+                 }
+             }).setBulkActions(maxBatchSize).build();
+
+
             for (StratioStreamingMessage stratioStreamingMessage : messages) {
                 try {
+
                     XContentBuilder contentBuilder = XContentFactory.jsonBuilder().startObject();
 
                     for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
@@ -81,7 +110,9 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
                     contentBuilder = contentBuilder.endObject();
                     IndexRequestBuilder request = getClient().prepareIndex(INDEX_NAME,
                             stratioStreamingMessage.getStreamName()).setSource(contentBuilder);
-                    bulkBuilder.add(request);
+
+
+                    bulkProcessor.add(request.request());
 
                 } catch (IOException e) {
                     log.error("Error generating a index to event element into stream {}",
@@ -90,7 +121,8 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
 
             }
 
-            bulkBuilder.execute().actionGet();
+            bulkProcessor.close();
+
 
         } catch (Exception e) {
             log.error("Error in ElasticSearch: " + e.getMessage());

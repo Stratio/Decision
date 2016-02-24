@@ -77,6 +77,7 @@ public class ConfigurationContext {
 
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
+    private final Integer elasticSearchMaxBatchSize;
 
     private final String solrHost;
     private final Boolean solrCloud;
@@ -114,6 +115,7 @@ public class ConfigurationContext {
         DATA_TOPICS("clustering.dataTopics"),
         ELASTICSEARCH_HOST("elasticsearch.hosts"),
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
+        ELASTICSEARCH_MAX_BATCH_SIZE("elasticsearch.maxBatchSize"),
         SOLR_HOST("solr.host"),
         SOLR_CLOUD("solr.cloud"),
         SOLR_DATADIR("solr.dataDir"),
@@ -210,6 +212,9 @@ public class ConfigurationContext {
 
         this.elasticSearchHosts = (List<String>) this.getListOrNull(ConfigurationKeys.ELASTICSEARCH_HOST.getKey(), config);
         this.elasticSearchClusterName = (String) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_CLUSTER_NAME.getKey(), config);
+        this.elasticSearchMaxBatchSize = (Integer) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_MAX_BATCH_SIZE
+                .getKey(), config);
+
 
         this.solrHost = (String) this.getValueOrNull(ConfigurationKeys.SOLR_HOST.getKey(), config);
         this.solrCloud = (Boolean) this.getValueOrNull(ConfigurationKeys.SOLR_CLOUD.getKey(), config);
@@ -426,6 +431,10 @@ public class ConfigurationContext {
 
     public BatchStatement.Type getCassandraBatchType() {
         return cassandraBatchType;
+    }
+
+    public Integer getElasticSearchMaxBatchSize() {
+        return elasticSearchMaxBatchSize;
     }
 
     private Object getValueOrNull(String key, Config config) {
