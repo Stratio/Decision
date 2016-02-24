@@ -86,7 +86,7 @@ public class StreamCommandTest extends BaseShellTest {
         querys.add(new StreamQuery("queryIdTest", "query raw test string"));
 
         Set<StreamAction> activeActions = new HashSet<>();
-        activeActions.add(StreamAction.INDEXED);
+        activeActions.add(StreamAction.SAVE_TO_ELASTICSEARCH);
 
         List<StratioStream> streams = new ArrayList<>();
         StratioStream stream = new StratioStream(streamName, values, querys, activeActions, true);
@@ -114,7 +114,7 @@ public class StreamCommandTest extends BaseShellTest {
         querys.add(new StreamQuery("queryIdTest", "query raw test string"));
 
         Set<StreamAction> activeActions = new HashSet<>();
-        activeActions.add(StreamAction.INDEXED);
+        activeActions.add(StreamAction.SAVE_TO_ELASTICSEARCH);
 
         List<StratioStream> streams = new ArrayList<>();
         StratioStream stream = new StratioStream(streamName, values, querys, activeActions, true);
@@ -191,7 +191,7 @@ public class StreamCommandTest extends BaseShellTest {
         querys.add(new StreamQuery("queryIdTest", "query raw test string"));
 
         Set<StreamAction> activeActions = new HashSet<>();
-        activeActions.add(StreamAction.INDEXED);
+        activeActions.add(StreamAction.SAVE_TO_ELASTICSEARCH);
 
         List<StratioStream> streams = new ArrayList<>();
         StratioStream stream = new StratioStream(streamName, values, querys, activeActions, true);

@@ -120,7 +120,9 @@ class StratioStreamingAPI
     val operation = LISTEN.toLowerCase
     val listenStreamMessage = new StreamMessageBuilder(sessionId).build(streamName, operation)
     syncOperation.performSyncOperation(listenStreamMessage)
-    val kafkaConsumer = new KafkaConsumer(streamName, zookeeperCluster, readFromStartOfStream = false)
+    val kafkaConsumer = new KafkaConsumer(
+      streamName, zookeeperCluster, kafkaZookeeperPath, readFromStartOfStream = false)
+
     streamingListeners.put(streamName, kafkaConsumer)
     kafkaConsumer.stream
   }
@@ -211,6 +213,14 @@ class StratioStreamingAPI
     syncOperation.performSyncOperation(stopSaveToSolrMessage)
   }
 
+  def saveToElasticsearch(streamName : String) = {
+    indexStream(streamName)
+  }
+
+  def stopSaveToElasticsearch(streamName : String) = {
+    stopIndexStream(streamName)
+  }
+
   def indexStream(streamName: String) = {
     checkStreamingStatus()
     val operation = INDEX.toLowerCase
@@ -268,7 +278,8 @@ class StratioStreamingAPI
   def initializeWithServerConfig(kafkaServer: String,
                                  kafkaPort: Int,
                                  theZookeeperServer: String,
-                                 theZookeeperPort: Int) = {
+                                 theZookeeperPort: Int,
+                                 theZookeeperPath: String= "") = {
     try {
       kafkaCluster = s"$kafkaServer:$kafkaPort"
       zookeeperServer = s"$theZookeeperServer:$theZookeeperPort"
@@ -282,6 +293,14 @@ class StratioStreamingAPI
     } catch {
       case ex: Throwable => throw new StratioEngineConnectionException("Unable to connect to Stratio Decision. " + ex.getMessage)
     }
+  }
+
+  override def withQuorumConfig(kafkaQuorum: String, zookeeperQuorum: String, zookeeperPath: String = ""):
+    IStratioStreamingAPI = {
+      kafkaCluster = kafkaQuorum
+      zookeeperServer = zookeeperQuorum
+      kafkaZookeeperPath = zookeeperPath
+      this
   }
 
   override def withServerConfig(kafkaQuorum: String, zookeeperQuorum: String):
@@ -366,6 +385,7 @@ class StratioStreamingAPI
   lazy val consumerBrokerPort = kafkaCluster.split(",")(0).split(":")(1).toInt
 
   var kafkaCluster = ""
+  var kafkaZookeeperPath = ""
   lazy val kafkaBroker = s"$kafkaCluster"
   var zookeeperServer = ""
   lazy val zookeeperCluster = s"$zookeeperServer"
@@ -441,7 +461,9 @@ class StratioStreamingAPI
   }
 
   private def initializeTopic() {
-    topicService = new KafkaTopicService(zookeeperCluster, consumerBrokerServer, consumerBrokerPort, 10000, 10000)
+    topicService = new KafkaTopicService(zookeeperCluster + kafkaZookeeperPath,
+      consumerBrokerServer, consumerBrokerPort, 10000, 10000)
+
     topicService.createTopicIfNotExist(streamingTopicName, 1, 1)
     topicService.createTopicIfNotExist(streamingDataTopicName, 1, 1);
   }

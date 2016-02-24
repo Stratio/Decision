@@ -48,13 +48,13 @@ public class IndexStreamFunction extends ActionBaseFunction {
 
     @Override
     protected boolean startAction(StratioStreamingMessage message) {
-        getStreamOperationService().enableAction(message.getStreamName(), StreamAction.INDEXED);
+        getStreamOperationService().enableAction(message.getStreamName(), StreamAction.SAVE_TO_ELASTICSEARCH);
         return true;
     }
 
     @Override
     protected boolean stopAction(StratioStreamingMessage message) {
-        getStreamOperationService().disableAction(message.getStreamName(), StreamAction.INDEXED);
+        getStreamOperationService().disableAction(message.getStreamName(), StreamAction.SAVE_TO_ELASTICSEARCH);
         return true;
     }
 
@@ -67,7 +67,7 @@ public class IndexStreamFunction extends ActionBaseFunction {
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new StreamNameNotEmptyValidation());
-        validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.INDEXED,
+        validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.SAVE_TO_ELASTICSEARCH,
                 ReplyCode.KO_ACTION_ALREADY_ENABLED.getCode()));
         validators.add(new StreamNotExistsValidation(getStreamOperationService()));
     }

@@ -30,18 +30,18 @@ public class ActionCommands implements CommandMarker {
     @Autowired
     private StratioStreamingApiWrapper ssaw;
 
-    @CliCommand(value = "index start", help = "index stream events")
+    @CliCommand(value = "save elasticsearch start", help = "index stream events into elasticsearch")
     public String indexStart(
             @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {
             ssaw.api().indexStream(streamName);
-            return "Stream ".concat(streamName).concat(" indexed correctly");
+            return "Stream ".concat(streamName).concat(" indexed correctly into elasticsearch");
         } catch (StratioStreamingException e) {
             throw new StreamingShellException(e);
         }
     }
 
-    @CliCommand(value = "index stop", help = "stop index stream events")
+    @CliCommand(value = "save elasticsearch stop", help = "stop index stream events into elasticsearch")
     public String indexStop(
             @CliOption(key = {"stream"}, help = "The stream name", mandatory = true, optionContext = "stream") final String streamName) {
         try {

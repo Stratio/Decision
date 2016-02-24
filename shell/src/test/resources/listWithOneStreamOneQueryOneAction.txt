@@ -1,6 +1,6 @@
   Stream name  User defined  Queries  Elements  Active actions
-  -----------  ------------  -------  --------  --------------
-  testStream   true          1        3         [INDEXED]
+  -----------  ------------  -------  --------  -----------------------
+  testStream   true          1        3         [SAVE_TO_ELASTICSEARCH]
 
 Queries from stream testStream:
 

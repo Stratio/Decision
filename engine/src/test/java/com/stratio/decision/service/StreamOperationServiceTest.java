@@ -26,7 +26,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -114,7 +113,7 @@ public class StreamOperationServiceTest {
     @Test
     public void addCallbackFunctionTest() throws ServiceException {
 
-        StreamAction streamAction = StreamAction.INDEXED;
+        StreamAction streamAction = StreamAction.SAVE_TO_ELASTICSEARCH;
 
         ArgumentCaptor<String> actionQueryIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
 

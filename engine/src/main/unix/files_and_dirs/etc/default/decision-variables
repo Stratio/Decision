@@ -1,0 +1,9 @@
+
+export DECISION_HOME=/opt/sds/decision
+export DECISION_CONF=/etc/sds/decision
+export DECISION_LOGS=/var/log/sds/decision
+export DECISION_OPTS="-Xms2048m -Xmx2048m -Dcom.sun.management.jmxremote.port=7193 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dkie.maven.settings.custom=/etc/sds/decision/workbench-settings.xml"
+
+export USER=decision
+export GROUP=stratio
+

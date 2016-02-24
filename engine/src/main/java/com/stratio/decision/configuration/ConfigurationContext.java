@@ -16,17 +16,17 @@
 package com.stratio.decision.configuration;
 
 
-import com.stratio.decision.commons.constants.InternalTopic;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+
+import com.datastax.driver.core.BatchStatement;
+import com.stratio.decision.commons.constants.InternalTopic;
 import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
 import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
 import com.typesafe.config.Config;
@@ -59,6 +59,7 @@ public class ConfigurationContext {
     private final int kafkaPartitions;
     private final int kafkaSessionTimeout;
     private final int kafkaConnectionTimeout;
+    private final String kafkaZookeeperPath;
 
     private final String sparkHost;
     private final String internalSparkHost;
@@ -77,7 +78,7 @@ public class ConfigurationContext {
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
 
-    private final String solrHosts;
+    private final String solrHost;
     private final Boolean solrCloud;
     private final String solrDataDir;
 
@@ -85,10 +86,15 @@ public class ConfigurationContext {
     private final String mongoUsername;
     private final String mongoPassword;
 
+    private final Integer cassandraMaxBatchSize;
+    private final BatchStatement.Type cassandraBatchType;
+
     private final DroolsConfigurationBean droolsConfiguration;
 
     public enum ConfigurationKeys {
         CASSANDRA_HOSTS("cassandra.hosts"),
+        CASSANDRA_MAX_BATCH_SIZE("cassandra.maxBatchSize"),
+        CASSANDRA_BATCH_TYPE("cassandra.batchType"),
         KAFKA_HOSTS("kafka.hosts"),
         ZOOKEEPER_HOSTS("zookeeper.hosts"),
         FAILOVER_ENABLED("clustering.failoverEnabled"),
@@ -104,10 +110,11 @@ public class ConfigurationContext {
         KAFKA_PARTITIONS("kafka.partitions"),
         KAFKA_SESSION_TIMEOUT("kafka.sessionTimeout"),
         KAFKA_CONNECTION_TIMEOUT("kafka.connectionTimeout"),
+        KAFKA_ZK_PATH("kafka.zookeeperPath"),
         DATA_TOPICS("clustering.dataTopics"),
         ELASTICSEARCH_HOST("elasticsearch.hosts"),
         ELASTICSEARCH_CLUSTER_NAME("elasticsearch.clusterName"),
-        SOLR_HOST("solr.hosts"),
+        SOLR_HOST("solr.host"),
         SOLR_CLOUD("solr.cloud"),
         SOLR_DATADIR("solr.dataDir"),
         MONGO_HOST("mongo.hosts"),
@@ -188,13 +195,23 @@ public class ConfigurationContext {
         this.kafkaPartitions = config.getInt(ConfigurationKeys.KAFKA_PARTITIONS.getKey());
         this.kafkaSessionTimeout = config.getInt(ConfigurationKeys.KAFKA_SESSION_TIMEOUT.getKey());
         this.kafkaConnectionTimeout = config.getInt(ConfigurationKeys.KAFKA_CONNECTION_TIMEOUT.getKey());
+        this.kafkaZookeeperPath = config.getString(ConfigurationKeys.KAFKA_ZK_PATH.getKey());
 
         this.cassandraHosts = (List<String>) this.getListOrNull(ConfigurationKeys.CASSANDRA_HOSTS.getKey(), config);
+        this.cassandraMaxBatchSize = config.getInt(ConfigurationKeys.CASSANDRA_MAX_BATCH_SIZE.getKey());
+
+
+        String batchType = (String) this.getValueOrNull(ConfigurationKeys.CASSANDRA_BATCH_TYPE.getKey(), config);
+        if (batchType == null){
+            this.cassandraBatchType = BatchStatement.Type.LOGGED;
+        } else {
+            this.cassandraBatchType =  BatchStatement.Type.valueOf(batchType);
+        }
 
         this.elasticSearchHosts = (List<String>) this.getListOrNull(ConfigurationKeys.ELASTICSEARCH_HOST.getKey(), config);
         this.elasticSearchClusterName = (String) this.getValueOrNull(ConfigurationKeys.ELASTICSEARCH_CLUSTER_NAME.getKey(), config);
 
-        this.solrHosts = (String) this.getValueOrNull(ConfigurationKeys.SOLR_HOST.getKey(), config);
+        this.solrHost = (String) this.getValueOrNull(ConfigurationKeys.SOLR_HOST.getKey(), config);
         this.solrCloud = (Boolean) this.getValueOrNull(ConfigurationKeys.SOLR_CLOUD.getKey(), config);
         this.solrDataDir = (String) this.getValueOrNull(ConfigurationKeys.SOLR_DATADIR.getKey(), config);
 
@@ -286,6 +303,11 @@ public class ConfigurationContext {
         return StringUtils.join(zookeeperHosts, ",");
     }
 
+    public String getZookeeperHostsQuorumWithPath() {
+        return getZookeeperHostsQuorum().concat(getKafkaZookeeperPath());
+    }
+
+
     public String getKafkaHostsQuorum() {
         return StringUtils.join(kafkaHosts, ",");
     }
@@ -334,6 +356,10 @@ public class ConfigurationContext {
         return kafkaConnectionTimeout;
     }
 
+    public String getKafkaZookeeperPath() {
+        return kafkaZookeeperPath;
+    }
+
     public List<String> getElasticSearchHosts() {
         return elasticSearchHosts;
     }
@@ -342,8 +368,8 @@ public class ConfigurationContext {
         return elasticSearchClusterName;
     }
 
-    public String getSolrHosts() {
-        return solrHosts;
+    public String getSolrHost() {
+        return solrHost;
     }
 
     public Boolean getSolrCloud() {
@@ -392,6 +418,14 @@ public class ConfigurationContext {
 
     public boolean isClusteringEnabled() {
         return clusteringEnabled;
+    }
+
+    public Integer getCassandraMaxBatchSize() {
+        return cassandraMaxBatchSize;
+    }
+
+    public BatchStatement.Type getCassandraBatchType() {
+        return cassandraBatchType;
     }
 
     private Object getValueOrNull(String key, Config config) {
