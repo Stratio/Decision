@@ -2,6 +2,15 @@
 
 Only listing significant user-visible, not internal code cleanups and minor bug fixes.
 
+## 1.0.0 (February 2016)
+
+* Drools integration
+* Batching support added
+* Cluster Manager, HA & Sharding support refactor
+* Zookeeper chroot configuration support added
+* Elastic search action renamed to save elasticsearch
+* Updated cassandra driver to 3.x
+
 ## 0.10.0 (January 2016)
 
 * Sharding with HA capabilities support
