@@ -51,8 +51,6 @@ public class KafkaTopicService implements TopicService {
 
         this.zkClient= new ZkClient(zookeeperCluster, sessionTimeout, connectionTimeout, new ZkStringSerializer());
 
-
-
         this.simpleConsumer = new SimpleConsumer(broker, brokerPort, CONSUMER_TIMEOUT, CONSUMER_BUFFER_SIZE,
                 CONSUMER_CLIENT_ID);
     }
