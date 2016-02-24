@@ -39,6 +39,7 @@ trait IStratioStreamingAPI {
    * @param kafkaPort
    * @param theZookeeperServer
    * @param theZookeeperPort
+   * @param theZookeeperPath
    * @return
    */
   @Deprecated
@@ -46,7 +47,22 @@ trait IStratioStreamingAPI {
   def initializeWithServerConfig(kafkaServer: String,
                                  kafkaPort: Int,
                                  theZookeeperServer: String,
-                                 theZookeeperPort: Int): IStratioStreamingAPI
+                                 theZookeeperPort: Int,
+                                 theZookeeperPath: String): IStratioStreamingAPI
+
+
+  /**
+    * Create a new instance of IStratioStreamingAPI, but streaming engine is not called.
+    * To call to streaming engine, use init() method.
+    * @param kafkaQuorum Format: host1:port1,host2:port2
+    * @param zookeeperQuorum Format: host1:port1,host2:port2
+    * @param zookeeperPath Format: /kafka
+    * @return
+    */
+  def withQuorumConfig(
+                        kafkaQuorum: String,
+                        zookeeperQuorum: String,
+                        zookeeperPath: String): IStratioStreamingAPI
 
   /**
    * Create a new instance of IStratioStreamingAPI, but streaming engine is not called.
@@ -55,7 +71,9 @@ trait IStratioStreamingAPI {
    * @param zookeeperQuorum Format: host1:port1,host2:port2
    * @return
    */
-  def withServerConfig(kafkaQuorum: String, zookeeperQuorum: String): IStratioStreamingAPI
+  def withServerConfig(
+                        kafkaQuorum: String,
+                        zookeeperQuorum: String): IStratioStreamingAPI
 
   /**
    * Create a new instance of IStratioStreamingAPI, but streaming engine is not called.

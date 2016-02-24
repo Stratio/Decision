@@ -15,13 +15,14 @@
  */
 package com.stratio.decision.shell.configuration;
 
-import com.stratio.decision.api.IStratioStreamingAPI;
-import com.stratio.decision.api.StratioStreamingAPIFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+
+import com.stratio.decision.api.IStratioStreamingAPI;
+import com.stratio.decision.api.StratioStreamingAPIFactory;
 
 
 @Configuration
@@ -36,9 +37,13 @@ public class StreamingApiConfiguration {
     @Value("${zookeeper.quorum}")
     private String zkQuorum;
 
+    @Value("${kafka.zookeeperPath}")
+    private String zkPath;
+
     @Bean
     public IStratioStreamingAPI stratioStreamingApi() {
-        return StratioStreamingAPIFactory.create().withServerConfig(kafkaBrokers,zkQuorum);
+        return StratioStreamingAPIFactory.create().
+                withQuorumConfig(kafkaBrokers, zkQuorum, zkPath);
     }
 
 }
