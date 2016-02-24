@@ -15,6 +15,7 @@
  */
 package com.stratio.decision.functions;
 
+import com.google.common.collect.Iterables;
 import com.mongodb.*;
 import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
@@ -38,39 +39,60 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
     private final List<String> mongoHosts;
     private final String username;
     private final String password;
+    private final Integer maxBatchSize;
 
-    public SaveToMongoActionExecutionFunction(List<String> mongoHosts, String username, String password) {
+
+    public SaveToMongoActionExecutionFunction(List<String> mongoHosts, String username, String password, Integer
+            maxBatchSize) {
         this.mongoHosts = mongoHosts;
         this.username = username;
         this.password = password;
+        this.maxBatchSize = maxBatchSize;
     }
+
 
     @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
-        Map<String, BulkWriteOperation> elementsToInsert = new HashMap<String, BulkWriteOperation>();
+
+
+
+        Integer partitionSize = maxBatchSize;
+
+        if (partitionSize == null || partitionSize <= 0){
+            partitionSize = Iterables.size(messages);
+        }
+
+        Iterable<List<StratioStreamingMessage>> partitionIterables =  Iterables.partition(messages, partitionSize);
 
         try {
 
-            for (StratioStreamingMessage event : messages) {
-                BasicDBObject object = new BasicDBObject(TIMESTAMP_FIELD, event.getTimestamp());
-                for (ColumnNameTypeValue columnNameTypeValue : event.getColumns()) {
-                    object.append(columnNameTypeValue.getColumn(), columnNameTypeValue.getValue());
+            for (List<StratioStreamingMessage> messageList : partitionIterables) {
+
+                Map<String, BulkWriteOperation> elementsToInsert = new HashMap<String, BulkWriteOperation>();
+
+                for (StratioStreamingMessage event : messageList) {
+                    BasicDBObject object = new BasicDBObject(TIMESTAMP_FIELD, event.getTimestamp());
+                    for (ColumnNameTypeValue columnNameTypeValue : event.getColumns()) {
+                        object.append(columnNameTypeValue.getColumn(), columnNameTypeValue.getValue());
+                    }
+
+                    BulkWriteOperation bulkInsertOperation = elementsToInsert.get(event.getStreamName());
+
+                    if (bulkInsertOperation == null) {
+                        bulkInsertOperation = getDB().getCollection(event.getStreamName())
+                                .initializeUnorderedBulkOperation();
+
+                        elementsToInsert.put(event.getStreamName(), bulkInsertOperation);
+                        getDB().getCollection(event.getStreamName())
+                                .createIndex(new BasicDBObject(TIMESTAMP_FIELD, -1));
+                    }
+
+                    bulkInsertOperation.insert(object);
                 }
 
-                BulkWriteOperation bulkInsertOperation = elementsToInsert.get(event.getStreamName());
-
-                if (bulkInsertOperation == null) {
-                    bulkInsertOperation = getDB().getCollection(event.getStreamName()).initializeUnorderedBulkOperation();
-
-                    elementsToInsert.put(event.getStreamName(), bulkInsertOperation);
-                    getDB().getCollection(event.getStreamName()).createIndex(new BasicDBObject(TIMESTAMP_FIELD, -1));
+                for (Entry<String, BulkWriteOperation> stratioStreamingMessage : elementsToInsert.entrySet()) {
+                    stratioStreamingMessage.getValue().execute();
                 }
-
-                bulkInsertOperation.insert(object);
-            }
-
-            for (Entry<String, BulkWriteOperation> stratioStreamingMessage : elementsToInsert.entrySet()) {
-                stratioStreamingMessage.getValue().execute();
             }
 
         } catch (Exception e) {
