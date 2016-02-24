@@ -62,6 +62,24 @@ class StratioStreamingAPIUnitTest
       }
     }
 
+    "set the quorum config" should {
+       "modifies the server config values" in new DummyStratioStreamingAPI {
+         api.kafkaCluster = ""
+         api.zookeeperServer = ""
+         api.kafkaZookeeperPath = ""
+
+         val newKafkaCluster = "kafkaQuorumTest"
+         val newZookeeperServer = "zookeeperQuorumTest"
+         val newZookeeperPath = "/path"
+
+         val result = api.withQuorumConfig(newKafkaCluster, newZookeeperServer, newZookeeperPath)
+
+         api.kafkaCluster should be(newKafkaCluster)
+         api.zookeeperServer should be(newZookeeperServer)
+         api.kafkaZookeeperPath should be (newZookeeperPath)
+       }
+    }
+
     "set the server config (with ports)" should {
       "modify the server config values" in new DummyStratioStreamingAPI {
         api.kafkaCluster = ""

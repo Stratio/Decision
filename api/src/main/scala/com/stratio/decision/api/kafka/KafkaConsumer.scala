@@ -25,13 +25,14 @@ import scala.collection.JavaConversions._
 
 class KafkaConsumer(topic: String,
                      zookeeperConnect: String,
+                     kafkaZookeeperPath: String = "",
                      groupId: String = "1111",
                      readFromStartOfStream: Boolean = true
                      ) extends Logging {
 
   val props = new Properties()
   props.put("group.id", groupId)
-  props.put("zookeeper.connect", zookeeperConnect)
+  props.put("zookeeper.connect", zookeeperConnect + kafkaZookeeperPath)
   props.put("auto.offset.reset", if(readFromStartOfStream) "smallest" else "largest")
   val config = new ConsumerConfig(props)
   val connector = Consumer.create(config)

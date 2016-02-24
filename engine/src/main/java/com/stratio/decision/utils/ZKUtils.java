@@ -15,11 +15,11 @@
  */
 package com.stratio.decision.utils;
 
-import com.google.gson.Gson;
-import com.stratio.decision.clustering.ClusterSyncManager;
-import com.stratio.decision.commons.constants.STREAMING;
-import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
-import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
@@ -29,10 +29,10 @@ import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.google.gson.Gson;
+import com.stratio.decision.commons.constants.STREAMING;
+import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
 
 public class ZKUtils {
 
@@ -98,6 +98,15 @@ public class ZKUtils {
         }
 
         client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, data);
+    }
+
+    public void createPath(String path) throws Exception {
+        if (client.checkExists().forPath(path) != null) {
+            logger.debug("Path already exists " + path);
+        }   else    {
+            client.create().creatingParentsIfNeeded().forPath(path);
+        }
+
     }
 
     public void createZNodeJsonReply(StratioStreamingMessage request, Object reply) throws Exception {
