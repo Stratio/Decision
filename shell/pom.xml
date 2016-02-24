@@ -114,7 +114,7 @@
                             <copyConfigurationDirectory>true</copyConfigurationDirectory>
                             <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
                             <assembleDirectory>target/appassembler</assembleDirectory>
-                            <extraJvmArguments>$SHELL_OPTS -Xms64m -Xmx64m</extraJvmArguments>
+                            <extraJvmArguments>$SHELL_OPTS -Xms128m -Xmx128m</extraJvmArguments>
                             <programs>
                                 <program>
                                     <mainClass>${jar.mainclass}</mainClass>
@@ -151,7 +151,7 @@
                                 <group>stratio</group>
                                 <requires>bash</requires>
                             </rpm>
-                            <name>Streaming Shell</name>
+                            <name>Decision Shell</name>
                             <excludeDirectoryAttributes>
                                 <dir>/etc</dir>
                                 <dir>/etc/init.d</dir>
@@ -161,6 +161,18 @@
                                 <dir>/usr</dir>
                                 <dir>/bin</dir>
                             </excludeDirectoryAttributes>
+                            <defaults>
+                                <directoryAttributes>
+                                    <user>decision</user>
+                                    <group>stratio</group>
+                                    <mode>0750</mode>
+                                </directoryAttributes>
+                                <fileAttributes>
+                                    <user>decision</user>
+                                    <group>stratio</group>
+                                    <mode>0644</mode>
+                                </fileAttributes>
+                            </defaults>
                             <assembly>
                                 <mkdirs>
                                     <path>/opt/sds/decision-shell</path>
@@ -189,14 +201,6 @@
                                     <to>/opt/sds/decision-shell/config</to>
                                 </copyDirectory>
                             </assembly>
-                            <defaults>
-                                <directoryAttributes>
-                                    <mode>0775</mode>
-                                </directoryAttributes>
-                                <fileAttributes>
-                                    <mode>0644</mode>
-                                </fileAttributes>
-                            </defaults>
                         </configuration>
                         <executions>
                             <execution>
@@ -228,143 +232,7 @@
                             </execution>
                         </executions>
                     </plugin>                    
-    
-<!--            
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>appassembler-maven-plugin</artifactId>
-                <version>1.8.1</version>
-                <configuration>
-                    <configurationDirectory>config</configurationDirectory>
-                    <copyConfigurationDirectory>true</copyConfigurationDirectory>
-                    <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
-                    <assembleDirectory>target/appassembler</assembleDirectory>
-                    <extraJvmArguments>$SHELL_OPTS -Xms64m -Xmx64m</extraJvmArguments>
-                    <programs>
-                        <program>
-                            <mainClass>${jar.mainclass}</mainClass>
-                            <name>shell</name>
-                        </program>
-                    </programs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>assemble</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>assemble</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 
-            <plugin>
-                <groupId>com.stratio.mojo.unix</groupId>
-                <artifactId>unix-maven-plugin</artifactId>
-                <version>1.1.6</version>
-                <extensions>true</extensions>
-                <inherited>false</inherited>
-                <configuration>
-                    <outputFileName>stratio-decision-shell</outputFileName>
-                    <contact>
-                        <![CDATA[Stratio Decision<decision@stratio.com>]]>
-                    </contact>
-                    <contactEmail>decision@stratio.com</contactEmail>
-                    <deb>
-                        <section>devel</section>
-                    </deb>
-                    <rpm>
-                        <group>stratio</group>
-                        <requires>bash</requires>
-                    </rpm>
-                    <name>Decision Shell</name>
-                    <excludeDirectoryAttributes>
-                        <dir>/etc</dir>
-                        <dir>/etc/init.d</dir>
-                        <dir>/etc/default</dir>
-                        <dir>/var</dir>
-                        <dir>/opt</dir>
-                        <dir>/usr</dir>
-                        <dir>/bin</dir>
-                    </excludeDirectoryAttributes>
-                    <assembly>
-                        <mkdirs>
-                            <path>/opt/sds/decision-shell</path>
-                            <attributes>
-                                <user>stratio</user>
-                                <group>stratio</group>
-                            </attributes>
-                        </mkdirs>
-                        <mkdirs>
-                            <path>/var/run/sds</path>
-                            <attributes>
-                                <user>stratio</user>
-                                <group>stratio</group>
-                            </attributes>
-                        </mkdirs>
-                        <copyDirectory>
-                            <from>target/appassembler/bin</from>
-                            <to>/opt/sds/decision-shell/bin</to>
-                        </copyDirectory>
-                        <copyDirectory>
-                            <from>target/appassembler/repo</from>
-                            <to>/opt/sds/decision-shell/repo</to>
-                        </copyDirectory>
-                        <copyDirectory>
-                            <from>target/appassembler/config/</from>
-                            <to>/opt/sds/decision-shell/config</to>
-                        </copyDirectory>
-                    </assembly>
-                    <defaults>
-                        <directoryAttributes>
-                            <mode>0775</mode>
-                        </directoryAttributes>
-                        <fileAttributes>
-                            <mode>0644</mode>
-                        </fileAttributes>
-                    </defaults>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>deb</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>package-deb</goal>
-                        </goals>
-                        <configuration>
-                            <architecture>all</architecture>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>rpm</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>package-rpm</goal>
-                        </goals>
-                        <configuration>
-                            <architecture>noarch</architecture>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->         
-               
             </plugins>
             </build>
         </profile>

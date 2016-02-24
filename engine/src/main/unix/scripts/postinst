@@ -46,6 +46,7 @@ case "$1" in
   chmod 775 $DIR_LOG
 
   chown -R ${USER}:${GROUP} $DIR_RUN
+  chown -R ${USER}:${GROUP} /opt/sds/.m2
 
   sed -i 's!"$BASEDIR"/:/etc/sds/decision/conf!/etc/sds/decision!g' /opt/sds/decision/bin/run
 

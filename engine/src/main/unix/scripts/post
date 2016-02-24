@@ -31,6 +31,7 @@ fi
 chown root:root /etc/init.d/decision
 
 chown -R ${USER}:${GROUP} $DIR_INSTALL
+chown -R ${USER}:${GROUP} /opt/sds/.m2
 
 chown -R ${USER}:${GROUP} $DIR_CONF
 chown -R ${USER}:${GROUP} $DIR_LOG
