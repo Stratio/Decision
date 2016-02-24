@@ -395,6 +395,18 @@
                         <dir>/usr</dir>
                         <dir>/bin</dir>
                     </excludeDirectoryAttributes>
+                    <defaults>
+                        <directoryAttributes>
+                            <user>decision</user>
+                            <group>stratio</group>
+                            <mode>0750</mode>
+                        </directoryAttributes>
+                        <fileAttributes>
+                            <user>decision</user>
+                            <group>stratio</group>
+                            <mode>0644</mode>
+                        </fileAttributes>
+                    </defaults>
                     <assembly>
                         <copyFile>
                             <path>src/main/unix/files_and_dirs/etc/init.d/decision</path>
@@ -431,6 +443,7 @@
                             <attributes>
                                 <user>decision</user>
                                 <group>stratio</group>
+                                <mode>0775</mode>
                             </attributes>
                         </mkdirs>
                         <copyDirectory>
@@ -476,14 +489,6 @@
                             </attributes>
                         </copyFile>
                     </assembly>
-                    <defaults>
-                        <directoryAttributes>
-                            <mode>0775</mode>
-                        </directoryAttributes>
-                        <fileAttributes>
-                            <mode>0664</mode>
-                        </fileAttributes>
-                    </defaults>
                 </configuration>
                 <executions>
                     <execution>
