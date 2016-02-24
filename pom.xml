@@ -289,13 +289,23 @@
             </roles>
         </developer>
         <developer>
-            <id>eraffenne</id>
-            <name>Emmanuelle Raffenne</name>
-            <email>eraffenne@stratio.com</email>
+            <id>jp</id>
+            <name>Jose Pablo Fernandez</name>
+            <email>josepablofernandez@stratio.com</email>
             <roles>
-                <role>tester</role>
-                <role>documentation</role>
-                <role>contributor</role>
+                <role>architect</role>
+                <role>developer</role>
+                <role>maintainer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>jp</id>
+            <name>Aitor Argomaniz</name>
+            <email>aargomaniz@stratio.com</email>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+                <role>maintainer</role>
             </roles>
         </developer>
     </developers>
