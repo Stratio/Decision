@@ -106,10 +106,6 @@ public class StreamingContextConfiguration {
         return context;
     }
 
-    private void initializeKafka()  {
-
-    }
-
 
     private void configureRequestContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
@@ -436,12 +432,6 @@ public class StreamingContextConfiguration {
 
     @PostConstruct
     private void initTopicService() {
-        try {
-            ZKUtils.getZKUtils(configurationContext.getZookeeperHostsQuorum());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         kafkaTopicService = new KafkaTopicService(configurationContext.getZookeeperHostsQuorumWithPath(),
                 configurationContext.getKafkaConsumerBrokerHost(), configurationContext.getKafkaConsumerBrokerPort(),
                 configurationContext.getKafkaConnectionTimeout(), configurationContext.getKafkaSessionTimeout());
