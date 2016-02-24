@@ -436,7 +436,6 @@ public class ConfigurationContext {
         return cassandraBatchType;
     }
 
-
     public Integer getElasticSearchMaxBatchSize() {
         return elasticSearchMaxBatchSize;
     }
