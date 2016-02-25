@@ -10,6 +10,8 @@ import java.util.Map;
  */
 public class DroolsConfigurationBean {
 
+    private Boolean isEnabled= true;
+
     private Map<String, DroolsConfigurationGroupBean> groups;
 
     public Map<String, DroolsConfigurationGroupBean> getGroups() {
@@ -39,5 +41,13 @@ public class DroolsConfigurationBean {
 
     public DroolsConfigurationGroupBean getGroup(String group){
         return groups.get(group);
+    }
+
+    public Boolean getIsEnabled()   {
+        return this.isEnabled;
+    }
+
+    public void setIsEnabled(Boolean isEnabled) {
+        this.isEnabled= isEnabled;
     }
 }

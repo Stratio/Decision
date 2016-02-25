@@ -3,20 +3,15 @@ package com.stratio.decision.drools;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Server;
 import org.kie.api.KieServices;
-//import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
 import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
-import com.stratio.decision.drools.sessions.DroolsStatefulSession;
-import com.stratio.decision.drools.sessions.DroolsStatelessSession;
 
-import scala.tools.cmd.gen.AnyVals;
+//import org.kie.api.builder.KieScanner;
 
 /**
  * Created by josepablofernandez on 2/12/15.
@@ -57,7 +52,7 @@ public class DroolsConnectionContainer {
 
         Map<String, DroolsInstace> groupContainers = new HashMap<>();
 
-        if (droolsConfigurationBean != null) {
+        if (droolsConfigurationBean != null && droolsConfigurationBean.getIsEnabled()) {
 
             if (droolsConfigurationBean.getListGroups() == null){
 
@@ -107,6 +102,8 @@ public class DroolsConnectionContainer {
 
             }
 
+        }   else    {
+            logger.info("Drools integration is not enabled");
         }
 
         return groupContainers;
