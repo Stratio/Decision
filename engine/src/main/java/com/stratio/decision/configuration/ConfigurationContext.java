@@ -30,6 +30,7 @@ import com.stratio.decision.commons.constants.InternalTopic;
 import com.stratio.decision.drools.configuration.DroolsConfigurationBean;
 import com.stratio.decision.drools.configuration.DroolsConfigurationGroupBean;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
 
 public class ConfigurationContext {
@@ -131,6 +132,7 @@ public class ConfigurationContext {
         CLUSTERING_ACK_TIMEOUT("clustering.ackTimeout"),
 
         // Drools Config
+        DROOLS_ENABLED("drools.enabled"),
         DROOLS_GROUP("drools.groups"),
         DROOLS_GROUP_NAME("name"),
         DROOLS_GROUP_SESSION("sessionName"),
@@ -236,6 +238,7 @@ public class ConfigurationContext {
         this.droolsConfiguration = new DroolsConfigurationBean();
         Config droolsGroupsConfig = ConfigFactory.load("drools");
         droolsConfiguration.setGroups(getDroolsConfigurationGroup(droolsGroupsConfig));
+        droolsConfiguration.setIsEnabled(this.getBoolean(ConfigurationKeys.DROOLS_ENABLED.getKey(), droolsGroupsConfig));
 
     }
 
@@ -449,6 +452,16 @@ public class ConfigurationContext {
             return config.getAnyRef(key);
         } else {
             return null;
+        }
+    }
+
+    private Boolean getBoolean(String key, Config config) {
+        try {
+            return config.getBoolean(key);
+        } catch (ConfigException.Missing ex)    {
+            return false;
+        } catch (Exception ex)  {
+            return false;
         }
     }
 

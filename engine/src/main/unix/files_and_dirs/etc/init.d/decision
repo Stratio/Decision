@@ -31,7 +31,6 @@ if [ -r $VARIABLES ]; then
 fi
 
 
-
 NAME="stratio-decision"
 DESC="Description for stratio-decision"
 BASEDIR=$DECISION_HOME
