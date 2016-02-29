@@ -50,7 +50,7 @@ public class ThenSpec extends BaseSpec {
 
     @Then("^the count of created streams is '(.*?)'$")
     public void assertStreamCount(Integer expectedCount)
-            throws StratioEngineStatusException, StratioAPIGenericException {
+            throws StratioEngineStatusException, StratioEngineOperationException, StratioAPIGenericException {
         commonspec.getLogger().info("Verifying stream count");
         assertThat("Bad stream count", commonspec.getStratioStreamingAPI()
                 .listStreams().size(), equalTo(expectedCount));
@@ -207,7 +207,7 @@ public class ThenSpec extends BaseSpec {
 
     @Then("^the stream '(.*?)' exists$")
     public void assertStreamExist(String stream)
-            throws StratioEngineStatusException, StratioAPIGenericException {
+            throws StratioEngineStatusException, StratioEngineOperationException, StratioAPIGenericException {
         commonspec.getLogger().info("Verifying stream existance ");
 
         List<String> existingStreams = new ArrayList<String>();
@@ -224,7 +224,7 @@ public class ThenSpec extends BaseSpec {
     public void assertStreamActions(
             @Transform(NullableStringConverter.class) String stream,
             @Transform(ArrayListConverter.class) ArrayList<String> expectedActions)
-            throws StratioEngineStatusException, StratioAPIGenericException {
+            throws StratioEngineStatusException, StratioEngineOperationException, StratioAPIGenericException {
         commonspec.getLogger().info("Verifying stream existance ");
 
         List<StratioStream> listedStreams = commonspec.getStratioStreamingAPI()

@@ -347,7 +347,9 @@ public class WhenSpec extends BaseSpec {
                             commonspec.getKAFKA_HOST(),
                             commonspec.getKAFKA_PORT(),
                             commonspec.getZOOKEEPER_HOST(),
-                            commonspec.getZOOKEEPER_PORT());
+                            commonspec.getZOOKEEPER_PORT(),
+                            commonspec.getZOOKEEPER_PATH()
+                    );
             commonspec.setStratioStreamingAPI(stratioStreamingAPI);
 
         } catch (Exception e) {

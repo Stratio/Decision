@@ -92,7 +92,7 @@ public class HookSpec extends BaseSpec {
                     commonspec.getZOOKEEPER_PORT());
             IStratioStreamingAPI stratioStreamingAPI = StratioStreamingAPIFactory.create().initializeWithServerConfig(
                     commonspec.getKAFKA_HOST(), commonspec.getKAFKA_PORT(), commonspec.getZOOKEEPER_HOST(),
-                    commonspec.getZOOKEEPER_PORT());
+                    commonspec.getZOOKEEPER_PORT(), commonspec.getZOOKEEPER_PATH());
             commonspec.setStratioStreamingAPI(stratioStreamingAPI);
 
         } catch (StratioStreamingException e) {
