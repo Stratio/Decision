@@ -122,6 +122,8 @@ public class ClusterSyncManager {
             e.printStackTrace();
         }
 
+        logger.warn("{} is now the ClusterSyncManager", this.groupId);
+
     }
 
 
@@ -316,12 +318,13 @@ public class ClusterSyncManager {
         switch (eventType){
 
             case CHILD_ADDED:
-                logger.info("STATUS - Group Initialized: {} ", nodeId);
+                logger.info("ClusterSyncManager Leader: {}. STATUS - Group Initialized: {} ", groupId, nodeId);
                 clusterNodesStatus.get(NODE_STATUS.INITIALIZED).add(nodeId);
                 clusterNodesStatus.get(NODE_STATUS.STOPPED).remove(nodeId);
                 break;
             case CHILD_REMOVED:
-                logger.error("***** STATUS - Group {} are notified as DOWN *****", nodeId);
+                logger.error("*****ClusterSyncManager Leader: {}.  STATUS - Group {} are notified as DOWN *****",
+                        groupId, nodeId);
                 clusterNodesStatus.get(NODE_STATUS.INITIALIZED).remove(nodeId);
                 clusterNodesStatus.get(NODE_STATUS.STOPPED).add(nodeId);
                 break;
@@ -338,12 +341,13 @@ public class ClusterSyncManager {
 
        if (clusterNodesStatus.get(NODE_STATUS.STOPPED).size() == 0){
             clusterStatus = STREAMING.ZK_EPHEMERAL_NODE_STATUS_INITIALIZED;
-            logger.info("STATUS - All groups Initialized");
+            logger.info("ClusterSyncManager Leader: {}. STATUS - All groups Initialized", groupId);
         }else {
             clusterStatus = STREAMING.ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN;
-            logger.error("**** STATUS - Some groups are DOWN");
-            clusterNodesStatus.get(NODE_STATUS.STOPPED).forEach( node -> logger.error("**** STATUS - groupId: {} is "
-                    + "DOWN", node));
+            logger.error("****ClusterSyncManager Leader: {}.  STATUS - Some groups are DOWN",  groupId);
+            clusterNodesStatus.get(NODE_STATUS.STOPPED).forEach( node -> logger.error("ClusterSyncManager Leader: {}."
+                    + "  **** STATUS - groupId: {} is "
+                    + "DOWN", groupId, node));
 
         }
 
@@ -360,5 +364,9 @@ public class ClusterSyncManager {
 
     public CuratorFramework getClient() {
         return client;
+    }
+
+    public String getGroupId() {
+        return groupId;
     }
 }
