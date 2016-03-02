@@ -105,6 +105,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         val stratioStreamMock = mock[StratioStream]
 
         api.setStatusOperation(streamingAPIListOperationMock)
@@ -149,6 +150,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         val stratioStreamMock = mock[StratioStream]
         api.setStatusOperation(streamingAPIListOperationMock)
 
@@ -172,6 +174,7 @@ class StratioStreamingAPIUnitTest
       "throw an exception if there is not any coincidence" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         val stratioStreamMock = mock[StratioStream]
 
         api.setStatusOperation(streamingAPIListOperationMock)
@@ -191,6 +194,7 @@ class StratioStreamingAPIUnitTest
       "throw an exception if there is not any stratio stream" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
 
         api.setStatusOperation(streamingAPIListOperationMock)
 
@@ -235,6 +239,8 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
+
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -272,6 +278,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -311,6 +318,8 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
+
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -350,6 +359,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -389,6 +399,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setAsyncOperation(streamingAPIAsyncOperationMock)
 
         doNothing().when(streamingAPIAsyncOperationMock).performAsyncOperation(any[StratioStreamingMessage])
@@ -426,6 +437,7 @@ class StratioStreamingAPIUnitTest
       "return the query id" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         val stratioStreamMock = mock[StratioStream]
         api.setStatusOperation(streamingAPIListOperationMock)
 
@@ -445,6 +457,7 @@ class StratioStreamingAPIUnitTest
       "return an empty String if the query is not found" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         val stratioStreamMock = mock[StratioStream]
         api.setStatusOperation(streamingAPIListOperationMock)
 
@@ -463,6 +476,7 @@ class StratioStreamingAPIUnitTest
       "throw an exception if there is not any coincidence" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         val stratioStreamMock = mock[StratioStream]
 
         api.setStatusOperation(streamingAPIListOperationMock)
@@ -482,6 +496,7 @@ class StratioStreamingAPIUnitTest
       "throw an exception if there is not any stratio stream" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
 
         api.setStatusOperation(streamingAPIListOperationMock)
 
@@ -526,6 +541,7 @@ class StratioStreamingAPIUnitTest
       "return the query id" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         val stratioStreamMock = mock[StratioStream]
         api.setStatusOperation(streamingAPIListOperationMock)
         api.setSyncOperation(streamingAPISyncOperationMock)
@@ -548,6 +564,7 @@ class StratioStreamingAPIUnitTest
       "return an empty String if the query is not found" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         val stratioStreamMock = mock[StratioStream]
         api.setStatusOperation(streamingAPIListOperationMock)
         api.setSyncOperation(streamingAPISyncOperationMock)
@@ -569,6 +586,7 @@ class StratioStreamingAPIUnitTest
       "throw an exception if there is not any coincidence" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         val stratioStreamMock = mock[StratioStream]
         api.setStatusOperation(streamingAPIListOperationMock)
         api.setSyncOperation(streamingAPISyncOperationMock)
@@ -590,6 +608,7 @@ class StratioStreamingAPIUnitTest
       "throw an exception if there is not any stratio stream" in new DummyStratioStreamingAPI {
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
 
         api.setStatusOperation(streamingAPIListOperationMock)
         api.setSyncOperation(streamingAPISyncOperationMock)
@@ -638,6 +657,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -675,6 +695,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -712,6 +733,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -749,6 +771,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -786,6 +809,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -823,6 +847,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -860,6 +885,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -900,6 +926,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -937,6 +964,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
         api.setSyncOperation(streamingAPISyncOperationMock)
 
         doNothing().when(streamingAPISyncOperationMock).performSyncOperation(any[StratioStreamingMessage])
@@ -971,6 +999,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
 
         api.isInit should be(true)
       }
@@ -997,6 +1026,7 @@ class StratioStreamingAPIUnitTest
 
         api.streamingUp = true
         api.streamingRunning = true
+        api.clusterUp = true
 
         api.isConnected should be(true)
       }
