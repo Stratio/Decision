@@ -122,7 +122,6 @@ public class ClusterSyncManager {
             e.printStackTrace();
         }
 
-        logger.warn("{} is now the ClusterSyncManager", this.groupId);
 
     }
 
