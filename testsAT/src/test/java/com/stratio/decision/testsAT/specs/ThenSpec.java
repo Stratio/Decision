@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) 2014 Stratio (http://stratio.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stratio.streaming.specs;
 
 import static net.sf.expectit.matcher.Matchers.regexp;
@@ -50,7 +65,7 @@ public class ThenSpec extends BaseSpec {
 
     @Then("^the count of created streams is '(.*?)'$")
     public void assertStreamCount(Integer expectedCount)
-            throws StratioEngineStatusException, StratioAPIGenericException {
+            throws StratioEngineStatusException, StratioEngineOperationException, StratioAPIGenericException {
         commonspec.getLogger().info("Verifying stream count");
         assertThat("Bad stream count", commonspec.getStratioStreamingAPI()
                 .listStreams().size(), equalTo(expectedCount));
@@ -207,7 +222,7 @@ public class ThenSpec extends BaseSpec {
 
     @Then("^the stream '(.*?)' exists$")
     public void assertStreamExist(String stream)
-            throws StratioEngineStatusException, StratioAPIGenericException {
+            throws StratioEngineStatusException, StratioEngineOperationException, StratioAPIGenericException {
         commonspec.getLogger().info("Verifying stream existance ");
 
         List<String> existingStreams = new ArrayList<String>();
@@ -224,7 +239,7 @@ public class ThenSpec extends BaseSpec {
     public void assertStreamActions(
             @Transform(NullableStringConverter.class) String stream,
             @Transform(ArrayListConverter.class) ArrayList<String> expectedActions)
-            throws StratioEngineStatusException, StratioAPIGenericException {
+            throws StratioEngineStatusException, StratioEngineOperationException, StratioAPIGenericException {
         commonspec.getLogger().info("Verifying stream existance ");
 
         List<StratioStream> listedStreams = commonspec.getStratioStreamingAPI()

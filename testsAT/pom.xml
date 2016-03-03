@@ -7,17 +7,17 @@
     <parent>
         <groupId>com.stratio</groupId>
         <artifactId>parent</artifactId>
-        <version>0.5.0</version>
+        <version>0.6.2</version>
     </parent>
 
     <properties>
         <stratio-test-bdd.version>0.2.0-SNAPSHOT</stratio-test-bdd.version>
-        <decision.version>0.9.0</decision.version>
+        <decision.version>1.0.0-SNAPSHOT</decision.version>
     </properties>
 
     <groupId>com.stratio.decision</groupId>
     <artifactId>decision-test</artifactId>
-    <version>1.0.0-SNAPSHOT}</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>decision-test</name>
 
     <build>
@@ -43,10 +43,10 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>acceptance-test</id>
                         <phase>integration-test</phase>
                         <goals>
                             <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>

@@ -10,18 +10,18 @@ Feature: Stream creation
 		Then the count of created streams is '1'
 		And the stream '<streamName>' has this columns (with name and type):
 			| 향 | String  |
-			| 2 | Integer | 
-				
+			| 2 | Integer |
+
 		Examples:
-			 | streamName 		 | 
+			 | streamName 		 |
 			 | testStream 		 |
-			 | anotherTestStream | 
+			 | anotherTestStream |
 
 	Scenario Outline: Consecutive stream creations
 		When I create a stream with name '<streamName>' and columns (with type):
 			| 1  | String  |
 			| 2  | Integer |
-		Then the count of created streams is '<streamCount>' 		
+		Then the count of created streams is '<streamCount>'
 		And an exception '<exception>' thrown
 
 		Examples:
@@ -29,12 +29,12 @@ Feature: Stream creation
 			 | testStream        | 2           | IS NOT    |
 			 | anotherTestStream | 2           | IS        |
 			 | AnotherTestStream | 3           | IS NOT    |
-			 
+
 	Scenario Outline: Invalid names stream creations
 	Given I drop every existing stream
 		When I create a stream with name '<streamName>' and columns (with type):
 			| 1  | String  |
-			| 2  | Integer | 		
+			| 2  | Integer |
 		And an exception 'IS' thrown with class 'StratioAPISecurityException' and message like 'Stream name cannot be <type>'
 		Then the count of created streams is '<streamCount>'
 
@@ -47,13 +47,13 @@ Feature: Stream creation
 		Given I drop every existing stream
 		When I create a stream with name '<streamName>' and columns (with type):
 			| 1  | String  |
-			| 2  | Integer | 		
+			| 2  | Integer |
 		And an exception 'IS' thrown with class 'StratioAPISecurityException' and message like 'Operation create not allowed .*'
 		Then the count of created streams is '<streamCount>'
 
 		Examples:
-			 | streamName                        | streamCount | 
-			 | stratio_stats_base                | 0           | 
+			 | streamName                        | streamCount |
+			 | stratio_stats_base                | 0           |
 			 | stratio_stats_global_by_operation | 0           |
 
 	Scenario: Nulled columns stream creations

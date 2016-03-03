@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) 2014 Stratio (http://stratio.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stratio.decision.testsAT.specs;
 
 import kafka.consumer.KafkaStream;
@@ -17,6 +32,7 @@ public class Common extends CommonG {
     private int KAFKA_PORT;
     private String ZOOKEEPER_HOST;
     private int ZOOKEEPER_PORT;
+    private String ZOOKEEPER_PATH;
     private Expect shellIface;
     private KafkaStream<String, StratioStreamingMessage> streamListener;
 
@@ -51,6 +67,15 @@ public class Common extends CommonG {
     public void setZOOKEEPER_HOST(String zOOKEEPER_HOST) {
         ZOOKEEPER_HOST = zOOKEEPER_HOST;
     }
+
+    public String getZOOKEEPER_PATH() {
+        return ZOOKEEPER_PATH;
+    }
+
+    public void setZOOKEEPER_PATH(String zOOKEEPER_PATH) {
+        ZOOKEEPER_PATH = zOOKEEPER_PATH;
+    }
+
 
     public int getZOOKEEPER_PORT() {
         return ZOOKEEPER_PORT;
