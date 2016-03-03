@@ -90,6 +90,13 @@ trait IStratioStreamingAPI {
                         zookeeperHost: String,
                         zookeeperPort: Int): IStratioStreamingAPI
 
+
+  /**
+    * If Decision is up but some of the nodes (group) of the cluster are down, we can continue inserting data
+    * in kafka data topics
+    */
+  def insertWithGroupDown() : IStratioStreamingAPI
+
   /**
    * When server configuration is added, call this method to try to connect
    * to streaming engine async.

@@ -76,10 +76,16 @@ public class ClusterSyncManagerLeaderListener implements LeaderLatchListener {
                         .clusterSyncManagerInstance);
                 cache.getListenable().addListener(listener);
 
+                logger.info("initialized PathCache for ClusterSyncManager Leader {}", clusterSyncManagerInstance
+                        .getGroupId());
+
                 return clusterSyncManagerInstance.initializedGroupStatus();
 
             } catch (Exception e) {
-                logger.error("Error initializing PathCache for Node Status Path: {}", e.getMessage());
+                logger.error("PathCache for ClusterSyncManager Leader {}. Error initializing PathCache for Node "
+                        + "Status Path: {}",
+                        clusterSyncManagerInstance
+                        .getGroupId(), e.getMessage());
             }
         }
 

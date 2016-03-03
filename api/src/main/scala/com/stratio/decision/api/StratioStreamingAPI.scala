@@ -64,8 +64,8 @@ class StratioStreamingAPI
   }
 
   def insertData(streamName: String, data: List[ColumnNameValue], topicName: String, checkTopicExists:Boolean) = {
-    checkStreamingStatus()
 
+    checkInsertStreamingStatus()
 
     val topic :String = InternalTopic.TOPIC_DATA.getTopicName.concat("_").concat(topicName)
 
@@ -79,7 +79,7 @@ class StratioStreamingAPI
 
 
   def insertData(streamName: String, data: List[ColumnNameValue]) = {
-    checkStreamingStatus()
+    checkInsertStreamingStatus
     val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
     asyncOperation.performAsyncOperation(insertStreamMessage)
   }
@@ -321,6 +321,12 @@ class StratioStreamingAPI
   }
 
 
+  def insertWithGroupDown():IStratioStreamingAPI = {
+    ignoreGroupDown = true
+    this
+  }
+
+
   override def init(): IStratioStreamingAPI = {
     try {
       log.info("Establishing connection with the engine...")
@@ -391,6 +397,8 @@ class StratioStreamingAPI
   lazy val zookeeperCluster = s"$zookeeperServer"
   var streamingUp = false
   var streamingRunning = false
+  var clusterUp = false
+  var ignoreGroupDown = false
   val streamingListeners = scala.collection.mutable.Map[String, KafkaConsumer]()
   lazy val kafkaProducer = new KafkaProducer(InternalTopic.TOPIC_REQUEST.getTopicName(), kafkaBroker)
   lazy val kafkaDataProducer = new KafkaProducer(InternalTopic.TOPIC_DATA.getTopicName(), kafkaBroker)
@@ -445,12 +453,15 @@ class StratioStreamingAPI
         case ZK_EPHEMERAL_NODE_STATUS_CONNECTED =>
           streamingUp = true
           streamingRunning = false
+          clusterUp = false
         case ZK_EPHEMERAL_NODE_STATUS_INITIALIZED =>
           streamingUp = true
           streamingRunning = true
+          clusterUp = true
         case ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN =>
           streamingUp = true
-          streamingRunning = false
+          streamingRunning = true
+          clusterUp = false
       }
     }
   }
@@ -473,6 +484,14 @@ class StratioStreamingAPI
     if (!streamingRunning) throw new StratioEngineStatusException("Stratio Decision not yet initialized")
   }
 
+  private def checkInsertStreamingStatus() {
+    if (!streamingUp) throw new StratioEngineStatusException("Stratio Decision is down")
+    if (!streamingRunning) throw new StratioEngineStatusException("Stratio Decision not yet initialized")
+    if (!clusterUp && !ignoreGroupDown){
+      throw new StratioEngineStatusException("Some of the groups of Stratio Decision are down")
+    }
+  }
+
   private def addListener() = {
     zookeeperClient.getCuratorListenable().addListener(new CuratorListener() {
       def eventReceived(client: CuratorFramework, event: CuratorEvent) = {
@@ -480,11 +499,25 @@ class StratioStreamingAPI
           case WATCHED => {
             zookeeperClient.checkExists().watched().forPath(ZK_EPHEMERAL_NODE_STATUS_PATH)
             zookeeperConsumer.getZNodeData(ZK_EPHEMERAL_NODE_STATUS_PATH) match {
-              case Some(ZK_EPHEMERAL_NODE_STATUS_CONNECTED) => streamingUp = true
-              case Some(ZK_EPHEMERAL_NODE_STATUS_INITIALIZED) => streamingUp = false
+              case Some(ZK_EPHEMERAL_NODE_STATUS_CONNECTED) => {
+                streamingUp = true
+                streamingRunning = false
+                clusterUp = false
+              }
+              case Some(ZK_EPHEMERAL_NODE_STATUS_INITIALIZED) => {
+                streamingUp = true
+                streamingRunning = true
+                clusterUp = true
+              }
+              case Some(ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN) => {
+                streamingUp = true
+                streamingRunning = true
+                clusterUp = false
+              }
               case _ => {
                 streamingUp = false
                 streamingRunning = false
+                clusterUp = false
               }
             }
           }
