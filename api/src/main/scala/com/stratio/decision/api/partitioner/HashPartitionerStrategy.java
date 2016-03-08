@@ -13,21 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.commons.constants;
+package com.stratio.decision.api.partitioner;
 
-public enum InternalTopic {
+import java.util.List;
 
-    TOPIC_REQUEST("stratio_decision_requests"), TOPIC_DATA("stratio_decision_data"), TOPIC_ACTION(
-            "stratio_decision_action"), TOPIC_PARTITIONED_DATA_SUFFIX("partition_");
+import com.stratio.decision.api.messaging.ColumnNameValue;
 
+/**
+ * Created by josepablofernandez on 7/03/16.
+ */
+public class HashPartitionerStrategy implements IPartitionerStrategy {
 
-    private final String topicName;
+    public Integer getPartitionNumber(List<ColumnNameValue> keyValues, Integer numberOfNodes) {
 
-    private InternalTopic(String topicName) {
-        this.topicName = topicName;
+        int  hash = 0;
+
+        for (int i = 0; i < keyValues.size(); i++) {
+
+           hash = JenkinsHash.hash32(keyValues.get(i).columnValue().toString().getBytes(), hash);
+
+        }
+
+        return  Math.abs(hash % numberOfNodes);
+
     }
 
-    public String getTopicName() {
-        return topicName;
-    }
 }

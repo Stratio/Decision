@@ -13,21 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.commons.constants;
+package com.stratio.decision.api.partitioner;
 
-public enum InternalTopic {
+import java.util.List;
 
-    TOPIC_REQUEST("stratio_decision_requests"), TOPIC_DATA("stratio_decision_data"), TOPIC_ACTION(
-            "stratio_decision_action"), TOPIC_PARTITIONED_DATA_SUFFIX("partition_");
+import com.stratio.decision.api.messaging.ColumnNameValue;
 
+/**
+ * Created by josepablofernandez on 7/03/16.
+ */
+public interface IPartitionerStrategy {
 
-    private final String topicName;
+    public Integer getPartitionNumber(List<ColumnNameValue> keyValues, Integer numberOfNodes);
 
-    private InternalTopic(String topicName) {
-        this.topicName = topicName;
-    }
-
-    public String getTopicName() {
-        return topicName;
-    }
 }

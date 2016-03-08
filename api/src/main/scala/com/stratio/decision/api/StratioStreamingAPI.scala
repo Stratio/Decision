@@ -24,10 +24,11 @@ import com.stratio.decision.api.messaging.{ColumnNameType, _}
 import com.stratio.decision.api.zookeeper.ZookeeperConsumer
 import com.stratio.decision.commons.constants.InternalTopic
 import com.stratio.decision.commons.constants.STREAMING.{ZK_EPHEMERAL_NODE_STATUS_CONNECTED,
-ZK_EPHEMERAL_NODE_STATUS_INITIALIZED, ZK_EPHEMERAL_NODE_STATUS_PATH, ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN}
+ZK_EPHEMERAL_NODE_STATUS_INITIALIZED, ZK_EPHEMERAL_NODE_STATUS_PATH, ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN, ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH}
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.ACTION.{INDEX, LISTEN, SAVETO_CASSANDRA,
 SAVETO_MONGO, SAVETO_SOLR, STOP_INDEX, STOP_LISTEN, STOP_SAVETO_CASSANDRA, STOP_SAVETO_MONGO, STOP_SAVETO_SOLR,
 STOP_SENDTODROOLS, START_SENDTODROOLS}
+import com.stratio.decision.commons.constants.InternalTopic.TOPIC_PARTITIONED_DATA_SUFFIX
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.DEFINITION
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.DEFINITION.{ADD_QUERY, ALTER, DROP, REMOVE_QUERY}
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS.MANIPULATION.LIST
@@ -39,7 +40,11 @@ import org.apache.curator.framework.api.CuratorEventType.WATCHED
 import org.apache.curator.framework.api.{CuratorEvent, CuratorListener}
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.RetryOneTime
+import org.apache.zookeeper.data.Stat
 import org.slf4j.LoggerFactory
+
+import com.stratio.decision.api.partitioner.PartitionerStrategyFactory
+
 
 import scala.collection.JavaConversions.{asScalaBuffer, bufferAsJavaList}
 import scala.util.{Failure, Try}
@@ -82,6 +87,21 @@ class StratioStreamingAPI
     checkInsertStreamingStatus
     val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
     asyncOperation.performAsyncOperation(insertStreamMessage)
+  }
+
+
+  def insertDataWithPartition(streamName: String, data: List[ColumnNameValue], keys: List[ColumnNameValue]) = {
+    insertDataWithPartition(streamName, data, keys, PartitionerStrategyFactory.Strategy.HASH)
+  }
+
+  private def insertDataWithPartition(streamName: String, data: List[ColumnNameValue], keys: List[ColumnNameValue],
+    partitionStrategy: PartitionerStrategyFactory.Strategy) = {
+
+      val partitioner = partitionerStrategyFactory.getPartitionerInstance(partitionStrategy)
+      val partitionNumber = partitioner.getPartitionNumber(keys, numberOfClusterNodes);
+      val topicName = TOPIC_PARTITIONED_DATA_SUFFIX.getTopicName + partitionNumber.toString
+      insertData(streamName, data, topicName)
+
   }
 
   def addQuery(streamName: String, query: String): String = {
@@ -399,6 +419,7 @@ class StratioStreamingAPI
   var streamingRunning = false
   var clusterUp = false
   var ignoreGroupDown = false
+  var numberOfClusterNodes = 1
   val streamingListeners = scala.collection.mutable.Map[String, KafkaConsumer]()
   lazy val kafkaProducer = new KafkaProducer(InternalTopic.TOPIC_REQUEST.getTopicName(), kafkaBroker)
   lazy val kafkaDataProducer = new KafkaProducer(InternalTopic.TOPIC_DATA.getTopicName(), kafkaBroker)
@@ -413,6 +434,8 @@ class StratioStreamingAPI
   private var _syncOperation: Option[StreamingAPISyncOperation] = None
   private var _asyncOperation: Option[StreamingAPIAsyncOperation] = None
   private var _statusOperation: Option[StreamingAPIListOperation] = None
+
+  private val partitionerStrategyFactory:PartitionerStrategyFactory = new PartitionerStrategyFactory()
 
   def syncOperation: StreamingAPISyncOperation =
     _syncOperation.getOrElse {
@@ -458,6 +481,8 @@ class StratioStreamingAPI
           streamingUp = true
           streamingRunning = true
           clusterUp = true
+          checkNumberOfClusterNodes
+
         case ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN =>
           streamingUp = true
           streamingRunning = true
@@ -465,6 +490,19 @@ class StratioStreamingAPI
       }
     }
   }
+
+  private def checkNumberOfClusterNodes(): Unit ={
+
+    val  zNode :Stat = zookeeperClient.checkExists().forPath(ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH)
+
+    if (zNode != null && zNode.getNumChildren>0) {
+      numberOfClusterNodes = zNode.getNumChildren
+    }else {
+      numberOfClusterNodes = 1
+    }
+
+  }
+
 
   private def startEphemeralNodeWatch() {
     zookeeperClient.checkExists().watched().forPath(ZK_EPHEMERAL_NODE_STATUS_PATH)
@@ -508,6 +546,7 @@ class StratioStreamingAPI
                 streamingUp = true
                 streamingRunning = true
                 clusterUp = true
+                checkNumberOfClusterNodes
               }
               case Some(ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN) => {
                 streamingUp = true
