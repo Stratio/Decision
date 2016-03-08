@@ -159,6 +159,11 @@ trait IStratioStreamingAPI {
   def insertData(streamName: String, data: List[ColumnNameValue])
 
 
+  @throws(classOf[StratioEngineStatusException])
+  @throws(classOf[StratioAPISecurityException])
+  def insertDataWithPartition(streamName: String, data: List[ColumnNameValue], keys: List[ColumnNameValue])
+
+
   /**
    * Adds a query to a stream.
    * @param streamName
