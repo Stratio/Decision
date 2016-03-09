@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.streaming.specs;
+package com.stratio.decision.testsAT.specs;
 
 import static net.sf.expectit.matcher.Matchers.regexp;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isIn;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.notNullValue;
+//import static org.assertj.core.api.Assertions.assertThat;
+//import static org.assertj.core.api.Assertions.isEqualTo;
+//import static org.assertj.core.api.Assertions.greaterThanOrEqualTo;
+//import static org.assertj.core.api.Assertions.hasItem;
+//import static org.assertj.core.api.Assertions.hasItems;
+//import static org.assertj.core.api.Assertions.hasSize;
+//import static org.assertj.core.api.Assertions.is;
+//import static org.assertj.core.api.Assertions.isIn;
+//import static org.assertj.core.api.Assertions.nullValue;
+//import static org.assertj.core.api.Assertions.notNullValue;
+
+import static com.stratio.assertions.Assertions.*;
+
+//import static org.assertj.core.api.Assertions.assertThat;  // main one
+
 import static com.stratio.tests.utils.matchers.PatternMatcher.pattern;
 
 import java.io.IOException;
@@ -67,8 +72,7 @@ public class ThenSpec extends BaseSpec {
     public void assertStreamCount(Integer expectedCount)
             throws StratioEngineStatusException, StratioEngineOperationException, StratioAPIGenericException {
         commonspec.getLogger().info("Verifying stream count");
-        assertThat("Bad stream count", commonspec.getStratioStreamingAPI()
-                .listStreams().size(), equalTo(expectedCount));
+        assertThat(commonspec.getStratioStreamingAPI().listStreams().size()).as("Stream count").isEqualTo(expectedCount);
     }
 
     @Then("^the stream '(.*?)' has this columns \\(with name and type\\):$")
@@ -87,13 +91,10 @@ public class ThenSpec extends BaseSpec {
             expectedColumns.add(expectedCol);
         }
 
-        assertThat(
-                "Unexpected column count at stream " + streamName,
-                commonspec.getStratioStreamingAPI().columnsFromStream(
-                        streamName), hasSize(data.raw().size()));
+        assertThat(commonspec.getStratioStreamingAPI().columnsFromStream(streamName))
+                .as("Unexpected column count at stream " + streamName).hasSize(data.raw().size());
 
-        assertThat("Unexpected columns at stream " + streamName, columns,
-                equalTo(expectedColumns));
+        assertThat(columns).as("Unexpected columns at stream " + streamName).isEqualTo(expectedColumns);
     }
 
     @Then("^the stream '(.*?)' has this content \\(with column name, type and value\\):$")
@@ -104,8 +105,7 @@ public class ThenSpec extends BaseSpec {
         KafkaStream<String, StratioStreamingMessage> streams = commonspec
                 .getStreamListener();
 
-        assertThat("No listener attached to stream " + streamName, streams,
-                is(notNullValue()));
+        assertThat(streams).as("No listener attached to stream " + streamName).isNotNull();
 
         ConsumerIterator<String, StratioStreamingMessage> consumer = streams
                 .iterator();
@@ -122,8 +122,7 @@ public class ThenSpec extends BaseSpec {
             try {
                 while (consumer.hasNext()) {
                     msg = (StratioStreamingMessage) consumer.next().message();
-                    assertThat("Unexpected stream content at " + streamName,
-                            msg, is(nullValue()));
+                    assertThat(msg).as("Unexpected stream content at " + streamName).isNotNull();
                 }
             } catch (kafka.consumer.ConsumerTimeoutException e) {
                 commonspec
@@ -165,8 +164,7 @@ public class ThenSpec extends BaseSpec {
                     commonspec.getLogger()
                             .info("Got event from {}", streamName);
 
-                    assertThat("Unexpected stream content", got,
-                            isIn(expectedData));
+                    assertThat(got).as("Unexpected stream content").isIn(expectedData);
                 }
             } catch (kafka.consumer.ConsumerTimeoutException e) {
                 commonspec
@@ -183,13 +181,11 @@ public class ThenSpec extends BaseSpec {
         commonspec.getLogger().info("Verifying topic count ");
 
         if (least == null) {
-            assertThat("Bad topic count",
-                    commonspec.pollZKForTopics("=", expectedCount),
-                    equalTo(expectedCount));
+            assertThat(commonspec.pollZKForTopics("=", expectedCount)).
+                    as("Bad topic count").isEqualTo(expectedCount);
         } else {
-            assertThat("Bad topic count",
-                    commonspec.pollZKForTopics(">=", expectedCount),
-                    greaterThanOrEqualTo(expectedCount));
+            assertThat(commonspec.pollZKForTopics(">=", expectedCount)).
+                    as("Bad topic count").isGreaterThanOrEqualTo(expectedCount);
         }
     }
 
@@ -200,8 +196,7 @@ public class ThenSpec extends BaseSpec {
         List<StratioQueryStream> queries = new ArrayList<StratioQueryStream>();
         queries = commonspec.getStratioStreamingAPI().queriesFromStream(
                 streamName);
-        assertThat("Unexpected queries found for stream " + streamName,
-                queries.size(), equalTo(expectedCount));
+        assertThat(queries.size()).as("Unexpected queries found for stream " + streamName).isEqualTo(expectedCount);
     }
 
     @Then("^the stream '(.*?)' has this query: '(.*?)'$")
@@ -216,8 +211,7 @@ public class ThenSpec extends BaseSpec {
             rawqueries.add(query.query());
         }
 
-        assertThat("Unexpected queries found for stream " + streamName,
-                rawqueries, hasItem(expectedQuery));
+        assertThat(rawqueries).as("Unexpected queries found for stream " + streamName).contains(expectedQuery);
     }
 
     @Then("^the stream '(.*?)' exists$")
@@ -232,7 +226,7 @@ public class ThenSpec extends BaseSpec {
         for (StratioStream s : listed) {
             existingStreams.add(s.getStreamName());
         }
-        assertThat("Unexistant stream", existingStreams, hasItem(stream));
+        assertThat(existingStreams).as("Unexistant stream").contains(stream);
     }
 
     @Then("^the stream '(.*?)' has '(.*?)' as active actions$")
@@ -253,8 +247,7 @@ public class ThenSpec extends BaseSpec {
             }
         }
 
-        assertThat("No action gotten, maybe there's no stream?", actions,
-                is(notNullValue()));
+        assertThat(actions).as("No action gotten, maybe there's no stream?").isNotNull();
 
         Iterator<StreamAction> sAactions = actions.iterator();
         String[] sActions = new String[actions.size()];
@@ -262,7 +255,7 @@ public class ThenSpec extends BaseSpec {
         while (sAactions.hasNext()) {
             sActions[i] = sAactions.next().toString();
         }
-        assertThat("Unexistant action", expectedActions, hasItems(sActions));
+        assertThat(expectedActions).as("Unexistant action").contains(sActions);
     }
 
     @Then("^the shell must output the string '(.*?)'$")
@@ -285,8 +278,7 @@ public class ThenSpec extends BaseSpec {
             o = commonspec.getShellIface().expect(regexp("$")).getBefore();
         }
 
-        assertThat("Shell output not found. Last output was", o,
-                pattern(escapedre));
+        assertThat(o).as("Shell output not found. Last output was").matches(escapedre);
     }
 
     @Then("^the shell output matches a regexp like '(.*?)'$")
