@@ -5,17 +5,22 @@ Feature: Stream creation
 	Scenario Outline: Initial stream creation
 		Given I drop every existing stream
 		When I create a stream with name '<streamName>' and columns (with type):
-			|  향  | String  |
+			| 향 | String  |
 			| 2  | Integer |
 		Then the count of created streams is '1'
 		And the stream '<streamName>' has this columns (with name and type):
 			| 향 | String  |
-			| 2 | Integer |
-
+			| 2  | Integer |
 		Examples:
 			 | streamName 		 |
 			 | testStream 		 |
 			 | anotherTestStream |
+
+	Scenario: Fixture deletion/creation
+		Given I drop every existing stream
+		When I create a stream with name 'anotherTestStream' and columns (with type):
+			| X  | String  |
+			| 2  | Integer |
 
 	Scenario Outline: Consecutive stream creations
 		When I create a stream with name '<streamName>' and columns (with type):
@@ -42,6 +47,11 @@ Feature: Stream creation
 			 | streamName | streamCount | type  |
 			 |            | 0           | empty |
 			 | //NULL//   | 0           | null  |
+	         | "            | 0         |double quotes  |
+			 | `            | 0         |  backtick  |
+			 | '            | 0         |  quotes  |
+			 | asd`         | 0         |  quotes  |
+	         | 0x0008       | 0         |hexadecimal   |
 
 	Scenario Outline: Reserved names stream creations
 		Given I drop every existing stream
