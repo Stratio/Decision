@@ -1,2 +1,3 @@
+/etc/default/decision-variables
 /etc/sds/decision/config.conf
 /etc/sds/decision/drools.conf
