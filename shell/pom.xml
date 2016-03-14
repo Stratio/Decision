@@ -202,6 +202,14 @@
                                     <from>target/appassembler/config/</from>
                                     <to>/opt/sds/decision-shell/config</to>
                                 </copyDirectory>
+                                <copyDirectory>
+                                    <from>../examples/target/examples</from>
+                                    <to>/opt/sds/decision/examples</to>
+                                    <directoryAttributes>
+                                        <user>decision</user>
+                                        <group>stratio</group>
+                                    </directoryAttributes>
+                                </copyDirectory>
                             </assembly>
                         </configuration>
                         <executions>
