@@ -41,7 +41,6 @@
             <version>4.0</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
@@ -140,6 +139,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.stratio.decision</groupId>
+            <artifactId>examples</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
@@ -337,10 +342,8 @@
 		        <execution>
 			    <id>engine</id>
 			    <configuration>
-			        <configurationSourceDirectory>src/main/config
-    			        </configurationSourceDirectory>
-			        <configurationDirectory>:/etc/sds/decision/conf
-			        </configurationDirectory>
+			        <configurationSourceDirectory>src/main/config</configurationSourceDirectory>
+			        <configurationDirectory>:/etc/sds/decision/conf</configurationDirectory>
 			        <copyConfigurationDirectory>true</copyConfigurationDirectory>
 			        <includeConfigurationDirectoryInClasspath>true
 			        </includeConfigurationDirectoryInClasspath>
@@ -348,10 +351,10 @@
 			        <extraJvmArguments>$DECISION_OPTS</extraJvmArguments>
 			        <filterConfigurationDirectory>true</filterConfigurationDirectory>
 			        <programs>
-				    <program>
-				        <mainClass>com.stratio.decision.StreamingEngine</mainClass>
-				        <id>run</id>
-				    </program>
+                        <program>
+                            <mainClass>com.stratio.decision.StreamingEngine</mainClass>
+                            <id>run</id>
+                        </program>
 			        </programs>
 			        <platforms>
 			    	    <platform>unix</platform>
@@ -465,6 +468,14 @@
                         <copyDirectory>
                             <from>target/appassembler/:/etc/sds/decision/conf</from>
                             <to>/etc/sds/decision</to>
+                            <directoryAttributes>
+                                <user>decision</user>
+                                <group>stratio</group>
+                            </directoryAttributes>
+                        </copyDirectory>
+                        <copyDirectory>
+                            <from>../examples/target/examples</from>
+                            <to>/opt/sds/decision/examples</to>
                             <directoryAttributes>
                                 <user>decision</user>
                                 <group>stratio</group>
