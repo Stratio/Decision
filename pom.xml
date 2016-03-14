@@ -41,9 +41,8 @@
         <module>api</module>
         <module>commons</module>
         <module>shell</module>
-        <module>siddhi</module>
         <module>examples</module>
-        <module>doc</module>
+        <module>siddhi</module>
     </modules>
 
     <inceptionYear>2014</inceptionYear>
@@ -235,7 +234,7 @@
             </roles>
         </developer>
         <developer>
-            <id>jp</id>
+            <id>aaitor</id>
             <name>Aitor Argomaniz</name>
             <email>aargomaniz@stratio.com</email>
             <roles>

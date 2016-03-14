@@ -28,30 +28,6 @@
 	<name>Stratio Decision API</name>
 	<description>Decision API</description>
 
-	<developers>
-		<developer>
-			<id>dmorales</id>
-			<name>David Morales</name>
-			<email>dmorales@stratio.com</email>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-				<role>maintainer</role>
-			</roles>
-		</developer>
-		<developer>
-			<id>arodriguez</id>
-			<name>Alberto Rodriguez</name>
-			<email>arodriguez@stratio.com</email>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-				<role>maintainer</role>
-			</roles>
-		</developer>
-	</developers>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>org.scala-lang</groupId>
@@ -119,11 +95,6 @@
 			<artifactId>scala-logging-slf4j_2.10</artifactId>
 			<version>2.1.2</version>
 		</dependency>
-	<!--	<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.1.2</version>
-		</dependency>-->
 
 		<dependency>
 			<groupId>org.apache.curator</groupId>
