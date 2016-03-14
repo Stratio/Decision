@@ -24,14 +24,14 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
-			<directory>target/appassembler</directory>
+			<directory>target/examples</directory>
 			<outputDirectory>decision-examples-${version}</outputDirectory>
 			<excludes>
 				<exclude>bin/**</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet>
-			<directory>target/appassembler/bin</directory>
+			<directory>target/examples/bin</directory>
 			<outputDirectory>decision-examples-${version}/bin</outputDirectory>
 			<includes>
 				<include>*</include>

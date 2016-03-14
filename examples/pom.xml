@@ -26,8 +26,7 @@
 		<jacoco.skip>true</jacoco.skip>
 		<sonar.coverage.exclusions>**/*.java</sonar.coverage.exclusions>
 	</properties>
-	<groupId>com.stratio.decision.examples</groupId>
-	<artifactId>decision-examples</artifactId>
+	<artifactId>examples</artifactId>
 	<name>Stratio Decision examples</name>
 	<description>Stratio Decision examples and executables.</description>
 	<dependencies>
@@ -101,13 +100,14 @@
 					<skip>true</skip>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>appassembler-maven-plugin</artifactId>
 				<version>1.8.1</version>
 				<configuration>
-					<assembleDirectory>target/appassembler</assembleDirectory>
-					<extraJvmArguments>-Xms64m -Xmx64m</extraJvmArguments>
+					<assembleDirectory>target/examples</assembleDirectory>
+					<extraJvmArguments>-Xms128m -Xmx128m</extraJvmArguments>
 					<programs>
 						<program>
 							<mainClass>com.stratio.decision.executables.DataFlowFromCsvMain</mainClass>
