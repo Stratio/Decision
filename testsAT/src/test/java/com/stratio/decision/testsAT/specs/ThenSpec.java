@@ -16,20 +16,7 @@
 package com.stratio.decision.testsAT.specs;
 
 import static net.sf.expectit.matcher.Matchers.regexp;
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.assertj.core.api.Assertions.isEqualTo;
-//import static org.assertj.core.api.Assertions.greaterThanOrEqualTo;
-//import static org.assertj.core.api.Assertions.hasItem;
-//import static org.assertj.core.api.Assertions.hasItems;
-//import static org.assertj.core.api.Assertions.hasSize;
-//import static org.assertj.core.api.Assertions.is;
-//import static org.assertj.core.api.Assertions.isIn;
-//import static org.assertj.core.api.Assertions.nullValue;
-//import static org.assertj.core.api.Assertions.notNullValue;
-
 import static com.stratio.assertions.Assertions.*;
-
-//import static org.assertj.core.api.Assertions.assertThat;  // main one
 
 import static com.stratio.tests.utils.matchers.PatternMatcher.pattern;
 
@@ -255,7 +242,7 @@ public class ThenSpec extends BaseSpec {
         while (sAactions.hasNext()) {
             sActions[i] = sAactions.next().toString();
         }
-        assertThat(expectedActions).as("Unexistant action").contains(sActions);
+        assertThat(expectedActions).as("Unexistant action").contains(sActions);   //contains(sActions);
     }
 
     @Then("^the shell must output the string '(.*?)'$")
