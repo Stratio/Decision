@@ -473,14 +473,7 @@
                                 <group>stratio</group>
                             </directoryAttributes>
                         </copyDirectory>
-                        <copyDirectory>
-                            <from>../examples/target/examples</from>
-                            <to>/opt/sds/decision/examples</to>
-                            <directoryAttributes>
-                                <user>decision</user>
-                                <group>stratio</group>
-                            </directoryAttributes>
-                        </copyDirectory>
+
                         <copyFile>
                             <path>src/main/unix/files_and_dirs/etc/default/decision-variables</path>
                             <toFile>/etc/default/decision-variables</toFile>
