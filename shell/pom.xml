@@ -204,7 +204,7 @@
                                 </copyDirectory>
                                 <copyDirectory>
                                     <from>../examples/target/examples</from>
-                                    <to>/opt/sds/decision/examples</to>
+                                    <to>/opt/sds/decision-shell/examples</to>
                                     <directoryAttributes>
                                         <user>decision</user>
                                         <group>stratio</group>
