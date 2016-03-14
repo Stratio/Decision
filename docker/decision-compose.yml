@@ -75,7 +75,7 @@ waitelastic:
     - elasticsearch
 
 decision:
-  image: qa.stratio.com:5000/stratio/decision:latest
+  image: qa.stratio.com:5000/stratio/decision:1.1.0-SNAPSHOT
   container_name: decision
   links:
     - waitkafka
@@ -85,7 +85,7 @@ decision:
   environment:
     KAFKA_HOSTS: kafka.demo.stratio.com:9092
     ZOOKEEPER_HOSTS: zookeeper.demo.stratio.com:2181
-    CASSANDRA_HOSTS: cassandra.demo.stratio.com
+    CASSANDRA_HOSTS: cassandra.demo.stratio.com:9042
     MONGODB_HOSTS: mongo.demo.stratio.com:27017
     ES_HOSTS: elasticsearch.demo.stratio.com:9300
 #   SOLR_HOSTS;
@@ -96,7 +96,7 @@ decision:
     FAILOVER_ENABLED: "true"
 
 decision-shell:
-  image: qa.stratio.com:5000/stratio/decision-shell:latest
+  image: qa.stratio.com:5000/stratio/decision-shell:1.1.0-SNAPSHOT
   container_name: shell
   links:
     - decision
