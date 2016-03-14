@@ -33,34 +33,34 @@ waitkafka:
   links:
     - kafka
 
-cassandra-lucene-index:
-  image: stratio/cassandra-lucene-index:2.2.4.0
-  container_name: cassandra
-  ports: 
-    - "9042:9042"
-  environment:
-    CLUSTER_NAME: DemoCluster
-    MAX_HEAP: 256M
-    MAX_NEW: 64M
-    SEEDS: 127.0.0.1
+#cassandra-lucene-index:
+#  image: stratio/cassandra-lucene-index:2.2.4.0
+#  container_name: cassandra
+#  ports: 
+#    - "9042:9042"
+#  environment:
+#    CLUSTER_NAME: DemoCluster
+#    MAX_HEAP: 256M
+#    MAX_NEW: 64M
+#    SEEDS: 127.0.0.1
 
-waitcassandra:
-  image: aanand/wait
-  container_name: waitcassandra
-  links:
-    - cassandra-lucene-index
+#waitcassandra:
+#  image: aanand/wait
+#  container_name: waitcassandra
+#  links:
+#    - cassandra-lucene-index
 
-mongo:
-  image: stratio/mongo:3.0.4
-  container_name: mongo
-  ports: 
-    - "27017:27017"
+#mongo:
+#  image: stratio/mongo:3.0.4
+#  container_name: mongo
+#  ports: 
+#    - "27017:27017"
 
-waitmongo:
-  image: aanand/wait
-  container_name: waitmongo
-  links:
-    - mongo
+#waitmongo:
+#  image: aanand/wait
+#  container_name: waitmongo
+#  links:
+#    - mongo
 
 elasticsearch:
   image: qa.stratio.com:5000/stratio/elasticsearch:1.7.1
@@ -79,14 +79,14 @@ decision:
   container_name: decision
   links:
     - waitkafka
-    - waitcassandra
-    - waitmongo
+#    - waitcassandra
+#    - waitmongo
     - waitelastic
   environment:
     KAFKA_HOSTS: kafka.demo.stratio.com:9092
     ZOOKEEPER_HOSTS: zookeeper.demo.stratio.com:2181
-    CASSANDRA_HOSTS: cassandra.demo.stratio.com:9042
-    MONGODB_HOSTS: mongo.demo.stratio.com:27017
+#    CASSANDRA_HOSTS: cassandra.demo.stratio.com:9042
+#    MONGODB_HOSTS: mongo.demo.stratio.com:27017
     ES_HOSTS: elasticsearch.demo.stratio.com:9300
 #   SOLR_HOSTS;
     CLUSTERING_ENABLED: "false"
