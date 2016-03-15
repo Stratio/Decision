@@ -167,6 +167,12 @@
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
             </dependency>
+            <!-- AVRO -->
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>1.8.0</version>
+            </dependency>
 
             <!-- METRICS -->
             <dependency>

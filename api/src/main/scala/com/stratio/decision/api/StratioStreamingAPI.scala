@@ -22,6 +22,7 @@ import com.stratio.decision.api.kafka.{KafkaConsumer, KafkaProducer}
 import com.stratio.decision.api.messaging.MessageBuilder.builder
 import com.stratio.decision.api.messaging.{ColumnNameType, _}
 import com.stratio.decision.api.zookeeper.ZookeeperConsumer
+import com.stratio.decision.commons.avro.{ColumnType, InsertMessage}
 import com.stratio.decision.commons.constants.InternalTopic
 import com.stratio.decision.commons.constants.STREAMING.{ZK_EPHEMERAL_NODE_STATUS_CONNECTED,
 ZK_EPHEMERAL_NODE_STATUS_INITIALIZED, ZK_EPHEMERAL_NODE_STATUS_PATH, ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN, ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH}
@@ -83,10 +84,31 @@ class StratioStreamingAPI
   }
 
 
+//  def insertData(streamName: String, data: List[ColumnNameValue]) = {
+//    checkInsertStreamingStatus
+//    val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
+//    asyncOperation.performAsyncOperation(insertStreamMessage)
+//  }
+
+  // TODO - TEST AVRO
   def insertData(streamName: String, data: List[ColumnNameValue]) = {
+
     checkInsertStreamingStatus
+
     val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
-    asyncOperation.performAsyncOperation(insertStreamMessage)
+
+    var columns = new java.util.ArrayList[com.stratio.decision.commons.avro.ColumnType]();
+    var c : ColumnType = null
+    for (d <- data){
+      c = new ColumnType(d.columnName, d.columnValue.toString)
+      columns.add(c)
+    }
+
+    val insertMessage = new InsertMessage(insertStreamMessage.getOperation, insertStreamMessage.getStreamName,
+      insertStreamMessage.getSession_id, columns)
+
+    kafkaDataProducer.sendAvro(insertMessage,  insertStreamMessage.getOperation)
+
   }
 
 

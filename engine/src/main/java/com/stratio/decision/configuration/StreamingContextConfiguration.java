@@ -15,12 +15,19 @@
  */
 package com.stratio.decision.configuration;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.avro.io.BinaryDecoder;
+import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.specific.SpecificDatumReader;
+import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
@@ -35,11 +42,13 @@ import org.springframework.context.annotation.Import;
 
 import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.decision.StreamingEngine;
+import com.stratio.decision.commons.avro.InsertMessage;
 import com.stratio.decision.commons.constants.InternalTopic;
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.kafka.service.KafkaTopicService;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.functions.AvroDeserializeFunction;
 import com.stratio.decision.functions.FilterDataFunction;
 import com.stratio.decision.functions.PairDataFunction;
 import com.stratio.decision.functions.SaveToCassandraActionExecutionFunction;
@@ -65,6 +74,9 @@ import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
 import com.stratio.decision.service.StreamOperationService;
 import com.stratio.decision.utils.ZKUtils;
 
+import scala.Array;
+import scala.Tuple2;
+
 @Configuration
 @Import(ServiceConfiguration.class)
 public class StreamingContextConfiguration {
@@ -81,6 +93,10 @@ public class StreamingContextConfiguration {
     private KafkaToJavaSerializer kafkaToJavaSerializer;
 
     private KafkaTopicService kafkaTopicService;
+
+
+
+
 
     private JavaStreamingContext create(String streamingContextName, int port, long streamingBatchTime, String sparkHost) {
         SparkConf conf = new SparkConf();
@@ -302,6 +318,9 @@ public class StreamingContextConfiguration {
         }
     }
 
+
+
+
     private void configureActionContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
 
@@ -390,6 +409,10 @@ public class StreamingContextConfiguration {
 */
     }
 
+
+
+
+
     private void configureDataContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
 
@@ -414,20 +437,39 @@ public class StreamingContextConfiguration {
          Decision topics has only one partition (by default), so if we have two o more decision instances (consumers) reading the
          same topic with the same groupId, only one instance will be able to read from the topic
          */
-        JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorumWithPath(),  configurationContext.getGroupId(), baseTopicMap);
-        messages.cache();
+//        JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
+//                configurationContext.getZookeeperHostsQuorumWithPath(),  configurationContext.getGroupId(), baseTopicMap);
 
-        KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
+        // TODO Prueba Avro
+        HashMap<String, String> kafkaParams = new HashMap<>();
+        kafkaParams.put("zookeeper.connect", configurationContext.getZookeeperHostsQuorumWithPath());
+        kafkaParams.put("zookeeper.connection.timeout.ms", "10000");
+        kafkaParams.put("group.id", configurationContext.getGroupId());
 
-        JavaDStream<StratioStreamingMessage> insertRequests = messages.filter(
-                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.INSERT)).map(
-                keepPayloadFromMessageFunction);
 
-        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(streamOperationService,
-                configurationContext.getZookeeperHostsQuorum());
+        JavaPairDStream<String, byte[]> messages = KafkaUtils.createStream(context, String.class, byte[].class,
+                kafka.serializer.StringDecoder.class, kafka.serializer.DefaultDecoder.class, kafkaParams, baseTopicMap,
+                StorageLevel.MEMORY_AND_DISK_SER_2());
 
-        insertRequests.foreachRDD(insertIntoStreamFunction);
+        AvroDeserializeFunction avroDeserializeFunction = new AvroDeserializeFunction();
+
+        JavaDStream<StratioStreamingMessage> m = messages.map(avroDeserializeFunction);
+
+
+
+
+//        messages.cache();
+
+//        KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
+//
+//        JavaDStream<StratioStreamingMessage> insertRequests = messages.filter(
+//                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.INSERT)).map(
+//                keepPayloadFromMessageFunction);
+//
+//        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(streamOperationService,
+//                configurationContext.getZookeeperHostsQuorum());
+//
+//        insertRequests.foreachRDD(insertIntoStreamFunction);
     }
 
     @PostConstruct
