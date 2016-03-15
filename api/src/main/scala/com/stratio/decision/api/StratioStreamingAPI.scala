@@ -100,7 +100,7 @@ class StratioStreamingAPI
     var columns = new java.util.ArrayList[com.stratio.decision.commons.avro.ColumnType]();
     var c : ColumnType = null
     for (d <- data){
-      c = new ColumnType(d.columnName, d.columnValue.toString)
+      c = new ColumnType(d.columnName, d.columnValue.toString, d.columnValue.getClass.getName)
       columns.add(c)
     }
 
