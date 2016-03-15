@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.commons.avro;  
+package com.stratio.decision.commons.avro;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
@@ -170,7 +170,7 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
   public static Builder newBuilder() {
     return new Builder();
   }
-  
+
   /**
    * Creates a new InsertMessage RecordBuilder by copying an existing Builder.
    * @param other The existing builder to copy.
@@ -179,7 +179,7 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
   public static Builder newBuilder(Builder other) {
     return new Builder(other);
   }
-  
+
   /**
    * Creates a new InsertMessage RecordBuilder by copying an existing InsertMessage instance.
    * @param other The existing instance to copy.
@@ -188,12 +188,12 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
   public static Builder newBuilder(InsertMessage other) {
     return new Builder(other);
   }
-  
+
   /**
    * RecordBuilder for InsertMessage instances.
    */
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<InsertMessage>
-    implements org.apache.avro.data.RecordBuilder<InsertMessage> {
+          implements org.apache.avro.data.RecordBuilder<InsertMessage> {
 
     private CharSequence operation;
     private CharSequence streamName;
@@ -206,7 +206,7 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
     private Builder() {
       super(InsertMessage.SCHEMA$);
     }
-    
+
     /**
      * Creates a Builder by copying an existing Builder.
      * @param other The existing Builder to copy.
@@ -238,13 +238,13 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
         fieldSetFlags()[5] = true;
       }
     }
-    
+
     /**
      * Creates a Builder by copying an existing InsertMessage instance
      * @param other The existing instance to copy.
      */
     private Builder(InsertMessage other) {
-            super(InsertMessage.SCHEMA$);
+      super(InsertMessage.SCHEMA$);
       if (isValidValue(fields()[0], other.operation)) {
         this.operation = data().deepCopy(fields()[0].schema(), other.operation);
         fieldSetFlags()[0] = true;
@@ -272,38 +272,38 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
     }
 
     /**
-      * Gets the value of the 'operation' field.
-      * @return The value.
-      */
+     * Gets the value of the 'operation' field.
+     * @return The value.
+     */
     public CharSequence getOperation() {
       return operation;
     }
 
     /**
-      * Sets the value of the 'operation' field.
-      * @param value The value of 'operation'.
-      * @return This builder.
-      */
+     * Sets the value of the 'operation' field.
+     * @param value The value of 'operation'.
+     * @return This builder.
+     */
     public Builder setOperation(CharSequence value) {
       validate(fields()[0], value);
       this.operation = value;
       fieldSetFlags()[0] = true;
-      return this; 
+      return this;
     }
 
     /**
-      * Checks whether the 'operation' field has been set.
-      * @return True if the 'operation' field has been set, false otherwise.
-      */
+     * Checks whether the 'operation' field has been set.
+     * @return True if the 'operation' field has been set, false otherwise.
+     */
     public boolean hasOperation() {
       return fieldSetFlags()[0];
     }
 
 
     /**
-      * Clears the value of the 'operation' field.
-      * @return This builder.
-      */
+     * Clears the value of the 'operation' field.
+     * @return This builder.
+     */
     public Builder clearOperation() {
       operation = null;
       fieldSetFlags()[0] = false;
@@ -311,38 +311,38 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
     }
 
     /**
-      * Gets the value of the 'streamName' field.
-      * @return The value.
-      */
+     * Gets the value of the 'streamName' field.
+     * @return The value.
+     */
     public CharSequence getStreamName() {
       return streamName;
     }
 
     /**
-      * Sets the value of the 'streamName' field.
-      * @param value The value of 'streamName'.
-      * @return This builder.
-      */
+     * Sets the value of the 'streamName' field.
+     * @param value The value of 'streamName'.
+     * @return This builder.
+     */
     public Builder setStreamName(CharSequence value) {
       validate(fields()[1], value);
       this.streamName = value;
       fieldSetFlags()[1] = true;
-      return this; 
+      return this;
     }
 
     /**
-      * Checks whether the 'streamName' field has been set.
-      * @return True if the 'streamName' field has been set, false otherwise.
-      */
+     * Checks whether the 'streamName' field has been set.
+     * @return True if the 'streamName' field has been set, false otherwise.
+     */
     public boolean hasStreamName() {
       return fieldSetFlags()[1];
     }
 
 
     /**
-      * Clears the value of the 'streamName' field.
-      * @return This builder.
-      */
+     * Clears the value of the 'streamName' field.
+     * @return This builder.
+     */
     public Builder clearStreamName() {
       streamName = null;
       fieldSetFlags()[1] = false;
@@ -350,38 +350,38 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
     }
 
     /**
-      * Gets the value of the 'sessionId' field.
-      * @return The value.
-      */
+     * Gets the value of the 'sessionId' field.
+     * @return The value.
+     */
     public CharSequence getSessionId() {
       return sessionId;
     }
 
     /**
-      * Sets the value of the 'sessionId' field.
-      * @param value The value of 'sessionId'.
-      * @return This builder.
-      */
+     * Sets the value of the 'sessionId' field.
+     * @param value The value of 'sessionId'.
+     * @return This builder.
+     */
     public Builder setSessionId(CharSequence value) {
       validate(fields()[2], value);
       this.sessionId = value;
       fieldSetFlags()[2] = true;
-      return this; 
+      return this;
     }
 
     /**
-      * Checks whether the 'sessionId' field has been set.
-      * @return True if the 'sessionId' field has been set, false otherwise.
-      */
+     * Checks whether the 'sessionId' field has been set.
+     * @return True if the 'sessionId' field has been set, false otherwise.
+     */
     public boolean hasSessionId() {
       return fieldSetFlags()[2];
     }
 
 
     /**
-      * Clears the value of the 'sessionId' field.
-      * @return This builder.
-      */
+     * Clears the value of the 'sessionId' field.
+     * @return This builder.
+     */
     public Builder clearSessionId() {
       sessionId = null;
       fieldSetFlags()[2] = false;
@@ -389,38 +389,38 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
     }
 
     /**
-      * Gets the value of the 'timestamp' field.
-      * @return The value.
-      */
+     * Gets the value of the 'timestamp' field.
+     * @return The value.
+     */
     public Long getTimestamp() {
       return timestamp;
     }
 
     /**
-      * Sets the value of the 'timestamp' field.
-      * @param value The value of 'timestamp'.
-      * @return This builder.
-      */
+     * Sets the value of the 'timestamp' field.
+     * @param value The value of 'timestamp'.
+     * @return This builder.
+     */
     public Builder setTimestamp(Long value) {
       validate(fields()[3], value);
       this.timestamp = value;
       fieldSetFlags()[3] = true;
-      return this; 
+      return this;
     }
 
     /**
-      * Checks whether the 'timestamp' field has been set.
-      * @return True if the 'timestamp' field has been set, false otherwise.
-      */
+     * Checks whether the 'timestamp' field has been set.
+     * @return True if the 'timestamp' field has been set, false otherwise.
+     */
     public boolean hasTimestamp() {
       return fieldSetFlags()[3];
     }
 
 
     /**
-      * Clears the value of the 'timestamp' field.
-      * @return This builder.
-      */
+     * Clears the value of the 'timestamp' field.
+     * @return This builder.
+     */
     public Builder clearTimestamp() {
       timestamp = null;
       fieldSetFlags()[3] = false;
@@ -428,38 +428,38 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
     }
 
     /**
-      * Gets the value of the 'data' field.
-      * @return The value.
-      */
+     * Gets the value of the 'data' field.
+     * @return The value.
+     */
     public java.util.List<ColumnType> getData() {
       return data;
     }
 
     /**
-      * Sets the value of the 'data' field.
-      * @param value The value of 'data'.
-      * @return This builder.
-      */
+     * Sets the value of the 'data' field.
+     * @param value The value of 'data'.
+     * @return This builder.
+     */
     public Builder setData(java.util.List<ColumnType> value) {
       validate(fields()[4], value);
       this.data = value;
       fieldSetFlags()[4] = true;
-      return this; 
+      return this;
     }
 
     /**
-      * Checks whether the 'data' field has been set.
-      * @return True if the 'data' field has been set, false otherwise.
-      */
+     * Checks whether the 'data' field has been set.
+     * @return True if the 'data' field has been set, false otherwise.
+     */
     public boolean hasData() {
       return fieldSetFlags()[4];
     }
 
 
     /**
-      * Clears the value of the 'data' field.
-      * @return This builder.
-      */
+     * Clears the value of the 'data' field.
+     * @return This builder.
+     */
     public Builder clearData() {
       data = null;
       fieldSetFlags()[4] = false;
@@ -467,38 +467,38 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
     }
 
     /**
-      * Gets the value of the 'actions' field.
-      * @return The value.
-      */
+     * Gets the value of the 'actions' field.
+     * @return The value.
+     */
     public java.util.List<Action> getActions() {
       return actions;
     }
 
     /**
-      * Sets the value of the 'actions' field.
-      * @param value The value of 'actions'.
-      * @return This builder.
-      */
+     * Sets the value of the 'actions' field.
+     * @param value The value of 'actions'.
+     * @return This builder.
+     */
     public Builder setActions(java.util.List<Action> value) {
       validate(fields()[5], value);
       this.actions = value;
       fieldSetFlags()[5] = true;
-      return this; 
+      return this;
     }
 
     /**
-      * Checks whether the 'actions' field has been set.
-      * @return True if the 'actions' field has been set, false otherwise.
-      */
+     * Checks whether the 'actions' field has been set.
+     * @return True if the 'actions' field has been set, false otherwise.
+     */
     public boolean hasActions() {
       return fieldSetFlags()[5];
     }
 
 
     /**
-      * Clears the value of the 'actions' field.
-      * @return This builder.
-      */
+     * Clears the value of the 'actions' field.
+     * @return This builder.
+     */
     public Builder clearActions() {
       actions = null;
       fieldSetFlags()[5] = false;
@@ -523,18 +523,18 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
   }
 
   private static final org.apache.avro.io.DatumWriter
-    WRITER$ = new org.apache.avro.specific.SpecificDatumWriter(SCHEMA$);  
+          WRITER$ = new org.apache.avro.specific.SpecificDatumWriter(SCHEMA$);
 
   @Override public void writeExternal(java.io.ObjectOutput out)
-    throws java.io.IOException {
+          throws java.io.IOException {
     WRITER$.write(this, org.apache.avro.specific.SpecificData.getEncoder(out));
   }
 
   private static final org.apache.avro.io.DatumReader
-    READER$ = new org.apache.avro.specific.SpecificDatumReader(SCHEMA$);  
+          READER$ = new org.apache.avro.specific.SpecificDatumReader(SCHEMA$);
 
   @Override public void readExternal(java.io.ObjectInput in)
-    throws java.io.IOException {
+          throws java.io.IOException {
     READER$.read(this, org.apache.avro.specific.SpecificData.getDecoder(in));
   }
 

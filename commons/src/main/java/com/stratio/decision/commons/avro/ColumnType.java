@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.commons.avro;  
+package com.stratio.decision.commons.avro;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class ColumnType extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
@@ -113,7 +113,7 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
   public static com.stratio.decision.commons.avro.ColumnType.Builder newBuilder() {
     return new com.stratio.decision.commons.avro.ColumnType.Builder();
   }
-  
+
   /**
    * Creates a new ColumnType RecordBuilder by copying an existing Builder.
    * @param other The existing builder to copy.
@@ -122,7 +122,7 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
   public static com.stratio.decision.commons.avro.ColumnType.Builder newBuilder(com.stratio.decision.commons.avro.ColumnType.Builder other) {
     return new com.stratio.decision.commons.avro.ColumnType.Builder(other);
   }
-  
+
   /**
    * Creates a new ColumnType RecordBuilder by copying an existing ColumnType instance.
    * @param other The existing instance to copy.
@@ -131,12 +131,12 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
   public static com.stratio.decision.commons.avro.ColumnType.Builder newBuilder(com.stratio.decision.commons.avro.ColumnType other) {
     return new com.stratio.decision.commons.avro.ColumnType.Builder(other);
   }
-  
+
   /**
    * RecordBuilder for ColumnType instances.
    */
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<ColumnType>
-    implements org.apache.avro.data.RecordBuilder<ColumnType> {
+          implements org.apache.avro.data.RecordBuilder<ColumnType> {
 
     private java.lang.CharSequence column;
     private java.lang.CharSequence value;
@@ -146,7 +146,7 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
     private Builder() {
       super(com.stratio.decision.commons.avro.ColumnType.SCHEMA$);
     }
-    
+
     /**
      * Creates a Builder by copying an existing Builder.
      * @param other The existing Builder to copy.
@@ -166,13 +166,13 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
         fieldSetFlags()[2] = true;
       }
     }
-    
+
     /**
      * Creates a Builder by copying an existing ColumnType instance
      * @param other The existing instance to copy.
      */
     private Builder(com.stratio.decision.commons.avro.ColumnType other) {
-            super(com.stratio.decision.commons.avro.ColumnType.SCHEMA$);
+      super(com.stratio.decision.commons.avro.ColumnType.SCHEMA$);
       if (isValidValue(fields()[0], other.column)) {
         this.column = data().deepCopy(fields()[0].schema(), other.column);
         fieldSetFlags()[0] = true;
@@ -188,38 +188,38 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
     }
 
     /**
-      * Gets the value of the 'column' field.
-      * @return The value.
-      */
+     * Gets the value of the 'column' field.
+     * @return The value.
+     */
     public java.lang.CharSequence getColumn() {
       return column;
     }
 
     /**
-      * Sets the value of the 'column' field.
-      * @param value The value of 'column'.
-      * @return This builder.
-      */
+     * Sets the value of the 'column' field.
+     * @param value The value of 'column'.
+     * @return This builder.
+     */
     public com.stratio.decision.commons.avro.ColumnType.Builder setColumn(java.lang.CharSequence value) {
       validate(fields()[0], value);
       this.column = value;
       fieldSetFlags()[0] = true;
-      return this; 
+      return this;
     }
 
     /**
-      * Checks whether the 'column' field has been set.
-      * @return True if the 'column' field has been set, false otherwise.
-      */
+     * Checks whether the 'column' field has been set.
+     * @return True if the 'column' field has been set, false otherwise.
+     */
     public boolean hasColumn() {
       return fieldSetFlags()[0];
     }
 
 
     /**
-      * Clears the value of the 'column' field.
-      * @return This builder.
-      */
+     * Clears the value of the 'column' field.
+     * @return This builder.
+     */
     public com.stratio.decision.commons.avro.ColumnType.Builder clearColumn() {
       column = null;
       fieldSetFlags()[0] = false;
@@ -227,38 +227,38 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
     }
 
     /**
-      * Gets the value of the 'value' field.
-      * @return The value.
-      */
+     * Gets the value of the 'value' field.
+     * @return The value.
+     */
     public java.lang.CharSequence getValue() {
       return value;
     }
 
     /**
-      * Sets the value of the 'value' field.
-      * @param value The value of 'value'.
-      * @return This builder.
-      */
+     * Sets the value of the 'value' field.
+     * @param value The value of 'value'.
+     * @return This builder.
+     */
     public com.stratio.decision.commons.avro.ColumnType.Builder setValue(java.lang.CharSequence value) {
       validate(fields()[1], value);
       this.value = value;
       fieldSetFlags()[1] = true;
-      return this; 
+      return this;
     }
 
     /**
-      * Checks whether the 'value' field has been set.
-      * @return True if the 'value' field has been set, false otherwise.
-      */
+     * Checks whether the 'value' field has been set.
+     * @return True if the 'value' field has been set, false otherwise.
+     */
     public boolean hasValue() {
       return fieldSetFlags()[1];
     }
 
 
     /**
-      * Clears the value of the 'value' field.
-      * @return This builder.
-      */
+     * Clears the value of the 'value' field.
+     * @return This builder.
+     */
     public com.stratio.decision.commons.avro.ColumnType.Builder clearValue() {
       value = null;
       fieldSetFlags()[1] = false;
@@ -266,38 +266,38 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
     }
 
     /**
-      * Gets the value of the 'type' field.
-      * @return The value.
-      */
+     * Gets the value of the 'type' field.
+     * @return The value.
+     */
     public java.lang.CharSequence getType() {
       return type;
     }
 
     /**
-      * Sets the value of the 'type' field.
-      * @param value The value of 'type'.
-      * @return This builder.
-      */
+     * Sets the value of the 'type' field.
+     * @param value The value of 'type'.
+     * @return This builder.
+     */
     public com.stratio.decision.commons.avro.ColumnType.Builder setType(java.lang.CharSequence value) {
       validate(fields()[2], value);
       this.type = value;
       fieldSetFlags()[2] = true;
-      return this; 
+      return this;
     }
 
     /**
-      * Checks whether the 'type' field has been set.
-      * @return True if the 'type' field has been set, false otherwise.
-      */
+     * Checks whether the 'type' field has been set.
+     * @return True if the 'type' field has been set, false otherwise.
+     */
     public boolean hasType() {
       return fieldSetFlags()[2];
     }
 
 
     /**
-      * Clears the value of the 'type' field.
-      * @return This builder.
-      */
+     * Clears the value of the 'type' field.
+     * @return This builder.
+     */
     public com.stratio.decision.commons.avro.ColumnType.Builder clearType() {
       type = null;
       fieldSetFlags()[2] = false;
@@ -319,18 +319,18 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
   }
 
   private static final org.apache.avro.io.DatumWriter
-    WRITER$ = new org.apache.avro.specific.SpecificDatumWriter(SCHEMA$);  
+          WRITER$ = new org.apache.avro.specific.SpecificDatumWriter(SCHEMA$);
 
   @Override public void writeExternal(java.io.ObjectOutput out)
-    throws java.io.IOException {
+          throws java.io.IOException {
     WRITER$.write(this, org.apache.avro.specific.SpecificData.getEncoder(out));
   }
 
   private static final org.apache.avro.io.DatumReader
-    READER$ = new org.apache.avro.specific.SpecificDatumReader(SCHEMA$);  
+          READER$ = new org.apache.avro.specific.SpecificDatumReader(SCHEMA$);
 
   @Override public void readExternal(java.io.ObjectInput in)
-    throws java.io.IOException {
+          throws java.io.IOException {
     READER$.read(this, org.apache.avro.specific.SpecificData.getDecoder(in));
   }
 
