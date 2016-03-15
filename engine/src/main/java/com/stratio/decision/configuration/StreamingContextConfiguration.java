@@ -440,6 +440,20 @@ public class StreamingContextConfiguration {
 //        JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
 //                configurationContext.getZookeeperHostsQuorumWithPath(),  configurationContext.getGroupId(), baseTopicMap);
 
+
+         /*  messages.cache();
+
+        KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
+
+        JavaDStream<StratioStreamingMessage> insertRequests = messages.filter(
+                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.INSERT)).map(
+                keepPayloadFromMessageFunction);
+
+        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(streamOperationService,
+                configurationContext.getZookeeperHostsQuorum());
+
+        insertRequests.foreachRDD(insertIntoStreamFunction);*/
+
         // TODO Prueba Avro
         HashMap<String, String> kafkaParams = new HashMap<>();
         kafkaParams.put("zookeeper.connect", configurationContext.getZookeeperHostsQuorumWithPath());
@@ -452,24 +466,16 @@ public class StreamingContextConfiguration {
                 StorageLevel.MEMORY_AND_DISK_SER_2());
 
         AvroDeserializeFunction avroDeserializeFunction = new AvroDeserializeFunction();
-
         JavaDStream<StratioStreamingMessage> m = messages.map(avroDeserializeFunction);
 
+        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(streamOperationService,
+                configurationContext.getZookeeperHostsQuorum());
+        m.foreachRDD(insertIntoStreamFunction);
 
 
 
-//        messages.cache();
 
-//        KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
-//
-//        JavaDStream<StratioStreamingMessage> insertRequests = messages.filter(
-//                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.INSERT)).map(
-//                keepPayloadFromMessageFunction);
-//
-//        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(streamOperationService,
-//                configurationContext.getZookeeperHostsQuorum());
-//
-//        insertRequests.foreachRDD(insertIntoStreamFunction);
+
     }
 
     @PostConstruct

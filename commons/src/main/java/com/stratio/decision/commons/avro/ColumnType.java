@@ -17,11 +17,12 @@ package com.stratio.decision.commons.avro;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class ColumnType extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -3306845145819085186L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"ColumnType\",\"namespace\":\"com.stratio.decision.commons.avro\",\"fields\":[{\"name\":\"column\",\"type\":\"string\"},{\"name\":\"value\",\"type\":\"string\"}]}");
+  private static final long serialVersionUID = 6385653382887656308L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"ColumnType\",\"namespace\":\"com.stratio.decision.commons.avro\",\"fields\":[{\"name\":\"column\",\"type\":\"string\"},{\"name\":\"value\",\"type\":\"string\"},{\"name\":\"type\",\"type\":\"string\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public java.lang.CharSequence column;
   @Deprecated public java.lang.CharSequence value;
+  @Deprecated public java.lang.CharSequence type;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -33,9 +34,10 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
   /**
    * All-args constructor.
    */
-  public ColumnType(java.lang.CharSequence column, java.lang.CharSequence value) {
+  public ColumnType(java.lang.CharSequence column, java.lang.CharSequence value, java.lang.CharSequence type) {
     this.column = column;
     this.value = value;
+    this.type = type;
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
@@ -44,6 +46,7 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
     switch (field$) {
     case 0: return column;
     case 1: return value;
+    case 2: return type;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -53,6 +56,7 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
     switch (field$) {
     case 0: column = (java.lang.CharSequence)value$; break;
     case 1: value = (java.lang.CharSequence)value$; break;
+    case 2: type = (java.lang.CharSequence)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -85,6 +89,21 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
    */
   public void setValue(java.lang.CharSequence value) {
     this.value = value;
+  }
+
+  /**
+   * Gets the value of the 'type' field.
+   */
+  public java.lang.CharSequence getType() {
+    return type;
+  }
+
+  /**
+   * Sets the value of the 'type' field.
+   * @param value the value to set.
+   */
+  public void setType(java.lang.CharSequence value) {
+    this.type = value;
   }
 
   /**
@@ -121,6 +140,7 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
 
     private java.lang.CharSequence column;
     private java.lang.CharSequence value;
+    private java.lang.CharSequence type;
 
     /** Creates a new Builder */
     private Builder() {
@@ -141,6 +161,10 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
         this.value = data().deepCopy(fields()[1].schema(), other.value);
         fieldSetFlags()[1] = true;
       }
+      if (isValidValue(fields()[2], other.type)) {
+        this.type = data().deepCopy(fields()[2].schema(), other.type);
+        fieldSetFlags()[2] = true;
+      }
     }
     
     /**
@@ -156,6 +180,10 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
       if (isValidValue(fields()[1], other.value)) {
         this.value = data().deepCopy(fields()[1].schema(), other.value);
         fieldSetFlags()[1] = true;
+      }
+      if (isValidValue(fields()[2], other.type)) {
+        this.type = data().deepCopy(fields()[2].schema(), other.type);
+        fieldSetFlags()[2] = true;
       }
     }
 
@@ -237,12 +265,52 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
       return this;
     }
 
+    /**
+      * Gets the value of the 'type' field.
+      * @return The value.
+      */
+    public java.lang.CharSequence getType() {
+      return type;
+    }
+
+    /**
+      * Sets the value of the 'type' field.
+      * @param value The value of 'type'.
+      * @return This builder.
+      */
+    public com.stratio.decision.commons.avro.ColumnType.Builder setType(java.lang.CharSequence value) {
+      validate(fields()[2], value);
+      this.type = value;
+      fieldSetFlags()[2] = true;
+      return this; 
+    }
+
+    /**
+      * Checks whether the 'type' field has been set.
+      * @return True if the 'type' field has been set, false otherwise.
+      */
+    public boolean hasType() {
+      return fieldSetFlags()[2];
+    }
+
+
+    /**
+      * Clears the value of the 'type' field.
+      * @return This builder.
+      */
+    public com.stratio.decision.commons.avro.ColumnType.Builder clearType() {
+      type = null;
+      fieldSetFlags()[2] = false;
+      return this;
+    }
+
     @Override
     public ColumnType build() {
       try {
         ColumnType record = new ColumnType();
         record.column = fieldSetFlags()[0] ? this.column : (java.lang.CharSequence) defaultValue(fields()[0]);
         record.value = fieldSetFlags()[1] ? this.value : (java.lang.CharSequence) defaultValue(fields()[1]);
+        record.type = fieldSetFlags()[2] ? this.type : (java.lang.CharSequence) defaultValue(fields()[2]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
