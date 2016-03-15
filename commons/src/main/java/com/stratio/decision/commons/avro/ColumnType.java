@@ -27,7 +27,7 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
   /**
    * Default constructor.  Note that this does not initialize fields
    * to their default values from the schema.  If that is desired then
-   * one should use <code>newBuilder()</code>. 
+   * one should use <code>newBuilder()</code>.
    */
   public ColumnType() {}
 
@@ -41,7 +41,7 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
-  // Used by DatumWriter.  Applications should not call. 
+  // Used by DatumWriter.  Applications should not call.
   public java.lang.Object get(int field$) {
     switch (field$) {
     case 0: return column;
@@ -50,7 +50,7 @@ public class ColumnType extends org.apache.avro.specific.SpecificRecordBase impl
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
-  // Used by DatumReader.  Applications should not call. 
+  // Used by DatumReader.  Applications should not call.
   @SuppressWarnings(value="unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {

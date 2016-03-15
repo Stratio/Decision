@@ -30,7 +30,7 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
   /**
    * Default constructor.  Note that this does not initialize fields
    * to their default values from the schema.  If that is desired then
-   * one should use <code>newBuilder()</code>. 
+   * one should use <code>newBuilder()</code>.
    */
   public InsertMessage() {}
 
@@ -47,7 +47,7 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
-  // Used by DatumWriter.  Applications should not call. 
+  // Used by DatumWriter.  Applications should not call.
   public Object get(int field$) {
     switch (field$) {
     case 0: return operation;
@@ -59,7 +59,7 @@ public class InsertMessage extends org.apache.avro.specific.SpecificRecordBase i
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
-  // Used by DatumReader.  Applications should not call. 
+  // Used by DatumReader.  Applications should not call.
   @SuppressWarnings(value="unchecked")
   public void put(int field$, Object value$) {
     switch (field$) {
