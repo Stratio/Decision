@@ -22,7 +22,7 @@ import com.stratio.decision.testsAT.utils.BaseTest;
 
 import cucumber.api.CucumberOptions;
 
-@CucumberOptions(features = { "src/test/resources/features/automated/automated/StreamStopIndex.feature" })
+@CucumberOptions(features = { "src/test/resources/features/automated/StreamStopIndex.feature" })
 public class ATStopIndex extends BaseTest {
 
     public ATStopIndex() {
