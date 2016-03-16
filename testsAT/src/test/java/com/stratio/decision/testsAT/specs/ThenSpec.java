@@ -22,10 +22,7 @@ import static com.stratio.tests.utils.matchers.PatternMatcher.pattern;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import net.sf.expectit.Result;
 import kafka.consumer.ConsumerIterator;
@@ -238,12 +235,25 @@ public class ThenSpec extends BaseSpec {
 
         Iterator<StreamAction> sAactions = actions.iterator();
         String[] sActions = new String[actions.size()];
-        int i = 0;
-        while (sAactions.hasNext()) {
-            sActions[i] = sAactions.next().toString();
+        if(!(sActions.length==0)) {
+            int i = 0;
+            while (sAactions.hasNext()) {
+                sActions[i] = sAactions.next().toString();
+            }
+            assertThat(expectedActions).as("Unexistant action").contains(sActions);
+        } else {
+            assertThat(sActions).as("Unexistant action").isEmpty();
         }
-        assertThat(expectedActions).as("Unexistant action").contains(sActions);   //contains(sActions);
     }
+
+
+
+
+
+
+
+
+
 
     @Then("^the shell must output the string '(.*?)'$")
     public void assertShellOutput(String expectedOutput) throws IOException {
