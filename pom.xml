@@ -92,9 +92,19 @@
                     <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
                     <excludes>
                         <exclude>**/README</exclude>
-                        <exclude>src/test/resources/**</exclude>
-                        <exclude>src/main/resources/**</exclude>
+                        <exclude>src/main/resources/**/*.txt</exclude>
+                        <exclude>src/test/resources/**/*.txt</exclude>
+                        <exclude>**/DEBIAN/conffiles</exclude>
                     </excludes>
+                    <mapping>
+                        <conf>SCRIPT_STYLE</conf>
+                        <preinst>SCRIPT_STYLE</preinst>
+                        <postrun>SCRIPT_STYLE</postrun>
+                        <prerun>SCRIPT_STYLE</prerun>
+                        <post>SCRIPT_STYLE</post>
+                        <postinst>SCRIPT_STYLE</postinst>
+                        <decision-variables>SCRIPT_STYLE</decision-variables>
+                    </mapping>
                 </configuration>
                 <executions>
                     <execution>
