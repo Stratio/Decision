@@ -88,10 +88,6 @@ class StratioStreamingAPI
 
   def insertData(streamName: String, data: List[ColumnNameValue]) = {
 
-//    checkInsertStreamingStatus
-//    val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
-//    asyncOperation.performAsyncOperation(insertStreamMessage)
-
     insertData(streamName, data, null, false)
   }
 
