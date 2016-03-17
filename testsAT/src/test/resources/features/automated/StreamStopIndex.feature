@@ -21,7 +21,7 @@ Feature: Stream stop index
 			| 1 | a | 
 			| 2 | 4 |
 		And I wait '5' seconds
-		Then the stream 'stopIndex' has 'INDEXED' as active actions
+		Then the stream 'stopIndex' has 'SAVE_TO_ELASTICSEARCH' as active actions
 		When I stop indexing a stream with name 'stopIndex'
 		Then the stream 'stopIndex' has '' as active actions		
 
@@ -29,8 +29,8 @@ Feature: Stream stop index
 		When I stop indexing a stream with name 'inexistentStream'		
 		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Stream .*? does not exists'			
 			 					
-	Scenario Outline: Stop indexing a bad named stream			
-		When I stop indexing a stream with name '<streamName>'		
+	Scenario Outline: Stop indexing a bad named stream
+		When I stop indexing a stream with name '<streamName>'
 		Then an exception 'IS' thrown with class 'StratioAPISecurityException' and message like '<message>'			
 			 
 		Examples:

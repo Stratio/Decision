@@ -22,7 +22,7 @@ import com.stratio.decision.testsAT.utils.BaseTest;
 
 import cucumber.api.CucumberOptions;
 
-@CucumberOptions(features = { "src/test/resources/features/StreamStopListen.feature" })
+@CucumberOptions(features = { "src/test/resources/features/automated/StreamStopListen.feature" })
 public class ATStopListen extends BaseTest {
 
     public ATStopListen() {
