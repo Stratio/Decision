@@ -35,28 +35,32 @@ public class StreamToActionBusCallback extends ActionControllerCallback {
 
     private final String streamName;
 
-    private final Producer<String, String> producer;
+    private final Producer<String, byte[]> avroProducer;
 
-    private final Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer;
     private final Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer;
+    private final Serializer<StratioStreamingMessage, byte[]> javaToAvroSerializer;
 
     private String groupId;
 
     public StreamToActionBusCallback(Set<StreamAction> activeActions, String streamName,
-            Producer<String, String> producer, Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer,
-            Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer) {
+            Producer<String, byte[]> avroProducer,
+            Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer,
+            Serializer<StratioStreamingMessage, byte[]> javaToAvroSerializer) {
         super(activeActions);
         this.streamName = streamName;
-        this.producer = producer;
-        this.kafkaToJavaSerializer = kafkaToJavaSerializer;
+        this.avroProducer = avroProducer;
         this.javaToSiddhiSerializer = javaToSiddhiSerializer;
+        this.javaToAvroSerializer = javaToAvroSerializer;
     }
 
     public StreamToActionBusCallback(Set<StreamAction> activeActions, String streamName,
-            Producer<String, String> producer, Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer,
-            Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer, String groupId) {
+            Producer<String, byte[]> avroProducer,
+            Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer,
+            Serializer<StratioStreamingMessage, byte[]> javaToAvroSerializer,
+            String groupId) {
 
-        this(activeActions, streamName,producer, kafkaToJavaSerializer, javaToSiddhiSerializer);
+        this(activeActions, streamName, avroProducer, javaToSiddhiSerializer,
+                javaToAvroSerializer);
         this.groupId = groupId;
     }
 
@@ -65,25 +69,27 @@ public class StreamToActionBusCallback extends ActionControllerCallback {
         if (log.isDebugEnabled()) {
             log.debug("Receiving {} events from stream {}", inEvents.length, streamName);
         }
-        List<KeyedMessage<String, String>> messages = new ArrayList<>();
+
+        String topicAction = InternalTopic.TOPIC_ACTION.getTopicName();
+        if (groupId !=null){
+            topicAction = topicAction.concat("_").concat(groupId);
+        }
+
+        List<KeyedMessage<String, byte[]>> messages = new ArrayList<>();
+
         for (Event event : inEvents) {
             StratioStreamingMessage messageObject = javaToSiddhiSerializer.deserialize(event);
 
             messageObject.setStreamName(streamName);
             messageObject.setActiveActions(this.activeActions);
 
-            String topicAction = InternalTopic.TOPIC_ACTION.getTopicName();
+            messages.add(new KeyedMessage<String, byte[]>(topicAction,
+                    javaToAvroSerializer.serialize(messageObject)));
 
-            if (groupId !=null){
-                topicAction = topicAction.concat("_").concat(groupId);
-            }
-
-            messages.add(new KeyedMessage<String, String>(topicAction,
-                    kafkaToJavaSerializer.deserialize(messageObject)));
         }
 
         if (messages.size() != 0) {
-            producer.send(messages);
+            avroProducer.send(messages);
         }
     }
 }
