@@ -15,29 +15,39 @@
  */
 package com.stratio.decision.api
 
-import com.google.gson.Gson
 import com.stratio.decision.api.kafka.KafkaProducer
-import com.stratio.decision.commons.messages.StratioStreamingMessage
+import com.stratio.decision.commons.avro.{ColumnType, InsertMessage}
+import com.stratio.decision.commons.messages.{ColumnNameTypeValue, StratioStreamingMessage}
+import collection.JavaConversions._
 
 class StreamingAPIAsyncOperation(tableProducer: KafkaProducer) {
-  def performAsyncOperation(message: StratioStreamingMessage, topicName:String) = {
-    addMessageToKafkaTopic(message, topicName)
+
+  def performAsyncOperation(message: StratioStreamingMessage, topicName:String) : Unit = {
+    addAvroMessageToKafkaTopic(message, topicName)
   }
 
-  def addMessageToKafkaTopic(message: StratioStreamingMessage, topicName:String) = {
-    val kafkaMessage = new Gson().toJson(message)
-    val operation = message.getOperation
-    tableProducer.send(kafkaMessage, operation, topicName)
+  def performAsyncOperation(message: StratioStreamingMessage) : Unit = {
+    performAsyncOperation(message, null)
   }
 
-  def performAsyncOperation(message: StratioStreamingMessage) = {
-    addMessageToKafkaTopic(message)
+  private def addAvroMessageToKafkaTopic(message: StratioStreamingMessage, topicName:String) = {
+    val avroKafkaMessage : InsertMessage = convertMessage(message)
+    tableProducer.sendAvro(avroKafkaMessage, message.getOperation, topicName)
   }
 
-  def addMessageToKafkaTopic(message: StratioStreamingMessage) = {
-    val kafkaMessage = new Gson().toJson(message)
-    val operation = message.getOperation
-    tableProducer.send(kafkaMessage, operation)
+  private def convertMessage(stratioStreamingMessage : StratioStreamingMessage) : InsertMessage = {
+
+    var columns = new java.util.ArrayList[com.stratio.decision.commons.avro.ColumnType]();
+    var c : ColumnType = null
+
+    for (messageColumn : ColumnNameTypeValue <- stratioStreamingMessage.getColumns){
+      c = new ColumnType(messageColumn.getColumn, messageColumn.getValue.toString, messageColumn.getValue.getClass
+        .getName)
+      columns.add(c)
+    }
+
+    new InsertMessage(stratioStreamingMessage.getOperation, stratioStreamingMessage.getStreamName,
+      stratioStreamingMessage.getSession_id, null, columns, null)
   }
 
 }
