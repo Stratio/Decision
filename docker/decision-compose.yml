@@ -1,9 +1,6 @@
 # sudo -i 
 # curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
 # chmod +x /usr/local/bin/docker-compose
-# weave launch-router --dns-domain="demo.stratio.com." --init-peer-count 1 && weave launch-proxy -H tcp://0.0.0.0:12375
-# weave expose
-# eval $(weave env)
 
 zookeeper:
   image: qa.stratio.com:5000/stratio/zookeeper:3.4.6
@@ -15,7 +12,7 @@ waitzk:
   image: aanand/wait
   container_name: waitzk
   links:
-      - zookeeper
+    - zookeeper
 
 kafka:
   image: qa.stratio.com:5000/kafka:0.8.1.1
@@ -23,9 +20,10 @@ kafka:
   ports:
     - "9092:9092"
   links:
+    - zookeeper
     - waitzk
   environment:
-    ZK_CONNECT: zookeeper.demo.stratio.com:2181
+    ZK_CONNECT: zookeeper:2181
 
 waitkafka:
   image: aanand/wait
@@ -33,40 +31,12 @@ waitkafka:
   links:
     - kafka
 
-#cassandra-lucene-index:
-#  image: stratio/cassandra-lucene-index:2.2.4.0
-#  container_name: cassandra
-#  ports: 
-#    - "9042:9042"
-#  environment:
-#    CLUSTER_NAME: DemoCluster
-#    MAX_HEAP: 256M
-#    MAX_NEW: 64M
-#    SEEDS: 127.0.0.1
-
-#waitcassandra:
-#  image: aanand/wait
-#  container_name: waitcassandra
-#  links:
-#    - cassandra-lucene-index
-
-#mongo:
-#  image: stratio/mongo:3.0.4
-#  container_name: mongo
-#  ports: 
-#    - "27017:27017"
-
-#waitmongo:
-#  image: aanand/wait
-#  container_name: waitmongo
-#  links:
-#    - mongo
-
 elasticsearch:
   image: qa.stratio.com:5000/stratio/elasticsearch:1.7.1
   container_name: elasticsearch
-  ports: 
+  ports:
     - "9300:9300"
+    - "9200:9200"
 
 waitelastic:
   image: aanand/wait
@@ -75,33 +45,28 @@ waitelastic:
     - elasticsearch
 
 decision:
-  image: qa.stratio.com:5000/stratio/decision:1.1.0-SNAPSHOT
+  image: qa.stratio.com:5000/stratio/decision:latest
   container_name: decision
   links:
+    - zookeeper
+    - kafka
     - waitkafka
-#    - waitcassandra
-#    - waitmongo
     - waitelastic
   environment:
-    KAFKA_HOSTS: kafka.demo.stratio.com:9092
-    ZOOKEEPER_HOSTS: zookeeper.demo.stratio.com:2181
-#    CASSANDRA_HOSTS: cassandra.demo.stratio.com:9042
-#    MONGODB_HOSTS: mongo.demo.stratio.com:27017
-    ES_HOSTS: elasticsearch.demo.stratio.com:9300
-#   SOLR_HOSTS;
+    KAFKA_HOSTS: kafka:9092
+    ZOOKEEPER_HOSTS: zookeeper:2181
+    ES_HOSTS: elasticsearch:9300
     CLUSTERING_ENABLED: "false"
     GROUP_ID: stratiogroup
-#    CLUSTER_GROUPS: stratiogroup
-#    DATATOPICS: stratiotopic
     FAILOVER_ENABLED: "true"
 
 decision-shell:
-  image: qa.stratio.com:5000/stratio/decision-shell:1.1.0-SNAPSHOT
+  image: qa.stratio.com:5000/stratio/decision-shell:latest
   container_name: shell
   links:
+    - zookeeper
+    - kafka
     - decision
   environment:
-    KAFKA_HOSTS: kafka.demo.stratio.com:9092
-    ZOOKEEPER_HOSTS: zookeeper.demo.stratio.com:2181
-
-#eval $(weave env --restore)
+    KAFKA_HOSTS: kafka:9092
+    ZOOKEEPER_HOSTS: zookeeper:2181
