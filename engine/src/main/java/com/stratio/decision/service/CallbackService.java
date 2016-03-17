@@ -34,18 +34,24 @@ import java.util.Set;
 public class CallbackService {
 
     private final Producer<String, String> producer;
+    private final Producer<String, byte[]> avroProducer;
     private final Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer;
     private final Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer;
+    private final Serializer<StratioStreamingMessage, byte[]> javaToAvroSerializer;
 
     private final Map<String, ActionControllerCallback> referencedCallbacks;
     private final Map<String, EngineActionCallback> referencedEngineCallbacks;
 
     public CallbackService(Producer<String, String> producer,
+            Producer<String, byte[]> avroProducer,
             Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer,
-            Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer) {
+            Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer,
+            Serializer<StratioStreamingMessage, byte[]> javaToAvroSerializer) {
         this.producer = producer;
+        this.avroProducer = avroProducer;
         this.kafkaToJavaSerializer = kafkaToJavaSerializer;
         this.javaToSiddhiSerializer = javaToSiddhiSerializer;
+        this.javaToAvroSerializer = javaToAvroSerializer;
         this.referencedCallbacks = new HashMap<>();
         this.referencedEngineCallbacks = new HashMap<>();
     }
@@ -55,8 +61,8 @@ public class CallbackService {
         ActionControllerCallback callback = referencedCallbacks.get(streamName);
 
         if (callback == null) {
-            callback = new StreamToActionBusCallback(actions, streamName, producer, kafkaToJavaSerializer,
-                    javaToSiddhiSerializer);
+            callback = new StreamToActionBusCallback(actions, streamName, avroProducer,
+                    javaToSiddhiSerializer, javaToAvroSerializer);
             referencedCallbacks.put(streamName, callback);
         }
 
@@ -68,8 +74,8 @@ public class CallbackService {
         ActionControllerCallback callback = referencedCallbacks.get(streamName);
 
         if (callback == null) {
-            callback = new StreamToActionBusCallback(actions, streamName, producer, kafkaToJavaSerializer,
-                    javaToSiddhiSerializer, groupId);
+            callback = new StreamToActionBusCallback(actions, streamName, avroProducer,
+                    javaToSiddhiSerializer, javaToAvroSerializer, groupId);
             referencedCallbacks.put(streamName, callback);
         }
 

@@ -15,16 +15,20 @@
  */
 package com.stratio.decision.configuration;
 
+import com.stratio.decision.commons.avro.InsertMessage;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.dao.StreamStatusDao;
 import com.stratio.decision.dao.StreamingFailoverDao;
 import com.stratio.decision.drools.DroolsConnectionContainer;
 import com.stratio.decision.factory.GsonFactory;
 import com.stratio.decision.serializer.Serializer;
+import com.stratio.decision.serializer.impl.JavaToAvroSerializer;
 import com.stratio.decision.serializer.impl.JavaToSiddhiSerializer;
 import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
 import com.stratio.decision.service.*;
 import kafka.javaapi.producer.Producer;
+
+import org.apache.avro.specific.SpecificDatumReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +55,9 @@ public class ServiceConfiguration {
     private Producer<String, String> producer;
 
     @Autowired
+    private Producer<String, byte[]> avroProducer;
+
+    @Autowired
     private ConfigurationContext configurationContext;
 
     @Autowired
@@ -70,7 +77,8 @@ public class ServiceConfiguration {
 
     @Bean
     public CallbackService callbackService() {
-        return new CallbackService(producer, kafkaToJavaSerializer(), javaToSiddhiSerializer());
+        return new CallbackService(producer, avroProducer, kafkaToJavaSerializer(), javaToSiddhiSerializer(),
+                javaToAvroSerializer());
     }
 
     @Bean
@@ -81,6 +89,11 @@ public class ServiceConfiguration {
     @Bean
     public Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer() {
         return new KafkaToJavaSerializer(GsonFactory.getInstance());
+    }
+
+    @Bean
+    public Serializer<StratioStreamingMessage, byte[]> javaToAvroSerializer() {
+        return new JavaToAvroSerializer(new SpecificDatumReader(InsertMessage.getClassSchema()));
     }
 
     @Bean

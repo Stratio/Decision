@@ -46,31 +46,24 @@ class KafkaProducer(topic: String,
 
   val producer = new Producer[AnyRef, AnyRef](new ProducerConfig(props))
 
-  // TODO - Test Avro Producer
-  val props2 = new Properties()
-  props2.put(org.apache.kafka.clients.producer.ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
-  props2.put(org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+  val propsAvro = new Properties()
+  propsAvro.put(org.apache.kafka.clients.producer.ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
+  propsAvro.put(org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
     "org.apache.kafka.common.serialization.ByteArraySerializer") // Kafka avro message stream comes in as a byte array
-  props2.put(org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+  propsAvro.put(org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
     "org.apache.kafka.common.serialization.StringSerializer")
-  val producerAvro = new org.apache.kafka.clients.producer.KafkaProducer[String, Array[Byte]](props2)
+  val producerAvro = new org.apache.kafka.clients.producer.KafkaProducer[String, Array[Byte]](propsAvro)
 
   override def close(): Unit = {
     producer.close
+    producerAvro.close
   }
 
-  def send(message: String, key: String) = {
-    try {
-      log.info("Sending KeyedMessage[key, value]: [" + key + "," + message + "]")
-      producer.send(new KeyedMessage(topic, key, message))
-    } catch {
-      case e: Exception =>
-        log.error("Error sending KeyedMessage[key, value]: [" + key + "," + message + "]")
-        log.error("Exception: " + e.getMessage)
-    }
+  def send(message: String, key: String) : Unit = {
+    send(message, key, null)
   }
 
-  def send(message: String, key: String, anotherTopic:String) = {
+  def send(message: String, key: String, anotherTopic:String) : Unit = {
 
     val destinationTopic:String = if (anotherTopic!=null) anotherTopic else topic
     try {
@@ -84,16 +77,21 @@ class KafkaProducer(topic: String,
     }
   }
 
-  def sendAvro(insertMessage: InsertMessage, key: String) = {
+  def sendAvro(insertMessage: InsertMessage, key: String) : Unit = {
+       sendAvro(insertMessage, key, null)
+  }
+
+  def sendAvro(insertMessage: InsertMessage, key: String, anotherTopic:String) : Unit = {
     try {
+
+      val destinationTopic:String = if (anotherTopic!=null) anotherTopic else topic
 
       log.info("Sending Avro Message")
 
-      val insertBytes = serializeInsertMessage(insertMessage) // Avro schema serialization as a byte array
+      val insertBytes = serializeInsertMessageToAvro(insertMessage) // Avro schema serialization as a byte array
 
-      val message = new ProducerRecord[String, Array[Byte]](topic, key, insertBytes) // Create a new producer record to
+      val message = new ProducerRecord[String, Array[Byte]](destinationTopic, key, insertBytes)
       producerAvro.send(message)
-
 
     } catch {
       case e: Exception =>
@@ -103,7 +101,7 @@ class KafkaProducer(topic: String,
   }
 
 
-  def serializeInsertMessage(insertMessage: InsertMessage): Array[Byte] = {
+  def serializeInsertMessageToAvro(insertMessage: InsertMessage): Array[Byte] = {
     val out = new ByteArrayOutputStream()
     val encoder = EncoderFactory.get.binaryEncoder(out, null)
     val writer = new SpecificDatumWriter[InsertMessage](InsertMessage.getClassSchema)
