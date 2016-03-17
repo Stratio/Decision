@@ -36,6 +36,7 @@ import org.springframework.context.annotation.Import;
 
 import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.decision.StreamingEngine;
+import com.stratio.decision.commons.avro.Action;
 import com.stratio.decision.commons.avro.ColumnType;
 import com.stratio.decision.commons.avro.InsertMessage;
 import com.stratio.decision.commons.constants.InternalTopic;
@@ -98,7 +99,8 @@ public class StreamingContextConfiguration {
         conf.setMaster(sparkHost);
 
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf.registerKryoClasses(new Class[] { StratioStreamingMessage.class, InsertMessage.class, ColumnType.class});
+        conf.registerKryoClasses(new Class[] { StratioStreamingMessage.class, InsertMessage.class, ColumnType.class,
+                Action.class});
 
         JavaStreamingContext streamingContext = new JavaStreamingContext(conf, new Duration(streamingBatchTime));
 
