@@ -54,12 +54,15 @@ public class SolrOperationsService {
 
     private String solrHosts;
 
+    private String zkHosts;
+
     private String dataDir;
 
     private Boolean isCloud;
 
-    public SolrOperationsService(String solrHosts, String dataDir, Boolean isCloud) {
+    public SolrOperationsService(String solrHosts, String zkHosts, String dataDir, Boolean isCloud) {
         this.solrHosts = solrHosts;
+        this.zkHosts = zkHosts;
         this.dataDir = dataDir;
         this.isCloud = isCloud;
     }
@@ -120,22 +123,22 @@ public class SolrOperationsService {
     }
 
     private String streamingToSolr(ColumnType column) {
-            switch (column) {
-                case BOOLEAN:
-                    return "boolean";
-                case DOUBLE:
-                    return "double";
-                case FLOAT:
-                    return "float";
-                case INTEGER:
-                    return "int";
-                case LONG:
-                    return "long";
-                case STRING:
-                    return "string";
-                default:
-                    throw new RuntimeException("Unsupported Column type");
-            }
+        switch (column) {
+        case BOOLEAN:
+            return "boolean";
+        case DOUBLE:
+            return "double";
+        case FLOAT:
+            return "float";
+        case INTEGER:
+            return "int";
+        case LONG:
+            return "long";
+        case STRING:
+            return "string";
+        default:
+            throw new RuntimeException("Unsupported Column type");
+        }
     }
 
     public List<String> getCoreList() throws IOException, SolrServerException {
@@ -154,7 +157,7 @@ public class SolrOperationsService {
     private SolrClient getSolrclient(String core) {
         SolrClient solrClient;
         if (isCloud) {
-            solrClient = new CloudSolrClient(solrHosts);
+            solrClient = new CloudSolrClient(zkHosts);
         } else {
             solrClient = new HttpSolrClient("http://" + solrHosts + "/solr");
         }

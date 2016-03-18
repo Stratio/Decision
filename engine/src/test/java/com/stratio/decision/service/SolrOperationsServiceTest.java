@@ -51,7 +51,7 @@ public class SolrOperationsServiceTest {
     public void setUp() throws Exception {
         LOGGER.debug("Initializing required classes");
 
-        service= new SolrOperationsService(HOSTS, DATA_FOLDER.getRoot().getAbsolutePath(), IS_CLOUD);
+        service= new SolrOperationsService(HOSTS, HOSTS, DATA_FOLDER.getRoot().getAbsolutePath(), IS_CLOUD);
 
     }
 
