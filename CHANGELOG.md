@@ -2,6 +2,14 @@
 
 Only listing significant user-visible, not internal code cleanups and minor bug fixes.
 
+## 1.1.0 (March 2016)
+
+* Kryo Serialization
+* Spark version upgraded to 1.6.0
+* Avro messaging support
+* Hash partitioning
+* Batching improvements
+
 ## 1.0.0 (February 2016)
 
 * Drools integration
