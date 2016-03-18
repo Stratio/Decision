@@ -28,7 +28,7 @@ public class ATListen extends BaseTest {
     public ATListen() {
     }
 
-    @Test(enabled = true, priority = 1)
+    @Test(enabled = true, groups = {"basic"})
     public void listenToStreamTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }

@@ -28,7 +28,7 @@ public class ATQueries extends BaseTest {
     public ATQueries() {
     }
 
-    @Test(enabled = true, priority = 1)
+    @Test(enabled = true, groups = {"basic"})
     public void streamQueriesTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }
