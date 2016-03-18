@@ -28,7 +28,7 @@ public class ATStopSaveToCassandra extends BaseTest {
     public ATStopSaveToCassandra() {
     }
 
-    @Test(enabled = true, priority = 1)
+    @Test(enabled = true, groups = {"basic"})
     public void stopSaveCassandraTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }

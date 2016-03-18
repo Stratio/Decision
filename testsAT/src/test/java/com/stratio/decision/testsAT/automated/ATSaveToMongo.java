@@ -28,7 +28,7 @@ public class ATSaveToMongo extends BaseTest {
     public ATSaveToMongo() {
     }
 
-    @Test(enabled = true, priority = 1)
+    @Test(enabled = true, groups = {"basic"})
     public void saveToMongoTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }

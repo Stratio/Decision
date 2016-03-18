@@ -28,7 +28,7 @@ public class ATAlter extends BaseTest {
     public ATAlter() {
     }
 
-    @Test(enabled = true, priority = 1)
+    @Test(enabled = true, groups = {"basic"})
     public void alterStreamTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }

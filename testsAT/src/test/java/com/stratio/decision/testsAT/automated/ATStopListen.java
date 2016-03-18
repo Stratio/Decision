@@ -28,7 +28,7 @@ public class ATStopListen extends BaseTest {
     public ATStopListen() {
     }
 
-    @Test(enabled = true, priority = 1)
+    @Test(enabled = true, groups = {"basic"})
     public void stopListenTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }

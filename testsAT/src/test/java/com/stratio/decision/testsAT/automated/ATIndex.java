@@ -28,7 +28,7 @@ public class ATIndex extends BaseTest {
     public ATIndex() {
     }
 
-    @Test(enabled = true, priority = 1)
+    @Test(enabled = true, groups = {"basic"})
     public void createStreamTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }

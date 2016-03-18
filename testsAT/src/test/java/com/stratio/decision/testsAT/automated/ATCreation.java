@@ -28,7 +28,7 @@ public class ATCreation extends BaseTest {
     public ATCreation() {
     }
 
-    @Test(enabled = true, priority = 1)
+    @Test(enabled = true, groups = {"basic"})
     public void createStreamTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }
