@@ -22,6 +22,7 @@ import com.stratio.decision.api.kafka.{KafkaConsumer, KafkaProducer}
 import com.stratio.decision.api.messaging.MessageBuilder.builder
 import com.stratio.decision.api.messaging.{ColumnNameType, _}
 import com.stratio.decision.api.zookeeper.ZookeeperConsumer
+import com.stratio.decision.commons.avro.{ColumnType, InsertMessage}
 import com.stratio.decision.commons.constants.InternalTopic
 import com.stratio.decision.commons.constants.STREAMING.{ZK_EPHEMERAL_NODE_STATUS_CONNECTED,
 ZK_EPHEMERAL_NODE_STATUS_INITIALIZED, ZK_EPHEMERAL_NODE_STATUS_PATH, ZK_EPHEMERAL_NODE_STATUS_GROUPS_DOWN, ZK_EPHEMERAL_GROUPS_STATUS_BASE_PATH}
@@ -72,7 +73,10 @@ class StratioStreamingAPI
 
     checkInsertStreamingStatus()
 
-    val topic :String = InternalTopic.TOPIC_DATA.getTopicName.concat("_").concat(topicName)
+    var topic : String = InternalTopic.TOPIC_DATA.getTopicName
+    if (topicName!=null) {
+      topic = topic.concat("_").concat(topicName)
+    }
 
     if (checkTopicExists){
       topicService.createTopicIfNotExist(topic, 1, 1)
@@ -82,13 +86,10 @@ class StratioStreamingAPI
     asyncOperation.performAsyncOperation(insertStreamMessage, topic)
   }
 
-
   def insertData(streamName: String, data: List[ColumnNameValue]) = {
-    checkInsertStreamingStatus
-    val insertStreamMessage = new InsertMessageBuilder(sessionId).build(streamName, data)
-    asyncOperation.performAsyncOperation(insertStreamMessage)
-  }
 
+    insertData(streamName, data, null, false)
+  }
 
   def insertDataWithPartition(streamName: String, data: List[ColumnNameValue], keys: List[ColumnNameValue]) = {
     insertDataWithPartition(streamName, data, keys, PartitionerStrategyFactory.Strategy.HASH)

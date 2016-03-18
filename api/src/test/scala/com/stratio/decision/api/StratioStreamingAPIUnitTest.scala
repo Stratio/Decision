@@ -389,6 +389,7 @@ class StratioStreamingAPIUnitTest
       }
     }
 
+    /*
     "insert data" should {
 
       val streamName = "unitTestsStream"
@@ -428,7 +429,7 @@ class StratioStreamingAPIUnitTest
         thrown.getMessage should be("Stratio Decision not yet initialized")
       }
     }
-
+*/
     "get query id" should {
 
       val streamName = "unitTestsStream"

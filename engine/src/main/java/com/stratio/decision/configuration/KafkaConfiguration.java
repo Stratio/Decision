@@ -40,4 +40,18 @@ public class KafkaConfiguration {
         return new Producer<String, String>(new ProducerConfig(properties));
     }
 
+    @Bean
+    public Producer<String, byte[]> avroProducer() {
+
+        Properties properties = new Properties();
+
+        properties.put("metadata.broker.list", configurationContext.getKafkaHostsQuorum());
+        properties.put(org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+    "org.apache.kafka.common.serialization.ByteArraySerializer");
+        properties.put(org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+    "org.apache.kafka.common.serialization.StringSerializer");
+
+        return new Producer<String, byte[]>(new ProducerConfig(properties));
+    }
+
 }

@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
@@ -35,11 +36,15 @@ import org.springframework.context.annotation.Import;
 
 import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.decision.StreamingEngine;
+import com.stratio.decision.commons.avro.Action;
+import com.stratio.decision.commons.avro.ColumnType;
+import com.stratio.decision.commons.avro.InsertMessage;
 import com.stratio.decision.commons.constants.InternalTopic;
 import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.kafka.service.KafkaTopicService;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.functions.messages.AvroDeserializeMessageFunction;
 import com.stratio.decision.functions.FilterDataFunction;
 import com.stratio.decision.functions.PairDataFunction;
 import com.stratio.decision.functions.SaveToCassandraActionExecutionFunction;
@@ -59,11 +64,11 @@ import com.stratio.decision.functions.ddl.AlterStreamFunction;
 import com.stratio.decision.functions.ddl.CreateStreamFunction;
 import com.stratio.decision.functions.dml.InsertIntoStreamFunction;
 import com.stratio.decision.functions.dml.ListStreamsFunction;
+import com.stratio.decision.functions.messages.FilterAvroMessagesByOperationFunction;
 import com.stratio.decision.functions.messages.FilterMessagesByOperationFunction;
 import com.stratio.decision.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
 import com.stratio.decision.service.StreamOperationService;
-import com.stratio.decision.utils.ZKUtils;
 
 @Configuration
 @Import(ServiceConfiguration.class)
@@ -82,12 +87,20 @@ public class StreamingContextConfiguration {
 
     private KafkaTopicService kafkaTopicService;
 
+
+
+
+
     private JavaStreamingContext create(String streamingContextName, int port, long streamingBatchTime, String sparkHost) {
         SparkConf conf = new SparkConf();
         conf.set("spark.ui.port", String.valueOf(port));
         conf.setAppName(streamingContextName);
         conf.setJars(JavaStreamingContext.jarOfClass(StreamingEngine.class));
         conf.setMaster(sparkHost);
+
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        conf.registerKryoClasses(new Class[] { StratioStreamingMessage.class, InsertMessage.class, ColumnType.class,
+                Action.class});
 
         JavaStreamingContext streamingContext = new JavaStreamingContext(conf, new Duration(streamingBatchTime));
 
@@ -118,11 +131,8 @@ public class StreamingContextConfiguration {
         groupId must be the cluster groupId. Kafka assigns each partition of a topic to one, and one only, consumer of
         the group.
         Decision topics has only one partition (by default), so if we have two o more decision instances (consumers)
-        reading
-         the
-        same topic with the same groupId, only one instance will be able to read from the topic
+        reading the same topic with the same groupId, only one instance will be able to read from the topic
         */
-
 
         JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
                 configurationContext.getZookeeperHostsQuorumWithPath(), configurationContext.getGroupId(), baseTopicMap);
@@ -302,38 +312,43 @@ public class StreamingContextConfiguration {
         }
     }
 
+
     private void configureActionContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
 
 
         String topicName = InternalTopic.TOPIC_ACTION.getTopicName();
-
         if (configurationContext.isClusteringEnabled() && configurationContext.getGroupId()!=null){
             topicName = topicName.concat("_").concat(configurationContext.getGroupId());
         }
-
         baseTopicMap.put(topicName, 1);
 
         kafkaTopicService.createTopicIfNotExist(topicName, configurationContext.getKafkaReplicationFactor(),
                 configurationContext.getKafkaPartitions());
 
+        HashMap<String, String> kafkaParams = new HashMap<>();
+        kafkaParams.put("zookeeper.connect", configurationContext.getZookeeperHostsQuorumWithPath());
+        kafkaParams.put("group.id", configurationContext.getGroupId());
         /*
         groupId must be the cluster groupId. Kafka assigns each partition of a topic to one, and one only, consumer of
         the group.
         Decision topics has only one partition (by default), so if we have two o more decision instances (consumers) reading the
         same topic with the same groupId, only one instance will be able to read from the topic
         */
-        JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorumWithPath(), configurationContext.getGroupId(), baseTopicMap);
-        messages.cache();
+        JavaPairDStream<String, byte[]> messages = KafkaUtils.createStream(context, String.class, byte[].class,
+                kafka.serializer.StringDecoder.class, kafka.serializer.DefaultDecoder.class, kafkaParams, baseTopicMap,
+                StorageLevel.MEMORY_AND_DISK_SER_2());
 
-        JavaDStream<StratioStreamingMessage> parsedDataDstream = messages.map(new SerializerFunction());
+        AvroDeserializeMessageFunction avroDeserializeMessageFunction = new AvroDeserializeMessageFunction();
+        JavaDStream<StratioStreamingMessage>  parsedDataDstream = messages.map(avroDeserializeMessageFunction);
 
         JavaPairDStream<StreamAction, StratioStreamingMessage> pairedDataDstream = parsedDataDstream
                 .mapPartitionsToPair(new PairDataFunction());
 
         JavaPairDStream<StreamAction, Iterable<StratioStreamingMessage>> groupedDataDstream = pairedDataDstream
                 .groupByKey();
+
+        groupedDataDstream.cache();
 
         try {
 
@@ -384,50 +399,39 @@ public class StreamingContextConfiguration {
             e.printStackTrace();
         }
 
-/*
-        groupedDataDstream.filter(new FilterDataFunction(StreamAction.FIRE_RULES)).foreachRDD(
-                new SendToKafkaActionExecutionFunction(configurationContext.getKafkaHostsQuorum()));
-*/
     }
 
     private void configureDataContext(JavaStreamingContext context) {
         Map<String, Integer> baseTopicMap = new HashMap<>();
 
-/*
-        baseTopicMap.put(InternalTopic.TOPIC_DATA.getTopicName(), 1);
-
-        kafkaTopicService.createTopicIfNotExist(InternalTopic.TOPIC_DATA.getTopicName(), configurationContext.getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
-
-        JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), InternalTopic.TOPIC_DATA.getTopicName(), baseTopicMap);
-        messages.cache();
-*/
 
         configurationContext.getDataTopics().forEach( dataTopic -> baseTopicMap.put(dataTopic, 1));
 
         kafkaTopicService.createTopicsIfNotExist(configurationContext.getDataTopics(), configurationContext
                 .getKafkaReplicationFactor(), configurationContext.getKafkaPartitions());
 
-        /*
+        HashMap<String, String> kafkaParams = new HashMap<>();
+        kafkaParams.put("zookeeper.connect", configurationContext.getZookeeperHostsQuorumWithPath());
+        kafkaParams.put("group.id", configurationContext.getGroupId());
+         /*
          groupId must be the cluster groupId. Kafka assigns each partition of a topic to one, and one only, consumer of
           the group.
          Decision topics has only one partition (by default), so if we have two o more decision instances (consumers) reading the
          same topic with the same groupId, only one instance will be able to read from the topic
          */
-        JavaPairDStream<String, String> messages = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorumWithPath(),  configurationContext.getGroupId(), baseTopicMap);
-        messages.cache();
+        JavaPairDStream<String, byte[]> messages = KafkaUtils.createStream(context, String.class, byte[].class,
+                kafka.serializer.StringDecoder.class, kafka.serializer.DefaultDecoder.class, kafkaParams, baseTopicMap,
+                StorageLevel.MEMORY_AND_DISK_SER_2());
 
-        KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
-
-        JavaDStream<StratioStreamingMessage> insertRequests = messages.filter(
-                new FilterMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.INSERT)).map(
-                keepPayloadFromMessageFunction);
+        AvroDeserializeMessageFunction avroDeserializeMessageFunction = new AvroDeserializeMessageFunction();
+        JavaDStream<StratioStreamingMessage>  insertRequests = messages.filter(
+                new FilterAvroMessagesByOperationFunction(STREAM_OPERATIONS.MANIPULATION.INSERT))
+                .map(avroDeserializeMessageFunction);
 
         InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorum());
-
         insertRequests.foreachRDD(insertIntoStreamFunction);
+
     }
 
     @PostConstruct
