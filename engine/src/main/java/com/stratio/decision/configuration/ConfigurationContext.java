@@ -84,6 +84,8 @@ public class ConfigurationContext {
     private final String solrHost;
     private final Boolean solrCloud;
     private final String solrDataDir;
+    private final String solrCloudZkHost;
+    private final Integer solrMaxBatchSize;
 
     private final List<String> mongoHosts;
     private final String mongoUsername;
@@ -122,6 +124,8 @@ public class ConfigurationContext {
         SOLR_HOST("solr.host"),
         SOLR_CLOUD("solr.cloud"),
         SOLR_DATADIR("solr.dataDir"),
+        SOLR_CLOUD_ZKHOST("solr.cloudZkHost"),
+        SOLR_MAX_BATCH_SIZE("solr.maxBatchSize"),
         MONGO_HOST("mongo.hosts"),
         MONGO_USER("mongo.user"),
         MONGO_PASSWORD("mongo.password"),
@@ -207,6 +211,8 @@ public class ConfigurationContext {
         this.solrHost = (String) this.getValueOrNull(ConfigurationKeys.SOLR_HOST.getKey(), config);
         this.solrCloud = (Boolean) this.getValueOrNull(ConfigurationKeys.SOLR_CLOUD.getKey(), config);
         this.solrDataDir = (String) this.getValueOrNull(ConfigurationKeys.SOLR_DATADIR.getKey(), config);
+        this.solrCloudZkHost = (String) this.getValueOrNull(ConfigurationKeys.SOLR_CLOUD_ZKHOST.getKey(), config);
+        this.solrMaxBatchSize =  (Integer) this.getValueOrNull(ConfigurationKeys.SOLR_MAX_BATCH_SIZE.getKey(), config);
 
         this.mongoHosts = (List<String>) this.getListOrNull(ConfigurationKeys.MONGO_HOST.getKey(), config);
         this.mongoUsername = (String) this.getValueOrNull(ConfigurationKeys.MONGO_USER.getKey(), config);
@@ -461,6 +467,15 @@ public class ConfigurationContext {
 
     public boolean isPartitionsEnabled() {
         return partitionsEnabled;
+    }
+
+    public String getSolrCloudZkHost() {
+        return solrCloudZkHost;
+    }
+
+    public Integer getSolrMaxBatchSize() {
+        return solrMaxBatchSize;
+
     }
 
     private Object getValueOrNull(String key, Config config) {

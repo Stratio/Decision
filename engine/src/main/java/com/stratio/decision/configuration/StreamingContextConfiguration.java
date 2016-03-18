@@ -383,8 +383,11 @@ public class StreamingContextConfiguration {
                 log.warn("ElasticSearch is NOT configured properly");
             }
 
-            SaveToSolrActionExecutionFunction saveToSolrActionExecutionFunction = new SaveToSolrActionExecutionFunction(configurationContext.getSolrHost(), configurationContext.getSolrCloud(),
-                    configurationContext.getSolrDataDir());
+            SaveToSolrActionExecutionFunction saveToSolrActionExecutionFunction = new
+                    SaveToSolrActionExecutionFunction(configurationContext.getSolrHost(), configurationContext
+                    .getSolrCloudZkHost(),
+                    configurationContext.getSolrCloud(),
+                    configurationContext.getSolrDataDir(), configurationContext.getSolrMaxBatchSize());
             if (saveToSolrActionExecutionFunction.check()) {
                 log.info("Solr is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_SOLR)).foreachRDD(
