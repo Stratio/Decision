@@ -28,7 +28,7 @@ public class ATLowACK extends BaseTest {
     public ATLowACK() {
     }
 
-    @Test(enabled = true, priority = 999)
+    @Test(enabled = true, groups = {"basic"})
     public void lowACKTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }

@@ -28,7 +28,7 @@ public class ATDeletion extends BaseTest {
     public ATDeletion() {
     }
 
-    @Test(enabled = true, priority = 1)
+    @Test(enabled = true, groups = {"basic"})
     public void deleteStreamTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }

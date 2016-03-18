@@ -28,7 +28,7 @@ public class ATStopIndex extends BaseTest {
     public ATStopIndex() {
     }
 
-    @Test(enabled = true, priority = 1)
+    @Test(enabled = true, groups = {"basic"})
     public void stopIndexTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }
