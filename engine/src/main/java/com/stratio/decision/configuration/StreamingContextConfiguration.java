@@ -102,6 +102,12 @@ public class StreamingContextConfiguration {
         conf.registerKryoClasses(new Class[] { StratioStreamingMessage.class, InsertMessage.class, ColumnType.class,
                 Action.class});
 
+
+        HashMap<String, String> tuningProperties = configurationContext.getSparkTunningProperties();
+        if (tuningProperties != null && tuningProperties.size() > 0) {
+            tuningProperties.forEach( (key, value) ->  conf.set(key, value));
+        }
+
         JavaStreamingContext streamingContext = new JavaStreamingContext(conf, new Duration(streamingBatchTime));
 
         return streamingContext;

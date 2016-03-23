@@ -65,6 +65,8 @@ public class ConfigurationContext {
     private final String sparkHost;
     private final String internalSparkHost;
 
+    private final HashMap<String, String> sparkTunningProperties;
+
     private final boolean clusteringEnabled;
     private final List<String> clusterGroups;
     private final boolean allAckEnabled;
@@ -136,6 +138,7 @@ public class ConfigurationContext {
         CLUSTERING_ALL_ACK_ENABLED("clustering.allAckEnabled"),
         CLUSTERING_ACK_TIMEOUT("clustering.ackTimeout"),
         CLUSTERING_PARTITIONS_ENABLED("clustering.partitionsEnabled"),
+        SPARK_TUNING_PROPERTIES("spark.tuningProperties"),
 
         // Drools Config
         DROOLS_ENABLED("drools.enabled"),
@@ -172,8 +175,6 @@ public class ConfigurationContext {
         this.kafkaConsumerBrokerPort = Integer.parseInt(kafkaHosts.get(0).split(":")[1]);
 
         this.zookeeperHosts = config.getStringList(ConfigurationKeys.ZOOKEEPER_HOSTS.getKey());
-        this.sparkHost = config.getString(ConfigurationKeys.SPARK_HOST.getKey());
-        this.internalSparkHost = config.getString(ConfigurationKeys.INTERNAL_SPARK_HOST.getKey());
 
         this.failOverEnabled = config.getBoolean(ConfigurationKeys.FAILOVER_ENABLED.getKey());
         this.failOverPeriod = config.getDuration(ConfigurationKeys.FAILOVER_PERIOD.getKey(), TimeUnit.MILLISECONDS);
@@ -181,10 +182,18 @@ public class ConfigurationContext {
         this.statsEnabled = config.getBoolean(ConfigurationKeys.STATS_ENABLED.getKey());
         this.printStreams = config.getBoolean(ConfigurationKeys.PRINT_STREAMS.getKey());
 
+        // Spark Properties
+        this.sparkHost = config.getString(ConfigurationKeys.SPARK_HOST.getKey());
+        this.internalSparkHost = config.getString(ConfigurationKeys.INTERNAL_SPARK_HOST.getKey());
         this.streamingBatchTime = config.getDuration(ConfigurationKeys.STREAMING_BATCH_TIME.getKey(),
                 TimeUnit.MILLISECONDS);
         this.internalStreamingBatchTime = config.getDuration(ConfigurationKeys.INTERNAL_STREAMING_BATCH_TIME.getKey(),
                 TimeUnit.MILLISECONDS);
+
+        this.sparkTunningProperties = (HashMap<String, String>) this.getValueOrNull(ConfigurationKeys
+                .SPARK_TUNING_PROPERTIES.getKey(), config);
+
+
         this.kafkaReplicationFactor = config.getInt(ConfigurationKeys.KAFKA_REPLICATION_FACTOR.getKey());
         this.kafkaPartitions = config.getInt(ConfigurationKeys.KAFKA_PARTITIONS.getKey());
         this.kafkaSessionTimeout = config.getInt(ConfigurationKeys.KAFKA_SESSION_TIMEOUT.getKey());
@@ -476,6 +485,10 @@ public class ConfigurationContext {
     public Integer getSolrMaxBatchSize() {
         return solrMaxBatchSize;
 
+    }
+
+    public HashMap<String, String> getSparkTunningProperties() {
+        return sparkTunningProperties;
     }
 
     private Object getValueOrNull(String key, Config config) {
