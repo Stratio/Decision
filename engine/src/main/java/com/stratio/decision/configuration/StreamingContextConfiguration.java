@@ -354,7 +354,8 @@ public class StreamingContextConfiguration {
         JavaPairDStream<StreamAction, Iterable<StratioStreamingMessage>> groupedDataDstream = pairedDataDstream
                 .groupByKey();
 
-        groupedDataDstream.cache();
+        // groupedDataDstream.cache();
+        groupedDataDstream.persist(StorageLevel.MEMORY_AND_DISK_SER());
 
         try {
 
