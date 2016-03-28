@@ -343,7 +343,7 @@ public class StreamingContextConfiguration {
         */
         JavaPairDStream<String, byte[]> messages = KafkaUtils.createStream(context, String.class, byte[].class,
                 kafka.serializer.StringDecoder.class, kafka.serializer.DefaultDecoder.class, kafkaParams, baseTopicMap,
-                StorageLevel.MEMORY_AND_DISK_SER_2());
+                StorageLevel.MEMORY_AND_DISK_SER());
 
         AvroDeserializeMessageFunction avroDeserializeMessageFunction = new AvroDeserializeMessageFunction();
         JavaDStream<StratioStreamingMessage>  parsedDataDstream = messages.map(avroDeserializeMessageFunction);
@@ -430,7 +430,7 @@ public class StreamingContextConfiguration {
          */
         JavaPairDStream<String, byte[]> messages = KafkaUtils.createStream(context, String.class, byte[].class,
                 kafka.serializer.StringDecoder.class, kafka.serializer.DefaultDecoder.class, kafkaParams, baseTopicMap,
-                StorageLevel.MEMORY_AND_DISK_SER_2());
+                StorageLevel.MEMORY_AND_DISK_SER());
 
         AvroDeserializeMessageFunction avroDeserializeMessageFunction = new AvroDeserializeMessageFunction();
         JavaDStream<StratioStreamingMessage>  insertRequests = messages.filter(
