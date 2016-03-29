@@ -102,6 +102,12 @@ public class StreamingContextConfiguration {
         conf.registerKryoClasses(new Class[] { StratioStreamingMessage.class, InsertMessage.class, ColumnType.class,
                 Action.class});
 
+
+        HashMap<String, String> tuningProperties = configurationContext.getSparkTunningProperties();
+        if (tuningProperties != null && tuningProperties.size() > 0) {
+            tuningProperties.forEach( (key, value) ->  conf.set(key, value));
+        }
+
         JavaStreamingContext streamingContext = new JavaStreamingContext(conf, new Duration(streamingBatchTime));
 
         return streamingContext;
@@ -337,7 +343,7 @@ public class StreamingContextConfiguration {
         */
         JavaPairDStream<String, byte[]> messages = KafkaUtils.createStream(context, String.class, byte[].class,
                 kafka.serializer.StringDecoder.class, kafka.serializer.DefaultDecoder.class, kafkaParams, baseTopicMap,
-                StorageLevel.MEMORY_AND_DISK_SER_2());
+                StorageLevel.MEMORY_AND_DISK_SER());
 
         AvroDeserializeMessageFunction avroDeserializeMessageFunction = new AvroDeserializeMessageFunction();
         JavaDStream<StratioStreamingMessage>  parsedDataDstream = messages.map(avroDeserializeMessageFunction);
@@ -348,7 +354,8 @@ public class StreamingContextConfiguration {
         JavaPairDStream<StreamAction, Iterable<StratioStreamingMessage>> groupedDataDstream = pairedDataDstream
                 .groupByKey();
 
-        groupedDataDstream.cache();
+        // groupedDataDstream.cache();
+        groupedDataDstream.persist(StorageLevel.MEMORY_AND_DISK_SER());
 
         try {
 
@@ -424,7 +431,7 @@ public class StreamingContextConfiguration {
          */
         JavaPairDStream<String, byte[]> messages = KafkaUtils.createStream(context, String.class, byte[].class,
                 kafka.serializer.StringDecoder.class, kafka.serializer.DefaultDecoder.class, kafkaParams, baseTopicMap,
-                StorageLevel.MEMORY_AND_DISK_SER_2());
+                StorageLevel.MEMORY_AND_DISK_SER());
 
         AvroDeserializeMessageFunction avroDeserializeMessageFunction = new AvroDeserializeMessageFunction();
         JavaDStream<StratioStreamingMessage>  insertRequests = messages.filter(
