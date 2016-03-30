@@ -24,6 +24,7 @@ Feature: Save to mongo
 		And a Mongo dataBase 'stratio_decision' contains a table 'mongoSaveStream' with values:
 			| 1-String | 2-Integer |
 			| a        | 4         |
+		And I drop a MongoDB database 'stratio_decision'
 
 	Scenario Outline: Saving from an nice existent stream, with unnacepted mongo fields
 		When I create a stream with name 'mongobadColsSaveStream' and columns (with type):
@@ -49,8 +50,8 @@ Feature: Save to mongo
 
 		Examples:
 		| streamName        | message                     |
-		|                   | Stream name cannot be empty |
+		|                   | Stream name cannot be empty  |
 		| //NULL//          | Stream name cannot be null  |
-		| $tream            | Stream name .*? is not compatible with |
-		| system.stream     | Stream name .*? is not compatible with |
-		| sostem.stream     | Stream name .*? is not compatible with |
+		| $tream            | Stream name $tream is not compatible with |
+		| system.stream     | Stream name system.stream is not compatible with |
+		| sostem.stream     | Stream name sostem.stream is not compatible with |

@@ -5,10 +5,9 @@ Feature: Index to elasticsearch
 	Background:
 		Given I connect to 'Elasticsearch' cluster at '${ES_NODE}'
 		Given I drop every existing stream
-#		Given I drop an elasticsearch index named 'stratiodecision'
+		Given I drop every existing elasticsearch index
 
 	Scenario Outline: Indexing a neat stream
-#		Given I drop an elasticsearch index named 'stratiodecision'
 		When I create a stream with name '<streamName>' and columns (with type):
 			| 1  | String  |
 			| 2  | Integer |
@@ -32,7 +31,6 @@ Feature: Index to elasticsearch
 		Then There are results found with:
 			| 1 | 2 |
 			| b | 5 |
-#		Then I drop an elasticsearch index named 'stratiodecision'
 
 		Examples:
 		| streamName   | convertedStreamName |

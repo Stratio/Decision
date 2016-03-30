@@ -23,12 +23,46 @@
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout
-                    pattern="%highlight{%level{length=1} %12.12c{1}} %d{HH:mm:ss} (%16.16F:%3L) - %highlight{%m}%n" />
+                    pattern="%highlight{%18.14c{1}} (%16.16F:%3L) - %highlight{%m}%n" />
+        </Console>
+        <Console name="ConsoleApi" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%18.14c{1}  - %msg%n}{INFO=cyan}"/>
+
+        </Console>
+        <Console name="ConsoleBlue" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%28.25c{1}  - %highlight{%m}%n}{INFO=cyan}"/>
         </Console>
     </Appenders>
     <Loggers>
-        <Root level="${sys:logLevel}">
+        <Root level="INFO">
             <AppenderRef ref="Console" />
         </Root>
+
+        <logger name="com.stratio.tests.utils.CukesHooks" level="INFO" additivity="false">
+            <appender-ref ref="ConsoleApi"/>
+        </logger>
+
+        <logger name="com.stratio.decision.api" level="INFO" additivity="false">
+            <appender-ref ref="ConsoleBlue"/>
+        </logger>
+
+        <logger name="org.apache.zookeeper.ZooKeeper" level="OFF"/>
+        <logger name="org.apache.zookeeper.ClientCnxn" level="OFF"/>
+        <logger name="org.reflections.Reflections" level="OFF"/>
+        <logger name="org.apache.curator.framework.imps.CuratorFrameworkImpl" level="OFF"/>
+        <logger name="com.stratio.decision.commons.kafka.service.KafkaTopicService" level="OFF"/>
+        <logger name="com.stratio.decision.api.StreamingAPISyncOperation" level="OFF"/>
+
+        <logger name="com.stratio.decision.api.kafka.KafkaProducer" level="OFF"/>
+        <logger name="com.stratio.decision.api.StreamingAPIListOperation" level="OFF"/>
+        <logger name="org.apache.curator.framework.state.ConnectionStateManager" level="OFF"/>
+        <logger name="com.datastax.driver.core.policies.DCAwareRoundRobinPolicy" level="OFF"/>
+        <logger name="org.elasticsearch.plugins" level="OFF"/>
+        <logger name="org.I0Itec.zkclient.ZkConnection" level="OFF"/>
+        <logger name="org.I0Itec.zkclient.ZkClient" level="OFF"/>
+        <logger name="org.I0Itec.zkclient.ZkEventThread" level="OFF"/>
+        <logger name="kafka.utils.VerifiableProperties" level="OFF"/>
+        <logger name="kafka.client" level="OFF"/>
+        <logger name="kafka.producer" level="OFF"/>
     </Loggers>
 </Configuration>

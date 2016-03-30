@@ -37,7 +37,7 @@ Feature: Stream alter
 		When I alter a stream with name 'testStream', setting its columns (with type) as:
 			| 6  | Integer  |
 			| 6  | String   |
-		Then an exception 'IS' thrown  with class 'StratioEngineOperationException' and message like 'Column 6 already exists'
+		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Column 6 already exists'
 		And the stream 'testStream' has this columns (with name and type):
 			| 1  | String   |
 			| 2  | Integer  |

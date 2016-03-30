@@ -37,18 +37,18 @@ Feature: Setting a milliseconds value for timing out a communication.
 	Scenario: Alter Stream on low ack must timeout (even it will succeed eventually)
 		When I alter a stream with name 'testStreamACK0', setting its columns (with type) as:
 			| 3  | Boolean  |
-		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Acknowledge timeout expired'
+		Then an exception 'IS' thrown with class 'StratioEngineConnectionException' and message like 'Acknowledge timeout expired'
 
 	Scenario: Drop Stream on low ack must timeout (even it will succeed eventually)
 		When I delete the stream 'testStreamACK0'
-		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Acknowledge timeout expired'
+		Then an exception 'IS' thrown with class 'StratioEngineConnectionException' and message like 'Acknowledge timeout expired'
 
 	Scenario Outline: Non valid ack timeout must be forbidden
 		When I set a '<timeout>' milliseconds ACK timeout
 		When I create a stream with name '<streamName>' and columns (with type):
 			| 1  | String  |
 			| 2  | Integer |
-		Then an exception 'IS' thrown with class 'StratioApiOperationException' and message like '<message>'
+		Then an exception 'IS' thrown with class 'StratioEngineConnectionException' and message like '<message>'
 
 		Examples:
 		| streamName     | timeout  | message                              |
