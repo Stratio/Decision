@@ -200,35 +200,42 @@ public class JavaToAvroSerializer  implements Serializer<StratioStreamingMessage
                     ColumnNameTypeValue columnNameTypeValue = new ColumnNameTypeValue();
                     columnNameTypeValue.setColumn(data.getColumn().toString());
 
-                    switch (data.getType().toString()) {
-                    case "java.lang.Double" :
-                        Double doubleData = new Double(data.getValue().toString());
-                        columnNameTypeValue.setValue(doubleData);
-                        columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.DOUBLE);
-                        break;
-                    case "java.lang.Float" :
-                        Float floatData = new Float(data.getValue().toString());
-                        columnNameTypeValue.setValue(floatData);
-                        columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.FLOAT);
-                        break;
-                    case "java.lang.Integer" :
-                        Integer integerData = new Integer(data.getValue().toString());
-                        columnNameTypeValue.setValue(integerData);
-                        columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.INTEGER);
-                        break;
-                    case "java.lang.Long" :
-                        Long longData = new Long(data.getValue().toString());
-                        columnNameTypeValue.setValue(longData);
-                        columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.LONG);
-                        break;
-                    case "java.lang.Boolean" :
-                        Boolean booleanData = new Boolean(data.getValue().toString());
-                        columnNameTypeValue.setValue(booleanData);
-                        columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.BOOLEAN);
-                        break;
-                    default:
-                        columnNameTypeValue.setValue(data.getValue().toString());
-                        columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.STRING);
+                    if (data.getValue() == null){
+                        columnNameTypeValue.setValue(null);
+                        columnNameTypeValue.setType(null);
+                    }
+                    else {
+
+                        switch (data.getType().toString()) {
+                        case "java.lang.Double":
+                            Double doubleData = new Double(data.getValue().toString());
+                            columnNameTypeValue.setValue(doubleData);
+                            columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.DOUBLE);
+                            break;
+                        case "java.lang.Float":
+                            Float floatData = new Float(data.getValue().toString());
+                            columnNameTypeValue.setValue(floatData);
+                            columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.FLOAT);
+                            break;
+                        case "java.lang.Integer":
+                            Integer integerData = new Integer(data.getValue().toString());
+                            columnNameTypeValue.setValue(integerData);
+                            columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.INTEGER);
+                            break;
+                        case "java.lang.Long":
+                            Long longData = new Long(data.getValue().toString());
+                            columnNameTypeValue.setValue(longData);
+                            columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.LONG);
+                            break;
+                        case "java.lang.Boolean":
+                            Boolean booleanData = new Boolean(data.getValue().toString());
+                            columnNameTypeValue.setValue(booleanData);
+                            columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.BOOLEAN);
+                            break;
+                        default:
+                            columnNameTypeValue.setValue(data.getValue().toString());
+                            columnNameTypeValue.setType(com.stratio.decision.commons.constants.ColumnType.STRING);
+                        }
                     }
 
                     stratioStreamingMessage.addColumn(columnNameTypeValue);

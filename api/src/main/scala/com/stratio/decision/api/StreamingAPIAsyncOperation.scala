@@ -41,8 +41,14 @@ class StreamingAPIAsyncOperation(tableProducer: KafkaProducer) {
     var c : ColumnType = null
 
     for (messageColumn : ColumnNameTypeValue <- stratioStreamingMessage.getColumns){
-      c = new ColumnType(messageColumn.getColumn, messageColumn.getValue.toString, messageColumn.getValue.getClass
-        .getName)
+
+      if (messageColumn.getValue != null) {
+        c = new ColumnType(messageColumn.getColumn, messageColumn.getValue.toString, messageColumn.getValue.getClass
+          .getName)
+      } else {
+
+        c = new ColumnType(messageColumn.getColumn, null, null);
+      }
       columns.add(c)
     }
 
