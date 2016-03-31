@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.commons.avro;  
+package com.stratio.decision.commons.avro;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
-public enum Action { 
+public enum Action {
   LISTEN, SAVE_TO_CASSANDRA, SAVE_TO_MONGO, SAVE_TO_SOLR, SAVE_TO_ELASTICSEARCH  ;
   public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"enum\",\"name\":\"Action\",\"namespace\":\"com.stratio.decision.commons.avro\",\"symbols\":[\"LISTEN\",\"SAVE_TO_CASSANDRA\",\"SAVE_TO_MONGO\",\"SAVE_TO_SOLR\",\"SAVE_TO_ELASTICSEARCH\"]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
