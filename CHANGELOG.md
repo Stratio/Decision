@@ -2,6 +2,10 @@
 
 Only listing significant user-visible, not internal code cleanups and minor bug fixes.
 
+## 1.0.1 (March  2016)
+
+* Minor bug related with avro serialization
+
 ## 1.0.0 (March  2016)
 
 * Drools integration
