@@ -60,9 +60,16 @@ public class JavaToAvroSerializer  implements Serializer<StratioStreamingMessage
             ColumnType c = null;
 
             for (ColumnNameTypeValue messageColumn : object.getColumns()) {
-                c = new ColumnType(messageColumn.getColumn(), messageColumn.getValue().toString(),
-                        messageColumn.getValue()
-                                .getClass().getName());
+
+                if ( messageColumn.getValue() != null){
+
+                    c = new ColumnType(messageColumn.getColumn(), messageColumn.getValue().toString(),
+                            messageColumn.getValue().getClass().getName());
+
+                } else {
+                    c = new ColumnType(messageColumn.getColumn(), null, null);
+                }
+
                 columns.add(c);
             }
 
