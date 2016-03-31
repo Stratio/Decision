@@ -20,7 +20,7 @@
 	<parent>
 		<groupId>com.stratio.decision</groupId>
 		<artifactId>stratio-decision</artifactId>
-		<version>1.0.1-RC1</version>
+		<version>1.0.1-RC2-SNAPSHOT</version>
 	</parent>
 	<artifactId>siddhi</artifactId>
 	<packaging>jar</packaging>
