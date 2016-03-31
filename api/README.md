@@ -23,7 +23,7 @@ Requirements
   * Scala 2.10.3
   * sbt 0.13
   * zookeeper
-  * kafka 0.8.1
+  * kafka 0.8.2.1
 
 How to start
 ============
