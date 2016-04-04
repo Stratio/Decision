@@ -18,8 +18,6 @@ package com.stratio.decision.testsAT.specs;
 import static net.sf.expectit.matcher.Matchers.regexp;
 import static com.stratio.assertions.Assertions.*;
 
-import static com.stratio.tests.utils.matchers.PatternMatcher.pattern;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;

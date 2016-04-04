@@ -58,7 +58,7 @@ Feature: Stream creation
 		When I create a stream with name '<streamName>' and columns (with type):
 			| 1  | String  |
 			| 2  | Integer |
-		And an exception 'IS' thrown with class 'StratioAPISecurityException' and message like 'Operation create not allowed .*'
+		And an exception 'IS' thrown with class 'StratioAPISecurityException' and message like 'Operation create not allowed in stream <streamName>'
 		Then the count of created streams is '<streamCount>'
 
 		Examples:

@@ -8,7 +8,7 @@ Feature: Stream deletion operation
 
 	Scenario Outline: System stream deletion
 		When I delete the stream '<streamToDelete>'
-		Then an exception 'IS' thrown with class 'StratioAPISecurityException' and message like 'Operation drop not allowed in stream .*?'
+		Then an exception 'IS' thrown with class 'StratioAPISecurityException' and message like 'Operation drop not allowed in stream <streamToDelete>'
 		And the count of created streams is '<streamCount>'
 
 		Examples:

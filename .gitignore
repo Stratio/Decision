@@ -8,5 +8,4 @@
 *.iml
 *.ipr
 *.iws
-shell.log
-decision.log
+*.log

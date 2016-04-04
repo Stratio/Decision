@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.decision.testsAT.utils;
+package com.stratio.tests.utils;
 
 import gherkin.formatter.model.Background;
 import gherkin.formatter.model.Examples;
@@ -39,6 +39,8 @@ public class CukesHooks extends BaseSpec implements ICucumberReporter,
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass()
             .getCanonicalName());
+
+
 
     Background background;
     Feature feature;
@@ -70,8 +72,8 @@ public class CukesHooks extends BaseSpec implements ICucumberReporter,
 
     @Override
     public void startOfScenarioLifeCycle(Scenario scenario) {
-        // logger.info("Got to scenario {} life cycle start",
-        // scenario.getName());
+         logger.info("Got to scenario {} life cycle start",
+        scenario.getName());
 
     }
 
@@ -98,7 +100,7 @@ public class CukesHooks extends BaseSpec implements ICucumberReporter,
 
     @Override
     public void feature(Feature feature) {
-        // logger.info("Starting running feature {}", feature.getName());
+         logger.info("Starting running feature {}", feature.getName());
         this.feature = feature;
     }
 

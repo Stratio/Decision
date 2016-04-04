@@ -26,12 +26,12 @@ Feature: Stop save to cassandra
 		When I stop saving to Cassandra a stream with name '<streamName>'
 		Then an exception 'IS NOT' thrown
 		And the stream '<streamName>' has '' as active actions
-		
+
 		Examples:
-		| streamName   | 
-		| testCstring  | 
-		| testcstring  | 
-		| testCnumber  | 
+		| streamName   |
+		| testCstring  |
+		| testcstring  |
+		| testCnumber  |
 		
 	Scenario Outline: Stop saving bad streams
 		When I stop saving to Cassandra a stream with name '<streamName>'

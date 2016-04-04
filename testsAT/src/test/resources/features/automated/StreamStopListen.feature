@@ -5,7 +5,7 @@ Feature: Stream stop listen
 	Background: 
 		Given I drop every existing stream
 		
-	Scenario: Stop listening to a non-listened existing stream			
+	Scenario: Stop listening to a non-listened existing stream
 		When I create a stream with name 'stopListen' and columns (with type):
 			| 1  | String  |
 			| 2  | Integer |
@@ -16,9 +16,9 @@ Feature: Stream stop listen
 		When I create a stream with name 'stopListen' and columns (with type):
 			| 1  | String  |
 			| 2  | Integer |
-		When I listen to a stream with name 'stopListen'	
+		When I listen to a stream with name 'stopListen'
 		And I insert into a stream with name 'stopListen' this data:
-			| 1 | a | 
+			| 1 | a |
 			| 2 | 4 |
 		And I wait '5' seconds
 
@@ -26,8 +26,8 @@ Feature: Stream stop listen
 		And  the stream 'stopListen' has this content (with column name, type and value):
 			| 1 String a | 2 Integer 4 |
 			| 1 String b | 2 Integer 5 |
-		When I stop listening to a stream with name 'stopListen' 	
-		Then the stream 'stopListen' has '' as active actions		
+		When I stop listening to a stream with name 'stopListen'
+		Then the stream 'stopListen' has '' as active actions
 
 	Scenario: Stop listen to an non-existing stream			
 		When I stop listening to a stream with name 'inexistentStream'		
