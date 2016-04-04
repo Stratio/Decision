@@ -3,7 +3,7 @@
 # chmod +x /usr/local/bin/docker-compose
 
 zookeeper:
-  image: qa.stratio.com:5000/stratio/zookeeper:3.4.6
+  image: stratio/zookeeper:3.4.6
   container_name: zookeeper
   ports:
     - "2181:2181"
@@ -15,7 +15,7 @@ waitzk:
     - zookeeper
 
 kafka:
-  image: qa.stratio.com:5000/kafka:0.8.1.1
+  image: stratio/kafka:0.8.1.1
   container_name: kafka
   ports:
     - "9092:9092"
@@ -32,7 +32,7 @@ waitkafka:
     - kafka
 
 elasticsearch:
-  image: qa.stratio.com:5000/stratio/elasticsearch:1.7.1
+  image: stratio/elasticsearch:1.7.1
   container_name: elasticsearch
   ports:
     - "9300:9300"
@@ -45,12 +45,13 @@ waitelastic:
     - elasticsearch
 
 decision:
-  image: qa.stratio.com:5000/stratio/decision:latest
+  image: stratio/decision:latest
   container_name: decision
   links:
     - zookeeper
     - kafka
     - waitkafka
+    - elasticsearch
     - waitelastic
   environment:
     KAFKA_HOSTS: kafka:9092
@@ -58,10 +59,10 @@ decision:
     ES_HOSTS: elasticsearch:9300
     CLUSTERING_ENABLED: "false"
     GROUP_ID: stratiogroup
-    FAILOVER_ENABLED: "true"
+    FAILOVER_ENABLED: "false"
 
 decision-shell:
-  image: qa.stratio.com:5000/stratio/decision-shell:latest
+  image: stratio/decision-shell:latest
   container_name: shell
   links:
     - zookeeper
@@ -70,3 +71,4 @@ decision-shell:
   environment:
     KAFKA_HOSTS: kafka:9092
     ZOOKEEPER_HOSTS: zookeeper:2181
+
