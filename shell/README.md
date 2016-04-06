@@ -54,6 +54,8 @@ insert --stream test --values "col1.234,col2.testString"
 * save cassandra stop - stop save to cassandra action
 * save mongo start - start save to mongo action
 * save mongo stop - stop save to mongo action
+* send drools start - start send data to drools action
+* send drools stop - stop send data to drools action
 
 ## License
 
