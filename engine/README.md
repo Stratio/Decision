@@ -10,23 +10,6 @@ Stratio Decision provides a simple Java/Scala API to send commands to the engine
 The key components of Decision Engine provide a fault-tolerant, high availability and extremely performant solution in order to work with thousands of miles of events per minute.
 
 
-
-:arrow_forward: Running Stratio Decision Engine
-
-
-**Usage**
-
-```
---sparkMaster local --zookeeper-cluster fqdn:port,fqdn2:port --kafka-cluster fqdn:port,fqdn2:port --cassandra-cluster fqdn,fqdn2
-```
-
-
-**Using the provided script**
-
-```
-sudo sh run-stratio-streaming com.stratio.decision.StreamingEngine --spark-master local_2 --zookeeper-cluster fqdn:port,fqdn2:port,... --kafka-cluster fqdn:port,fqdn2:port,... --cassandra-cluster fqdn,fqdn,...
-```
-
 How to run engine Integration Tests
 ----------------------------------------------
 
