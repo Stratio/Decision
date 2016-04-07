@@ -54,7 +54,8 @@ chown -R ${USER}:${GROUP} $DIR_LOG
 
 chmod 755 /etc/init.d/decision
 chmod 755 /opt/sds/decision/bin/run
-chmod 644 /etc/default/decision
+chmod 644 /etc/default/decision-functions
+chmod 644 /etc/default/decision-variables
 
 sed -i 's!"$BASEDIR"/:/etc/sds/decision/conf!/etc/sds/decision!g' /opt/sds/decision/bin/run
 
