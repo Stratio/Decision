@@ -4,7 +4,7 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 ## 1.0.1 (March  2016)
 
-* Minor bug related with avro serialization
+* Minor bug related with Avro serialization
 
 ## 1.0.0 (March  2016)
 
