@@ -46,6 +46,9 @@ case "$1" in
   
   chown root:${GROUP} /var/run/sds 2>/dev/null
   chmod 775 /var/run/sds 2>/dev/null
+  
+   chown root:${GROUP} /etc/sds 2>/dev/null
+  chmod 775 /etc/sds 2>/dev/null
 
   ;;
 esac
