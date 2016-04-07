@@ -511,7 +511,16 @@
                                     <attributes>
                                         <user>root</user>
                                         <group>root</group>
-                                        <mode>755</mode>
+                                        <mode>644</mode>
+                                    </attributes>
+                                </copyFile>
+                                <copyFile>
+                                    <path>src/main/unix/files_and_dirs/etc/default/decision-functions</path>
+                                    <toFile>/etc/default/decision-functions</toFile>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>root</group>
+                                        <mode>644</mode>
                                     </attributes>
                                 </copyFile>
                                 <copyFile>
@@ -550,7 +559,7 @@
                                     <attributes>
                                         <user>root</user>
                                         <group>root</group>
-                                        <mode>755</mode>
+                                        <mode>644</mode>
                                     </attributes>
                                 </copyFile>
                                 <copyFile>
@@ -560,6 +569,15 @@
                                         <user>root</user>
                                         <group>root</group>
                                         <mode>755</mode>
+                                    </attributes>
+                                </copyFile>
+                                <copyFile>
+                                    <path>src/main/unix/files_and_dirs/etc/default/decision-functions</path>
+                                    <toFile>/etc/default/decision-functions</toFile>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>root</group>
+                                        <mode>644</mode>
                                     </attributes>
                                 </copyFile>
                                 <copyFile>
