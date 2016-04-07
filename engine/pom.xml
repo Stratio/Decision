@@ -413,24 +413,40 @@
                         </fileAttributes>
                     </defaults>
                     <assembly>
-                        <copyFile>
-                            <path>src/main/unix/files_and_dirs/etc/init.d/decision</path>
-                            <toFile>/etc/init.d/decision</toFile>
+                        <mkdirs>
+                            <path>/etc/sds</path>
                             <attributes>
                                 <user>root</user>
-                                <group>root</group>
-                                <mode>755</mode>
-                            </attributes>
-                        </copyFile>
-                        <mkdirs>
-                            <path>/opt/sds/decision</path>
-                            <attributes>
-                                <user>decision</user>
                                 <group>stratio</group>
+                                <mode>0775</mode>
+                            </attributes>
+                        </mkdirs>
+                        <mkdirs>
+                            <path>/var/log/sds</path>
+                            <attributes>
+                                <user>root</user>
+                                <group>stratio</group>
+                                <mode>0775</mode>
+                            </attributes>
+                        </mkdirs>
+                        <mkdirs>
+                            <path>/opt/sds</path>
+                            <attributes>
+                                <user>root</user>
+                                <group>stratio</group>
+                                <mode>0775</mode>
                             </attributes>
                         </mkdirs>
                         <mkdirs>
                             <path>/var/run/sds</path>
+                            <attributes>
+                                <user>root</user>
+                                <group>stratio</group>
+                                <mode>0775</mode>
+                            </attributes>
+                        </mkdirs>
+                        <mkdirs>
+                            <path>/opt/sds/decision</path>
                             <attributes>
                                 <user>decision</user>
                                 <group>stratio</group>
@@ -476,24 +492,7 @@
                             </directoryAttributes>
                         </copyDirectory>
 
-                        <copyFile>
-                            <path>src/main/unix/files_and_dirs/etc/default/decision-variables</path>
-                            <toFile>/etc/default/decision-variables</toFile>
-                            <attributes>
-                                <user>root</user>
-                                <group>root</group>
-                                <mode>755</mode>
-                            </attributes>
-                        </copyFile>
-                        <copyFile>
-                            <path>src/main/unix/files_and_dirs/etc/security/limits.d/decision.conf</path>
-                            <toFile>/etc/security/limits.d/decision.conf</toFile>
-                            <attributes>
-                                <user>root</user>
-                                <group>root</group>
-                                <mode>755</mode>
-                            </attributes>
-                        </copyFile>
+
                     </assembly>
                 </configuration>
                 <executions>
@@ -505,6 +504,35 @@
                         </goals>
                         <configuration>
                             <architecture>all</architecture>
+                            <assembly>
+                                <copyFile>
+                                    <path>src/main/unix/files_and_dirs/etc/default/decision-variables</path>
+                                    <toFile>/etc/default/decision-variables</toFile>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>root</group>
+                                        <mode>755</mode>
+                                    </attributes>
+                                </copyFile>
+                                <copyFile>
+                                    <path>src/main/unix/files_and_dirs/etc/security/limits.d/decision.conf</path>
+                                    <toFile>/etc/security/limits.d/decision.conf</toFile>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>root</group>
+                                        <mode>755</mode>
+                                    </attributes>
+                                </copyFile>
+                                <copyFile>
+                                    <path>src/main/unix/files_and_dirs/etc/init.d/decision</path>
+                                    <toFile>/etc/init.d/decision</toFile>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>root</group>
+                                        <mode>755</mode>
+                                    </attributes>
+                                </copyFile>
+                            </assembly>
                         </configuration>
                     </execution>
                     <execution>
@@ -515,6 +543,35 @@
                         </goals>
                         <configuration>
                             <architecture>noarch</architecture>
+                            <assembly>
+                                <copyFile>
+                                    <path>src/main/unix/files_and_dirs/etc/default/decision-variables</path>
+                                    <toFile>/etc/default/decision-variables</toFile>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>root</group>
+                                        <mode>755</mode>
+                                    </attributes>
+                                </copyFile>
+                                <copyFile>
+                                    <path>src/main/unix/files_and_dirs/etc/security/limits.d/decision.conf</path>
+                                    <toFile>/etc/security/limits.d/decision.conf</toFile>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>root</group>
+                                        <mode>755</mode>
+                                    </attributes>
+                                </copyFile>
+                                <copyFile>
+                                    <path>src/main/unix/files_and_dirs/etc/init.d/decision</path>
+                                    <toFile>/etc/init.d/decision</toFile>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>root</group>
+                                        <mode>755</mode>
+                                    </attributes>
+                                </copyFile>
+                            </assembly>
                         </configuration>
                     </execution>
                 </executions>

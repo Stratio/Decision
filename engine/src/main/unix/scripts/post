@@ -25,7 +25,6 @@ USER='decision'
 DIR_INSTALL='/opt/sds/decision'
 DIR_CONF='/etc/sds/decision'
 DIR_LOG='/var/log/sds/decision'
-DIR_RUN='/var/run/sds'
 
 # Add stratio group if it doesn't already exists
 if ! getent group $GROUP >/dev/null 2>&1; then
@@ -51,14 +50,11 @@ chown -R ${USER}:${GROUP} /opt/sds/.m2
 
 chown -R ${USER}:${GROUP} $DIR_CONF
 chown -R ${USER}:${GROUP} $DIR_LOG
-chmod -R 775 $DIR_INSTALL
-chmod 775 $DIR_LOG
 
-chown -R ${USER}:${GROUP} $DIR_RUN
 
 chmod 755 /etc/init.d/decision
 chmod 755 /opt/sds/decision/bin/run
-#chmod +x /etc/default/decision
+chmod 644 /etc/default/decision
 
 sed -i 's!"$BASEDIR"/:/etc/sds/decision/conf!/etc/sds/decision!g' /opt/sds/decision/bin/run
 
