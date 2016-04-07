@@ -61,9 +61,9 @@ case "$1" in
   chown root:root /etc/default/decision-functions
   chown root:root /etc/default/decision-variables
 
-  chmod 750 $DIR_CONF
-  chmod 750 $DIR_LOG
-  chmod 750 $DIR_INSTALL
+  chmod 755 $DIR_CONF
+  chmod 755 $DIR_LOG
+  chmod 755 $DIR_INSTALL
 
   chown -R ${USER}:${GROUP} /opt/sds/.m2
   chmod 644 /etc/default/decision-functions

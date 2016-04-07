@@ -404,7 +404,7 @@
                         <directoryAttributes>
                             <user>decision</user>
                             <group>stratio</group>
-                            <mode>0750</mode>
+                            <mode>0755</mode>
                         </directoryAttributes>
                         <fileAttributes>
                             <user>decision</user>
