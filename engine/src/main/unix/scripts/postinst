@@ -26,7 +26,6 @@ DIR_INSTALL='/opt/sds/decision'
 DIR_CONF='/etc/sds/decision'
 DIR_CONF='/etc/sds/decision'
 DIR_LOG='/var/log/sds/decision'
-DIR_RUN='/var/run/sds'
 
 chmod 755 /etc/init.d/decision
 chmod 755 /opt/sds/decision/bin
@@ -58,11 +57,17 @@ case "$1" in
   chown -R ${USER}:${GROUP} $DIR_INSTALL
   chown -R ${USER}:${GROUP} $DIR_CONF
   chown -R ${USER}:${GROUP} $DIR_LOG
-  chmod -R 775 $DIR_INSTALL
-  chmod 775 $DIR_LOG
 
-  chown -R ${USER}:${GROUP} $DIR_RUN
+  chown root:root /etc/default/decision-functions
+  chown root:root /etc/default/decision-variables
+
+  chmod 750 $DIR_CONF
+  chmod 750 $DIR_LOG
+  chmod 750 $DIR_INSTALL
+
   chown -R ${USER}:${GROUP} /opt/sds/.m2
+  chmod 644 /etc/default/decision-functions
+  chmod 644 /etc/default/decision-variables
 
   sed -i 's!"$BASEDIR"/:/etc/sds/decision/conf!/etc/sds/decision!g' /opt/sds/decision/bin/run
 

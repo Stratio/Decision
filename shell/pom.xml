@@ -177,6 +177,30 @@
                             </defaults>
                             <assembly>
                                 <mkdirs>
+                                    <path>/etc/sds</path>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>stratio</group>
+                                        <mode>0775</mode>
+                                    </attributes>
+                                </mkdirs>
+                                <mkdirs>
+                                    <path>/var/log/sds</path>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>stratio</group>
+                                        <mode>0775</mode>
+                                    </attributes>
+                                </mkdirs>
+                                <mkdirs>
+                                    <path>/opt/sds</path>
+                                    <attributes>
+                                        <user>root</user>
+                                        <group>stratio</group>
+                                        <mode>0775</mode>
+                                    </attributes>
+                                </mkdirs>
+                                <mkdirs>
                                     <path>/opt/sds/decision-shell</path>
                                     <attributes>
                                         <user>decision</user>
@@ -186,8 +210,9 @@
                                 <mkdirs>
                                     <path>/var/run/sds</path>
                                     <attributes>
-                                        <user>decision</user>
+                                        <user>root</user>
                                         <group>stratio</group>
+                                        <mode>0775</mode>
                                     </attributes>
                                 </mkdirs>
                                 <copyDirectory>
