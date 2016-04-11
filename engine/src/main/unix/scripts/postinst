@@ -61,13 +61,26 @@ case "$1" in
   chown root:root /etc/default/decision-functions
   chown root:root /etc/default/decision-variables
 
-  chmod 750 $DIR_CONF
-  chmod 750 $DIR_LOG
-  chmod 750 $DIR_INSTALL
+  chmod 755 $DIR_CONF
+  chmod 755 $DIR_LOG
+  chmod 755 $DIR_INSTALL
 
   chown -R ${USER}:${GROUP} /opt/sds/.m2
   chmod 644 /etc/default/decision-functions
   chmod 644 /etc/default/decision-variables
+
+
+    chown root:${GROUP} /etc/sds 2>/dev/null
+    chmod 775 /etc/sds 2>/dev/null
+
+    chown root:${GROUP} /var/log/sds 2>/dev/null
+    chmod 775 /var/log/sds 2>/dev/null
+
+    chown root:${GROUP} /var/run/sds 2>/dev/null
+    chmod 775 /var/run/sds 2>/dev/null
+
+    chown root:${GROUP} /opt/sds 2>/dev/null
+    chmod 775 /opt/sds 2>/dev/null
 
   sed -i 's!"$BASEDIR"/:/etc/sds/decision/conf!/etc/sds/decision!g' /opt/sds/decision/bin/run
 
