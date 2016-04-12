@@ -1,47 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
 
-    Copyright (C) 2014 Stratio (http://stratio.com)
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-            http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
 <Configuration status="INFO">
     <Properties>
         <Property name="logLevel">INFO</Property>
     </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%highlight{%28.25c{1}} - %highlight{%m}%n" />"
+            <PatternLayout pattern="%highlight{%.20c{1}} - %highlight{%m}%n" />
         </Console>
-        <Console name="ConsoleApi" target="SYSTEM_OUT">
-            <PatternLayout pattern="%highlight{%28.25c{1} - %msg%n}{INFO=cyan}"/>
-        </Console>
-        <Console name="ConsoleBlue" target="SYSTEM_OUT">
-            <PatternLayout pattern="%highlight{%28.25c{1}  - %highlight{%m}%n}{INFO=cyan}"/>
+        <Console name="Hooks" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%.20c{1} - %msg%n}{INFO=cyan}"/>
         </Console>
     </Appenders>
     <Loggers>
         <Root level="INFO">
-            <AppenderRef ref="Console" />
+            <AppenderRef ref="Console"/>
         </Root>
 
-        <logger name="com.stratio.tests.utils.CukesGHooks" level="INFO" additivity="false">
-            <appender-ref ref="ConsoleApi"/>
+        <logger name="com.stratio.tests.utils" level="INFO" additivity="false">
+            <appender-ref ref="Hooks"/>
         </logger>
-
         <logger name="com.stratio.decision.api" level="INFO" additivity="false">
-            <appender-ref ref="ConsoleBlue"/>
+            <appender-ref ref="Hooks"/>
         </logger>
         <logger name="org.apache.zookeeper.ZooKeeper" level="OFF"/>
         <logger name="org.apache.zookeeper.ClientCnxn" level="OFF"/>
