@@ -22,7 +22,7 @@
     </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%highlight{%70.90c{70}} - %highlight{%m}%n" />"
+            <PatternLayout pattern="%highlight{%28.25c{1}} - %highlight{%m}%n" />"
         </Console>
         <Console name="ConsoleApi" target="SYSTEM_OUT">
             <PatternLayout pattern="%highlight{%28.25c{1} - %msg%n}{INFO=cyan}"/>
