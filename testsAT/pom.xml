@@ -3,23 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>com.stratio</groupId>
         <artifactId>parent</artifactId>
         <version>0.6.2</version>
     </parent>
-
-    <properties>
-        <stratio-test-bdd.version>0.2.0-SNAPSHOT</stratio-test-bdd.version>
-        <decision.version>1.0.0-SNAPSHOT</decision.version>
-    </properties>
-
     <groupId>com.stratio.decision</groupId>
     <artifactId>decision-test</artifactId>
     <version>1.1.0-SNAPSHOT</version>
     <name>decision-test</name>
-
+    <properties>
+        <stratio-test-bdd.version>0.2.0-SNAPSHOT</stratio-test-bdd.version>
+        <decision.version>${project.version}</decision.version>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -113,9 +109,5 @@
             <artifactId>testng</artifactId>
             <version>6.9.9</version>
         </dependency>
-
-
-
     </dependencies>
-
 </project>
