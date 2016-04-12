@@ -72,8 +72,8 @@ public class CukesHooks extends BaseSpec implements ICucumberReporter,
 
     @Override
     public void startOfScenarioLifeCycle(Scenario scenario) {
-         logger.info("Got to scenario {} life cycle start",
-        scenario.getName());
+//         logger.info("Got to scenario {} life cycle start",
+//        scenario.getName());
 
     }
 
@@ -89,7 +89,7 @@ public class CukesHooks extends BaseSpec implements ICucumberReporter,
 
     @Override
     public void eof() {
-        logger.info("Got to end of file");
+        //logger.info("Got to end of file");
     }
 
     @Override
@@ -100,19 +100,19 @@ public class CukesHooks extends BaseSpec implements ICucumberReporter,
 
     @Override
     public void feature(Feature feature) {
-         logger.info("Starting running feature {}", feature.getName());
+//         logger.info("Starting running feature {}", feature.getName());
         this.feature = feature;
     }
 
     @Override
     public void scenario(Scenario scenario) {
-        logger.info("Got to scenario {} ", scenario.getName());
+//        logger.info("Got to scenario {} ", scenario.getName());
         this.scenario = scenario;
     }
 
     @Override
     public void scenarioOutline(ScenarioOutline scenarioOutline) {
-        logger.info("Got to scenarioOutline {} ", scenarioOutline.getName());
+//        logger.info("Got to scenarioOutline {} ", scenarioOutline.getName());
         this.scenarioOutline = scenarioOutline;
     }
 

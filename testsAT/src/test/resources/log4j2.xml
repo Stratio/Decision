@@ -22,37 +22,29 @@
     </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout
-                    pattern="%highlight{%18.14c{1}} (%16.16F:%3L) - %highlight{%m}%n" />
+            <PatternLayout pattern="%highlight{%.20c{1}} - %highlight{%m}%n" />
         </Console>
-        <Console name="ConsoleApi" target="SYSTEM_OUT">
-            <PatternLayout pattern="%highlight{%18.14c{1}  - %msg%n}{INFO=cyan}"/>
-
-        </Console>
-        <Console name="ConsoleBlue" target="SYSTEM_OUT">
-            <PatternLayout pattern="%highlight{%28.25c{1}  - %highlight{%m}%n}{INFO=cyan}"/>
+        <Console name="Hooks" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%.20c{1} - %msg%n}{INFO=cyan}"/>
         </Console>
     </Appenders>
     <Loggers>
         <Root level="INFO">
-            <AppenderRef ref="Console" />
+            <AppenderRef ref="Console"/>
         </Root>
 
-        <logger name="com.stratio.tests.utils.CukesHooks" level="INFO" additivity="false">
-            <appender-ref ref="ConsoleApi"/>
+        <logger name="com.stratio.tests.utils" level="INFO" additivity="false">
+            <appender-ref ref="Hooks"/>
         </logger>
-
         <logger name="com.stratio.decision.api" level="INFO" additivity="false">
-            <appender-ref ref="ConsoleBlue"/>
+            <appender-ref ref="Hooks"/>
         </logger>
-
         <logger name="org.apache.zookeeper.ZooKeeper" level="OFF"/>
         <logger name="org.apache.zookeeper.ClientCnxn" level="OFF"/>
         <logger name="org.reflections.Reflections" level="OFF"/>
         <logger name="org.apache.curator.framework.imps.CuratorFrameworkImpl" level="OFF"/>
         <logger name="com.stratio.decision.commons.kafka.service.KafkaTopicService" level="OFF"/>
         <logger name="com.stratio.decision.api.StreamingAPISyncOperation" level="OFF"/>
-
         <logger name="com.stratio.decision.api.kafka.KafkaProducer" level="OFF"/>
         <logger name="com.stratio.decision.api.StreamingAPIListOperation" level="OFF"/>
         <logger name="org.apache.curator.framework.state.ConnectionStateManager" level="OFF"/>
@@ -62,7 +54,25 @@
         <logger name="org.I0Itec.zkclient.ZkClient" level="OFF"/>
         <logger name="org.I0Itec.zkclient.ZkEventThread" level="OFF"/>
         <logger name="kafka.utils.VerifiableProperties" level="OFF"/>
-        <logger name="kafka.client" level="OFF"/>
-        <logger name="kafka.producer" level="OFF"/>
+        <logger name="org.apache.kafka.clients.producer.ProducerConfig" level="OFF"/>
+        <logger name="kafka.consumer.ConsumerFetcherManager" level="OFF"/>
+        <logger name="kafka.consumer.RangeAssignor " level="OFF"/>
+        <logger name="kafka.consumer.ConsumerFetcherManager" level="OFF"/>
+        <logger name="kafka.consumer.ConsumerFetcherThread" level="OFF"/>
+        <logger name="kafka.consumer.ZookeeperConsumerConnector" level="OFF"/>
+        <logger name="kafka.consumer.RangeAssignor" level="OFF"/>
+        <logger name="kafka.consumer.ConsumerFetcherManager" level="OFF"/>
+        <logger name="kafka.consumer.ConsumerFetcherThread" level="OFF"/>
+        <logger name="kafka.consumer.SimpleConsumer" level="OFF"/>
+        <logger name="kafka.consumer.ZookeeperTopicEventWatcher" level="OFF"/>
+        <logger name="com.datastax.driver.core.NettyUtil" level="OFF"/>
+        <logger name="com.datastax.driver.core.Cluster" level="OFF"/>
+        <logger name="kafka.consumer.ConsumerFetcherManager$LeaderFinderThread" level="OFF"/>
+        <logger name="kafka.client.ClientUtils$" level="OFF"/>
+        <logger name="kafka.producer.SyncProducer" level="OFF"/>
+        <logger name="kafka.producer.ProducerPool" level="OFF"/>
+        <logger name="kafka.producer.Producer" level="OFF"/>
+        <logger name="kafka.consumer.ConsumerFetcherManager$LeaderFinderThread" level="OFF"/>
+        <logger name="kafka.consumer.ConsumerFetcherManager$LeaderFinderThread" level="OFF"/>
     </Loggers>
 </Configuration>
