@@ -24,7 +24,7 @@ Feature: Save to cassandra
 	Scenario: Saving from an unexistent stream
 		When I start saving to Cassandra a stream with name 'unexistantStream'
 		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Stream .* does not exist'
-	
+#
 	Scenario Outline: Saving from an bad named stream
 		When I start saving to Cassandra a stream with name '<streamName>'
 		Then an exception 'IS' thrown with class 'StratioAPISecurityException' and message like '<message>'
@@ -37,7 +37,7 @@ Feature: Save to cassandra
 		
 	Scenario Outline: Saving from an existent stream with an unnacepted equivalent C* table name
 		When I start saving to Cassandra a stream with name '<streamName>'
-		Then an exception 'IS ' thrown with class 'StratioAPISecurityException' and message like 'Stream name <streamName> is not compatible with SAVE_TO_CASSANDRA action'
+		Then an exception 'IS ' thrown with class 'com.stratio.decision.commons.exceptions.StratioAPISecurityException' and message like 'Stream name <streamName> is not compatible with SAVE_TO_CASSANDRA action.'
 		And the stream '<streamName>' has '' as active actions
 
 		Examples:
@@ -65,12 +65,12 @@ Feature: Save to cassandra
 		And a Casandra keyspace 'stratio_streaming' contains a table 'testCstring'
 		And a Casandra keyspace 'stratio_streaming' contains a table 'testcstring' with '1' rows
 		And a Casandra keyspace 'stratio_streaming' contains a table 'testCstring' with '1' rows
-#		And a Casandra keyspace 'stratio_streaming' contains a table 'testcstring' with values:
-#			| col1-text | col2-int |
-#			| b         | 5        |
-#		And a Casandra keyspace 'stratio_streaming' contains a table 'testCstring' with values:
-#			| col1-text | col2-int |
-#			| a         | 4        |
+		And a Casandra keyspace 'stratio_streaming' contains a table 'testcstring' with values:
+			| col1-text | col2-int |
+			| b         | 5        |
+		And a Casandra keyspace 'stratio_streaming' contains a table 'testCstring' with values:
+			| col1-text | col2-int |
+			| a         | 4        |
 
 	@ignore @manual
 	Scenario: Saving from an existent stream

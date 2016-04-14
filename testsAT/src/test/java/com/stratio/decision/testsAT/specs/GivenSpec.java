@@ -35,14 +35,25 @@ public class GivenSpec extends BaseSpec {
     public void dropStreams() throws StratioEngineStatusException,
             StratioAPISecurityException, StratioEngineOperationException,
             StratioAPIGenericException {
-        commonspec.getLogger().info("Wiping every stream");
         List<StratioStream> streamList = commonspec.getStratioStreamingAPI()
                 .listStreams();
 
+        String strStreamList = "";
+        if (streamList.size()==1)
+        {
+            strStreamList = streamList.get(0).getStreamName() + strStreamList;
+        } else {
+            for (int i = 0; i < streamList.size(); i++) {
+                if (i == streamList.size() - 1) {
+                    strStreamList = streamList.get(i).getStreamName() + strStreamList;
+                } else {
+                    strStreamList = strStreamList + ", " +streamList.get(i).getStreamName();
+                }
+            }
+        }
+        commonspec.getLogger().info("Wiping every stream [{}]", strStreamList);
         for (StratioStream stream : streamList) {
             if (stream.getUserDefined()) {
-                commonspec.getLogger()
-                        .info("Wiping {}", stream.getStreamName());
                 String streamName = stream.getStreamName();
                 commonspec.getStratioStreamingAPI().dropStream(streamName);
             } else {

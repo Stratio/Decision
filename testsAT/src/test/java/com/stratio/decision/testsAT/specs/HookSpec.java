@@ -100,9 +100,9 @@ public class HookSpec extends BaseSpec {
 
     @Before(order = 20, value = "@api")
     public void streamingApiSetup() {
-        commonspec.getLogger().info("Stratio Streaming API setup");
+        commonspec.getLogger().info("Stratio Decision API setup");
         try {
-            commonspec.getLogger().info("Starting Stratio Streaming factory on {}:{}, {}:{}",
+            commonspec.getLogger().info("Starting Stratio Decision factory on {}:{}, {}:{}",
                     commonspec.getKAFKA_HOST(), commonspec.getKAFKA_PORT(), commonspec.getZOOKEEPER_HOST(),
                     commonspec.getZOOKEEPER_PORT());
             IStratioStreamingAPI stratioStreamingAPI = StratioStreamingAPIFactory.create().initializeWithServerConfig(
@@ -111,14 +111,14 @@ public class HookSpec extends BaseSpec {
             commonspec.setStratioStreamingAPI(stratioStreamingAPI);
 
         } catch (StratioStreamingException e) {
-            commonspec.getLogger().error("Got Exception on connecting to Stratio Streaming", e);
+            commonspec.getLogger().error("Got Exception on connecting to Stratio Decision", e);
             fail("Unable to create Stratio Streaming Factory");
         }
     }
 
     @After(order = 20, value = "@api")
     public void apiTeardown() throws IOException {
-        commonspec.getLogger().info("Clearing Stratio Streaming API");
+        commonspec.getLogger().info("Clearing Stratio Decision API");
         if (commonspec.getStratioStreamingAPI() != null) {
             commonspec.getStratioStreamingAPI().close();
         }
@@ -127,7 +127,7 @@ public class HookSpec extends BaseSpec {
 
     @After(order = 20, value = "@shell")
     public void shellTeardown() throws IOException {
-        commonspec.getLogger().info("Closing Stratio Streaming shell prompt");
+        commonspec.getLogger().info("Closing Stratio Decision shell prompt");
         if (commonspec.getShellIface() != null) {
             commonspec.getShellIface().sendLine("exit");
             commonspec.getShellIface().expect(eof());

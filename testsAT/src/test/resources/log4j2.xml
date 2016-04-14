@@ -32,13 +32,10 @@
         <Root level="INFO">
             <AppenderRef ref="Console"/>
         </Root>
-
         <logger name="com.stratio.tests.utils" level="INFO" additivity="false">
             <appender-ref ref="Hooks"/>
         </logger>
-        <logger name="com.stratio.decision.api" level="INFO" additivity="false">
-            <appender-ref ref="Hooks"/>
-        </logger>
+        <logger name="com.stratio.decision.api" level="OFF"/>
         <logger name="org.apache.zookeeper.ZooKeeper" level="OFF"/>
         <logger name="org.apache.zookeeper.ClientCnxn" level="OFF"/>
         <logger name="org.reflections.Reflections" level="OFF"/>
@@ -50,6 +47,7 @@
         <logger name="org.apache.curator.framework.state.ConnectionStateManager" level="OFF"/>
         <logger name="com.datastax.driver.core.policies.DCAwareRoundRobinPolicy" level="OFF"/>
         <logger name="org.elasticsearch.plugins" level="OFF"/>
+        <logger name="org.elasticsearch.transport" level="OFF"/>
         <logger name="org.I0Itec.zkclient.ZkConnection" level="OFF"/>
         <logger name="org.I0Itec.zkclient.ZkClient" level="OFF"/>
         <logger name="org.I0Itec.zkclient.ZkEventThread" level="OFF"/>
