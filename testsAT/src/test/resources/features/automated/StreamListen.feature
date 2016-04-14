@@ -43,7 +43,6 @@ Feature: Stream listen
 			 | streamName 	|
 			 | testStream 	|
 
-	@ignore
 	Scenario Outline: Listen to a stream, named as an internal topic
 		Given I drop every existing stream
 		When I create a stream with name '<streamName>' and columns (with type):

@@ -40,5 +40,5 @@ Feature: Stream deletion operation
 		Examples:
 			 | streamName   |  exceptionClass                 | message             |
 			 | testDeletion | StratioEngineOperationException | .*? does not exists |
-			 | //NULL//     | StratioAPISecurityException     | Stream name cannot be null |
-			 |              | StratioAPISecurityException     | invalid stream name |
+			 | //NULL//     | com.stratio.decision.commons.exceptions.StratioAPISecurityException     | Stream name cannot be null |
+			 |              | com.stratio.decision.commons.exceptions.StratioAPISecurityException     | invalid stream name |
