@@ -14,7 +14,7 @@ Feature: Setting a milliseconds value for timing out a communication.
 		When I create a stream with name 'testStreamACK0' and columns (with type):
 			| 1  | String  |
 			| 2  | Integer |
-		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Acknowledge timeout expired'
+		Then an exception 'IS' thrown with class 'com.stratio.decision.commons.exceptions.StratioEngineConnectionException' and message like 'Acknowledge timeout expired'
 
 	Scenario: Timeout set after any operation wont be honored
 		When I set a '10000' milliseconds ACK timeout
