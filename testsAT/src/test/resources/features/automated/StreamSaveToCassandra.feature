@@ -24,7 +24,7 @@ Feature: Save to cassandra
 	Scenario: Saving from an unexistent stream
 		When I start saving to Cassandra a stream with name 'unexistantStream'
 		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Stream .* does not exist'
-#
+
 	Scenario Outline: Saving from an bad named stream
 		When I start saving to Cassandra a stream with name '<streamName>'
 		Then an exception 'IS' thrown with class 'StratioAPISecurityException' and message like '<message>'
@@ -34,7 +34,7 @@ Feature: Save to cassandra
 		|            | Stream name cannot be empty |
 		| //NULL//   | Stream name cannot be null  |
 		| 0x0008     | Bad stream name             |
-		
+
 	Scenario Outline: Saving from an existent stream with an unnacepted equivalent C* table name
 		When I start saving to Cassandra a stream with name '<streamName>'
 		Then an exception 'IS ' thrown with class 'com.stratio.decision.commons.exceptions.StratioAPISecurityException' and message like 'Stream name <streamName> is not compatible with SAVE_TO_CASSANDRA action.'
@@ -46,7 +46,7 @@ Feature: Save to cassandra
 		| 2testCnumber |
 
 	Scenario: Saving from an existent stream
-		When I create a Cassandra keyspace named 'stratio_streaming'
+		When I create a Cassandra keyspace named 'stratio_decision'
 		When I start saving to Cassandra a stream with name 'testcstring'
 		When I start saving to Cassandra a stream with name 'testCstring'
 		And I wait '10' seconds
@@ -60,9 +60,9 @@ Feature: Save to cassandra
 			| col3 | 'b' |
 			| col4 | 5 |
 		And I wait '10' seconds
-		Then a Cassandra keyspace 'stratio_streaming' exists
-		And a Casandra keyspace 'stratio_streaming' contains a table 'testcstring'
-		And a Casandra keyspace 'stratio_streaming' contains a table 'testCstring'
+		Then a Cassandra keyspace 'stratio_decision' exists
+		And a Casandra keyspace 'stratio_decision' contains a table 'testcstring'
+		And a Casandra keyspace 'stratio_decision' contains a table 'testCstring'
 		And a Casandra keyspace 'stratio_streaming' contains a table 'testcstring' with '1' rows
 		And a Casandra keyspace 'stratio_streaming' contains a table 'testCstring' with '1' rows
 		And a Casandra keyspace 'stratio_streaming' contains a table 'testcstring' with values:
@@ -72,7 +72,7 @@ Feature: Save to cassandra
 			| col1-text | col2-int |
 			| a         | 4        |
 
-	@ignore @manual
+
 	Scenario: Saving from an existent stream
 		When I start saving to Cassandra a stream with name 'testCstring'
 		When I start saving to Cassandra a stream with name 'testcstring'
