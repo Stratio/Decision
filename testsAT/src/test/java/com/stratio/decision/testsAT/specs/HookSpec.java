@@ -57,10 +57,10 @@ public class HookSpec extends BaseSpec {
 
     @Before(order = 20, value = "@C*")
     public void cassandraKSWipe() throws IOException, InterruptedException {
-        commonspec.getLogger().info("Wiping every C* table under stratio_streaming keyspace (if it does exist)");
-        List<String> tables = commonspec.getCassandraClient().getTables("stratio_streaming");
+        commonspec.getLogger().info("Wiping every C* table under stratio_decision keyspace (if it does exist)");
+        List<String> tables = commonspec.getCassandraClient().getTables("stratio_decision");
         for (String table : tables) {
-            commonspec.getCassandraClient().executeQuery("TRUNCATE stratio_streaming.\"" + table + "\" ;");
+            commonspec.getCassandraClient().executeQuery("TRUNCATE stratio_decision.\"" + table + "\" ;");
         }
     }
 
