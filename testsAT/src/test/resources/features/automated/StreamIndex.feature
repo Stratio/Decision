@@ -40,7 +40,7 @@ Feature: Index to elasticsearch
 		| '            | '                 |
 		| /            | /               |
 		|  korean:향    |  korean:향          |
-		| 0x0000       |  \u0000			 |
+		| 0x0000       | \u0000			 |
 
 
 	Scenario Outline: Index a stream, delete it, recreate it with different contract and listen again
