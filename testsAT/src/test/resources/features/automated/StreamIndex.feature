@@ -34,13 +34,13 @@ Feature: Index to elasticsearch
 
 		Examples:
 		| streamName   | convertedStreamName |
-		| "            | %22                 |
+		| "            | "                 |
 		| testESnumber | testESnumber        |
-		| 0x0008       | %08                 |
-		| '            | %27                 |
-		| /            | %2F                 |
+		| 0x0008       | \u0008                 |
+		| '            | '                 |
+		| /            | /               |
 		|  korean:향    |  korean:향          |
-		| 0x0000       | %00				 |
+		| 0x0000       | \u0000			 |
 
 
 	Scenario Outline: Index a stream, delete it, recreate it with different contract and listen again
