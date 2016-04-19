@@ -73,7 +73,7 @@ Feature: Save to cassandra
 			| a         | 4        |
 
 
-	Scenario: Saving from an existent stream
+	Scenario: Saving from an existent stream with existent table
 		When I start saving to Cassandra a stream with name 'testCstring'
 		When I start saving to Cassandra a stream with name 'testcstring'
 		And I insert into a stream with name 'testCstring' this data:
