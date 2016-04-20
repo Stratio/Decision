@@ -27,8 +27,8 @@ Feature: Stream listen
 		And the stream '<streamName>' has 'LISTEN' as active actions
 		Then the number of kafka topics is '4'
 		Then the stream '<streamName>' has this content (with column name, type and value):
-			| 1 String a | 2 Integer 4.0 |
-			| 1 String b | 2 String 5.0 |
+			| 1 String a | 2 Integer 4 |
+			| 1 String b | 2 Integer 5 |
 
 		Examples:
 			 | streamName 	|
@@ -48,7 +48,7 @@ Feature: Stream listen
 		When I create a stream with name '<streamName>' and columns (with type):
 			| 1  | String  |
 			| 2  | Integer |
-		Then an exception 'IS' thrown with class 'XX' and message like 'YY'
+		Then an exception 'IS' thrown with class 'StratioAPISecurityException' and message like 'Reserved names as an internal topic'
 
 		Examples:
 			 | streamName 	              |
@@ -72,7 +72,7 @@ Feature: Stream listen
 			| 2  | Integer |
 		When I listen to a stream with name '<streamName>'
 		Then the number of kafka topics is, at least, '3'
-		And an exception 'IS' thrown with class 'StratioAPISecurityException' and message like 'Stream name .*? is not compatible with LISTEN action'
+		And an exception 'IS' thrown with class 'com.stratio.decision.commons.exceptions.StratioAPISecurityException' and message like 'Stream name <streamName> is not compatible with LISTEN action.'
 
 		Examples:
 			 | streamName   |
