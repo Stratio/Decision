@@ -54,4 +54,4 @@ Feature: Setting a milliseconds value for timing out a communication.
 		| streamName     | timeout  | message                              |
 		| testStreamACK5 | -1       | timeout value must be a positive int |
 		| testStreamACK6 | 0        | timeout value must be a positive int |
-		| testStreamACK7 | //NULL// | Stream name cannot be null           |
+		| testStreamACK7 | //NULL// | timeout value must be a positive int |
