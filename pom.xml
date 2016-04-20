@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.stratio</groupId>
         <artifactId>parent</artifactId>
-        <version>0.6.2</version>
+        <version>0.7.0</version>
     </parent>
 
     <groupId>com.stratio.decision</groupId>
@@ -69,6 +69,7 @@
         <guava.version>16.0.1</guava.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <stratio-platform.target>1.7</stratio-platform.target>
     </properties>
 
     <build>
