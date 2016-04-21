@@ -52,6 +52,7 @@ Feature: Query addition
 		| query |
 		| from testAddQuery2 select '2' as col2 insert into testAddQuery2Output |
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Create badly formed query so its id will be an empty string
 		When I add a query '<query>' to a stream with name 'testAddQuery2'
 		Then an exception 'IS' thrown with class '<exception>' and message like '<message>'
@@ -96,7 +97,7 @@ Feature: Query addition
 		| query                                                                 |
 		| from testAddQuery2 select '2' as col2 insert into testAddQuery2Output |
 
-
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Drop query with nulled values involved.
 		When I remove a query '<query>' to a stream with name '<streamName>'
 		Then an exception 'IS' thrown with class '<exception>' and message like '<message>'
@@ -118,6 +119,7 @@ Feature: Query addition
 		| query |
 		| from testAddQuery select "2" as col2 insert into testAddQueryOutput |
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Inexistant stream query drop
 		When I add a query 'from testAddQuery select "2" as col2 insert into testAddQueryOutput' to a stream with name 'testAddQuery'
 		When I remove a query '<query>' to a stream with name 'bar'

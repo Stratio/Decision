@@ -5,7 +5,8 @@ Feature: Save to mongo
 	Background:
 		Given I drop every existing stream
 		Given I connect to 'Mongo' cluster at '${MONGO_HOST}'
-			
+
+	@ignore @tillfixed(DECISION-299)
 	Scenario: Saving from an unexistent stream
 		When I start saving to MongoDB a stream with name 'unexistantStream'
 		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Stream .* does not exist'
@@ -26,6 +27,7 @@ Feature: Save to mongo
 			| a        | 4         |
 		And I drop a MongoDB database 'stratio_decision'
 
+	@ignore @tillfixed(DECISION-300)
 	Scenario Outline: Saving from an nice existent stream, with unnacepted mongo fields
 		When I create a stream with name 'mongobadColsSaveStream' and columns (with type):
 			| <columnName>  | String  |
@@ -41,6 +43,7 @@ Feature: Save to mongo
 		| a.value    |
 		| a$value    |
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Saving unnacepted streams at Mongo
 		When I create a stream with name '<streamName>' and columns (with type):
 			| 1  | String  |

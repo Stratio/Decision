@@ -25,6 +25,7 @@ Feature: Stream stop index
 		When I stop indexing a stream with name 'stopIndex'
 		Then the stream 'stopIndex' has '' as active actions		
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario: Stop indexing a non-existing stream			
 		When I stop indexing a stream with name 'inexistentStream'		
 		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Stream .*? does not exists'			

@@ -34,6 +34,7 @@ Feature: Stream listen
 			 | streamName 	|
 			 | testStream 	|
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Listen to an non-existing stream
 		Given I drop every existing stream
 		When I listen to a stream with name '<streamName>'
@@ -43,6 +44,7 @@ Feature: Stream listen
 			 | streamName 	|
 			 | testStream 	|
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Listen to a stream, named as an internal topic
 		Given I drop every existing stream
 		When I create a stream with name '<streamName>' and columns (with type):
@@ -65,6 +67,7 @@ Feature: Stream listen
 			 |          	| Stream name cannot be empty |
 			 | //NULL// 	| Stream name cannot be null  |
 
+	@ignore @tillfixed(DECISION-297)
 	Scenario Outline: Listening to streams with special names should be forbidden
 		Given I drop every existing stream
 		When I create a stream with name '<streamName>' and columns (with type):

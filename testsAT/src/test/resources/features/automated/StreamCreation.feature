@@ -2,6 +2,7 @@
 Feature: Stream creation
 	createStream method should increment the stream count
 
+	@ignore @tillfixed(DECISION-297)
 	Scenario Outline: Initial stream creation
 		Given I drop every existing stream
 		When I create a stream with name '<streamName>' and columns (with type):
@@ -35,6 +36,7 @@ Feature: Stream creation
 			 | anotherTestStream | 2           | IS        |
 			 | AnotherTestStream | 3           | IS NOT    |
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Invalid names stream creations
 	Given I drop every existing stream
 		When I create a stream with name '<streamName>' and columns (with type):

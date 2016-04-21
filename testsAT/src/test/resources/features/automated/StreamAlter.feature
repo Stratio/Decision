@@ -2,12 +2,14 @@
 Feature: Stream alter
 	alterStream method should add the specified columns to an existing stream
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario: Alter non-exixtent stream
 		Given I drop every existing stream
 		When I alter a stream with name 'testStream', setting its columns (with type) as:
 			| 1  | Boolean  |
 		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Stream .*? does not exists'
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario: Alter pre-existing columns
 		Given I drop every existing stream
 		When I create a stream with name 'testStream' and columns (with type):
@@ -45,16 +47,19 @@ Feature: Stream alter
 			| b  | String   |
 			| 6  | Integer  |
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario: Alter with non-existant column type
 		When I alter a stream with name 'testStream', setting its columns (with type) as:
 			| 33  | NiftyType  |
 		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Bad column definition at alter'
 
+	@ignore @tillfixed(DECISION-302)
 	Scenario: alter with empty columns
 		When I alter a stream with name 'testStream', setting its columns (with type) as:
 			||
 		Then an exception 'IS' thrown with class 'StratioAPISecurityException' and message like 'Invalid column list'
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario: Alter a non-existing stream with a non-existant column type
 		When I alter a stream with name 'NonExistantTestStream', setting its columns (with type) as:
 			| 33  | NiftyType  |
