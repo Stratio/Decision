@@ -20,11 +20,13 @@ Feature: Save to cassandra
 		When I create a stream with name 'testcstring' and columns (with type):
 			| col3  | String  |
 			| col4  | Integer |
-			
+
+	@ignore @tillfixed(DECISION-299)
 	Scenario: Saving from an unexistent stream
 		When I start saving to Cassandra a stream with name 'unexistantStream'
 		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Stream .* does not exist'
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Saving from an bad named stream
 		When I start saving to Cassandra a stream with name '<streamName>'
 		Then an exception 'IS' thrown with class 'StratioAPISecurityException' and message like '<message>'
@@ -45,6 +47,7 @@ Feature: Save to cassandra
 		| testC*number |
 		| 2testCnumber |
 
+	@ignore @tillfixed(DECISION-298)
 	Scenario: Saving from an existent stream
 		When I create a Cassandra keyspace named 'stratio_decision'
 		When I start saving to Cassandra a stream with name 'testcstring'
@@ -72,7 +75,7 @@ Feature: Save to cassandra
 			| col1-text | col2-int |
 			| a         | 4        |
 
-
+	@ignore @tillfixed(DECISION-299)
 	Scenario: Saving from an existent stream with existent table
 		When I start saving to Cassandra a stream with name 'testCstring'
 		When I start saving to Cassandra a stream with name 'testcstring'

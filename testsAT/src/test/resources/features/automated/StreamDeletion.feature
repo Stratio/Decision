@@ -32,6 +32,7 @@ Feature: Stream deletion operation
 			 | '":             	   | '":           		| IS NOT    |
 			 | testDeletion 	   | testDeletion 	    | IS NOT  	|
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Non-existing stream deletion
 		When I delete the stream '<streamName>'
 		Then an exception 'IS' thrown with class '<exceptionClass>' and message like '<message>'

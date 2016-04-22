@@ -7,6 +7,7 @@ Feature: Index to elasticsearch
 		Given I drop every existing stream
 		Given I drop every existing elasticsearch index
 
+	@ignore @tillfixed(DECISION-297)
 	Scenario Outline: Indexing a neat stream
 		When I create a stream with name '<streamName>' and columns (with type):
 			| 1  | String  |
@@ -86,6 +87,7 @@ Feature: Index to elasticsearch
 		| streamName   |
 		| a            |
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Index from a an non-existing stream
 		When I index a stream with name '<streamName>'
 		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Stream <streamName> does not exists'

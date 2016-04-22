@@ -43,6 +43,7 @@ Feature: Setting a milliseconds value for timing out a communication.
 		When I delete the stream 'testStreamACK0'
 		Then an exception 'IS' thrown with class 'StratioEngineConnectionException' and message like 'Acknowledge timeout expired'
 
+	@ignore @tillfixed(DECISION-301)
 	Scenario Outline: Non valid ack timeout must be forbidden
 		When I set a '<timeout>' milliseconds ACK timeout
 		When I create a stream with name '<streamName>' and columns (with type):

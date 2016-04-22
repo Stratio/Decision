@@ -29,6 +29,7 @@ Feature: Stream stop listen
 		When I stop listening to a stream with name 'stopListen'
 		Then the stream 'stopListen' has '' as active actions
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario: Stop listen to an non-existing stream			
 		When I stop listening to a stream with name 'inexistentStream'		
 		Then an exception 'IS' thrown with class 'StratioEngineOperationException' and message like 'Stream .*? does not exists'			
