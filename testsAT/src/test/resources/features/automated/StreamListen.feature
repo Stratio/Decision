@@ -2,6 +2,7 @@
 Feature: Stream listen
 	listenStream method should do something cool
 
+	@ignore @tillfixed(DECISION-305)
 	Scenario Outline: Listen to an existing stream
 		Given I drop every existing stream
 		When I create a stream with name '<streamName>' and columns (with type):
