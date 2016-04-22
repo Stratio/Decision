@@ -34,7 +34,7 @@ Feature: Query addition
 
 		Examples:
 		| query |
-		| from testAddQuery select '2' as col2 insert into testAddQueryOutput |
+		| from testAddQuery select 2 as col2 insert into testAddQueryOutput |
 
 	Scenario Outline: Create query and drop generated
 		When I add a query '<query>' to a stream with name 'testAddQuery2'
@@ -107,6 +107,7 @@ Feature: Query addition
 		| //NULL//      | from testAddQuery2 select '2' as col2 insert into testAddQuery2Output | StratioAPISecurityException | Stream name cannot be null |
 		| testAddQuery  | //NULL//                                                              | StratioAPISecurityException | Query cannot be null       |
 
+	@ignore @tillfixed(DECISION-299)
 	Scenario Outline: Drop inexistant query
 		When I add a query 'from testAddQuery select "2" as col2 insert into testAddQueryOutput' to a stream with name 'testAddQuery'
 		When I remove a query 'foo' to a stream with name 'testAddQuery'
