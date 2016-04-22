@@ -23,6 +23,7 @@ Feature: Stream creation
 			| X  | String  |
 			| 2  | Integer |
 
+	@ignore @tillfixed(DECISION-304)
 	Scenario Outline: Consecutive stream creations
 		When I create a stream with name '<streamName>' and columns (with type):
 			| 1  | String  |
@@ -68,6 +69,7 @@ Feature: Stream creation
 			 | stratio_stats_base                | 0           |
 			 | stratio_stats_global_by_operation | 0           |
 
+	@ignore @tillfixed(DECISION-302)
 	Scenario: Nulled columns stream creations
 		When I create a stream with name 'noColumnStream' and columns (with type):
 			||
