@@ -2,6 +2,14 @@
 
 Only listing significant user-visible, not internal code cleanups and minor bug fixes.
 
+## 1.1.0 (April  2016)
+
+* Spark properties in Decision configuration
+
+## 1.0.2 (March  2016)
+
+* Minor bug related with permissions
+
 ## 1.0.1 (March  2016)
 
 * Minor bug related with avro serialization
