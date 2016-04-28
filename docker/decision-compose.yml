@@ -59,7 +59,7 @@ decision:
     ES_HOSTS: elasticsearch:9300
     CLUSTERING_ENABLED: "false"
     GROUP_ID: stratiogroup
-    FAILOVER_ENABLED: "false"
+    FAILOVER_ENABLED: "true"
 
 decision-shell:
   image: stratio/decision-shell:latest
