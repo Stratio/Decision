@@ -122,7 +122,10 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
     }
 
     public StreamOperationService getStreamOperationService() {
-        return streamOperationService;
+        // return streamOperationService;
+        return (StreamOperationService) ActionBaseContext.getInstance().getContext().getBean
+        ("streamOperationService");
+       // return null;
     }
 
     public String getZookeeperHost() {
