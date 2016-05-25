@@ -326,23 +326,23 @@ public class StreamingContextConfiguration {
         listRequests.foreachRDD(listStreamsFunction);
         dropRequests.foreachRDD(createStreamFunction);
 
-        if (configurationContext.isAuditEnabled() || configurationContext.isStatsEnabled()) {
-
-            JavaDStream<StratioStreamingMessage> allRequests = createRequests.union(alterRequests)
-                    .union(addQueryRequests).union(removeQueryRequests).union(listenRequests).union(stopListenRequests)
-                    .union(listRequests).union(dropRequests);
-
-            // TODO enable audit functionality
-            // if (configurationContext.isAuditEnabled()) {
-            // SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction =
-            // new SaveRequestsToAuditLogFunction(
-            // configurationContext.getCassandraHostsQuorum());
-            //
-            // // persist the RDDs to cassandra using STRATIO DEEP
-            // allRequests.window(new Duration(2000), new
-            // Duration(6000)).foreachRDD(saveRequestsToAuditLogFunction);
-            // }
-        }
+//        if (configurationContext.isAuditEnabled() || configurationContext.isStatsEnabled()) {
+//
+//            JavaDStream<StratioStreamingMessage> allRequests = createRequests.union(alterRequests)
+//                    .union(addQueryRequests).union(removeQueryRequests).union(listenRequests).union(stopListenRequests)
+//                    .union(listRequests).union(dropRequests);
+//
+//            // TODO enable audit functionality
+//            // if (configurationContext.isAuditEnabled()) {
+//            // SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction =
+//            // new SaveRequestsToAuditLogFunction(
+//            // configurationContext.getCassandraHostsQuorum());
+//            //
+//            // // persist the RDDs to cassandra using STRATIO DEEP
+//            // allRequests.window(new Duration(2000), new
+//            // Duration(6000)).foreachRDD(saveRequestsToAuditLogFunction);
+//            // }
+//        }
     }
 
 
@@ -471,7 +471,7 @@ public class StreamingContextConfiguration {
 
 //        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(streamOperationService,
 //                configurationContext.getZookeeperHostsQuorum());
-        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(null,
+        InsertIntoStreamFunction insertIntoStreamFunction = new InsertIntoStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorum());
         insertRequests.foreachRDD(insertIntoStreamFunction);
 

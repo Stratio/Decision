@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.VoidFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
 
     private final Set<RequestValidation> stopValidators;
     private final Set<RequestValidation> startValidators;
-    private final transient StreamOperationService streamOperationService;
+    protected final transient StreamOperationService streamOperationService;
     private final String zookeeperHost;
 
     public ActionBaseFunction(StreamOperationService streamOperationService, String zookeeperHost) {
@@ -64,35 +65,93 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
 
     @Override
     public Void call(JavaRDD<StratioStreamingMessage> rdd) throws Exception {
-        for (StratioStreamingMessage message : rdd.collect()) {
-            try {
 
-                boolean defaultResponse = false;
-                if (getStartOperationCommand() != null
-                        && getStartOperationCommand().equalsIgnoreCase(message.getOperation())) {
-                    if (validOperation(message, startValidators)) {
-                        defaultResponse = startAction(message);
+        rdd.foreach(new VoidFunction<StratioStreamingMessage>() {
+            @Override public void call(StratioStreamingMessage message) throws Exception {
+
+
+//                try {
+//
+//                    boolean defaultResponse = false;
+//
+//                    defaultResponse = startAction(message);
+//
+//                    if (defaultResponse) {
+//                        ackStreamingOperation(message, new ActionCallbackDto(ReplyCode.OK.getCode()));
+//                    }
+//
+//                } catch (RequestValidationException e) {
+//                    log.error("Custom validation error", e);
+//                    ackStreamingOperation(message, new ActionCallbackDto(e.getCode(), e.getMessage()));
+//                } catch (Exception e) {
+//                    log.error("Fatal validation error", e);
+//                    ackStreamingOperation(message,
+//                            new ActionCallbackDto(ReplyCode.KO_GENERAL_ERROR.getCode(), e.getMessage()));
+//                }
+
+
+                try {
+
+                    boolean defaultResponse = false;
+                    if (getStartOperationCommand() != null
+                            && getStartOperationCommand().equalsIgnoreCase(message.getOperation())) {
+                        if (validOperation(message, startValidators)) {
+                            defaultResponse = startAction(message);
+                        }
+                    } else if (getStopOperationCommand() != null
+                            && getStopOperationCommand().equalsIgnoreCase(message.getOperation())) {
+                        if (validOperation(message, stopValidators)) {
+                            defaultResponse = stopAction(message);
+                        }
                     }
-                } else if (getStopOperationCommand() != null
-                        && getStopOperationCommand().equalsIgnoreCase(message.getOperation())) {
-                    if (validOperation(message, stopValidators)) {
-                        defaultResponse = stopAction(message);
+
+                    if (defaultResponse) {
+                        ackStreamingOperation(message, new ActionCallbackDto(ReplyCode.OK.getCode()));
                     }
+
+                } catch (RequestValidationException e) {
+                    log.error("Custom validation error", e);
+                    ackStreamingOperation(message, new ActionCallbackDto(e.getCode(), e.getMessage()));
+                } catch (Exception e) {
+                    log.error("Fatal validation error", e);
+                    ackStreamingOperation(message,
+                            new ActionCallbackDto(ReplyCode.KO_GENERAL_ERROR.getCode(), e.getMessage()));
                 }
 
-                if (defaultResponse) {
-                    ackStreamingOperation(message, new ActionCallbackDto(ReplyCode.OK.getCode()));
-                }
 
-            } catch (RequestValidationException e) {
-                log.error("Custom validation error", e);
-                ackStreamingOperation(message, new ActionCallbackDto(e.getCode(), e.getMessage()));
-            } catch (Exception e) {
-                log.error("Fatal validation error", e);
-                ackStreamingOperation(message,
-                        new ActionCallbackDto(ReplyCode.KO_GENERAL_ERROR.getCode(), e.getMessage()));
             }
-        }
+        });
+
+
+//        for (StratioStreamingMessage message : rdd.collect()) {
+//            try {
+//
+//                boolean defaultResponse = false;
+//                if (getStartOperationCommand() != null
+//                        && getStartOperationCommand().equalsIgnoreCase(message.getOperation())) {
+//                    if (validOperation(message, startValidators)) {
+//                        defaultResponse = startAction(message);
+//                    }
+//                } else if (getStopOperationCommand() != null
+//                        && getStopOperationCommand().equalsIgnoreCase(message.getOperation())) {
+//                    if (validOperation(message, stopValidators)) {
+//                        defaultResponse = stopAction(message);
+//                    }
+//                }
+//
+//                if (defaultResponse) {
+//                    ackStreamingOperation(message, new ActionCallbackDto(ReplyCode.OK.getCode()));
+//                }
+//
+//            } catch (RequestValidationException e) {
+//                log.error("Custom validation error", e);
+//                ackStreamingOperation(message, new ActionCallbackDto(e.getCode(), e.getMessage()));
+//            } catch (Exception e) {
+//                log.error("Fatal validation error", e);
+//                ackStreamingOperation(message,
+//                        new ActionCallbackDto(ReplyCode.KO_GENERAL_ERROR.getCode(), e.getMessage()));
+//            }
+//        }
         return null;
     }
 
@@ -125,7 +184,6 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
         // return streamOperationService;
         return (StreamOperationService) ActionBaseContext.getInstance().getContext().getBean
         ("streamOperationService");
-       // return null;
     }
 
     public String getZookeeperHost() {

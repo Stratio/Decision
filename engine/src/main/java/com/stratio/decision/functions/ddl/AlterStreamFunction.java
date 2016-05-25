@@ -71,6 +71,7 @@ public class AlterStreamFunction extends ActionBaseFunction {
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+//        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new StreamNotExistsValidation());
     }
 }

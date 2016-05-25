@@ -15,17 +15,29 @@
  */
 package com.stratio.decision.functions.validator;
 
+import com.stratio.decision.functions.ActionBaseContext;
 import com.stratio.decision.service.StreamOperationService;
 
 public abstract class BaseSiddhiRequestValidation implements RequestValidation {
 
-    private final StreamOperationService streamOperationService;
+    private  StreamOperationService streamOperationService = null;
+
+    public BaseSiddhiRequestValidation(){
+
+    }
 
     public BaseSiddhiRequestValidation(StreamOperationService streamOperationService) {
         this.streamOperationService = streamOperationService;
     }
 
     public StreamOperationService getStreamOperationService() {
+
+        if (streamOperationService == null) {
+
+            streamOperationService = (StreamOperationService) ActionBaseContext.getInstance().getContext().getBean
+                    ("streamOperationService");
+        }
+
         return streamOperationService;
     }
 

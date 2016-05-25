@@ -19,6 +19,8 @@ import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.VoidFunction;
+
 import scala.Tuple2;
 
 import java.util.List;
@@ -33,10 +35,18 @@ public abstract class BaseActionExecutionFunction implements
     @Override
     public Void call(JavaPairRDD<StreamAction, Iterable<StratioStreamingMessage>> rdd) throws Exception {
 
-        List<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> rddContent = rdd.collect();
-        if (rddContent.size() != 0) {
-            process(rddContent.get(0)._2);
-        }
+//        List<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> rddContent = rdd.collect();
+//        if (rddContent.size() != 0) {
+//            process(rddContent.get(0)._2);
+//        }
+
+        rdd.foreach(new VoidFunction<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>>() {
+            @Override public void call(Tuple2<StreamAction, Iterable<StratioStreamingMessage>> streamActionIterableTuple2)
+                    throws Exception {
+                process(streamActionIterableTuple2._2());
+            }
+        });
+
         return null;
     }
 
