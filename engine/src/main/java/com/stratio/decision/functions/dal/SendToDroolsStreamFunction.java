@@ -65,15 +65,21 @@ public class SendToDroolsStreamFunction extends ActionBaseFunction  {
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new StreamNameNotEmptyValidation());
-        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+//        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new StreamNotExistsValidation());
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new StreamNameNotEmptyValidation());
-        validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.SEND_TO_DROOLS,
+//        validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.SEND_TO_DROOLS,
+//                ReplyCode.KO_ACTION_ALREADY_ENABLED.getCode()));
+//        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+//        validators.add(new DroolsStreamNameValidator());
+
+        validators.add(new ActionEnabledValidation(StreamAction.SEND_TO_DROOLS,
                 ReplyCode.KO_ACTION_ALREADY_ENABLED.getCode()));
-        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new StreamNotExistsValidation());
         validators.add(new DroolsStreamNameValidator());
     }
 

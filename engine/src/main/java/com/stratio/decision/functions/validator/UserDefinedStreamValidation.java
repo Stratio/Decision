@@ -26,6 +26,10 @@ public class UserDefinedStreamValidation extends BaseSiddhiRequestValidation {
         super(streamOperationService);
     }
 
+    public UserDefinedStreamValidation() {
+        super();
+    }
+
     private final static String INTERNAL_STREAM_DROP_NOT_ALLOWED = "Cannot delete the internal stream %s";
 
     @Override

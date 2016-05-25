@@ -15,11 +15,13 @@
  */
 package com.stratio.decision.functions.validator;
 
+import java.io.Serializable;
+
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.exception.RequestValidationException;
 import com.stratio.decision.exception.StreamExistsException;
 
-public interface RequestValidation {
+public interface RequestValidation  extends Serializable{
 
     void validate(StratioStreamingMessage request) throws RequestValidationException, StreamExistsException;
 

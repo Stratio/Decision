@@ -35,7 +35,7 @@ public class SaveToCassandraOperationsService {
 
     private static final Logger log = LoggerFactory.getLogger(SaveToCassandraOperationsService.class);
 
-    private final Session session;
+    private transient final Session session;
 
     public SaveToCassandraOperationsService(Session session) {
         this.session = session;

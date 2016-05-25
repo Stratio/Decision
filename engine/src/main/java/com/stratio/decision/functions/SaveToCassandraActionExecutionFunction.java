@@ -32,16 +32,16 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
     private static final Logger log = LoggerFactory.getLogger(SaveToCassandraActionExecutionFunction.class);
 
-    private Session cassandraSession;
+    private transient Session cassandraSession;
 
     private final String cassandraQuorum;
     private final int cassandraPort;
     private final int maxBatchSize;
-    private final BatchStatement.Type batchType;
+    private final transient BatchStatement.Type batchType;
 
     private HashMap<String, Integer> tablenames = new HashMap<>();
 
-    private SaveToCassandraOperationsService cassandraTableOperationsService;
+    private  SaveToCassandraOperationsService cassandraTableOperationsService;
 
     public SaveToCassandraActionExecutionFunction(String cassandraQuorum, int cassandraPort, int maxBatchSize,
             BatchStatement.Type batchType) {
