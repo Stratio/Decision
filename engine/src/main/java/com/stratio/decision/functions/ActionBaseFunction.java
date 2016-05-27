@@ -70,27 +70,6 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
         rdd.foreach(new VoidFunction<StratioStreamingMessage>() {
             @Override public void call(StratioStreamingMessage message) throws Exception {
 
-
-//                try {
-//
-//                    boolean defaultResponse = false;
-//
-//                    defaultResponse = startAction(message);
-//
-//                    if (defaultResponse) {
-//                        ackStreamingOperation(message, new ActionCallbackDto(ReplyCode.OK.getCode()));
-//                    }
-//
-//                } catch (RequestValidationException e) {
-//                    log.error("Custom validation error", e);
-//                    ackStreamingOperation(message, new ActionCallbackDto(e.getCode(), e.getMessage()));
-//                } catch (Exception e) {
-//                    log.error("Fatal validation error", e);
-//                    ackStreamingOperation(message,
-//                            new ActionCallbackDto(ReplyCode.KO_GENERAL_ERROR.getCode(), e.getMessage()));
-//                }
-
-
                 try {
 
                     boolean defaultResponse = false;
@@ -119,40 +98,9 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
                             new ActionCallbackDto(ReplyCode.KO_GENERAL_ERROR.getCode(), e.getMessage()));
                 }
 
-
             }
         });
 
-
-//        for (StratioStreamingMessage message : rdd.collect()) {
-//            try {
-//
-//                boolean defaultResponse = false;
-//                if (getStartOperationCommand() != null
-//                        && getStartOperationCommand().equalsIgnoreCase(message.getOperation())) {
-//                    if (validOperation(message, startValidators)) {
-//                        defaultResponse = startAction(message);
-//                    }
-//                } else if (getStopOperationCommand() != null
-//                        && getStopOperationCommand().equalsIgnoreCase(message.getOperation())) {
-//                    if (validOperation(message, stopValidators)) {
-//                        defaultResponse = stopAction(message);
-//                    }
-//                }
-//
-//                if (defaultResponse) {
-//                    ackStreamingOperation(message, new ActionCallbackDto(ReplyCode.OK.getCode()));
-//                }
-//
-//            } catch (RequestValidationException e) {
-//                log.error("Custom validation error", e);
-//                ackStreamingOperation(message, new ActionCallbackDto(e.getCode(), e.getMessage()));
-//            } catch (Exception e) {
-//                log.error("Fatal validation error", e);
-//                ackStreamingOperation(message,
-//                        new ActionCallbackDto(ReplyCode.KO_GENERAL_ERROR.getCode(), e.getMessage()));
-//            }
-//        }
         return null;
     }
 

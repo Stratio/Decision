@@ -45,10 +45,11 @@ public class StreamingEngine {
             if (node.isLeader()) {
                 log.info("This is the Decision leader node.");
 
-                AnnotationConfigApplicationContext annotationConfigApplicationContext = ActionBaseContext
-                        .getInstance().getContext();
 
                 try  {
+
+                    AnnotationConfigApplicationContext annotationConfigApplicationContext = ActionBaseContext
+                            .getInstance().getContext();
 
                     ConfigurationContext configurationContext = annotationConfigApplicationContext.getBean("configurationContext", ConfigurationContext.class);
 
@@ -77,36 +78,6 @@ public class StreamingEngine {
                 }
 
 
-
-
-
-//                try (AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(
-//                        BaseConfiguration.class)) {
-//                    ConfigurationContext configurationContext = annotationConfigApplicationContext.getBean("configurationContext", ConfigurationContext.class);
-//
-//                    /**
-//                     * ClusterSyncManager Instance
-//                     */
-//                    FailOverTask failOverTask = null;
-//                    if (configurationContext.isFailOverEnabled()){
-//                        failOverTask = annotationConfigApplicationContext.getBean("failOverTask", FailOverTask
-//                                .class);
-//                    }
-//
-//                    ClusterSyncManager
-//                            .getClusterSyncManager(configurationContext, failOverTask).start();
-//
-//                    annotationConfigApplicationContext.registerShutdownHook();
-//                    JavaStreamingContext context = annotationConfigApplicationContext.getBean("streamingContext", JavaStreamingContext.class);
-//                    context.start();
-//
-//                    ClusterSyncManager.getNode().initializedNodeStatus();
-//
-//                    context.awaitTermination();
-//
-//                } catch (Exception e) {
-//                    log.error("Fatal error", e);
-//                }
             }
         } catch (Exception e) {
             log.error("Fatal error", e);
