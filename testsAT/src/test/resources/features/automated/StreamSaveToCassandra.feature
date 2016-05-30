@@ -47,7 +47,7 @@ Feature: Save to cassandra
 		| testC*number |
 		| 2testCnumber |
 
-	@ignore @tillfixed(DECISION-298)
+	@ignore @tillfixed(DECISION-311)
 	Scenario: Saving from an existent stream
 		When I create a Cassandra keyspace named 'stratio_decision'
 		When I start saving to Cassandra a stream with name 'testcstring'
@@ -66,13 +66,13 @@ Feature: Save to cassandra
 		Then a Cassandra keyspace 'stratio_decision' exists
 		And a Casandra keyspace 'stratio_decision' contains a table 'testcstring'
 		And a Casandra keyspace 'stratio_decision' contains a table 'testCstring'
-		And a Casandra keyspace 'stratio_streaming' contains a table 'testcstring' with '1' rows
-		And a Casandra keyspace 'stratio_streaming' contains a table 'testCstring' with '1' rows
-		And a Casandra keyspace 'stratio_streaming' contains a table 'testcstring' with values:
-			| col1-text | col2-int |
+		And a Casandra keyspace 'stratio_decision' contains a table 'testcstring' with '1' rows
+		And a Casandra keyspace 'stratio_decision' contains a table 'testCstring' with '1' rows
+		And a Casandra keyspace 'stratio_decision' contains a table 'testcstring' with values:
+			| col3-varchar | col4-int |
 			| b         | 5        |
-		And a Casandra keyspace 'stratio_streaming' contains a table 'testCstring' with values:
-			| col1-text | col2-int |
+		And a Casandra keyspace 'stratio_decision' contains a table 'testCstring' with values:
+			| col1-varchar | col2-int |
 			| a         | 4        |
 
 	@ignore @tillfixed(DECISION-299)
