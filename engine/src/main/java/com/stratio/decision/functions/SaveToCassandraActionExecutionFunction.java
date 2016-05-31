@@ -41,7 +41,7 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
     private HashMap<String, Integer> tablenames = new HashMap<>();
 
-    private  SaveToCassandraOperationsService cassandraTableOperationsService;
+    private  transient SaveToCassandraOperationsService cassandraTableOperationsService;
 
     public SaveToCassandraActionExecutionFunction(String cassandraQuorum, int cassandraPort, int maxBatchSize,
             BatchStatement.Type batchType) {

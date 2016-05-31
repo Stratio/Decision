@@ -33,8 +33,8 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
 
     private static Logger log = LoggerFactory.getLogger(SaveToMongoActionExecutionFunction.class);
 
-    private MongoClient mongoClient;
-    private DB streamingDb;
+    private transient MongoClient mongoClient;
+    private transient DB streamingDb;
 
     private final List<String> mongoHosts;
     private final String username;
