@@ -45,7 +45,7 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
 
     private static final SimpleDateFormat elasicSearchTimestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
-    private Client elasticSearchClient;
+    private transient Client elasticSearchClient;
 
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
