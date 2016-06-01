@@ -27,6 +27,8 @@ import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.client.ElasticsearchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import com.datastax.driver.core.ProtocolOptions;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
 import com.stratio.decision.StreamingEngine;
 import com.stratio.decision.commons.avro.Action;
 import com.stratio.decision.commons.avro.ColumnType;
@@ -68,6 +72,7 @@ import com.stratio.decision.functions.messages.FilterAvroMessagesByOperationFunc
 import com.stratio.decision.functions.messages.FilterMessagesByOperationFunction;
 import com.stratio.decision.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
+import com.stratio.decision.service.SaveToCassandraOperationsService;
 import com.stratio.decision.service.StreamOperationService;
 
 @Configuration
@@ -84,6 +89,18 @@ public class StreamingContextConfiguration {
 
     @Autowired
     private KafkaToJavaSerializer kafkaToJavaSerializer;
+
+    @Autowired
+    private MongoClient mongoClient;
+
+    @Autowired
+    private DB mongoDB;
+
+    @Autowired
+    private SaveToCassandraOperationsService saveToCassandraOperationsService;
+
+    @Autowired
+    private Client elasticsearchClient;
 
     private KafkaTopicService kafkaTopicService;
 
@@ -386,13 +403,9 @@ public class StreamingContextConfiguration {
 
         try {
 
-            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction =
-                new SaveToCassandraActionExecutionFunction(
-                    configurationContext.getCassandraHostsQuorum(),
-                    configurationContext.getCassandraPort(),
-                    configurationContext.getCassandraMaxBatchSize(),
-                    configurationContext.getCassandraBatchType()
-                );
+            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
+                    ProtocolOptions.DEFAULT_PORT, configurationContext.getCassandraMaxBatchSize(),
+                    configurationContext.getCassandraBatchType(), saveToCassandraOperationsService);
             if (saveToCassandraActionExecutionFunction.check()) {
                 log.info("Cassandra is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
@@ -403,7 +416,7 @@ public class StreamingContextConfiguration {
 
             SaveToMongoActionExecutionFunction saveToMongoActionExecutionFunction = new SaveToMongoActionExecutionFunction(configurationContext.getMongoHosts(),
                     configurationContext.getMongoUsername(), configurationContext
-                    .getMongoPassword(), configurationContext.getMongoMaxBatchSize());
+                    .getMongoPassword(), configurationContext.getMongoMaxBatchSize(), mongoClient, mongoDB);
             if (saveToMongoActionExecutionFunction.check()) {
                 log.info("MongoDB is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(
@@ -413,7 +426,8 @@ public class StreamingContextConfiguration {
             }
 
             SaveToElasticSearchActionExecutionFunction saveToElasticSearchActionExecutionFunction = new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHosts(),
-                    configurationContext.getElasticSearchClusterName(), configurationContext.getElasticSearchMaxBatchSize());
+                    configurationContext.getElasticSearchClusterName(), configurationContext
+                    .getElasticSearchMaxBatchSize(), elasticsearchClient);
             if (saveToElasticSearchActionExecutionFunction.check()) {
                 log.info("ElasticSearch is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_ELASTICSEARCH)).foreachRDD(saveToElasticSearchActionExecutionFunction);

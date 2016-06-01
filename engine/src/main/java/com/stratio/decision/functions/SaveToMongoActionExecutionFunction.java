@@ -43,12 +43,21 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
 
 
     public SaveToMongoActionExecutionFunction(List<String> mongoHosts, String username, String password, Integer
+            maxBatchSize, MongoClient mongoClient, DB streamingDb) {
+
+        this(mongoHosts, username, password, maxBatchSize);
+        this.mongoClient = mongoClient;
+        this.streamingDb = streamingDb;
+    }
+
+    public SaveToMongoActionExecutionFunction(List<String> mongoHosts, String username, String password, Integer
             maxBatchSize) {
         this.mongoHosts = mongoHosts;
         this.username = username;
         this.password = password;
         this.maxBatchSize = maxBatchSize;
     }
+
 
 
     @Override
@@ -111,33 +120,42 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
     }
 
     private MongoClient getMongoClient() throws UnknownHostException {
-        if (mongoClient == null) {
-            List<ServerAddress> serverAddresses = new ArrayList();
-            for (String mongoHost : mongoHosts) {
-                String[] elements = mongoHost.split(":");
-                if (elements.length < 2) {
-                    //no port
-                    serverAddresses.add(new ServerAddress(elements[0]));
-                } else {
-                    serverAddresses.add(new ServerAddress(elements[0], Integer.parseInt(elements[1])));
-                }
-            }
-            if (username != null && password != null) {
-                mongoClient = new MongoClient(serverAddresses, Arrays.asList(MongoCredential.createPlainCredential(username,
-                        "$external", password.toCharArray())));
-            } else {
-                log.warn(
-                        "MongoDB user or password are not defined. User: [{}], Password: [{}]. trying anonymous connection.",
-                        username, password);
-                mongoClient = new MongoClient(serverAddresses);
-            }
+
+        if (mongoClient == null){
+            mongoClient = (MongoClient) ActionBaseContext.getInstance().getContext().getBean
+                    ("mongoClient");
         }
+
         return mongoClient;
+//        if (mongoClient == null) {
+//            List<ServerAddress> serverAddresses = new ArrayList();
+//            for (String mongoHost : mongoHosts) {
+//                String[] elements = mongoHost.split(":");
+//                if (elements.length < 2) {
+//                    //no port
+//                    serverAddresses.add(new ServerAddress(elements[0]));
+//                } else {
+//                    serverAddresses.add(new ServerAddress(elements[0], Integer.parseInt(elements[1])));
+//                }
+//            }
+//            if (username != null && password != null) {
+//                mongoClient = new MongoClient(serverAddresses, Arrays.asList(MongoCredential.createPlainCredential(username,
+//                        "$external", password.toCharArray())));
+//            } else {
+//                log.warn(
+//                        "MongoDB user or password are not defined. User: [{}], Password: [{}]. trying anonymous connection.",
+//                        username, password);
+//                mongoClient = new MongoClient(serverAddresses);
+//            }
+//        }
+//        return mongoClient;
     }
 
     private DB getDB() throws UnknownHostException {
         if (streamingDb == null) {
-            streamingDb = getMongoClient().getDB(STREAMING.STREAMING_KEYSPACE_NAME);
+          //  streamingDb = getMongoClient().getDB(STREAMING.STREAMING_KEYSPACE_NAME);
+            streamingDb= (DB) ActionBaseContext.getInstance().getContext().getBean
+                    ("mongoDB");
         }
         return streamingDb;
     }

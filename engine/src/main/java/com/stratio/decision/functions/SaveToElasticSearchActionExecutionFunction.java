@@ -60,6 +60,12 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
         this.maxBatchSize = maxBatchSize==null?1000:maxBatchSize;
     }
 
+    public SaveToElasticSearchActionExecutionFunction(List<String> elasticSearchHosts, String
+            elasticSearchClusterName, Integer maxBatchSize, Client elasticSearchClient) {
+        this(elasticSearchHosts, elasticSearchClusterName, maxBatchSize);
+        this.elasticSearchClient = elasticSearchClient;
+    }
+
     @Override
     public Boolean check() throws Exception {
         try {
@@ -132,16 +138,9 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
 
     private Client getClient() {
         if (elasticSearchClient == null) {
-            Settings settings = ImmutableSettings.settingsBuilder()
-                    .put("client.transport.ignore_cluster_name", true)
-                    .put("cluster.name", elasticSearchClusterName)
-                    .build();
-            TransportClient tc = new TransportClient(settings);
-            for (String elasticSearchHost : elasticSearchHosts) {
-                String[] elements = elasticSearchHost.split(":");
-                tc.addTransportAddress(new InetSocketTransportAddress(elements[0], Integer.parseInt(elements[1])));
-            }
-            elasticSearchClient = tc;
+
+            elasticSearchClient = (Client) ActionBaseContext.getInstance().getContext().getBean
+                    ("elasticsearchClient");
         }
         return elasticSearchClient;
     }
