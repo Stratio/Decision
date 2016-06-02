@@ -48,13 +48,19 @@ public class SaveToCassandraOperationsService {
 
         this.session = session;
 
-        if (session.getCluster().getMetadata().getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME) == null) {
-           createKeyspace(STREAMING.STREAMING_KEYSPACE_NAME);
+        if (session != null) {
+            if (session.getCluster().getMetadata().getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME) == null) {
+                createKeyspace(STREAMING.STREAMING_KEYSPACE_NAME);
+            }
+            refreshTablenames();
         }
-        refreshTablenames();
     }
 
     public Boolean check() throws Exception {
+
+        if (session == null)
+            return false;
+
         try {
             return session.getState().getConnectedHosts().size() > 0;
         } catch (Exception e) {

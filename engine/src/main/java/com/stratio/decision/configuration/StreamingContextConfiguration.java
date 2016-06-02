@@ -73,6 +73,7 @@ import com.stratio.decision.functions.messages.FilterMessagesByOperationFunction
 import com.stratio.decision.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
 import com.stratio.decision.service.SaveToCassandraOperationsService;
+import com.stratio.decision.service.SolrOperationsService;
 import com.stratio.decision.service.StreamOperationService;
 
 @Configuration
@@ -98,6 +99,9 @@ public class StreamingContextConfiguration {
 
     @Autowired
     private SaveToCassandraOperationsService saveToCassandraOperationsService;
+
+    @Autowired
+    private SolrOperationsService solrOperationsService;
 
     @Autowired
     private Client elasticsearchClient;
@@ -439,7 +443,7 @@ public class StreamingContextConfiguration {
                     SaveToSolrActionExecutionFunction(configurationContext.getSolrHost(), configurationContext
                     .getSolrCloudZkHost(),
                     configurationContext.getSolrCloud(),
-                    configurationContext.getSolrDataDir(), configurationContext.getSolrMaxBatchSize());
+                    configurationContext.getSolrDataDir(), configurationContext.getSolrMaxBatchSize(), solrOperationsService);
             if (saveToSolrActionExecutionFunction.check()) {
                 log.info("Solr is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_SOLR)).foreachRDD(
