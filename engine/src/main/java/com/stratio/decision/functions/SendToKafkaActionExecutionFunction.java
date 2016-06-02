@@ -64,11 +64,15 @@ public class SendToKafkaActionExecutionFunction extends BaseActionExecutionFunct
 
     private Producer<String, String> getProducer() {
         if (producer == null) {
-            Properties properties = new Properties();
-            properties.put("serializer.class", "kafka.serializer.StringEncoder");
-            properties.put("metadata.broker.list", kafkaQuorum);
-            properties.put("producer.type", "async");
-            producer = new Producer<String, String>(new ProducerConfig(properties));
+
+            producer = (Producer) ActionBaseContext.getInstance().getContext().getBean
+                    ("producer");
+
+//            Properties properties = new Properties();
+//            properties.put("serializer.class", "kafka.serializer.StringEncoder");
+//            properties.put("metadata.broker.list", kafkaQuorum);
+//            properties.put("producer.type", "async");
+//            producer = new Producer<String, String>(new ProducerConfig(properties));
         }
         return producer;
     }

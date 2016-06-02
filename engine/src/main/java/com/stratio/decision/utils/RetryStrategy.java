@@ -15,10 +15,12 @@
  */
 package com.stratio.decision.utils;
 
+import java.io.Serializable;
+
 /**
  * Utils class for implementing retrying in functions
  */
-public class RetryStrategy {
+public class RetryStrategy implements Serializable {
 
     public static final int DEFAULT_RETRIES = 3;
     public static final long DEFAULT_WAIT_TIME_IN_MILLI = 2000;

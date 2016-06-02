@@ -46,7 +46,7 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
     private Map<String, SolrClient> solrClients = new HashMap<>();
     private List<String> solrCores = new ArrayList<String>();
 
-    private SolrOperationsService solrOperationsService;
+    private transient SolrOperationsService solrOperationsService;
 
     private RetryStrategy retryStrategy;
 
@@ -62,7 +62,18 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
         this.zkHost = zkHost;
         this.dataDir = dataDir;
         this.isCloud = isCloud;
-        this.solrOperationsService = new SolrOperationsService(solrHost, zkHost, dataDir, isCloud);
+        // this.solrOperationsService = new SolrOperationsService(solrHost, zkHost, dataDir, isCloud);
+        this.retryStrategy = new RetryStrategy();
+        this.maxBatchSize = maxBatchSize!=null?maxBatchSize:-1;
+    }
+
+    public SaveToSolrActionExecutionFunction(String solrHost, String zkHost, Boolean isCloud, String dataDir, Integer
+            maxBatchSize, SolrOperationsService solrOperationsService) {
+        this.solrHost = solrHost;
+        this.zkHost = zkHost;
+        this.dataDir = dataDir;
+        this.isCloud = isCloud;
+        this.solrOperationsService = solrOperationsService;
         this.retryStrategy = new RetryStrategy();
         this.maxBatchSize = maxBatchSize!=null?maxBatchSize:-1;
     }
@@ -70,7 +81,7 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
     @Override
     public Boolean check() throws Exception {
         try {
-            solrOperationsService.getCoreList();
+            getSolrOperationsService().getCoreList();
             return true;
         } catch (Exception e) {
             return false;
@@ -179,13 +190,13 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
         //check if core exists
         if (solrCores.size() == 0) {
             // Initialize solrcores list
-            solrCores = solrOperationsService.getCoreList();
+            solrCores = getSolrOperationsService().getCoreList();
         }
         if (!solrCores.contains(core)) {
             // Create Core
-            solrOperationsService.createCore(message);
+            getSolrOperationsService().createCore(message);
             // Update core list
-            solrCores = solrOperationsService.getCoreList();
+            solrCores = getSolrOperationsService().getCoreList();
         }
     }
 
@@ -223,6 +234,15 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
             solrClients.put(core, solrClient);
         }
         return solrClient;
+    }
+
+    private SolrOperationsService getSolrOperationsService() {
+        if (solrOperationsService == null) {
+            solrOperationsService = (SolrOperationsService) ActionBaseContext.getInstance().getContext().getBean
+                    ("solrOperationsService");
+        }
+
+        return solrOperationsService;
     }
 
 

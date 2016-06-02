@@ -36,29 +36,21 @@ public class CassandraConfiguration {
     private static Logger log = LoggerFactory.getLogger(CassandraConfiguration.class);
 
 
-//    @Bean
-//    public Session session() {
-//
-//        log.error("Creating Spring Bean for cassandra session");
-//
-//        return  Cluster.builder().addContactPoints(configurationContext.getCassandraHostsQuorum().split(","))
-//                .withPort(9042)
-//                .build().connect();
-//
-//
-//    }
-
     @Bean
     public SaveToCassandraOperationsService saveToCassandraOperationsService() {
 
         log.error("Creating Spring Bean for SaveToCassandraOperationsService session");
 
 
-        String[] k = configurationContext.getCassandraHostsQuorum().split(",");
+        Session session;
 
-        Session session = Cluster.builder().addContactPoints(configurationContext.getCassandraHostsQuorum().split(","))
+        try {
+         session = Cluster.builder().addContactPoints(configurationContext.getCassandraHostsQuorum().split(","))
                 .withPort(9042)
                 .build().connect();
+        } catch (Exception e) {
+            session = null;
+        }
 
         return new SaveToCassandraOperationsService(session);
     }
