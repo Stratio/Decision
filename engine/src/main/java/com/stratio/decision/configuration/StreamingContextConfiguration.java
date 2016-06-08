@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
@@ -37,6 +38,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import com.datastax.driver.core.ProtocolOptions;
+import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.stratio.decision.StreamingEngine;
@@ -76,6 +78,8 @@ import com.stratio.decision.service.SaveToCassandraOperationsService;
 import com.stratio.decision.service.SolrOperationsService;
 import com.stratio.decision.service.StreamOperationService;
 
+import static com.datastax.spark.connector.japi.CassandraStreamingJavaUtil.*;
+
 @Configuration
 @Import(ServiceConfiguration.class)
 public class StreamingContextConfiguration {
@@ -97,8 +101,8 @@ public class StreamingContextConfiguration {
     @Autowired
     private DB mongoDB;
 
-    @Autowired
-    private SaveToCassandraOperationsService saveToCassandraOperationsService;
+//    @Autowired
+//    private SaveToCassandraOperationsService saveToCassandraOperationsService;
 
     @Autowired
     private SolrOperationsService solrOperationsService;
@@ -128,6 +132,12 @@ public class StreamingContextConfiguration {
         if (tuningProperties != null && tuningProperties.size() > 0) {
             tuningProperties.forEach( (key, value) ->  conf.set(key, value));
         }
+
+
+        // TODO Testing cassandra connector
+
+        conf.set("spark.cassandra.connection.host", "cassandra.demo.stratio.com");
+        conf.set("spark.cassandra.connection.port", "9042");
 
         JavaStreamingContext streamingContext = new JavaStreamingContext(conf, new Duration(streamingBatchTime));
 
@@ -405,18 +415,42 @@ public class StreamingContextConfiguration {
         // groupedDataDstream.cache();
         groupedDataDstream.persist(StorageLevel.MEMORY_AND_DISK_SER());
 
+        JavaDStream<StratioStreamingMessage> cassandraDStream = parsedDataDstream.filter(new
+                                                                                           Function<StratioStreamingMessage, Boolean>() {
+            @Override public Boolean call(StratioStreamingMessage v1) throws Exception {
+                if (v1.getActiveActions().contains(StreamAction.SAVE_TO_CASSANDRA))
+                    return true;
+                return false;
+            }
+        });
+        /*
+        CassandraJavaUtil.mapColumnTo()
+        javaFunctions(cassandraDStream).writerBuilder("", "", mapToRow)
+        */
+
         try {
 
-            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
-                    ProtocolOptions.DEFAULT_PORT, configurationContext.getCassandraMaxBatchSize(),
-                    configurationContext.getCassandraBatchType(), saveToCassandraOperationsService);
-            if (saveToCassandraActionExecutionFunction.check()) {
-                log.info("Cassandra is configured properly");
-                groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
-                        saveToCassandraActionExecutionFunction);
-            } else {
-                log.warn("Cassandra is NOT configured properly");
-            }
+//            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
+//                    ProtocolOptions.DEFAULT_PORT, configurationContext.getCassandraMaxBatchSize(),
+//                    configurationContext.getCassandraBatchType(), saveToCassandraOperationsService);
+//            if (saveToCassandraActionExecutionFunction.check()) {
+//                log.info("Cassandra is configured properly");
+//                groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
+//                        saveToCassandraActionExecutionFunction);
+//            } else {
+//                log.warn("Cassandra is NOT configured properly");
+//            }
+
+//            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
+//                    ProtocolOptions.DEFAULT_PORT, configurationContext.getCassandraMaxBatchSize(),
+//                    configurationContext.getCassandraBatchType(), context.sc().sc());
+
+//                log.info("Cassandra is configured properly");
+//                groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
+//                        saveToCassandraActionExecutionFunction);
+
+
+
 
             SaveToMongoActionExecutionFunction saveToMongoActionExecutionFunction = new SaveToMongoActionExecutionFunction(configurationContext.getMongoHosts(),
                     configurationContext.getMongoUsername(), configurationContext
