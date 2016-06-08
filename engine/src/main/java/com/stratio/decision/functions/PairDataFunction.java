@@ -36,6 +36,9 @@ public class PairDataFunction implements
         while (messages.hasNext()) {
             StratioStreamingMessage message = messages.next();
             for (StreamAction action : message.getActiveActions()) {
+
+                // TODO -TESTING
+                if (action!= StreamAction.SAVE_TO_CASSANDRA)
                 result.add(new Tuple2<StreamAction, StratioStreamingMessage>(action, message));
             }
         }

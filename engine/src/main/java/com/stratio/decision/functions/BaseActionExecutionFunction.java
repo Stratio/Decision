@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+
+
 public abstract class BaseActionExecutionFunction implements
         Function<JavaPairRDD<StreamAction, Iterable<StratioStreamingMessage>>, Void> {
 
@@ -40,45 +42,34 @@ public abstract class BaseActionExecutionFunction implements
 
 //        List<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> rddContent = rdd.collect();
 //        if (rddContent.size() != 0) {
-//            process(rddContent.get(0)._2);
+//            process(rddContent.get(0)._2());
 //        }
 
-//        rdd.foreachPartition(new VoidFunction<Iterator<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>>>() {
-//            @Override public void call(Iterator<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> tuple2Iterator)
+
+        rdd.mapPartitions(
+                new FlatMapFunction<Iterator<Tuple2<StreamAction,Iterable<StratioStreamingMessage>>>, Object>() {
+
+                    @Override public Iterable<Object> call(
+                            Iterator<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> tuple2Iterator)
+                            throws Exception {
+
+
+                        while (tuple2Iterator.hasNext()){
+                                process(tuple2Iterator.next()._2());
+                        }
+
+                        return new ArrayList<Object>();
+                    }
+                }).count();
+
+
+
+//        rdd.foreach(new VoidFunction<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>>() {
+//            @Override public void call(Tuple2<StreamAction, Iterable<StratioStreamingMessage>> streamActionIterableTuple2)
 //                    throws Exception {
-//
-//                while (tuple2Iterator.hasNext()){
-//                    process(tuple2Iterator.next()._2());
-//                }
-//
+//                process(streamActionIterableTuple2._2());
 //            }
 //        });
-
-
-//        rdd.mapPartitions(
-//                new FlatMapFunction<Iterator<Tuple2<StreamAction,Iterable<StratioStreamingMessage>>>, Object>() {
-//
-//                    @Override public Iterable<Object> call(
-//                            Iterator<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> tuple2Iterator)
-//                            throws Exception {
-//
-//
-//                        while (tuple2Iterator.hasNext()){
-//                                process(tuple2Iterator.next()._2());
-//                        }
-//
-//                        return new ArrayList<Object>();
-//                    }
-//                }).count();
-
-
-
-        rdd.foreach(new VoidFunction<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>>() {
-            @Override public void call(Tuple2<StreamAction, Iterable<StratioStreamingMessage>> streamActionIterableTuple2)
-                    throws Exception {
-                process(streamActionIterableTuple2._2());
-            }
-        });
 
 
         return null;

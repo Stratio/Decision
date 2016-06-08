@@ -40,7 +40,7 @@ public class SaveToCassandraOperationsService {
 
     private static final Logger log = LoggerFactory.getLogger(SaveToCassandraOperationsService.class);
 
-    private transient final Session session;
+    private  final Session session;
 
     private HashMap<String, Integer> tablenames = new HashMap<>();
 
