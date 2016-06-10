@@ -80,24 +80,6 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
     }
 
     @Override
-    public Void call(JavaPairRDD<StreamAction, Iterable<StratioStreamingMessage>> rdd) throws Exception {
-
-        JavaRDD<StratioStreamingMessage> r = rdd.flatMap(new FlatMapFunction<Tuple2<StreamAction,Iterable<StratioStreamingMessage>>,
-                StratioStreamingMessage>() {
-
-            @Override public Iterable<StratioStreamingMessage> call(
-                    Tuple2<StreamAction, Iterable<StratioStreamingMessage>> streamActionIterableTuple2)
-                    throws Exception {
-                return streamActionIterableTuple2._2();
-            }
-        });
-
-
-
-        return null;
-    }
-
-    @Override
     public Boolean check() throws Exception {
 //        try {
 //            return getSession().getState().getConnectedHosts().size() > 0;
@@ -109,6 +91,52 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
        // return getCassandraTableOperationsService().check();
     }
+
+//    @Override
+//    public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
+//
+//        Integer partitionSize = maxBatchSize;
+//
+//        if (partitionSize <= 0){
+//            partitionSize = Iterables.size(messages);
+//        }
+//
+//        Iterable<List<StratioStreamingMessage>> partitionIterables =  Iterables.partition(messages, partitionSize);
+//
+//        try {
+//
+//            for (List<StratioStreamingMessage> messageList : partitionIterables) {
+//
+//                BatchStatement batch = new BatchStatement(batchType);
+//
+//                for (StratioStreamingMessage stratioStreamingMessage : messageList) {
+//                    Set<String> columns = getColumnSet(stratioStreamingMessage.getColumns());
+//                    if (getCassandraTableOperationsService().getTableNames().get(stratioStreamingMessage.getStreamName())
+//                            == null) {
+//                        getCassandraTableOperationsService().createTable(stratioStreamingMessage.getStreamName(),
+//                                stratioStreamingMessage.getColumns(), TIMESTAMP_FIELD);
+//                        getCassandraTableOperationsService().refreshTablenames();
+//                    }
+//                    if (getCassandraTableOperationsService().getTableNames().get(stratioStreamingMessage.getStreamName()) != columns.hashCode()) {
+//                        getCassandraTableOperationsService()
+//                                .alterTable(stratioStreamingMessage.getStreamName(), columns,
+//                                        stratioStreamingMessage.getColumns());
+//                        getCassandraTableOperationsService().refreshTablenames();
+//                    }
+//
+//                    batch.add(getCassandraTableOperationsService().createInsertStatement(
+//                            stratioStreamingMessage.getStreamName(), stratioStreamingMessage.getColumns(),
+//                            TIMESTAMP_FIELD));
+//                }
+//
+//                getCassandraTableOperationsService().getSession().execute(batch);
+//            }
+//
+//            }catch(Exception e){
+//                log.error("Error in Cassandra for batch size {}: {}", Iterables.size(partitionIterables), e.getMessage());
+//            }
+//
+//    }
 
     @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
@@ -128,31 +156,18 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
                 BatchStatement batch = new BatchStatement(batchType);
 
                 for (StratioStreamingMessage stratioStreamingMessage : messageList) {
-                    Set<String> columns = getColumnSet(stratioStreamingMessage.getColumns());
-                    if (getCassandraTableOperationsService().getTableNames().get(stratioStreamingMessage.getStreamName())
-                            == null) {
-                        getCassandraTableOperationsService().createTable(stratioStreamingMessage.getStreamName(),
-                                stratioStreamingMessage.getColumns(), TIMESTAMP_FIELD);
-                        getCassandraTableOperationsService().refreshTablenames();
-                    }
-                    if (getCassandraTableOperationsService().getTableNames().get(stratioStreamingMessage.getStreamName()) != columns.hashCode()) {
-                        getCassandraTableOperationsService()
-                                .alterTable(stratioStreamingMessage.getStreamName(), columns,
-                                        stratioStreamingMessage.getColumns());
-                        getCassandraTableOperationsService().refreshTablenames();
-                    }
-
-                    batch.add(getCassandraTableOperationsService().createInsertStatement(
+                    //Set<String> columns = getColumnSet(stratioStreamingMessage.getColumns());
+                     batch.add(getCassandraTableOperationsService().createInsertStatement(
                             stratioStreamingMessage.getStreamName(), stratioStreamingMessage.getColumns(),
                             TIMESTAMP_FIELD));
                 }
 
-                getCassandraTableOperationsService().getSession().execute(batch);
+                getCassandraTableOperationsService().execute(batch);
             }
 
-            }catch(Exception e){
-                log.error("Error in Cassandra for batch size {}: {}", Iterables.size(partitionIterables), e.getMessage());
-            }
+        }catch(Exception e){
+            log.error("Error in Cassandra for batch size {}: {}", Iterables.size(partitionIterables), e.getMessage());
+        }
 
     }
 

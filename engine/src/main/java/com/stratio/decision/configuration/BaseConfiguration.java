@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import({ StreamingContextConfiguration.class, ZookeeperConfiguration.class, KafkaConfiguration.class,
-        MetricsConfiguration.class,  SchredulerConfiguration.class, MongoConfiguration
+        MetricsConfiguration.class,  SchredulerConfiguration.class, CassandraConfiguration.class,  MongoConfiguration
         .class, ElasticSearchConfiguration.class, SolrConfiguration.class })
 public class BaseConfiguration {
 

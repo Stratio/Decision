@@ -21,9 +21,14 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.VoidFunction2;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.SQLContext;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
+import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -39,6 +44,7 @@ import org.springframework.context.annotation.Import;
 
 import com.datastax.driver.core.ProtocolOptions;
 import com.datastax.spark.connector.japi.CassandraJavaUtil;
+import com.datastax.spark.connector.writer.RowWriterFactory;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.stratio.decision.StreamingEngine;
@@ -50,6 +56,8 @@ import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.kafka.service.KafkaTopicService;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.functions.CheckCassandraStructureFunction;
+import com.stratio.decision.functions.FilterCassandraDataFunction;
 import com.stratio.decision.functions.messages.AvroDeserializeMessageFunction;
 import com.stratio.decision.functions.FilterDataFunction;
 import com.stratio.decision.functions.PairDataFunction;
@@ -101,8 +109,8 @@ public class StreamingContextConfiguration {
     @Autowired
     private DB mongoDB;
 
-//    @Autowired
-//    private SaveToCassandraOperationsService saveToCassandraOperationsService;
+    @Autowired
+    private SaveToCassandraOperationsService saveToCassandraOperationsService;
 
     @Autowired
     private SolrOperationsService solrOperationsService;
@@ -415,14 +423,48 @@ public class StreamingContextConfiguration {
         // groupedDataDstream.cache();
         groupedDataDstream.persist(StorageLevel.MEMORY_AND_DISK_SER());
 
-        JavaDStream<StratioStreamingMessage> cassandraDStream = parsedDataDstream.filter(new
-                                                                                           Function<StratioStreamingMessage, Boolean>() {
-            @Override public Boolean call(StratioStreamingMessage v1) throws Exception {
-                if (v1.getActiveActions().contains(StreamAction.SAVE_TO_CASSANDRA))
-                    return true;
-                return false;
+        try {
+            if (saveToCassandraOperationsService.check()) {
+
+
+                log.warn("Cassandra IS configured properly");
+
+                JavaDStream<StratioStreamingMessage> cassandraDStream = parsedDataDstream
+                                        .filter(new FilterCassandraDataFunction()).cache();
+                cassandraDStream.foreachRDD(new CheckCassandraStructureFunction());
+
+             //   SQLContext sqlContext = new org.apache.spark.sql.SQLContext(context.sc());
+
+//                cassandraDStream.foreach(new Function<JavaRDD<StratioStreamingMessage>, Void>() {
+//                    @Override public Void call(JavaRDD<StratioStreamingMessage> v1) throws Exception {
+//
+//
+//                        if (!v1.isEmpty()) {
+//                            DataFrame schemaStratioStreamingMessage = sqlContext
+//                                    .createDataFrame(v1, StratioStreamingMessage
+//                                            .class);
+//                            schemaStratioStreamingMessage.registerTempTable("stratioMessage");
+//                            log.warn("DATA FRAME REGISTRADO");
+//                        }
+//
+//                        return null;
+//                    }
+//                });
+
+
+                //javaFunctions(cassandraDStream).writerBuilder("stratio_decision", "prueba", new RowWriterFactory<>());
+
+
+
+            } else {
+                log.warn("Cassandra is NOT configured properly");
             }
-        });
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
         /*
         CassandraJavaUtil.mapColumnTo()
         javaFunctions(cassandraDStream).writerBuilder("", "", mapToRow)
@@ -441,13 +483,13 @@ public class StreamingContextConfiguration {
 //                log.warn("Cassandra is NOT configured properly");
 //            }
 
-//            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
-//                    ProtocolOptions.DEFAULT_PORT, configurationContext.getCassandraMaxBatchSize(),
-//                    configurationContext.getCassandraBatchType(), context.sc().sc());
+            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
+                    ProtocolOptions.DEFAULT_PORT, configurationContext.getCassandraMaxBatchSize(),
+                    configurationContext.getCassandraBatchType());
 
-//                log.info("Cassandra is configured properly");
-//                groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
-//                        saveToCassandraActionExecutionFunction);
+                log.info("Cassandra is configured properly");
+                groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
+                        saveToCassandraActionExecutionFunction);
 
 
 

@@ -15,6 +15,7 @@
  */
 package com.stratio.decision.service;
 
+import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.ColumnMetadata;
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.Session;
@@ -25,6 +26,8 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.utils.UUIDs;
 import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +46,8 @@ public class SaveToCassandraOperationsService {
     private  final Session session;
 
     private HashMap<String, Integer> tablenames = new HashMap<>();
+
+    static final String TIMESTAMP_FIELD = "timestamp";
 
     public SaveToCassandraOperationsService(Session session) {
 
@@ -66,6 +71,39 @@ public class SaveToCassandraOperationsService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+
+    public void checkStructure(StratioStreamingMessage message){
+
+        log.warn("CHECKING STRUCTURE: " + message.getStreamName());
+
+            Set<String> columns = getColumnSet(message.getColumns());
+            if (getTableNames().get(message.getStreamName())  == null) {
+                createTable(message.getStreamName(), message.getColumns(), TIMESTAMP_FIELD);
+                refreshTablenames();
+            }
+            if (getTableNames().get(message.getStreamName()) != columns.hashCode()) {
+
+               alterTable(message.getStreamName(), columns, message.getColumns());
+               refreshTablenames();
+            }
+
+    }
+
+    public void execute(BatchStatement batch){
+        getSession().execute(batch);
+    }
+
+
+    private Set<String> getColumnSet(List<ColumnNameTypeValue> columns) {
+        Set<String> columnsSet = new HashSet<>();
+        for (ColumnNameTypeValue column : columns) {
+            columnsSet.add(column.getColumn());
+        }
+        columnsSet.add(TIMESTAMP_FIELD);
+
+        return columnsSet;
     }
 
     public void refreshTablenames() {
