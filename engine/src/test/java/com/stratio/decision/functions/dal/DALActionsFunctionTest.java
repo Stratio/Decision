@@ -41,6 +41,7 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(DALActionsFunctionTest.class);
     private static JavaSparkContext context= null;
 
+
     @Before
     public void setUp() throws Exception {
         LOGGER.debug("Initializing required classes");
@@ -59,6 +60,7 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
     public void testListeStreamFunction() throws Exception {
 
         ListenStreamFunction func= new ListenStreamFunction(streamOperationsService, ZOO_HOST);
+
         assertEquals("Expected action not found", STREAM_OPERATIONS.ACTION.LISTEN, func.getStartOperationCommand());
         assertEquals("Expected action not found", STREAM_OPERATIONS.ACTION.STOP_LISTEN, func.getStopOperationCommand());
 
@@ -98,6 +100,7 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
         func.addStartRequestsValidations(validators);
         func.addStopRequestsValidations(validators);
     }
+
 
     @Test
     public void testSaveToMongoStreamFunction() throws Exception {
@@ -152,4 +155,5 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
         context.stop();
 
     }
+
 }

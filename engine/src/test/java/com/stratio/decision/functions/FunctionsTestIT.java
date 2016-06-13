@@ -24,6 +24,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,9 @@ public class FunctionsTestIT extends ActionBaseFunctionHelper {
         }
     }
 
+
     @Test
+    @Ignore
     public void testActionBaseFunctionCall() throws Exception {
 
         List<StratioStreamingMessage> list = new ArrayList<StratioStreamingMessage>();
@@ -83,6 +86,7 @@ public class FunctionsTestIT extends ActionBaseFunctionHelper {
         context.stop();
     }
 
+
     @Test
     public void testSaveToMongo() throws Exception {
         LOGGER.debug("Connecting to MongoDB host: " + conf.getStringList("mongo.hosts").toString());
@@ -106,6 +110,7 @@ public class FunctionsTestIT extends ActionBaseFunctionHelper {
     }
 
     @Test
+    @Ignore
     public void testSendToKafka() throws Exception {
         LOGGER.debug("Connecting to Kafka host: " + conf.getStringList("kafka.hosts").toString());
         SendToKafkaActionExecutionFunction func =

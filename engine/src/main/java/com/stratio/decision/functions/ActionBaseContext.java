@@ -43,7 +43,7 @@ public class ActionBaseContext implements Serializable {
             context = new
                     AnnotationConfigApplicationContext(BaseConfiguration.class);
 
-            log.error("CONTEXTO SPRING INICIALIZADO: {}" + context.toString());
+            log.debug("SPRING CONTEXT INITIALIZED: {}" + context.toString());
         }
     }
 

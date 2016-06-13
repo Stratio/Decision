@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.BatchStatement;
 import com.google.common.collect.Iterables;
+import com.stratio.decision.commons.constants.STREAMING;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
@@ -130,6 +131,13 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
         if (cassandraTableOperationsService == null) {
             cassandraTableOperationsService =  (SaveToCassandraOperationsService) ActionBaseContext.getInstance().getContext().getBean
                     ("saveToCassandraOperationsService");
+
+            if (cassandraTableOperationsService.getSession() != null) {
+                if (cassandraTableOperationsService.getSession().getCluster().getMetadata().getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME) == null) {
+                    cassandraTableOperationsService.createKeyspace(STREAMING.STREAMING_KEYSPACE_NAME);
+                }
+                cassandraTableOperationsService.refreshTablenames();
+            }
 
         }
 
