@@ -20,7 +20,7 @@ import com.stratio.decision.service.StreamOperationService;
 
 public abstract class BaseSiddhiRequestValidation implements RequestValidation {
 
-    private  StreamOperationService streamOperationService = null;
+    private  transient StreamOperationService streamOperationService = null;
 
     public BaseSiddhiRequestValidation(){
 

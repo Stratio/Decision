@@ -44,8 +44,7 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
 
     private final Set<RequestValidation> stopValidators;
     private final Set<RequestValidation> startValidators;
-    protected final transient StreamOperationService streamOperationService;
-    protected transient StreamOperationService executorStreamOperationService;
+    protected transient StreamOperationService streamOperationService;
     private final String zookeeperHost;
 
     public ActionBaseFunction(StreamOperationService streamOperationService, String zookeeperHost) {
@@ -130,15 +129,14 @@ public abstract class ActionBaseFunction implements Function<JavaRDD<StratioStre
     }
 
     public StreamOperationService getStreamOperationService() {
-        // return streamOperationService;
 
-        if (executorStreamOperationService == null)
-            executorStreamOperationService = (StreamOperationService) ActionBaseContext.getInstance().getContext().getBean
+        if (streamOperationService == null)
+            streamOperationService = (StreamOperationService) ActionBaseContext.getInstance().getContext().getBean
                     ("streamOperationService");
 
-        return executorStreamOperationService;
-//        return (StreamOperationService) ActionBaseContext.getInstance().getContext().getBean
-//        ("streamOperationService");
+        return streamOperationService;
+
+
     }
 
     public String getZookeeperHost() {
