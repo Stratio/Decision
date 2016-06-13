@@ -99,17 +99,6 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
     }
 
     @Override
-    public Void call(JavaPairRDD<StreamAction, Iterable<StratioStreamingMessage>> rdd) throws Exception {
-
-        List<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> rddContent = rdd.collect();
-        if (rddContent.size() != 0) {
-            process(rddContent.get(0)._2());
-        }
-
-        return null;
-    }
-
-    @Override
     public void process(Iterable<StratioStreamingMessage> messages) throws Exception {
 
 
