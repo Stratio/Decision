@@ -39,18 +39,7 @@ public class CassandraConfiguration {
     @Bean
     public SaveToCassandraOperationsService saveToCassandraOperationsService() {
 
-        log.error("Creating Spring Bean for SaveToCassandraOperationsService");
-
-//
-//        Session session;
-//
-//        try {
-//         session = Cluster.builder().addContactPoints(configurationContext.getCassandraHostsQuorum().split(","))
-//                .withPort(9042)
-//                .build().connect();
-//        } catch (Exception e) {
-//            session = null;
-//        }
+        log.debug("Creating Spring Bean for SaveToCassandraOperationsService");
 
         return new SaveToCassandraOperationsService(cassandraSession());
     }
@@ -59,7 +48,7 @@ public class CassandraConfiguration {
     @Bean
     public Session cassandraSession() {
 
-        log.error("Creating Spring Bean for cassandra session");
+        log.debug("Creating Spring Bean for cassandra session");
         Session session;
 
         try {

@@ -16,26 +16,37 @@
 
 package com.stratio.decision.functions;
 
-import com.google.common.collect.Iterables;
-import com.stratio.decision.commons.messages.ColumnNameTypeValue;
-import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.service.SolrOperationsService;
-import com.stratio.decision.utils.RetryStrategy;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.*;
+import com.google.common.collect.Iterables;
+import com.stratio.decision.commons.constants.StreamAction;
+import com.stratio.decision.commons.messages.ColumnNameTypeValue;
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.service.SolrOperationsService;
+import com.stratio.decision.utils.RetryStrategy;
+
+import scala.Tuple2;
 
 public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFunction {
 
@@ -62,7 +73,6 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
         this.zkHost = zkHost;
         this.dataDir = dataDir;
         this.isCloud = isCloud;
-        // this.solrOperationsService = new SolrOperationsService(solrHost, zkHost, dataDir, isCloud);
         this.retryStrategy = new RetryStrategy();
         this.maxBatchSize = maxBatchSize!=null?maxBatchSize:-1;
     }
@@ -86,6 +96,17 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public Void call(JavaPairRDD<StreamAction, Iterable<StratioStreamingMessage>> rdd) throws Exception {
+
+        List<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> rddContent = rdd.collect();
+        if (rddContent.size() != 0) {
+            process(rddContent.get(0)._2());
+        }
+
+        return null;
     }
 
     @Override
@@ -143,46 +164,6 @@ public class SaveToSolrActionExecutionFunction extends BaseActionExecutionFuncti
             log.error("Error in Solr: " + ex.getMessage());
         }
 
-
-
-
-        //        try {
-        //            Map<String, Collection<SolrInputDocument>> elemntsToInsert = new HashMap<String, Collection<SolrInputDocument>>();
-        //            int count = 0;
-        //            for (StratioStreamingMessage stratioStreamingMessage : messages) {
-        //                count += 1;
-        //                SolrInputDocument document = new SolrInputDocument();
-        //                document.addField("stratio_decision_id", System.nanoTime() + "-" + count);
-        //                for (ColumnNameTypeValue column : stratioStreamingMessage.getColumns()) {
-        //                    document.addField(column.getColumn(), column.getValue());
-        //                }
-        //                checkCore(stratioStreamingMessage);
-        //                Collection<SolrInputDocument> collection = elemntsToInsert.get(stratioStreamingMessage.getStreamName());
-        //                if (collection == null) {
-        //                    collection = new HashSet<>();
-        //                }
-        //                collection.add(document);
-        //                elemntsToInsert.put(stratioStreamingMessage.getStreamName(), collection);
-        //            }
-        //            while (retryStrategy.shouldRetry()) {
-        //                try {
-        //                    for (Map.Entry<String, Collection<SolrInputDocument>> elem : elemntsToInsert.entrySet()) {
-        //                        getSolrclient(elem.getKey()).add(elem.getValue());
-        //                    }
-        //                    break;
-        //                } catch (SolrException e) {
-        //                    try {
-        //                        log.error("Solr cloud status not yet properly initialized, retrying");
-        //                        retryStrategy.errorOccured();
-        //                    } catch (RuntimeException ex) {
-        //                        log.error("Error while initializing Solr Cloud core ", ex.getMessage());
-        //                    }
-        //                }
-        //            }
-        //            flushClients();
-        //        } catch (Exception ex) {
-        //            log.error("Error in Solr: " + ex.getMessage());
-        //        }
     }
 
     private void checkCore(StratioStreamingMessage message) throws IOException, SolrServerException, ParserConfigurationException, TransformerException, SAXException, URISyntaxException, InterruptedException {
