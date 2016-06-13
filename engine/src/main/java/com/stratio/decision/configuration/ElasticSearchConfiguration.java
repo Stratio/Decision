@@ -31,15 +31,14 @@ public class ElasticSearchConfiguration {
                 .put("cluster.name", "elasticsearch")
                 .build();
         TransportClient tc = new TransportClient(settings);
-//        for (String elasticSearchHost : "elasticsearch.demo.stratio.com:9300") {
-//            String[] elements = elasticSearchHost.split(":");
-//            tc.addTransportAddress(new InetSocketTransportAddress(elements[0], Integer.parseInt(elements[1])));
-//        }
 
-        String[] elements = "elasticsearch.demo.stratio.com:9300".split(":");
-        tc.addTransportAddress(new InetSocketTransportAddress(elements[0], Integer.parseInt(elements[1])));
+        for (String elasticSearchHost : configurationContext.getElasticSearchHosts()) {
+            String[] elements = elasticSearchHost.split(":");
+            tc.addTransportAddress(new InetSocketTransportAddress(elements[0], Integer.parseInt(elements[1])));
+        }
 
-        log.error("Creating Spring Bean for elasticsearchClient");
+
+        log.debug("Creating Spring Bean for elasticsearchClient");
 
         return  tc;
 

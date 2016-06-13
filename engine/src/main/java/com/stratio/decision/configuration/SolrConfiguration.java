@@ -22,7 +22,7 @@ public class SolrConfiguration {
     @Bean
     public SolrOperationsService solrOperationsService() {
 
-        log.error("Creating Spring Bean for SolrOperationsService ");
+        log.debug("Creating Spring Bean for SolrOperationsService ");
 
 
         return  new SolrOperationsService(configurationContext.getSolrHost(), configurationContext

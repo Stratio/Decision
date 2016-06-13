@@ -119,18 +119,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.3</version>
         </dependency>
-        <!-- http://mvnrepository.com/artifact/com.datastax.spark/spark-cassandra-connector_2.10 -->
-        <dependency>
-            <groupId>com.datastax.spark</groupId>
-            <artifactId>spark-cassandra-connector_2.10</artifactId>
-            <version>1.5.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.datastax.spark</groupId>
-            <artifactId>spark-cassandra-connector-java_2.10</artifactId>
-            <version>1.5.0</version>
-        </dependency>
 
 
         <dependency>
