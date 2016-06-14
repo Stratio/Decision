@@ -46,21 +46,23 @@ public abstract class BaseActionExecutionFunction implements
 //        }
 
 
-        rdd.mapPartitions(
-                new FlatMapFunction<Iterator<Tuple2<StreamAction,Iterable<StratioStreamingMessage>>>, Object>() {
+        if (!rdd.isEmpty()) {
 
-                    @Override public Iterable<Object> call(
-                            Iterator<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> tuple2Iterator)
-                            throws Exception {
+            rdd.mapPartitions(
+                    new FlatMapFunction<Iterator<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>>, Object>() {
 
+                        @Override public Iterable<Object> call(
+                                Iterator<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> tuple2Iterator)
+                                throws Exception {
 
-                        while (tuple2Iterator.hasNext()){
+                            while (tuple2Iterator.hasNext()) {
                                 process(tuple2Iterator.next()._2());
-                        }
+                            }
 
-                        return new ArrayList<Object>();
-                    }
-                }).count();
+                            return new ArrayList<Object>();
+                        }
+                    }).count();
+        }
 
 
 
