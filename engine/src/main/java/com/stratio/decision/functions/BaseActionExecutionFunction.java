@@ -40,11 +40,6 @@ public abstract class BaseActionExecutionFunction implements
     @Override
     public Void call(JavaPairRDD<StreamAction, Iterable<StratioStreamingMessage>> rdd) throws Exception {
 
-//        List<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> rddContent = rdd.collect();
-//        if (rddContent.size() != 0) {
-//            process(rddContent.get(0)._2());
-//        }
-
 
         if (!rdd.isEmpty()) {
 
