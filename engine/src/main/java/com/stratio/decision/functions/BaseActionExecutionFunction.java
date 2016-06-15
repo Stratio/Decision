@@ -65,15 +65,6 @@ public abstract class BaseActionExecutionFunction implements
         }
 
 
-
-//        rdd.foreach(new VoidFunction<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>>() {
-//            @Override public void call(Tuple2<StreamAction, Iterable<StratioStreamingMessage>> streamActionIterableTuple2)
-//                    throws Exception {
-//                process(streamActionIterableTuple2._2());
-//            }
-//        });
-
-
         return null;
     }
 
