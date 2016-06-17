@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.datastax.driver.core.ProtocolOptions;
 import org.apache.commons.lang3.StringUtils;
 
 import com.datastax.driver.core.BatchStatement;
@@ -42,6 +43,7 @@ public class ConfigurationContext {
     private final String groupId;
 
     private final List<String> cassandraHosts;
+    private final Integer cassandraPort;
     private final List<String> kafkaHosts;
     private final String kafkaConsumerBrokerHost;
     private final int kafkaConsumerBrokerPort;
@@ -101,6 +103,7 @@ public class ConfigurationContext {
 
     public enum ConfigurationKeys {
         CASSANDRA_HOSTS("cassandra.hosts"),
+        CASSANDRA_PORT("cassandra.port"),
         CASSANDRA_MAX_BATCH_SIZE("cassandra.maxBatchSize"),
         CASSANDRA_BATCH_TYPE("cassandra.batchType"),
         KAFKA_HOSTS("kafka.hosts"),
@@ -201,6 +204,7 @@ public class ConfigurationContext {
         this.kafkaZookeeperPath = config.getString(ConfigurationKeys.KAFKA_ZK_PATH.getKey());
 
         this.cassandraHosts = (List<String>) this.getListOrNull(ConfigurationKeys.CASSANDRA_HOSTS.getKey(), config);
+        this.cassandraPort = (Integer) this.getValueOrNull(ConfigurationKeys.CASSANDRA_PORT.getKey(), config);
         this.cassandraMaxBatchSize = config.getInt(ConfigurationKeys.CASSANDRA_MAX_BATCH_SIZE.getKey());
 
 
@@ -311,6 +315,13 @@ public class ConfigurationContext {
 
     public List<String> getCassandraHosts() {
         return cassandraHosts;
+    }
+
+    public Integer getCassandraPort() {
+        if (cassandraPort != null)
+            return cassandraPort;
+        else
+            return ProtocolOptions.DEFAULT_PORT;
     }
 
     public String getCassandraHostsQuorum() {

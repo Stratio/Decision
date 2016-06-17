@@ -359,9 +359,13 @@ public class StreamingContextConfiguration {
 
         try {
 
-            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
-                    ProtocolOptions.DEFAULT_PORT, configurationContext.getCassandraMaxBatchSize(),
-                    configurationContext.getCassandraBatchType());
+            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction =
+                new SaveToCassandraActionExecutionFunction(
+                    configurationContext.getCassandraHostsQuorum(),
+                    configurationContext.getCassandraPort(),
+                    configurationContext.getCassandraMaxBatchSize(),
+                    configurationContext.getCassandraBatchType()
+                );
             if (saveToCassandraActionExecutionFunction.check()) {
                 log.info("Cassandra is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
