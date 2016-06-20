@@ -41,7 +41,6 @@ public class DALActionsFunctionTest extends ActionBaseFunctionHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(DALActionsFunctionTest.class);
     private static JavaSparkContext context= null;
 
-
     @Before
     public void setUp() throws Exception {
         LOGGER.debug("Initializing required classes");

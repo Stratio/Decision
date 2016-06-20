@@ -91,5 +91,4 @@ public class DDLActionsFunctionTest extends ActionBaseFunctionHelper {
         func.addStartRequestsValidations(validators);
         func.addStopRequestsValidations(validators);
     }
-
 }
