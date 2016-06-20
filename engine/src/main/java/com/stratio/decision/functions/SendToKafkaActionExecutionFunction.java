@@ -31,13 +31,18 @@ public class SendToKafkaActionExecutionFunction extends BaseActionExecutionFunct
 
     private static final long serialVersionUID = -1661238643911306344L;
 
-    private Producer<String, String> producer;
+    private transient Producer<String, String> producer;
     private KafkaToJavaSerializer kafkaToJavaSerializer;
 
     private final String kafkaQuorum;
 
     public SendToKafkaActionExecutionFunction(String kafkaQuorum) {
         this.kafkaQuorum = kafkaQuorum;
+    }
+
+    public SendToKafkaActionExecutionFunction(String kafkaQuorum, Producer<String, String> producer) {
+        this(kafkaQuorum);
+        this.producer = producer;
     }
 
     @Override
@@ -70,4 +75,5 @@ public class SendToKafkaActionExecutionFunction extends BaseActionExecutionFunct
         }
         return producer;
     }
+
 }
