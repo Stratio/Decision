@@ -47,15 +47,6 @@ public class SaveToCassandraOperationsService {
     public SaveToCassandraOperationsService(Session session) {
 
         this.session = session;
-
-        /*
-        if (session != null) {
-            if (session.getCluster().getMetadata().getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME) == null) {
-                createKeyspace(STREAMING.STREAMING_KEYSPACE_NAME);
-            }
-            refreshTablenames();
-        }
-        */
     }
 
     public Boolean check() throws Exception {

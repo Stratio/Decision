@@ -36,7 +36,6 @@ public class PairDataFunction implements
         while (messages.hasNext()) {
             StratioStreamingMessage message = messages.next();
             for (StreamAction action : message.getActiveActions()) {
-
                 result.add(new Tuple2<StreamAction, StratioStreamingMessage>(action, message));
             }
         }

@@ -71,5 +71,4 @@ public class DMLActionsFunctionTest extends ActionBaseFunctionHelper {
         func.addStopRequestsValidations(validators);
     }
 
-
 }

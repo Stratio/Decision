@@ -130,5 +130,4 @@ public class SaveToCassandraOperationsServiceTest {
         assertEquals("Expected null but exception found", null, ex);
 
     }
-
 }
