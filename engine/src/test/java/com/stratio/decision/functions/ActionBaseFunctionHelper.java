@@ -32,10 +32,15 @@ import com.stratio.decision.task.FailOverTask;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.commons.collections.set.ListOrderedSet;
+
 import org.wso2.siddhi.core.SiddhiManager;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
+
+import kafka.producer.ProducerConfig;
+import kafka.javaapi.producer.Producer;
 
 /**
  * Created by aitor on 9/23/15.
@@ -49,6 +54,8 @@ public abstract class ActionBaseFunctionHelper {
     protected CallbackService callbackService;
 
     protected StreamOperationService streamOperationsService;
+
+    protected Producer producer;
 
     protected Set<RequestValidation> validators;
 
@@ -81,6 +88,13 @@ public abstract class ActionBaseFunctionHelper {
         validators= new ListOrderedSet();
         StreamNameNotEmptyValidation validation= new StreamNameNotEmptyValidation();
         validators.add(validation);
+
+        Properties properties = new Properties();
+        properties.put("serializer.class", "kafka.serializer.StringEncoder");
+        properties.put("metadata.broker.list",  conf.getStringList("kafka.hosts").get(0));
+        properties.put("producer.type", "async");
+
+        producer = new kafka.javaapi.producer.Producer<String, String>(new ProducerConfig(properties));
 
         ConfigurationContext configurationContext = new ConfigurationContext();
         try {
