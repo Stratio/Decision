@@ -53,7 +53,7 @@ public class CassandraConfiguration {
 
         try {
             session = Cluster.builder().addContactPoints(configurationContext.getCassandraHostsQuorum().split(","))
-                    .withPort(9042)
+                    .withPort(configurationContext.getCassandraPort())
                     .build().connect();
         } catch (Exception e) {
             session = null;

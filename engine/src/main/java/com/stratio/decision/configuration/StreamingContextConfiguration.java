@@ -366,7 +366,7 @@ public class StreamingContextConfiguration {
         try {
 
             SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
-                    ProtocolOptions.DEFAULT_PORT, configurationContext.getCassandraMaxBatchSize(),
+                    configurationContext.getCassandraPort(), configurationContext.getCassandraMaxBatchSize(),
                     configurationContext.getCassandraBatchType(), saveToCassandraOperationsService);
             if (saveToCassandraActionExecutionFunction.check()) {
                 log.info("Cassandra is configured properly");
