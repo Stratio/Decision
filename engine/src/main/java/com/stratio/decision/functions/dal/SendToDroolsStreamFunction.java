@@ -65,7 +65,6 @@ public class SendToDroolsStreamFunction extends ActionBaseFunction  {
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new StreamNameNotEmptyValidation());
-//        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
         validators.add(new StreamNotExistsValidation());
     }
 
