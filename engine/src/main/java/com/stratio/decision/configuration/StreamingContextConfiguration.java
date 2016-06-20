@@ -163,22 +163,22 @@ public class StreamingContextConfiguration {
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
 
-        CreateStreamFunction createStreamFunction = new CreateStreamFunction(null,
+        CreateStreamFunction createStreamFunction = new CreateStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorumWithPath());
-        AlterStreamFunction alterStreamFunction = new AlterStreamFunction(null,
+        AlterStreamFunction alterStreamFunction = new AlterStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorumWithPath());
-        AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(null,
+        AddQueryToStreamFunction addQueryToStreamFunction = new AddQueryToStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorumWithPath());
-        ListenStreamFunction listenStreamFunction = new ListenStreamFunction(null,
+        ListenStreamFunction listenStreamFunction = new ListenStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorumWithPath());
-        ListStreamsFunction listStreamsFunction = new ListStreamsFunction(null,
+        ListStreamsFunction listStreamsFunction = new ListStreamsFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorumWithPath());
 
 
         if (configurationContext.getDroolsConfiguration() != null) {
 
             SendToDroolsStreamFunction sendToDroolsStreamFunction = new SendToDroolsStreamFunction
-                    (null, configurationContext.getZookeeperHostsQuorumWithPath());
+                    (streamOperationService, configurationContext.getZookeeperHostsQuorumWithPath());
 
             JavaDStream<StratioStreamingMessage> sendToDroolsRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.START_SENDTODROOLS)).map(
@@ -200,7 +200,7 @@ public class StreamingContextConfiguration {
         if (configurationContext.getCassandraHosts() != null) {
 
             SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
-                    null, configurationContext.getZookeeperHostsQuorumWithPath());
+                    streamOperationService, configurationContext.getZookeeperHostsQuorumWithPath());
 
             JavaDStream<StratioStreamingMessage> saveToCassandraRequests = messages.filter(
                     new FilterMessagesByOperationFunction(STREAM_OPERATIONS.ACTION.SAVETO_CASSANDRA)).map(
@@ -220,7 +220,7 @@ public class StreamingContextConfiguration {
 
         if (configurationContext.getElasticSearchHosts() != null) {
 
-            IndexStreamFunction indexStreamFunction = new IndexStreamFunction(null,
+            IndexStreamFunction indexStreamFunction = new IndexStreamFunction(streamOperationService,
                     configurationContext.getZookeeperHostsQuorumWithPath());
 
             JavaDStream<StratioStreamingMessage> streamToIndexerRequests = messages.filter(
@@ -240,7 +240,7 @@ public class StreamingContextConfiguration {
 
         if (configurationContext.getSolrHost() != null) {
 
-            SaveToSolrStreamFunction solrStreamFunction = new SaveToSolrStreamFunction(null,
+            SaveToSolrStreamFunction solrStreamFunction = new SaveToSolrStreamFunction(streamOperationService,
                     configurationContext.getZookeeperHostsQuorumWithPath());
 
             JavaDStream<StratioStreamingMessage> saveToSolrRequests = messages.filter(
@@ -260,7 +260,7 @@ public class StreamingContextConfiguration {
 
         if (configurationContext.getMongoHosts() != null) {
 
-            SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(null,
+            SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(streamOperationService,
                     configurationContext.getZookeeperHostsQuorumWithPath());
 
             JavaDStream<StratioStreamingMessage> saveToMongoRequests = messages.filter(
