@@ -35,7 +35,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import com.datastax.driver.core.ProtocolOptions;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.stratio.decision.StreamingEngine;
@@ -108,6 +107,9 @@ public class StreamingContextConfiguration {
     private KafkaTopicService kafkaTopicService;
 
 
+
+
+
     private JavaStreamingContext create(String streamingContextName, int port, long streamingBatchTime, String sparkHost) {
         SparkConf conf = new SparkConf();
         conf.set("spark.ui.port", String.valueOf(port));
@@ -162,7 +164,6 @@ public class StreamingContextConfiguration {
         messages.cache();
 
         KeepPayloadFromMessageFunction keepPayloadFromMessageFunction = new KeepPayloadFromMessageFunction();
-
         CreateStreamFunction createStreamFunction = new CreateStreamFunction(streamOperationService,
                 configurationContext.getZookeeperHostsQuorumWithPath());
         AlterStreamFunction alterStreamFunction = new AlterStreamFunction(streamOperationService,
@@ -198,7 +199,6 @@ public class StreamingContextConfiguration {
 
 
         if (configurationContext.getCassandraHosts() != null) {
-
             SaveToCassandraStreamFunction saveToCassandraStreamFunction = new SaveToCassandraStreamFunction(
                     streamOperationService, configurationContext.getZookeeperHostsQuorumWithPath());
 
@@ -219,7 +219,6 @@ public class StreamingContextConfiguration {
         }
 
         if (configurationContext.getElasticSearchHosts() != null) {
-
             IndexStreamFunction indexStreamFunction = new IndexStreamFunction(streamOperationService,
                     configurationContext.getZookeeperHostsQuorumWithPath());
 
@@ -239,7 +238,6 @@ public class StreamingContextConfiguration {
         }
 
         if (configurationContext.getSolrHost() != null) {
-
             SaveToSolrStreamFunction solrStreamFunction = new SaveToSolrStreamFunction(streamOperationService,
                     configurationContext.getZookeeperHostsQuorumWithPath());
 
@@ -259,7 +257,6 @@ public class StreamingContextConfiguration {
         }
 
         if (configurationContext.getMongoHosts() != null) {
-
             SaveToMongoStreamFunction saveToMongoStreamFunction = new SaveToMongoStreamFunction(streamOperationService,
                     configurationContext.getZookeeperHostsQuorumWithPath());
 
@@ -361,8 +358,6 @@ public class StreamingContextConfiguration {
 
         groupedDataDstream.persist(StorageLevel.MEMORY_AND_DISK_SER());
 
-
-
         try {
 
             SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
@@ -375,7 +370,6 @@ public class StreamingContextConfiguration {
             } else {
                 log.warn("Cassandra is NOT configured properly");
             }
-
 
             SaveToMongoActionExecutionFunction saveToMongoActionExecutionFunction = new SaveToMongoActionExecutionFunction(configurationContext.getMongoHosts(),
                     configurationContext.getMongoUsername(), configurationContext
