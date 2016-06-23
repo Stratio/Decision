@@ -57,15 +57,15 @@ public class ListenStreamFunction extends ActionBaseFunction {
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new StreamNameNotEmptyValidation());
-        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new StreamNotExistsValidation());
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new StreamNameNotEmptyValidation());
-        validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.LISTEN,
+        validators.add(new ActionEnabledValidation(StreamAction.LISTEN,
                 ReplyCode.KO_LISTENER_ALREADY_EXISTS.getCode()));
-        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new StreamNotExistsValidation());
         validators.add(new KafkaStreamNameValidator());
     }
 }

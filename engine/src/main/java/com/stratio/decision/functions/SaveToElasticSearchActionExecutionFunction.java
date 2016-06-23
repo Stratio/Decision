@@ -15,27 +15,22 @@
  */
 package com.stratio.decision.functions;
 
-import com.stratio.decision.commons.messages.ColumnNameTypeValue;
-import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.List;
+import com.stratio.decision.commons.messages.ColumnNameTypeValue;
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
 
 public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecutionFunction {
 
@@ -45,7 +40,7 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
 
     private static final SimpleDateFormat elasicSearchTimestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
-    private Client elasticSearchClient;
+    private transient Client elasticSearchClient;
 
     private final List<String> elasticSearchHosts;
     private final String elasticSearchClusterName;
@@ -58,6 +53,12 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
         this.elasticSearchHosts = elasticSearchHosts;
         this.elasticSearchClusterName = elasticSearchClusterName;
         this.maxBatchSize = maxBatchSize==null?1000:maxBatchSize;
+    }
+
+    public SaveToElasticSearchActionExecutionFunction(List<String> elasticSearchHosts, String
+            elasticSearchClusterName, Integer maxBatchSize, Client elasticSearchClient) {
+        this(elasticSearchHosts, elasticSearchClusterName, maxBatchSize);
+        this.elasticSearchClient = elasticSearchClient;
     }
 
     @Override
@@ -132,16 +133,9 @@ public class SaveToElasticSearchActionExecutionFunction extends BaseActionExecut
 
     private Client getClient() {
         if (elasticSearchClient == null) {
-            Settings settings = ImmutableSettings.settingsBuilder()
-                    .put("client.transport.ignore_cluster_name", true)
-                    .put("cluster.name", elasticSearchClusterName)
-                    .build();
-            TransportClient tc = new TransportClient(settings);
-            for (String elasticSearchHost : elasticSearchHosts) {
-                String[] elements = elasticSearchHost.split(":");
-                tc.addTransportAddress(new InetSocketTransportAddress(elements[0], Integer.parseInt(elements[1])));
-            }
-            elasticSearchClient = tc;
+
+            elasticSearchClient = (Client) ActionBaseContext.getInstance().getContext().getBean
+                    ("elasticsearchClient");
         }
         return elasticSearchClient;
     }

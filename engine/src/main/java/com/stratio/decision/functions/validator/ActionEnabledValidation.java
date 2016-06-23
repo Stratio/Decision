@@ -34,6 +34,13 @@ public class ActionEnabledValidation extends BaseSiddhiRequestValidation {
         this.specificErrorCode = specificErrorCode;
     }
 
+    public ActionEnabledValidation(StreamAction streamAction,
+            int specificErrorCode) {
+        super();
+        this.streamAction = streamAction;
+        this.specificErrorCode = specificErrorCode;
+    }
+
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
         if (getStreamOperationService().isActionEnabled(request.getStreamName(), streamAction)) {

@@ -61,14 +61,14 @@ public class CreateStreamFunction extends ActionBaseFunction {
 
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
-        validators.add(new UserDefinedStreamValidation(getStreamOperationService()));
+        validators.add(new StreamNotExistsValidation());
+        validators.add(new UserDefinedStreamValidation());
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new StreamNameNotEmptyValidation());
-        validators.add(new StreamExistsValidation(getStreamOperationService()));
+        validators.add(new StreamExistsValidation());
     }
 
 }

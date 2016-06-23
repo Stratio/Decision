@@ -58,15 +58,15 @@ public class SaveToMongoStreamFunction extends ActionBaseFunction {
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new StreamNameNotEmptyValidation());
-        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new StreamNotExistsValidation());
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
         validators.add(new StreamNameNotEmptyValidation());
-        validators.add(new ActionEnabledValidation(getStreamOperationService(), StreamAction.SAVE_TO_MONGO,
+        validators.add(new ActionEnabledValidation(StreamAction.SAVE_TO_MONGO,
                 ReplyCode.KO_ACTION_ALREADY_ENABLED.getCode()));
-        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+        validators.add(new StreamNotExistsValidation());
         validators.add(new MongoStreamNameValidator());
     }
 

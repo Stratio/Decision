@@ -27,6 +27,7 @@ import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
+import org.elasticsearch.client.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import com.datastax.driver.core.ProtocolOptions;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
 import com.stratio.decision.StreamingEngine;
 import com.stratio.decision.commons.avro.Action;
 import com.stratio.decision.commons.avro.ColumnType;
@@ -44,7 +46,6 @@ import com.stratio.decision.commons.constants.STREAM_OPERATIONS;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.kafka.service.KafkaTopicService;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.functions.messages.AvroDeserializeMessageFunction;
 import com.stratio.decision.functions.FilterDataFunction;
 import com.stratio.decision.functions.PairDataFunction;
 import com.stratio.decision.functions.SaveToCassandraActionExecutionFunction;
@@ -52,7 +53,6 @@ import com.stratio.decision.functions.SaveToElasticSearchActionExecutionFunction
 import com.stratio.decision.functions.SaveToMongoActionExecutionFunction;
 import com.stratio.decision.functions.SaveToSolrActionExecutionFunction;
 import com.stratio.decision.functions.SendToKafkaActionExecutionFunction;
-import com.stratio.decision.functions.SerializerFunction;
 import com.stratio.decision.functions.dal.IndexStreamFunction;
 import com.stratio.decision.functions.dal.ListenStreamFunction;
 import com.stratio.decision.functions.dal.SaveToCassandraStreamFunction;
@@ -64,11 +64,15 @@ import com.stratio.decision.functions.ddl.AlterStreamFunction;
 import com.stratio.decision.functions.ddl.CreateStreamFunction;
 import com.stratio.decision.functions.dml.InsertIntoStreamFunction;
 import com.stratio.decision.functions.dml.ListStreamsFunction;
+import com.stratio.decision.functions.messages.AvroDeserializeMessageFunction;
 import com.stratio.decision.functions.messages.FilterAvroMessagesByOperationFunction;
 import com.stratio.decision.functions.messages.FilterMessagesByOperationFunction;
 import com.stratio.decision.functions.messages.KeepPayloadFromMessageFunction;
 import com.stratio.decision.serializer.impl.KafkaToJavaSerializer;
+import com.stratio.decision.service.SaveToCassandraOperationsService;
+import com.stratio.decision.service.SolrOperationsService;
 import com.stratio.decision.service.StreamOperationService;
+
 
 @Configuration
 @Import(ServiceConfiguration.class)
@@ -84,6 +88,21 @@ public class StreamingContextConfiguration {
 
     @Autowired
     private KafkaToJavaSerializer kafkaToJavaSerializer;
+
+    @Autowired
+    private MongoClient mongoClient;
+
+    @Autowired
+    private DB mongoDB;
+
+    @Autowired
+    private SaveToCassandraOperationsService saveToCassandraOperationsService;
+
+    @Autowired
+    private SolrOperationsService solrOperationsService;
+
+    @Autowired
+    private Client elasticsearchClient;
 
     private KafkaTopicService kafkaTopicService;
 
@@ -299,23 +318,6 @@ public class StreamingContextConfiguration {
         listRequests.foreachRDD(listStreamsFunction);
         dropRequests.foreachRDD(createStreamFunction);
 
-        if (configurationContext.isAuditEnabled() || configurationContext.isStatsEnabled()) {
-
-            JavaDStream<StratioStreamingMessage> allRequests = createRequests.union(alterRequests)
-                    .union(addQueryRequests).union(removeQueryRequests).union(listenRequests).union(stopListenRequests)
-                    .union(listRequests).union(dropRequests);
-
-            // TODO enable audit functionality
-            // if (configurationContext.isAuditEnabled()) {
-            // SaveRequestsToAuditLogFunction saveRequestsToAuditLogFunction =
-            // new SaveRequestsToAuditLogFunction(
-            // configurationContext.getCassandraHostsQuorum());
-            //
-            // // persist the RDDs to cassandra using STRATIO DEEP
-            // allRequests.window(new Duration(2000), new
-            // Duration(6000)).foreachRDD(saveRequestsToAuditLogFunction);
-            // }
-        }
     }
 
 
@@ -354,18 +356,13 @@ public class StreamingContextConfiguration {
         JavaPairDStream<StreamAction, Iterable<StratioStreamingMessage>> groupedDataDstream = pairedDataDstream
                 .groupByKey();
 
-        // groupedDataDstream.cache();
         groupedDataDstream.persist(StorageLevel.MEMORY_AND_DISK_SER());
 
         try {
 
-            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction =
-                new SaveToCassandraActionExecutionFunction(
-                    configurationContext.getCassandraHostsQuorum(),
-                    configurationContext.getCassandraPort(),
-                    configurationContext.getCassandraMaxBatchSize(),
-                    configurationContext.getCassandraBatchType()
-                );
+            SaveToCassandraActionExecutionFunction saveToCassandraActionExecutionFunction = new SaveToCassandraActionExecutionFunction(configurationContext.getCassandraHostsQuorum(),
+                    configurationContext.getCassandraPort(), configurationContext.getCassandraMaxBatchSize(),
+                    configurationContext.getCassandraBatchType(), saveToCassandraOperationsService);
             if (saveToCassandraActionExecutionFunction.check()) {
                 log.info("Cassandra is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_CASSANDRA)).foreachRDD(
@@ -376,7 +373,7 @@ public class StreamingContextConfiguration {
 
             SaveToMongoActionExecutionFunction saveToMongoActionExecutionFunction = new SaveToMongoActionExecutionFunction(configurationContext.getMongoHosts(),
                     configurationContext.getMongoUsername(), configurationContext
-                    .getMongoPassword(), configurationContext.getMongoMaxBatchSize());
+                    .getMongoPassword(), configurationContext.getMongoMaxBatchSize(), mongoClient, mongoDB);
             if (saveToMongoActionExecutionFunction.check()) {
                 log.info("MongoDB is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_MONGO)).foreachRDD(
@@ -386,7 +383,8 @@ public class StreamingContextConfiguration {
             }
 
             SaveToElasticSearchActionExecutionFunction saveToElasticSearchActionExecutionFunction = new SaveToElasticSearchActionExecutionFunction(configurationContext.getElasticSearchHosts(),
-                    configurationContext.getElasticSearchClusterName(), configurationContext.getElasticSearchMaxBatchSize());
+                    configurationContext.getElasticSearchClusterName(), configurationContext
+                    .getElasticSearchMaxBatchSize(), elasticsearchClient);
             if (saveToElasticSearchActionExecutionFunction.check()) {
                 log.info("ElasticSearch is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_ELASTICSEARCH)).foreachRDD(saveToElasticSearchActionExecutionFunction);
@@ -398,7 +396,7 @@ public class StreamingContextConfiguration {
                     SaveToSolrActionExecutionFunction(configurationContext.getSolrHost(), configurationContext
                     .getSolrCloudZkHost(),
                     configurationContext.getSolrCloud(),
-                    configurationContext.getSolrDataDir(), configurationContext.getSolrMaxBatchSize());
+                    configurationContext.getSolrDataDir(), configurationContext.getSolrMaxBatchSize(), solrOperationsService);
             if (saveToSolrActionExecutionFunction.check()) {
                 log.info("Solr is configured properly");
                 groupedDataDstream.filter(new FilterDataFunction(StreamAction.SAVE_TO_SOLR)).foreachRDD(

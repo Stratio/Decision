@@ -19,11 +19,13 @@ import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,9 @@ import com.datastax.driver.core.ProtocolOptions;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import com.stratio.decision.functions.dal.ListenStreamFunction;
 import com.stratio.decision.service.StreamsHelper;
+
+import kafka.javaapi.producer.Producer;
+import kafka.producer.ProducerConfig;
 
 /**
  * Created by aitor on 9/23/15.
@@ -57,31 +62,6 @@ public class FunctionsTestIT extends ActionBaseFunctionHelper {
         }
     }
 
-    @Test
-    public void testActionBaseFunctionCall() throws Exception {
-
-        List<StratioStreamingMessage> list = new ArrayList<StratioStreamingMessage>();
-
-        message.setOperation("stop_listen");
-        list.add(message);
-
-        LOGGER.debug("Starting Local Spark Context");
-        context = new JavaSparkContext("local[2]", "test");
-        JavaRDD<StratioStreamingMessage> rdd = context.parallelize(list);
-
-        ListenStreamFunction func = new ListenStreamFunction(streamOperationsService, ZOO_HOST);
-        Exception ex = null;
-        try {
-            func.startAction(message);
-            func.call(rdd);
-
-        } catch (Exception e) {
-            ex = e;
-        }
-
-        assertNull("Expected null value", ex);
-        context.stop();
-    }
 
     @Test
     public void testSaveToMongo() throws Exception {
@@ -108,8 +88,10 @@ public class FunctionsTestIT extends ActionBaseFunctionHelper {
     @Test
     public void testSendToKafka() throws Exception {
         LOGGER.debug("Connecting to Kafka host: " + conf.getStringList("kafka.hosts").toString());
+
         SendToKafkaActionExecutionFunction func =
-                new SendToKafkaActionExecutionFunction(getHostsStringFromList(conf.getStringList("kafka.hosts")));
+                new SendToKafkaActionExecutionFunction(getHostsStringFromList(conf.getStringList("kafka.hosts")),
+                        producer);
 
         List<StratioStreamingMessage> list = new ArrayList<StratioStreamingMessage>();
         list.add(message);

@@ -72,15 +72,17 @@ public class AddQueryToStreamFunction extends ActionBaseFunction {
 
     @Override
     protected void addStopRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
-        validators.add(new QueryNotExistsValidation(getStreamOperationService()));
-        validators.add(new UserDefinedStreamValidation(getStreamOperationService()));
+
+        validators.add(new StreamNotExistsValidation());
+        validators.add(new QueryNotExistsValidation());
+        validators.add(new UserDefinedStreamValidation());
     }
 
     @Override
     protected void addStartRequestsValidations(Set<RequestValidation> validators) {
-        validators.add(new QueryExistsValidation(getStreamOperationService()));
-        validators.add(new StreamNotExistsValidation(getStreamOperationService()));
+
+        validators.add(new QueryExistsValidation());
+        validators.add(new StreamNotExistsValidation());
     }
 
 }

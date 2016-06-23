@@ -19,6 +19,7 @@ import com.stratio.decision.clustering.ClusterSyncManager;
 import com.stratio.decision.configuration.BaseConfiguration;
 import com.stratio.decision.configuration.ConfigurationContext;
 import com.stratio.decision.configuration.FirstConfiguration;
+import com.stratio.decision.functions.ActionBaseContext;
 import com.stratio.decision.highAvailability.LeadershipManager;
 import com.stratio.decision.task.FailOverTask;
 import com.stratio.decision.utils.ZKUtils;
@@ -43,8 +44,13 @@ public class StreamingEngine {
             node.waitForLeadership();
             if (node.isLeader()) {
                 log.info("This is the Decision leader node.");
-                try (AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(
-                        BaseConfiguration.class)) {
+
+
+                try  {
+
+                    AnnotationConfigApplicationContext annotationConfigApplicationContext = ActionBaseContext
+                            .getInstance().getContext();
+
                     ConfigurationContext configurationContext = annotationConfigApplicationContext.getBean("configurationContext", ConfigurationContext.class);
 
                     /**
@@ -70,6 +76,8 @@ public class StreamingEngine {
                 } catch (Exception e) {
                     log.error("Fatal error", e);
                 }
+
+
             }
         } catch (Exception e) {
             log.error("Fatal error", e);

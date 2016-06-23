@@ -15,16 +15,23 @@
  */
 package com.stratio.decision.functions;
 
-import com.datastax.driver.core.*;
-import com.google.common.collect.Iterables;
-import com.stratio.decision.commons.constants.STREAMING;
-import com.stratio.decision.commons.messages.ColumnNameTypeValue;
-import com.stratio.decision.commons.messages.StratioStreamingMessage;
-import com.stratio.decision.service.SaveToCassandraOperationsService;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.spark.api.java.JavaPairRDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import com.datastax.driver.core.BatchStatement;
+import com.google.common.collect.Iterables;
+import com.stratio.decision.commons.constants.STREAMING;
+import com.stratio.decision.commons.constants.StreamAction;
+import com.stratio.decision.commons.messages.ColumnNameTypeValue;
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import com.stratio.decision.service.SaveToCassandraOperationsService;
+
+import scala.Tuple2;
 
 public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionFunction {
 
@@ -32,16 +39,14 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
     private static final Logger log = LoggerFactory.getLogger(SaveToCassandraActionExecutionFunction.class);
 
-    private Session cassandraSession;
 
     private final String cassandraQuorum;
     private final int cassandraPort;
     private final int maxBatchSize;
-    private final BatchStatement.Type batchType;
+    private final transient BatchStatement.Type batchType;
 
-    private HashMap<String, Integer> tablenames = new HashMap<>();
 
-    private SaveToCassandraOperationsService cassandraTableOperationsService;
+    private  transient SaveToCassandraOperationsService cassandraTableOperationsService;
 
     public SaveToCassandraActionExecutionFunction(String cassandraQuorum, int cassandraPort, int maxBatchSize,
             BatchStatement.Type batchType) {
@@ -51,13 +56,29 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
         this.batchType = batchType;
     }
 
+
+    public SaveToCassandraActionExecutionFunction(String cassandraQuorum, int cassandraPort, int maxBatchSize,
+            BatchStatement.Type batchType, SaveToCassandraOperationsService
+            cassandraTableOperationsService) {
+       this(cassandraQuorum, cassandraPort, maxBatchSize, batchType);
+       this.cassandraTableOperationsService = cassandraTableOperationsService;
+    }
+
+    @Override
+    public Void call(JavaPairRDD<StreamAction, Iterable<StratioStreamingMessage>> rdd) throws Exception {
+
+        List<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> rddContent = rdd.collect();
+        if (rddContent.size() != 0) {
+            process(rddContent.get(0)._2());
+        }
+
+        return null;
+    }
+
     @Override
     public Boolean check() throws Exception {
-        try {
-            return getSession().getState().getConnectedHosts().size() > 0;
-        } catch (Exception e) {
-            return false;
-        }
+
+       return getCassandraTableOperationsService().check();
     }
 
     @Override
@@ -73,22 +94,26 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
         try {
 
+
+            getCassandraTableOperationsService().checkKeyspace();
+
             for (List<StratioStreamingMessage> messageList : partitionIterables) {
 
                 BatchStatement batch = new BatchStatement(batchType);
 
                 for (StratioStreamingMessage stratioStreamingMessage : messageList) {
                     Set<String> columns = getColumnSet(stratioStreamingMessage.getColumns());
-                    if (tablenames.get(stratioStreamingMessage.getStreamName()) == null) {
+                    if (getCassandraTableOperationsService().getTableNames().get(stratioStreamingMessage.getStreamName())
+                            == null) {
                         getCassandraTableOperationsService().createTable(stratioStreamingMessage.getStreamName(),
                                 stratioStreamingMessage.getColumns(), TIMESTAMP_FIELD);
-                        refreshTablenames();
+                        getCassandraTableOperationsService().refreshTablenames();
                     }
-                    if (tablenames.get(stratioStreamingMessage.getStreamName()) != columns.hashCode()) {
+                    if (getCassandraTableOperationsService().getTableNames().get(stratioStreamingMessage.getStreamName()) != columns.hashCode()) {
                         getCassandraTableOperationsService()
                                 .alterTable(stratioStreamingMessage.getStreamName(), columns,
                                         stratioStreamingMessage.getColumns());
-                        refreshTablenames();
+                        getCassandraTableOperationsService().refreshTablenames();
                     }
 
                     batch.add(getCassandraTableOperationsService().createInsertStatement(
@@ -96,7 +121,7 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
                             TIMESTAMP_FIELD));
                 }
 
-                getSession().execute(batch);
+                getCassandraTableOperationsService().getSession().execute(batch);
             }
 
             }catch(Exception e){
@@ -107,35 +132,19 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
     private SaveToCassandraOperationsService getCassandraTableOperationsService() {
         if (cassandraTableOperationsService == null) {
-            cassandraTableOperationsService = new SaveToCassandraOperationsService(getSession());
+            cassandraTableOperationsService =  (SaveToCassandraOperationsService) ActionBaseContext.getInstance().getContext().getBean
+                    ("saveToCassandraOperationsService");
+
+            if (cassandraTableOperationsService.getSession() != null) {
+                if (cassandraTableOperationsService.getSession().getCluster().getMetadata().getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME) == null) {
+                    cassandraTableOperationsService.createKeyspace(STREAMING.STREAMING_KEYSPACE_NAME);
+                }
+                cassandraTableOperationsService.refreshTablenames();
+            }
+
         }
 
         return cassandraTableOperationsService;
-    }
-
-    private Session getSession() {
-        if (cassandraSession == null) {
-            cassandraSession = Cluster.builder().addContactPoints(cassandraQuorum.split(",")).withPort(cassandraPort)
-                    .build().connect();
-            if (cassandraSession.getCluster().getMetadata().getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME) == null) {
-                getCassandraTableOperationsService().createKeyspace(STREAMING.STREAMING_KEYSPACE_NAME);
-            }
-            refreshTablenames();
-        }
-        return cassandraSession;
-    }
-
-    private void refreshTablenames() {
-        Collection<TableMetadata> tableMetadatas = getSession().getCluster().getMetadata()
-                .getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME).getTables();
-        tablenames = new HashMap<>();
-        for (TableMetadata tableMetadata : tableMetadatas) {
-            Set<String> columns = new HashSet<>();
-            for (ColumnMetadata columnMetadata : tableMetadata.getColumns()) {
-                columns.add(columnMetadata.getName());
-            }
-            tablenames.put(tableMetadata.getName(), columns.hashCode());
-        }
     }
 
     private Set<String> getColumnSet(List<ColumnNameTypeValue> columns) {
@@ -147,4 +156,5 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
         return columnsSet;
     }
+
 }

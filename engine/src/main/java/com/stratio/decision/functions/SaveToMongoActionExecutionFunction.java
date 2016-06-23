@@ -15,17 +15,22 @@
  */
 package com.stratio.decision.functions;
 
-import com.google.common.collect.Iterables;
-import com.mongodb.*;
-import com.stratio.decision.commons.constants.STREAMING;
-import com.stratio.decision.commons.messages.ColumnNameTypeValue;
-import com.stratio.decision.commons.messages.StratioStreamingMessage;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.UnknownHostException;
-import java.util.*;
-import java.util.Map.Entry;
+import com.google.common.collect.Iterables;
+import com.mongodb.BasicDBObject;
+import com.mongodb.BulkWriteOperation;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
+import com.stratio.decision.commons.messages.ColumnNameTypeValue;
+import com.stratio.decision.commons.messages.StratioStreamingMessage;
 
 public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunction {
 
@@ -33,14 +38,22 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
 
     private static Logger log = LoggerFactory.getLogger(SaveToMongoActionExecutionFunction.class);
 
-    private MongoClient mongoClient;
-    private DB streamingDb;
+    private transient MongoClient mongoClient;
+    private transient DB streamingDb;
 
     private final List<String> mongoHosts;
     private final String username;
     private final String password;
     private final Integer maxBatchSize;
 
+
+    public SaveToMongoActionExecutionFunction(List<String> mongoHosts, String username, String password, Integer
+            maxBatchSize, MongoClient mongoClient, DB streamingDb) {
+
+        this(mongoHosts, username, password, maxBatchSize);
+        this.mongoClient = mongoClient;
+        this.streamingDb = streamingDb;
+    }
 
     public SaveToMongoActionExecutionFunction(List<String> mongoHosts, String username, String password, Integer
             maxBatchSize) {
@@ -111,33 +124,19 @@ public class SaveToMongoActionExecutionFunction extends BaseActionExecutionFunct
     }
 
     private MongoClient getMongoClient() throws UnknownHostException {
-        if (mongoClient == null) {
-            List<ServerAddress> serverAddresses = new ArrayList();
-            for (String mongoHost : mongoHosts) {
-                String[] elements = mongoHost.split(":");
-                if (elements.length < 2) {
-                    //no port
-                    serverAddresses.add(new ServerAddress(elements[0]));
-                } else {
-                    serverAddresses.add(new ServerAddress(elements[0], Integer.parseInt(elements[1])));
-                }
-            }
-            if (username != null && password != null) {
-                mongoClient = new MongoClient(serverAddresses, Arrays.asList(MongoCredential.createPlainCredential(username,
-                        "$external", password.toCharArray())));
-            } else {
-                log.warn(
-                        "MongoDB user or password are not defined. User: [{}], Password: [{}]. trying anonymous connection.",
-                        username, password);
-                mongoClient = new MongoClient(serverAddresses);
-            }
+
+        if (mongoClient == null){
+            mongoClient = (MongoClient) ActionBaseContext.getInstance().getContext().getBean
+                    ("mongoClient");
         }
+
         return mongoClient;
     }
 
     private DB getDB() throws UnknownHostException {
         if (streamingDb == null) {
-            streamingDb = getMongoClient().getDB(STREAMING.STREAMING_KEYSPACE_NAME);
+            streamingDb= (DB) ActionBaseContext.getInstance().getContext().getBean
+                    ("mongoDB");
         }
         return streamingDb;
     }

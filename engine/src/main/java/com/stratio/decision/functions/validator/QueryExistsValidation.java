@@ -28,6 +28,10 @@ public class QueryExistsValidation extends BaseSiddhiRequestValidation {
         super(streamOperationService);
     }
 
+    public QueryExistsValidation() {
+        super();
+    }
+
     @Override
     public void validate(StratioStreamingMessage request) throws RequestValidationException {
 

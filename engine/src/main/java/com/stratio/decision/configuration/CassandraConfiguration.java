@@ -15,6 +15,8 @@
  */
 package com.stratio.decision.configuration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +24,8 @@ import org.springframework.context.annotation.Lazy;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
+import com.stratio.decision.functions.SaveToCassandraActionExecutionFunction;
+import com.stratio.decision.service.SaveToCassandraOperationsService;
 
 @Configuration
 public class CassandraConfiguration {
@@ -29,10 +33,34 @@ public class CassandraConfiguration {
     @Autowired
     private ConfigurationContext configurationContext;
 
+    private static Logger log = LoggerFactory.getLogger(CassandraConfiguration.class);
+
+
     @Bean
-    @Lazy
-    public Session session() {
-        return Cluster.builder().addContactPoints(configurationContext.getCassandraHostsQuorum().split(",")).build()
-                .connect();
+    public SaveToCassandraOperationsService saveToCassandraOperationsService() {
+
+        log.debug("Creating Spring Bean for SaveToCassandraOperationsService");
+
+        return new SaveToCassandraOperationsService(cassandraSession());
     }
+
+
+    @Bean
+    public Session cassandraSession() {
+
+        log.debug("Creating Spring Bean for cassandra session");
+        Session session;
+
+        try {
+            session = Cluster.builder().addContactPoints(configurationContext.getCassandraHostsQuorum().split(","))
+                    .withPort(configurationContext.getCassandraPort())
+                    .build().connect();
+        } catch (Exception e) {
+            session = null;
+        }
+
+        return session;
+
+    }
+
 }

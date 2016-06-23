@@ -18,10 +18,17 @@ package com.stratio.decision.functions;
 import com.stratio.decision.commons.constants.StreamAction;
 import com.stratio.decision.commons.messages.StratioStreamingMessage;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.VoidFunction;
+
 import scala.Tuple2;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+
 
 public abstract class BaseActionExecutionFunction implements
         Function<JavaPairRDD<StreamAction, Iterable<StratioStreamingMessage>>, Void> {
@@ -33,10 +40,26 @@ public abstract class BaseActionExecutionFunction implements
     @Override
     public Void call(JavaPairRDD<StreamAction, Iterable<StratioStreamingMessage>> rdd) throws Exception {
 
-        List<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> rddContent = rdd.collect();
-        if (rddContent.size() != 0) {
-            process(rddContent.get(0)._2);
+
+        if (!rdd.isEmpty()) {
+
+            rdd.mapPartitions(
+                    new FlatMapFunction<Iterator<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>>, Object>() {
+
+                        @Override public Iterable<Object> call(
+                                Iterator<Tuple2<StreamAction, Iterable<StratioStreamingMessage>>> tuple2Iterator)
+                                throws Exception {
+
+                            while (tuple2Iterator.hasNext()) {
+                                process(tuple2Iterator.next()._2());
+                            }
+
+                            return new ArrayList<Object>();
+                        }
+                    }).count();
         }
+
+
         return null;
     }
 

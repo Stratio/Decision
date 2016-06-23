@@ -33,7 +33,6 @@ public class DMLActionsFunctionTest extends ActionBaseFunctionHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(DMLActionsFunctionTest.class);
 
 
-
     @Before
     public void setUp() throws Exception {
         LOGGER.debug("Initializing required classes");

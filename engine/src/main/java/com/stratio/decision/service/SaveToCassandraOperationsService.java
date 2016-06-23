@@ -15,8 +15,10 @@
  */
 package com.stratio.decision.service;
 
+import com.datastax.driver.core.ColumnMetadata;
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.TableMetadata;
 import com.datastax.driver.core.exceptions.AlreadyExistsException;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
@@ -26,20 +28,65 @@ import com.stratio.decision.commons.messages.ColumnNameTypeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+
 
 public class SaveToCassandraOperationsService {
 
     private static final Logger log = LoggerFactory.getLogger(SaveToCassandraOperationsService.class);
 
-    private final Session session;
+    private  final Session session;
+
+    private HashMap<String, Integer> tablenames = new HashMap<>();
 
     public SaveToCassandraOperationsService(Session session) {
+
         this.session = session;
+
+
     }
+
+    public Boolean check() throws Exception {
+
+        if (session == null)
+            return false;
+
+        try {
+            return session.getState().getConnectedHosts().size() > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void refreshTablenames() {
+        Collection<TableMetadata> tableMetadatas = session.getCluster().getMetadata()
+                .getKeyspace(STREAMING.STREAMING_KEYSPACE_NAME).getTables();
+        tablenames = new HashMap<>();
+        for (TableMetadata tableMetadata : tableMetadatas) {
+            Set<String> columns = new HashSet<>();
+            for (ColumnMetadata columnMetadata : tableMetadata.getColumns()) {
+                columns.add(columnMetadata.getName());
+            }
+            tablenames.put(tableMetadata.getName(), columns.hashCode());
+        }
+    }
+
+
+    public void checkKeyspace() {
+
+        if (session!= null && session.getCluster().getMetadata().getKeyspace
+                (STREAMING.STREAMING_KEYSPACE_NAME) == null) {
+            createKeyspace(STREAMING.STREAMING_KEYSPACE_NAME);
+        }
+
+        refreshTablenames();
+    }
+
 
     public void createKeyspace(String keyspaceName) {
         session.execute(String.format(
@@ -124,4 +171,15 @@ public class SaveToCassandraOperationsService {
 
         return fields;
     }
+
+    public HashMap<String, Integer> getTableNames(){
+        return tablenames;
+    }
+
+    public Session getSession(){
+        return session;
+    }
+
+
+
 }
