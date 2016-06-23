@@ -47,6 +47,8 @@ public class SaveToCassandraOperationsService {
     public SaveToCassandraOperationsService(Session session) {
 
         this.session = session;
+
+
     }
 
     public Boolean check() throws Exception {
@@ -74,6 +76,16 @@ public class SaveToCassandraOperationsService {
         }
     }
 
+
+    public void checkKeyspace() {
+
+        if (session!= null && session.getCluster().getMetadata().getKeyspace
+                (STREAMING.STREAMING_KEYSPACE_NAME) == null) {
+            createKeyspace(STREAMING.STREAMING_KEYSPACE_NAME);
+        }
+
+        refreshTablenames();
+    }
 
 
     public void createKeyspace(String keyspaceName) {

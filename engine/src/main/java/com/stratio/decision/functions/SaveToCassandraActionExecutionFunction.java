@@ -94,6 +94,9 @@ public class SaveToCassandraActionExecutionFunction extends BaseActionExecutionF
 
         try {
 
+
+            getCassandraTableOperationsService().checkKeyspace();
+
             for (List<StratioStreamingMessage> messageList : partitionIterables) {
 
                 BatchStatement batch = new BatchStatement(batchType);

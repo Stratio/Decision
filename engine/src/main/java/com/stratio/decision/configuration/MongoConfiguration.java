@@ -78,7 +78,7 @@ public class MongoConfiguration {
             e.printStackTrace();
         }
 
-        log.error("Creating Spring Bean for mongoclient");
+        log.debug("Creating Spring Bean for mongoclient");
         return mongoClient;
 
     }
