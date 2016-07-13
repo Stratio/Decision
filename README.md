@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/Stratio/Decision/badge.svg?branch=master)](https://coveralls.io/github/Stratio/Decision?branch=master)
+
 DECISION-CEP-ENGINE
 ===================
 

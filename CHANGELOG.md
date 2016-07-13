@@ -2,6 +2,10 @@
 
 Only listing significant user-visible, not internal code cleanups and minor bug fixes.
 
+## 1.2.0 (upcoming)
+
+* TBD
+
 ## 1.1.0 (April  2016)
 
 * Spark properties in Decision configuration
